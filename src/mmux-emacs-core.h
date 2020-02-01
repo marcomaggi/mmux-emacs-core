@@ -209,6 +209,58 @@ mmux_emacs_core_get_ssize (emacs_env * env, emacs_value arg)
   return ((ssize_t)(mmux_emacs_core_get_intmax(env, arg)));
 }
 
+/* ------------------------------------------------------------------ */
+
+static inline uint8_t
+mmux_emacs_core_get_uint8 (emacs_env * env, emacs_value arg)
+{
+  return ((uint8_t)(mmux_emacs_core_get_intmax(env, arg)));
+}
+
+static inline uint16_t
+mmux_emacs_core_get_uint16 (emacs_env * env, emacs_value arg)
+{
+  return ((uint16_t)(mmux_emacs_core_get_intmax(env, arg)));
+}
+
+static inline uint32_t
+mmux_emacs_core_get_uint32 (emacs_env * env, emacs_value arg)
+{
+  return ((uint32_t)(mmux_emacs_core_get_intmax(env, arg)));
+}
+
+static inline uint64_t
+mmux_emacs_core_get_uint64 (emacs_env * env, emacs_value arg)
+{
+  return ((uint64_t)(mmux_emacs_core_get_intmax(env, arg)));
+}
+
+/* ------------------------------------------------------------------ */
+
+static inline int8_t
+mmux_emacs_core_get_int8 (emacs_env * env, emacs_value arg)
+{
+  return ((int8_t)(mmux_emacs_core_get_intmax(env, arg)));
+}
+
+static inline int16_t
+mmux_emacs_core_get_int16 (emacs_env * env, emacs_value arg)
+{
+  return ((int16_t)(mmux_emacs_core_get_intmax(env, arg)));
+}
+
+static inline int32_t
+mmux_emacs_core_get_int32 (emacs_env * env, emacs_value arg)
+{
+  return ((int32_t)(mmux_emacs_core_get_intmax(env, arg)));
+}
+
+static inline int64_t
+mmux_emacs_core_get_int64 (emacs_env * env, emacs_value arg)
+{
+  return ((int64_t)(mmux_emacs_core_get_intmax(env, arg)));
+}
+
 
 /** --------------------------------------------------------------------
  ** MMUX Emacs generic inline functions: object makers.
@@ -280,6 +332,58 @@ mmux_emacs_core_make_string (emacs_env * env, char const * strptr, size_t strlen
   return env->make_string(env, strptr, strlen);
 }
 
+/* ------------------------------------------------------------------ */
+
+static inline emacs_value
+mmux_emacs_core_make_uint8 (emacs_env * env, uint8_t arg)
+{
+  return mmux_emacs_core_make_intmax(env, (intmax_t)arg);
+}
+
+static inline emacs_value
+mmux_emacs_core_make_uint16 (emacs_env * env, uint16_t arg)
+{
+  return mmux_emacs_core_make_intmax(env, (intmax_t)arg);
+}
+
+static inline emacs_value
+mmux_emacs_core_make_uint32 (emacs_env * env, uint32_t arg)
+{
+  return mmux_emacs_core_make_intmax(env, (intmax_t)arg);
+}
+
+static inline emacs_value
+mmux_emacs_core_make_uint64 (emacs_env * env, uint64_t arg)
+{
+  return mmux_emacs_core_make_intmax(env, (intmax_t)arg);
+}
+
+/* ------------------------------------------------------------------ */
+
+static inline emacs_value
+mmux_emacs_core_make_int8 (emacs_env * env, int8_t arg)
+{
+  return mmux_emacs_core_make_intmax(env, (intmax_t)arg);
+}
+
+static inline emacs_value
+mmux_emacs_core_make_int16 (emacs_env * env, int16_t arg)
+{
+  return mmux_emacs_core_make_intmax(env, (intmax_t)arg);
+}
+
+static inline emacs_value
+mmux_emacs_core_make_int32 (emacs_env * env, int32_t arg)
+{
+  return mmux_emacs_core_make_intmax(env, (intmax_t)arg);
+}
+
+static inline emacs_value
+mmux_emacs_core_make_int64 (emacs_env * env, int64_t arg)
+{
+  return mmux_emacs_core_make_intmax(env, (intmax_t)arg);
+}
+
 
 /** --------------------------------------------------------------------
  ** Bytevector user pointer objects.
@@ -291,6 +395,12 @@ struct mmux_emacs_core_bytevector_t {
   size_t	len;
   uint8_t	* ptr;
 };
+
+static inline mmux_emacs_core_bytevector_t *
+mmux_emacs_core_get_bytevector (emacs_env * env, emacs_value arg)
+{
+  return ((mmux_emacs_core_bytevector_t *)mmux_emacs_core_get_user_ptr(env, arg));
+}
 
 
 /** --------------------------------------------------------------------

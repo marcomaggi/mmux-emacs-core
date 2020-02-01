@@ -56,8 +56,10 @@ mmux_emacs_core_decl int  plugin_is_GPL_compatible;
 mmux_emacs_core_decl int emacs_module_init (struct emacs_runtime *ert)
   __attribute__((__nonnull__(1)));
 
-mmux_emacs_core_private_decl void
-mmux_emacs_core_user_ptr_objects_init (emacs_env * env)
+mmux_emacs_core_private_decl void mmux_emacs_core_user_ptr_objects_init (emacs_env * env)
+  __attribute__((__nonnull__(1)));
+
+mmux_emacs_core_private_decl void mmux_emacs_core_bytevectors_init (emacs_env * env)
   __attribute__((__nonnull__(1)));
 
 

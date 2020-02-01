@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-01 19:18:23 marco>
+;; Time-stamp: <2020-02-01 20:49:56 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -328,7 +328,7 @@
        (<= cc-UINTMAX_MIN op cc-UINTMAX_MAX)))
 
 
-;;;; bytevector objects
+;;;; bytevector objects: object definition
 
 (cl-defstruct (cc-bytevector (:constructor cc--make-bytevector))
   obj)
@@ -338,6 +338,34 @@
 (cl-defgeneric cc-bytevector ((len integer))
   "Build and return a new instance of `cc-bytevector'."
   (cc--make-bytevector :obj (mmux-core-c-bytevector-make len)))
+
+
+;;;; bytevector objects: inspection
+
+(cl-defgeneric cc-bytevector-length (bv)
+  "Return an exact integer representing the length of a `cc-bytevector' object.")
+(cl-defgeneric cc-bytevector-length ((bf cc-bytevector))
+  "Return an exact integer representing the length of a `cc-bytevector' object."
+  (mmux-core-c-bytevector-length (cc-bytevector-obj bv)))
+
+
+;;;; bytevector objects: setters and getters
+
+(cl-defgeneric cl-bytevector-ref (bv idx)
+  "Extract a value from a bytevector.")
+
+(cl-defmethod cl-bytevector-ref ((bv cc-bytevector) (idx integer))
+  "Extract a value from a bytevector."
+  (mmux-core-c-bytevector-u8-ref (cc-bytevector-obj bv) idx))
+
+;;; --------------------------------------------------------------------
+
+(cl-defgeneric cl-bytevector-set! (bv idx val)
+  "Extract a value from a bytevector.")
+
+(cl-defmethod cl-bytevector-set! ((bv cc-bytevector) (idx integer) (val integer))
+  "Extract a value from a bytevector."
+  (mmux-core-c-bytevector-u8-set! (cc-bytevector-obj bv) idx val))
 
 
 ;;;; done

@@ -279,6 +279,8 @@ Return an integer representing the library interface current age.
 
 @menu
 * constants sizeof::            Size of common C language types.
+* constants limits::            Ranges representable by C language types.
+* constants float::             Constants related to floating-point numbers.
 @end menu
 
 @c page
@@ -453,6 +455,402 @@ Size of @code{double} measured in bytes.
 @deftypevr {Constant} integer cc-SIZEOF_LONG_DOUBLE
 Size of @code{long double} measured in bytes.
 @end deftypevr
+
+@c page
+@node constants limits
+@section Ranges representable by C language types
+
+
+The following syntactic bindings are defined in the module @file{cc-constants}, which is required by
+@value{PackageEmacsModule}.
+
+
+@deftypevr {Constant} integer cc-SCHAR_MIN
+Exact integer representing the minimum value representable by a @code{signed char}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SCHAR_MAX
+Exact integer representing the maximum value representable by a @code{signed char}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-CHAR_MIN
+Exact integer representing the minimum value representable by a @code{char}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-CHAR_MAX
+Exact integer representing the maximum value representable by a @code{char}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-UCHAR_MIN
+Exact integer representing the minimum value representable by a @code{unsigned char}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-UCHAR_MAX
+Exact integer representing the maximum value representable by a @code{unsigned char}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SHRT_MIN
+Exact integer representing the minimum value representable by a @code{signed short int}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SHRT_MAX
+Exact integer representing the maximum value representable by a @code{signed short int}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-USHRT_MIN
+Exact integer representing the minimum value representable by a @code{unsigned short int}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-USHRT_MAX
+Exact integer representing the maximum value representable by a @code{unsigned short int}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-INT_MIN
+Exact integer representing the minimum value representable by a @code{signed int}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-INT_MAX
+Exact integer representing the maximum value representable by a @code{signed int}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-UINT_MIN
+Exact integer representing the minimum value representable by a @code{unsigned int}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-UINT_MAX
+Exact integer representing the maximum value representable by a @code{unsigned int}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-LONG_MIN
+Exact integer representing the minimum value representable by a @code{signed long int}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-LONG_MAX
+Exact integer representing the maximum value representable by a @code{signed long int}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-ULONG_MIN
+Exact integer representing the minimum value representable by a @code{unsigned long int}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-ULONG_MAX
+Exact integer representing the maximum value representable by a @code{unsigned long int}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-LLONG_MIN
+Exact integer representing the minimum value representable by a @code{signed long long int}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-LLONG_MAX
+Exact integer representing the maximum value representable by a @code{signed long long int}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-ULLONG_MIN
+Exact integer representing the minimum value representable by a @code{unsigned long long int}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-ULLONG_MAX
+Exact integer representing the maximum value representable by a @code{unsigned long long int}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-WCHAR_MIN
+Exact integer representing the minimum value representable by a @code{wchar_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-WCHAR_MAX
+Exact integer representing the maximum value representable by a @code{wchar_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZE_T_MIN
+Exact integer representing the minimum value representable by a @code{size_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZE_T_MAX
+Exact integer representing the maximum value representable by a @code{size_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SSIZE_T_MIN
+Exact integer representing the minimum value representable by a @code{ssize_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SSIZE_T_MAX
+Exact integer representing the maximum value representable by a @code{ssize_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-INTMAX_MIN
+Exact integer representing the minimum value representable by a @code{intmax_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-INTMAX_MAX
+Exact integer representing the maximum value representable by a @code{intmax_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-UINTMAX_MIN
+Exact integer representing the maximum value representable by a @code{uintmax_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-INT8_MIN
+Exact integer representing the minimum value representable by a @code{int8_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-INT8_MAX
+Exact integer representing the maximum value representable by a @code{int8_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-UINT8_MIN
+Exact integer representing the minimum value representable by a @code{uint8_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-UINT8_MAX
+Exact integer representing the maximum value representable by a @code{uint8_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-INT16_MIN
+Exact integer representing the minimum value representable by a @code{int16_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-INT16_MAX
+Exact integer representing the maximum value representable by a @code{int16_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-UINT16_MIN
+Exact integer representing the minimum value representable by a @code{uint16_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-UINT16_MAX
+Exact integer representing the maximum value representable by a @code{uint16_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-INT32_MIN
+Exact integer representing the minimum value representable by a @code{int32_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-INT32_MAX
+Exact integer representing the maximum value representable by a @code{int32_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-UINT32_MIN
+Exact integer representing the minimum value representable by a @code{uint32_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-UINT32_MAX
+Exact integer representing the maximum value representable by a @code{uint32_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-INT64_MIN
+Exact integer representing the minimum value representable by a @code{int64_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-INT64_MAX
+Exact integer representing the maximum value representable by a @code{int64_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-UINT64_MIN
+Exact integer representing the minimum value representable by a @code{uint64_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-UINT64_MAX
+Exact integer representing the maximum value representable by a @code{uint64_t}.
+@end deftypevr
+
+@c page
+@node constants float
+@section Constants related to floating--point numbers
+
+
+The following syntactic bindings are defined in the module @file{cc-constants}, which is required by
+@value{PackageEmacsModule}.
+
+
+@defvr {Constant} cc-FLT_ROUNDS
+Value of the system constant @code{FLT_ROUNDS}.
+@end defvr
+
+
+@defvr {Constant} cc-FLT_RADIX
+Value of the system constant @code{FLT_RADIX}.
+@end defvr
+
+
+@defvr {Constant} cc-FLT_MANT_DIG
+Value of the system constant @code{FLT_MANT_DIG}.
+@end defvr
+
+
+@defvr {Constant} cc-DBL_MANT_DIG
+Value of the system constant @code{DBL_MANT_DIG}.
+@end defvr
+
+
+@defvr {Constant} cc-LDBL_MANT_DIG
+Value of the system constant @code{LDBL_MANT_DIG}.
+@end defvr
+
+
+@defvr {Constant} cc-FLT_DIG
+Value of the system constant @code{FLT_DIG}.
+@end defvr
+
+
+@defvr {Constant} cc-DBL_DIG
+Value of the system constant @code{DBL_DIG}.
+@end defvr
+
+
+@defvr {Constant} cc-LDBL_DIG
+Value of the system constant @code{LDBL_DIG}.
+@end defvr
+
+
+@defvr {Constant} cc-FLT_MIN_EXP
+Value of the system constant @code{FLT_MIN_EXP}.
+@end defvr
+
+
+@defvr {Constant} cc-DBL_MIN_EXP
+Value of the system constant @code{DBL_MIN_EXP}.
+@end defvr
+
+
+@defvr {Constant} cc-LDBL_MIN_EXP
+Value of the system constant @code{LDBL_MIN_EXP}.
+@end defvr
+
+
+@defvr {Constant} cc-FLT_MIN_10_EXP
+Value of the system constant @code{FLT_MIN_10_EXP}.
+@end defvr
+
+
+@defvr {Constant} cc-DBL_MIN_10_EXP
+Value of the system constant @code{DBL_MIN_10_EXP}.
+@end defvr
+
+
+@defvr {Constant} cc-LDBL_MIN_10_EXP
+Value of the system constant @code{LDBL_MIN_10_EXP}.
+@end defvr
+
+
+@defvr {Constant} cc-FLT_MAX_EXP
+Value of the system constant @code{FLT_MAX_EXP}.
+@end defvr
+
+
+@defvr {Constant} cc-DBL_MAX_EXP
+Value of the system constant @code{DBL_MAX_EXP}.
+@end defvr
+
+
+@defvr {Constant} cc-LDBL_MAX_EXP
+Value of the system constant @code{LDBL_MAX_EXP}.
+@end defvr
+
+
+@defvr {Constant} cc-FLT_MAX_10_EXP
+Value of the system constant @code{FLT_MAX_10_EXP}.
+@end defvr
+
+
+@defvr {Constant} cc-DBL_MAX_10_EXP
+Value of the system constant @code{DBL_MAX_10_EXP}.
+@end defvr
+
+
+@defvr {Constant} cc-LDBL_MAX_10_EXP
+Value of the system constant @code{LDBL_MAX_10_EXP}.
+@end defvr
+
+
+@defvr {Constant} cc-FLT_MAX
+Value of the system constant @code{FLT_MAX}.
+@end defvr
+
+
+@defvr {Constant} cc-DBL_MAX
+Value of the system constant @code{DBL_MAX}.
+@end defvr
+
+
+@defvr {Constant} cc-LDBL_MAX
+Value of the system constant @code{LDBL_MAX}.
+@end defvr
+
+
+@defvr {Constant} cc-FLT_MIN
+Value of the system constant @code{FLT_MIN}.
+@end defvr
+
+
+@defvr {Constant} cc-DBL_MIN
+Value of the system constant @code{DBL_MIN}.
+@end defvr
+
+
+@defvr {Constant} cc-LDBL_MIN
+Value of the system constant @code{LDBL_MIN}.
+@end defvr
+
+
+@defvr {Constant} cc-FLT_EPSILON
+Value of the system constant @code{FLT_EPSILON}.
+@end defvr
+
+
+@defvr {Constant} cc-DBL_EPSILON
+Value of the system constant @code{DBL_EPSILON}.
+@end defvr
+
+
+@defvr {Constant} cc-LDBL_EPSILON
+Value of the system constant @code{LDBL_EPSILON}.
+@end defvr
 
 @c page
 @node ctypes

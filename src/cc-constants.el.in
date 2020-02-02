@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-02 06:26:04 marco>
+;; Time-stamp: <2020-02-02 07:05:26 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -306,8 +306,8 @@
 ;;; --------------------------------------------------------------------
 
 (defconst cc-SIZE_T_MIN
-  "Exact integer representing the minimum value representable by a `size_t'."
-  0)
+  0
+  "Exact integer representing the minimum value representable by a `size_t'.")
 
 (defconst cc-SIZE_T_MAX
   (cond ((= cc-SIZEOF_SIZE_T cc-SIZEOF_SIGNED_INT)		cc-INT_MAX)
@@ -438,6 +438,125 @@
 (defconst cc-UINT64_MAX
   (1- (expt 2 (* 8 cc-SIZEOF_UINT64_T)))
   "Exact integer representing the maximum value representable by a `uint64_t'.")
+
+
+;;;; constants related to floating-point numbers
+
+(defconst cc-FLT_ROUNDS
+  @VALUEOF_FLT_ROUNDS@
+  "Value of the system constant `FLT_ROUNDS'.")
+
+(defconst cc-FLT_RADIX
+  @VALUEOF_FLT_RADIX@
+  "Value of the system constant `FLT_RADIX'.")
+
+(defconst cc-FLT_MANT_DIG
+  @VALUEOF_FLT_MANT_DIG@
+  "Value of the system constant `FLT_MANT_DIG'.")
+
+(defconst cc-DBL_MANT_DIG
+  @VALUEOF_DBL_MANT_DIG@
+  "Value of the system constant `DBL_MANT_DIG'.")
+
+(defconst cc-LDBL_MANT_DIG
+  @VALUEOF_LDBL_MANT_DIG@
+  "Value of the system constant `LDBL_MANT_DIG'.")
+
+(defconst cc-FLT_DIG
+  @VALUEOF_FLT_DIG@
+  "Value of the system constant `FLT_DIG'.")
+
+(defconst cc-DBL_DIG
+  @VALUEOF_DBL_DIG@
+  "Value of the system constant `DBL_DIG'.")
+
+(defconst cc-LDBL_DIG
+  @VALUEOF_LDBL_DIG@
+  "Value of the system constant `LDBL_DIG'.")
+
+(defconst cc-FLT_MIN_EXP
+  @VALUEOF_FLT_MIN_EXP@
+  "Value of the system constant `FLT_MIN_EXP'.")
+
+(defconst cc-DBL_MIN_EXP
+  @VALUEOF_DBL_MIN_EXP@
+  "Value of the system constant `DBL_MIN_EXP'.")
+
+(defconst cc-LDBL_MIN_EXP
+  @VALUEOF_LDBL_MIN_EXP@
+  "Value of the system constant `LDBL_MIN_EXP'.")
+
+(defconst cc-FLT_MIN_10_EXP
+  @VALUEOF_FLT_MIN_10_EXP@
+  "Value of the system constant `FLT_MIN_10_EXP'.")
+
+(defconst cc-DBL_MIN_10_EXP
+  @VALUEOF_DBL_MIN_10_EXP@
+  "Value of the system constant `DBL_MIN_10_EXP'.")
+
+(defconst cc-LDBL_MIN_10_EXP
+  @VALUEOF_LDBL_MIN_10_EXP@
+  "Value of the system constant `LDBL_MIN_10_EXP'.")
+
+(defconst cc-FLT_MAX_EXP
+  @VALUEOF_FLT_MAX_EXP@
+  "Value of the system constant `FLT_MAX_EXP'.")
+
+(defconst cc-DBL_MAX_EXP
+  @VALUEOF_DBL_MAX_EXP@
+  "Value of the system constant `DBL_MAX_EXP'.")
+
+(defconst cc-LDBL_MAX_EXP
+  @VALUEOF_LDBL_MAX_EXP@
+  "Value of the system constant `LDBL_MAX_EXP'.")
+
+(defconst cc-FLT_MAX_10_EXP
+  @VALUEOF_FLT_MAX_10_EXP@
+  "Value of the system constant `FLT_MAX_10_EXP'.")
+
+(defconst cc-DBL_MAX_10_EXP
+  @VALUEOF_DBL_MAX_10_EXP@
+  "Value of the system constant `DBL_MAX_10_EXP'.")
+
+(defconst cc-LDBL_MAX_10_EXP
+  @VALUEOF_LDBL_MAX_10_EXP@
+  "Value of the system constant `LDBL_MAX_10_EXP'.")
+
+(defconst cc-FLT_MAX
+  @VALUEOF_FLT_MAX@
+  "Value of the system constant `FLT_MAX'.")
+
+(defconst cc-DBL_MAX
+  @VALUEOF_DBL_MAX@
+  "Value of the system constant `DBL_MAX'.")
+
+(defconst cc-LDBL_MAX
+  @VALUEOF_LDBL_MAX@
+  "Value of the system constant `LDBL_MAX'.")
+
+(defconst cc-FLT_MIN
+  @VALUEOF_FLT_MIN@
+  "Value of the system constant `FLT_MIN'.")
+
+(defconst cc-DBL_MIN
+  @VALUEOF_DBL_MIN@
+  "Value of the system constant `DBL_MIN'.")
+
+(defconst cc-LDBL_MIN
+  @VALUEOF_LDBL_MIN@
+  "Value of the system constant `LDBL_MIN'.")
+
+(defconst cc-FLT_EPSILON
+  @VALUEOF_FLT_EPSILON@
+  "Value of the system constant `FLT_EPSILON'.")
+
+(defconst cc-DBL_EPSILON
+  @VALUEOF_DBL_EPSILON@
+  "Value of the system constant `DBL_EPSILON'.")
+
+(defconst cc-LDBL_EPSILON
+  @VALUEOF_LDBL_EPSILON@
+  "Value of the system constant `LDBL_EPSILON'.")
 
 
 ;;;; done

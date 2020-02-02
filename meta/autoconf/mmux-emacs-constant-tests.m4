@@ -21,7 +21,7 @@ AC_DEFUN([MMUX_EMACS_VALUEOF_TEST],[
     [AC_COMPUTE_INT([mmux_emacs_cv_valueof_$1],
        [$2],
        [MMUX_EMACS_INCLUDES],
-       [mmux_emacs_cv_valueof_$1="#f"])])
+       [mmux_emacs_cv_valueof_$1="nil"])])
    VALUEOF_$1="$mmux_emacs_cv_valueof_$1"
    AC_SUBST([VALUEOF_$1])])
 
@@ -73,6 +73,29 @@ AC_DEFUN([MMUX_EMACS_DOUBLEOF_TEST],
 
 AC_DEFUN([MMUX_EMACS_DOUBLE_CONSTANT_TEST],[MMUX_EMACS_DOUBLEOF_TEST([$1],[$1])])
 AC_DEFUN([MMUX_EMACS_DOUBLE_CONSTANT_TESTS],[m4_map_args_w($1,[MMUX_EMACS_DOUBLE_CONSTANT_TEST(],[)])])
+
+dnl $1 - C symbol name
+dnl $2 - defined variable stem
+AC_DEFUN([MMUX_EMACS_LONGDOUBLEOF_TEST],
+  [VALUEOF_$1=""
+   AC_CACHE_CHECK([the floating point value of '$1'],
+     [mmux_emacs_cv_longdoubleof_$1],
+     [AC_RUN_IFELSE([AC_LANG_SOURCE([MMUX_EMACS_INCLUDES
+        int main (void)
+        {
+           FILE *f = fopen ("conftest.val", "w");
+           fprintf(f, "%Lf", $1);
+           return ferror (f) || fclose (f) != 0;
+        }])],
+        [mmux_emacs_cv_longdoubleof_$1=`cat conftest.val`],
+        [mmux_emacs_cv_longdoubleof_$1=""],
+	[mmux_emacs_cv_longdoubleof_$1="0.0"])
+      rm -f conftest.val])
+   VALUEOF_$1="$mmux_emacs_cv_longdoubleof_$1"
+   AC_SUBST([VALUEOF_$1])])
+
+AC_DEFUN([MMUX_EMACS_LONG_DOUBLE_CONSTANT_TEST],[MMUX_EMACS_LONGDOUBLEOF_TEST([$1],[$1])])
+AC_DEFUN([MMUX_EMACS_LONG_DOUBLE_CONSTANT_TESTS],[m4_map_args_w($1,[MMUX_EMACS_LONG_DOUBLE_CONSTANT_TEST(],[)])])
 
 ### end of file
 # Local Variables:

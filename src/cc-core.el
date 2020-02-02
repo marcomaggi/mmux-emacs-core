@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-01 20:49:56 marco>
+;; Time-stamp: <2020-02-02 06:11:37 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -92,6 +92,24 @@
   "Return true if OP is an exact integer object and it is in the range representable by `unsigned char'."
   (and (integerp op)
        (<= cc-UCHAR_MIN op cc-UCHAR_MAX)))
+
+
+;;;; C language type wrappers: wchar
+
+(cl-defstruct (cc-wchar (:constructor cc--make-wchar))
+  obj)
+
+(cl-defgeneric cc-wchar (init)
+  "Build and return a new instance of `cc-wchar'.")
+(cl-defgeneric cc-wchar ((init integer))
+  "Build and return a new instance of `cc-wchar'."
+  (cl-assert (cc-range-wchar-p init))
+  (cc--make-wchar :obj init))
+
+(defun cc-range-wchar-p (op)
+  "Return true if OP is an exact integer object and it is in the range representable by `wchar_t'."
+  (and (integerp op)
+       (<= cc-WCHAR_MIN op cc-WCHAR_MAX)))
 
 
 ;;;; C language type wrappers: signed short int
@@ -238,56 +256,38 @@
        (<= cc-ULLONG_MIN op cc-ULLONG_MAX)))
 
 
-;;;; C language type wrappers: wchar
-
-(cl-defstruct (cc-wchar (:constructor cc--make-wchar))
-  obj)
-
-(cl-defgeneric cc-wchar (init)
-  "Build and return a new instance of `cc-wchar'.")
-(cl-defgeneric cc-wchar ((init integer))
-  "Build and return a new instance of `cc-wchar'."
-  (cl-assert (cc-range-wchar-p init))
-  (cc--make-wchar :obj init))
-
-(defun cc-range-wchar-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `wchar_t'."
-  (and (integerp op)
-       (<= cc-WCHAR_MIN op cc-WCHAR_MAX)))
-
-
 ;;;; C language type wrappers: size_t
 
-(cl-defstruct (cc-size_t (:constructor cc--make-size_t))
+(cl-defstruct (cc-usize (:constructor cc--make-size_t))
   obj)
 
-(cl-defgeneric cc-size_t (init)
-  "Build and return a new instance of `cc-size_t'.")
-(cl-defgeneric cc-size_t ((init integer))
-  "Build and return a new instance of `cc-size_t'."
-  (cl-assert (cc-range-size_t-p init))
+(cl-defgeneric cc-usize (init)
+  "Build and return a new instance of `cc-usize'.")
+(cl-defgeneric cc-usize ((init integer))
+  "Build and return a new instance of `cc-usize'."
+  (cl-assert (cc-range-usize-p init))
   (cc--make-size_t :obj init))
 
-(defun cc-range-size_t-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `size_t_t'."
+(defun cc-range-usize-p (op)
+  "Return true if OP is an exact integer object and it is in the range representable by `size_t'."
   (and (integerp op)
        (<= cc-SIZE_T_MIN op cc-SIZE_T_MAX)))
 
 
 ;;;; C language type wrappers: ssize_t
 
-(cl-defstruct (cc-ssize_t (:constructor cc--make-ssize_t))
+(cl-defstruct (cc-ssize (:constructor cc--make-ssize_t))
   obj)
 
-(cl-defgeneric cc-ssize_t (init)
-  "Build and return a new instance of `cc-ssize_t'.")
-(cl-defgeneric cc-ssize_t ((init integer))
-  "Build and return a new instance of `cc-ssize_t'."
-  (cl-assert (cc-range-ssize_t-p init))
+(cl-defgeneric cc-ssize (init)
+  "Build and return a new instance of `cc-ssize'.")
+(cl-defgeneric cc-ssize ((init integer))
+  "Build and return a new instance of `cc-ssize'."
+  (cl-assert (cc-range-ssize-p init))
   (cc--make-ssize_t :obj init))
 
-(defun cc-range-ssize_t-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `ssize_t_t'."
+(defun cc-range-ssize-p (op)
+  "Return true if OP is an exact integer object and it is in the range representable by `ssize_t'."
   (and (integerp op)
        (<= cc-SSIZE_T_MIN op cc-SSIZE_T_MAX)))
 
@@ -328,6 +328,146 @@
        (<= cc-UINTMAX_MIN op cc-UINTMAX_MAX)))
 
 
+;;;; C language type wrappers: int8_t, uint8_t
+
+(cl-defstruct (cc-int8 (:constructor cc--make-int8))
+  obj)
+
+(cl-defgeneric cc-int8 (init)
+  "Build and return a new instance of `cc-int8'.")
+(cl-defgeneric cc-int8 ((init integer))
+  "Build and return a new instance of `cc-int8'."
+  (cl-assert (cc-range-int8-p init))
+  (cc--make-int8 :obj init))
+
+(defun cc-range-int8-p (op)
+  "Return true if OP is an exact integer object and it is in the range representable by `int8_t'."
+  (and (integerp op)
+       (<= cc-INT8_MIN op cc-INT8_MAX)))
+
+;;; --------------------------------------------------------------------
+
+(cl-defstruct (cc-uint8 (:constructor cc--make-uint8))
+  obj)
+
+(cl-defgeneric cc-uint8 (init)
+  "Build and return a new instance of `cc-uint8'.")
+(cl-defgeneric cc-uint8 ((init integer))
+  "Build and return a new instance of `cc-uint8'."
+  (cl-assert (cc-range-uint8-p init))
+  (cc--make-uint8 :obj init))
+
+(defun cc-range-uint8-p (op)
+  "Return true if OP is an exact integer object and it is in the range representable by `uint8_t'."
+  (and (integerp op)
+       (<= cc-UINT8_MIN op cc-UINT8_MAX)))
+
+
+;;;; C language type wrappers: int16_t, uint16_t
+
+(cl-defstruct (cc-int16 (:constructor cc--make-int16))
+  obj)
+
+(cl-defgeneric cc-int16 (init)
+  "Build and return a new instance of `cc-int16'.")
+(cl-defgeneric cc-int16 ((init integer))
+  "Build and return a new instance of `cc-int16'."
+  (cl-assert (cc-range-int16-p init))
+  (cc--make-int16 :obj init))
+
+(defun cc-range-int16-p (op)
+  "Return true if OP is an exact integer object and it is in the range representable by `int16_t'."
+  (and (integerp op)
+       (<= cc-INT16_MIN op cc-INT16_MAX)))
+
+;;; --------------------------------------------------------------------
+
+(cl-defstruct (cc-uint16 (:constructor cc--make-uint16))
+  obj)
+
+(cl-defgeneric cc-uint16 (init)
+  "Build and return a new instance of `cc-uint16'.")
+(cl-defgeneric cc-uint16 ((init integer))
+  "Build and return a new instance of `cc-uint16'."
+  (cl-assert (cc-range-uint16-p init))
+  (cc--make-uint16 :obj init))
+
+(defun cc-range-uint16-p (op)
+  "Return true if OP is an exact integer object and it is in the range representable by `uint16_t'."
+  (and (integerp op)
+       (<= cc-UINT16_MIN op cc-UINT16_MAX)))
+
+
+;;;; C language type wrappers: int32_t, uint32_t
+
+(cl-defstruct (cc-int32 (:constructor cc--make-int32))
+  obj)
+
+(cl-defgeneric cc-int32 (init)
+  "Build and return a new instance of `cc-int32'.")
+(cl-defgeneric cc-int32 ((init integer))
+  "Build and return a new instance of `cc-int32'."
+  (cl-assert (cc-range-int32-p init))
+  (cc--make-int32 :obj init))
+
+(defun cc-range-int32-p (op)
+  "Return true if OP is an exact integer object and it is in the range representable by `int32_t'."
+  (and (integerp op)
+       (<= cc-INT32_MIN op cc-INT32_MAX)))
+
+;;; --------------------------------------------------------------------
+
+(cl-defstruct (cc-uint32 (:constructor cc--make-uint32))
+  obj)
+
+(cl-defgeneric cc-uint32 (init)
+  "Build and return a new instance of `cc-uint32'.")
+(cl-defgeneric cc-uint32 ((init integer))
+  "Build and return a new instance of `cc-uint32'."
+  (cl-assert (cc-range-uint32-p init))
+  (cc--make-uint32 :obj init))
+
+(defun cc-range-uint32-p (op)
+  "Return true if OP is an exact integer object and it is in the range representable by `uint32_t'."
+  (and (integerp op)
+       (<= cc-UINT32_MIN op cc-UINT32_MAX)))
+
+
+;;;; C language type wrappers: int64_t, uint64_t
+
+(cl-defstruct (cc-int64 (:constructor cc--make-int64))
+  obj)
+
+(cl-defgeneric cc-int64 (init)
+  "Build and return a new instance of `cc-int64'.")
+(cl-defgeneric cc-int64 ((init integer))
+  "Build and return a new instance of `cc-int64'."
+  (cl-assert (cc-range-int64-p init))
+  (cc--make-int64 :obj init))
+
+(defun cc-range-int64-p (op)
+  "Return true if OP is an exact integer object and it is in the range representable by `int64_t'."
+  (and (integerp op)
+       (<= cc-INT64_MIN op cc-INT64_MAX)))
+
+;;; --------------------------------------------------------------------
+
+(cl-defstruct (cc-uint64 (:constructor cc--make-uint64))
+  obj)
+
+(cl-defgeneric cc-uint64 (init)
+  "Build and return a new instance of `cc-uint64'.")
+(cl-defgeneric cc-uint64 ((init integer))
+  "Build and return a new instance of `cc-uint64'."
+  (cl-assert (cc-range-uint64-p init))
+  (cc--make-uint64 :obj init))
+
+(defun cc-range-uint64-p (op)
+  "Return true if OP is an exact integer object and it is in the range representable by `uint64_t'."
+  (and (integerp op)
+       (<= cc-UINT64_MIN op cc-UINT64_MAX)))
+
+
 ;;;; bytevector objects: object definition
 
 (cl-defstruct (cc-bytevector (:constructor cc--make-bytevector))
@@ -344,7 +484,7 @@
 
 (cl-defgeneric cc-bytevector-length (bv)
   "Return an exact integer representing the length of a `cc-bytevector' object.")
-(cl-defgeneric cc-bytevector-length ((bf cc-bytevector))
+(cl-defgeneric cc-bytevector-length ((bv cc-bytevector))
   "Return an exact integer representing the length of a `cc-bytevector' object."
   (mmux-core-c-bytevector-length (cc-bytevector-obj bv)))
 

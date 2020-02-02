@@ -46,13 +46,13 @@
 @set PackageLibstem                     @file{mmux-emacs-core}
 @set PackageSharedLibraryBasename       @file{libmmux-emacs-core}
 
-@set PackageEmacsModule                 @file{mmux-emacs-core}
+@set PackageEmacsModule                 @file{cc-core}
 @set PackageHeader                      mmux-emacs-core.h
 @set PackageHeaderFile                  @file{@value{PackageHeader}}
 
 @set PackageApiCPrefixLower             mmux_emacs_core_
 @set PackageApiCPrefixUpper             MMUX_EMACS_CORE_
-@set PackageApiElispPrefix              mmux-core-
+@set PackageApiElispPrefix              cc-
 
 @set GithubUrl                 @url{https://github.com/marcomaggi/@value{PACKAGE_NICKNAME}}
 @set BitbucketUrl              @url{https://bitbucket.org/marcomaggi/@value{PACKAGE_NICKNAME}}
@@ -149,6 +149,8 @@ included in the section entitled ``@gnu{} Free Documentation License''.
 @menu
 * overview::                    Overview of the package.
 * version::                     Version functions.
+* constants::                   Constant values.
+* ctypes::                      Object wrappers for C language types.
 
 Appendices
 
@@ -175,15 +177,15 @@ External documents
 
 
 This document describes version @value{VERSION} of @value{PACKAGE}, a @gnu{} Emacs module
-implemented on top of a C11 language library; it basic infrastructure to write dynamic modules for
-Emacs.
+implemented on top of a C11 language library; it provides basic infrastructure to write dynamic
+modules for Emacs.
 
 This package supports @posix{} platforms.  This package is meant to work with @gnu{} Emacs version
 @value{RequiredEmacsVersion}.  This package depends upon the external packages: @code{cl-lib}.  To
 run the test suite: this package requires the @code{ert} package.
 
-@value{PACKAGE} installs a single elisp module @value{PackageEmacsModule} and a C language shared
-library with basename @value{PackageSharedLibraryBasename} (using the @gnu{} Libtool
+@value{PACKAGE} installs the elisp modules @value{PackageEmacsModule}, @file{cc-constants} and a C
+language shared library with basename @value{PackageSharedLibraryBasename} (using the @gnu{} Libtool
 infrastructure).  All the elisp definition names are prefixed with
 @code{@value{PackageApiElispPrefix}}.  The C language shared library is installed under
 @samp{$libdir}, for example:
@@ -269,6 +271,1082 @@ Return an integer representing the library interface current revision number.
 @deftypefun int mmux_emacs_core_version_interface_age (void)
 Return an integer representing the library interface current age.
 @end deftypefun
+
+@c page
+@node constants
+@chapter Constant values
+
+
+@menu
+* constants sizeof::            Size of common C language types.
+@end menu
+
+@c page
+@node constants sizeof
+@section Size of common C language types
+
+
+The following syntactic bindings are defined in the module @file{cc-constants}, which is required by
+@value{PackageEmacsModule}.
+
+
+@deftypevr {Constant} integer cc-SIZEOF_CHAR
+Size of @code{char} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_SIGNED_CHAR
+Size of @code{signed char} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_UNSIGNED_CHAR
+Size of @code{unsigned char} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_WCHAR
+Size of @code{wchar_t} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_SIGNED_SHORT_INT
+Size of @code{signed short int} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_UNSIGNED_SHORT_INT
+Size of @code{signed short int} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_SIGNED_INT
+Size of @code{signed int} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_UNSIGNED_INT
+Size of @code{signed int} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_UNSIGNED_INT
+Size of @code{unsigned int} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_UNUNSIGNED_INT
+Size of @code{unsigned int} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_SIGNED_LONG_INT
+Size of @code{signed long int} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_UNSIGNED_LONG_INT
+Size of @code{signed long int} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_UNSIGNED_LONG_INT
+Size of @code{unsigned long int} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_UNUNSIGNED_LONG_INT
+Size of @code{unsigned long int} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_SIGNED_LONG_LONG_INT
+Size of @code{signed long long int} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_UNSIGNED_LONG_LONG_INT
+Size of @code{signed long long int} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_UNSIGNED_LONG_LONG_INT
+Size of @code{unsigned long long int} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_UNUNSIGNED_LONG_LONG_INT
+Size of @code{unsigned long long int} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_SIZE_T
+Size of @code{size_t} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_SSIZE_T
+Size of @code{ssize_t} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_INTMAX_T
+Size of @code{intmax_t} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_UINTMAX_T
+Size of @code{uintmax_t} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_INT8_T
+Size of @code{int8_t} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_UINT8_T
+Size of @code{uint8_t} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_INT16_T
+Size of @code{int16_t} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_UINT16_T
+Size of @code{uint16_t} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_INT32_T
+Size of @code{int32_t} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_UINT32_T
+Size of @code{uint32_t} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_INT64_T
+Size of @code{int64_t} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_UINT64_T
+Size of @code{uint64_t} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_FLOAT
+Size of @code{float} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_DOUBLE
+Size of @code{double} measured in bytes.
+@end deftypevr
+
+
+@deftypevr {Constant} integer cc-SIZEOF_LONG_DOUBLE
+Size of @code{long double} measured in bytes.
+@end deftypevr
+
+@c page
+@node ctypes
+@chapter Object wrappers for C language types.
+
+
+@value{PACKAGE} defines elisp data types in the module @value{PackageEmacsModule}.  Many wrappers
+for integer types are implemented for safety of writing interfaces to C language library and for
+better dispatching of multimethods.
+
+@quotation
+@strong{NOTE} At the time of this writing (Feb 2, 2020) @gnu{} Emacs version 26 internally
+represents exact integer objects with values of type C language @code{intmax_t}, but not the whole
+range of such type is available.
+@end quotation
+
+@menu
+* ctypes char::                 Wrapper for @code{char}.
+* ctypes schar::                Wrapper for @code{signed char}.
+* ctypes uchar::                Wrapper for @code{unsigned char}.
+* ctypes wchar::                Wrapper for @code{wchar_t}.
+* ctypes sshrt::                Wrapper for @code{signed short int}.
+* ctypes ushrt::                Wrapper for @code{unsigned short int}.
+* ctypes sint::                 Wrapper for @code{signed int}.
+* ctypes uint::                 Wrapper for @code{unsigned int}.
+* ctypes slong::                Wrapper for @code{signed long int}.
+* ctypes ulong::                Wrapper for @code{unsigned long int}.
+* ctypes sllong::               Wrapper for @code{signed long long int}.
+* ctypes ullong::               Wrapper for @code{unsigned long long int}.
+* ctypes ssize::                Wrapper for @code{ssize_t}.
+* ctypes usize::                Wrapper for @code{size_t}.
+* ctypes intmax::               Wrapper for @code{intmax_t}.
+* ctypes uintmax::              Wrapper for @code{uintmax_t}.
+* ctypes int8::                 Wrapper for @code{int8_t}.
+* ctypes uint8::                Wrapper for @code{uint8_t}.
+* ctypes int16::                Wrapper for @code{int16_t}.
+* ctypes uint16::               Wrapper for @code{uint16_t}.
+* ctypes int32::                Wrapper for @code{int32_t}.
+* ctypes uint32::               Wrapper for @code{uint32_t}.
+* ctypes int64::                Wrapper for @code{int64_t}.
+* ctypes uint64::               Wrapper for @code{uint64_t}.
+@end menu
+
+@c page
+@node ctypes char
+@section Wrapper for @code{char}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-char
+Object wrapper for the C language type @code{char}.
+@end deftp
+
+
+@deffn {Generic Function} cc-char (@var{INIT})
+@deffnx {Method} cc-char ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-char} initialised with @var{INIT}, which must be an
+exact integer object in the range of the C language type @code{char}.
+@end deffn
+
+
+@defun cc-char-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-char}, otherwise return false.
+@end defun
+
+
+@defun cc-char-obj @var{CH}
+Given an instance of @objtype{cc-char}: return the exact integer representing its @ascii{} code.
+@end defun
+
+
+@defun cc-range-char-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{char}.
+@end defun
+
+@c page
+@node ctypes schar
+@section Wrapper for @code{signed char}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-schar
+Object wrapper for the C language type @code{signed char}.
+@end deftp
+
+
+@deffn {Generic Function} cc-schar (@var{INIT})
+@deffnx {Method} cc-schar ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-schar} initialised with @var{INIT}, which must be an
+exact integer object in the range of the C language type @code{signed char}.
+@end deffn
+
+
+@defun cc-schar-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-schar}, otherwise return false.
+@end defun
+
+
+@defun cc-schar-obj @var{CH}
+Given an instance of @objtype{cc-schar}: return the exact integer representing its @ascii{} code.
+@end defun
+
+
+@defun cc-range-schar-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{signed char}.
+@end defun
+
+@c page
+@node ctypes uchar
+@section Wrapper for @code{unsigned char}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-uchar
+Object wrapper for the C language type @code{unsigned char}.
+@end deftp
+
+
+@deffn {Generic Function} cc-uchar (@var{INIT})
+@deffnx {Method} cc-uchar ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-uchar} initialised with @var{INIT}, which must be an
+exact integer object in the range of the C language type @code{unsigned char}.
+@end deffn
+
+
+@defun cc-uchar-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-uchar}, otherwise return false.
+@end defun
+
+
+@defun cc-uchar-obj @var{CH}
+Given an instance of @objtype{cc-uchar}: return the exact integer representing its @ascii{} code.
+@end defun
+
+
+@defun cc-range-uchar-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{unsigned char}.
+@end defun
+
+@c page
+@node ctypes wchar
+@section Wrapper for @code{wchar_t}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-wchar
+Object wrapper for the C language type @code{wchar_t}.
+@end deftp
+
+
+@deffn {Generic Function} cc-wchar (@var{INIT})
+@deffnx {Method} cc-wchar ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-wchar} initialised with @var{INIT}, which must be an
+exact integer object in the range of the C language type @code{wchar_t}.
+@end deffn
+
+
+@defun cc-wchar-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-wchar}, otherwise return false.
+@end defun
+
+
+@defun cc-wchar-obj @var{CH}
+Given an instance of @objtype{cc-wchar}: return the exact integer representing its @ascii{} code.
+@end defun
+
+
+@defun cc-range-wchar-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{wchar_t}.
+@end defun
+
+@c page
+@node ctypes sshrt
+@section Wrapper for @code{signed short int}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-signed-short-int
+Object wrapper for the C language type @code{signed short int}.
+@end deftp
+
+
+@deffn {Generic Function} cc-signed-short-int (@var{INIT})
+@deffnx {Method} cc-signed-short-int ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-signed-short-int} initialised with @var{INIT}, which
+must be an exact integer object in the range of the C language type @code{signed short int}.
+@end deffn
+
+
+@defun cc-signed-short-int-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-signed-short-int}, otherwise return false.
+@end defun
+
+
+@defun cc-signed-short-int-obj @var{CH}
+Given an instance of @objtype{cc-signed-short-int}: return the exact integer representing its
+@ascii{} code.
+@end defun
+
+
+@defun cc-range-signed-short-int-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{signed short int}.
+@end defun
+
+@c page
+@node ctypes ushrt
+@section Wrapper for @code{unsigned short int}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-unsigned-short-int
+Object wrapper for the C language type @code{unsigned short int}.
+@end deftp
+
+
+@deffn {Generic Function} cc-unsigned-short-int (@var{INIT})
+@deffnx {Method} cc-unsigned-short-int ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-unsigned-short-int} initialised with @var{INIT},
+which must be an exact integer object in the range of the C language type @code{unsigned short int}.
+@end deffn
+
+
+@defun cc-unsigned-short-int-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-unsigned-short-int}, otherwise return false.
+@end defun
+
+
+@defun cc-unsigned-short-int-obj @var{CH}
+Given an instance of @objtype{cc-unsigned-short-int}: return the exact integer representing its
+@ascii{} code.
+@end defun
+
+
+@defun cc-range-unsigned-short-int-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{unsigned short int}.
+@end defun
+
+@c page
+@node ctypes sint
+@section Wrapper for @code{signed int}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-signed-int
+Object wrapper for the C language type @code{signed int}.
+@end deftp
+
+
+@deffn {Generic Function} cc-signed-int (@var{INIT})
+@deffnx {Method} cc-signed-int ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-signed-int} initialised with @var{INIT}, which
+must be an exact integer object in the range of the C language type @code{signed int}.
+@end deffn
+
+
+@defun cc-signed-int-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-signed-int}, otherwise return false.
+@end defun
+
+
+@defun cc-signed-int-obj @var{CH}
+Given an instance of @objtype{cc-signed-int}: return the exact integer representing its
+@ascii{} code.
+@end defun
+
+
+@defun cc-range-signed-int-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{signed int}.
+@end defun
+
+@c page
+@node ctypes uint
+@section Wrapper for @code{unsigned int}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-unsigned-int
+Object wrapper for the C language type @code{unsigned int}.
+@end deftp
+
+
+@deffn {Generic Function} cc-unsigned-int (@var{INIT})
+@deffnx {Method} cc-unsigned-int ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-unsigned-int} initialised with @var{INIT}, which must
+be an exact integer object in the range of the C language type @code{unsigned int}.
+@end deffn
+
+
+@defun cc-unsigned-int-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-unsigned-int}, otherwise return false.
+@end defun
+
+
+@defun cc-unsigned-int-obj @var{CH}
+Given an instance of @objtype{cc-unsigned-int}: return the exact integer representing its @ascii{}
+code.
+@end defun
+
+
+@defun cc-range-unsigned-int-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{unsigned int}.
+@end defun
+
+@c page
+@node ctypes slong
+@section Wrapper for @code{signed long int}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-signed-long-int
+Object wrapper for the C language type @code{signed long int}.
+@end deftp
+
+
+@deffn {Generic Function} cc-signed-long-int (@var{INIT})
+@deffnx {Method} cc-signed-long-int ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-signed-long-int} initialised with @var{INIT}, which
+must be an exact integer object in the range of the C language type @code{signed long int}.
+@end deffn
+
+
+@defun cc-signed-long-int-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-signed-long-int}, otherwise return false.
+@end defun
+
+
+@defun cc-signed-long-int-obj @var{CH}
+Given an instance of @objtype{cc-signed-long-int}: return the exact integer representing its
+@ascii{} code.
+@end defun
+
+
+@defun cc-range-signed-long-int-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{signed long int}.
+@end defun
+
+@c page
+@node ctypes ulong
+@section Wrapper for @code{unsigned long int}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-unsigned-long-int
+Object wrapper for the C language type @code{unsigned long int}.
+@end deftp
+
+
+@deffn {Generic Function} cc-unsigned-long-int (@var{INIT})
+@deffnx {Method} cc-unsigned-long-int ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-unsigned-long-int} initialised with @var{INIT}, which
+must be an exact integer object in the range of the C language type @code{unsigned long int}.
+@end deffn
+
+
+@defun cc-unsigned-long-int-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-unsigned-long-int}, otherwise return false.
+@end defun
+
+
+@defun cc-unsigned-long-int-obj @var{CH}
+Given an instance of @objtype{cc-unsigned-long-int}: return the exact integer representing its
+@ascii{} code.
+@end defun
+
+
+@defun cc-range-unsigned-long-int-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{unsigned long int}.
+@end defun
+
+@c page
+@node ctypes sllong
+@section Wrapper for @code{signed long long int}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-signed-long-long-int
+Object wrapper for the C language type @code{signed long long int}.
+@end deftp
+
+
+@deffn {Generic Function} cc-signed-long-long-int (@var{INIT})
+@deffnx {Method} cc-signed-long-long-int ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-signed-long-long-int} initialised with @var{INIT},
+which must be an exact integer object in the range of the C language type @code{signed long long
+int}.
+@end deffn
+
+
+@defun cc-signed-long-long-int-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-signed-long-long-int}, otherwise return
+false.
+@end defun
+
+
+@defun cc-signed-long-long-int-obj @var{CH}
+Given an instance of @objtype{cc-signed-long-long-int}: return the exact integer representing its
+@ascii{} code.
+@end defun
+
+
+@defun cc-range-signed-long-long-int-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{signed long long int}.
+@end defun
+
+@c page
+@node ctypes ullong
+@section Wrapper for @code{unsigned long long int}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-unsigned-long-long-int
+Object wrapper for the C language type @code{unsigned long long int}.
+@end deftp
+
+
+@deffn {Generic Function} cc-unsigned-long-long-int (@var{INIT})
+@deffnx {Method} cc-unsigned-long-long-int ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-unsigned-long-long-int} initialised with @var{INIT},
+which must be an exact integer object in the range of the C language type @code{unsigned long long
+int}.
+@end deffn
+
+
+@defun cc-unsigned-long-long-int-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-unsigned-long-long-int}, otherwise return
+false.
+@end defun
+
+
+@defun cc-unsigned-long-long-int-obj @var{CH}
+Given an instance of @objtype{cc-unsigned-long-long-int}: return the exact integer representing its
+@ascii{} code.
+@end defun
+
+
+@defun cc-range-unsigned-long-long-int-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{unsigned long long int}.
+@end defun
+
+@c page
+@node ctypes ssize
+@section Wrapper for @code{ssize_t}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-ssize
+Object wrapper for the C language type @code{ssize_t}.
+@end deftp
+
+
+@deffn {Generic Function} cc-ssize (@var{INIT})
+@deffnx {Method} cc-ssize ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-ssize} initialised with @var{INIT}, which must be an
+exact integer object in the range of the C language type @code{ssize_t}.
+@end deffn
+
+
+@defun cc-ssize-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-ssize}, otherwise return false.
+@end defun
+
+
+@defun cc-ssize-obj @var{CH}
+Given an instance of @objtype{cc-ssize}: return the exact integer representing its @ascii{} code.
+@end defun
+
+
+@defun cc-range-ssize-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{ssize_t}.
+@end defun
+
+@c page
+@node ctypes usize
+@section Wrapper for @code{size_t}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-usize
+Object wrapper for the C language type @code{size_t}.
+@end deftp
+
+
+@deffn {Generic Function} cc-usize (@var{INIT})
+@deffnx {Method} cc-usize ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-usize} initialised with @var{INIT}, which must be an
+exact integer object in the range of the C language type @code{size_t}.
+@end deffn
+
+
+@defun cc-usize-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-usize}, otherwise return false.
+@end defun
+
+
+@defun cc-usize-obj @var{CH}
+Given an instance of @objtype{cc-usize}: return the exact integer representing its @ascii{} code.
+@end defun
+
+
+@defun cc-range-usize-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{size_t}.
+@end defun
+
+@c page
+@node ctypes intmax
+@section Wrapper for @code{intmax_t}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-intmax
+Object wrapper for the C language type @code{intmax_t}.
+@end deftp
+
+
+@deffn {Generic Function} cc-intmax (@var{INIT})
+@deffnx {Method} cc-intmax ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-intmax} initialised with @var{INIT}, which must be an
+exact integer object in the range of the C language type @code{intmax_t}.
+@end deffn
+
+
+@defun cc-intmax-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-intmax}, otherwise return false.
+@end defun
+
+
+@defun cc-intmax-obj @var{CH}
+Given an instance of @objtype{cc-intmax}: return the exact integer representing its @ascii{} code.
+@end defun
+
+
+@defun cc-range-intmax-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{intmax_t}.
+@end defun
+
+@c page
+@node ctypes uintmax
+@section Wrapper for @code{uintmax_t}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-uintmax
+Object wrapper for the C language type @code{uintmax_t}.
+@end deftp
+
+
+@deffn {Generic Function} cc-uintmax (@var{INIT})
+@deffnx {Method} cc-uintmax ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-uintmax} initialised with @var{INIT}, which must be
+an exact integer object in the range of the C language type @code{uintmax_t}.
+@end deffn
+
+
+@defun cc-uintmax-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-uintmax}, otherwise return false.
+@end defun
+
+
+@defun cc-uintmax-obj @var{CH}
+Given an instance of @objtype{cc-uintmax}: return the exact integer representing its @ascii{} code.
+@end defun
+
+
+@defun cc-range-uintmax-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{uintmax}.
+@end defun
+
+@c page
+@node ctypes int8
+@section Wrapper for @code{int8_t}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-int8
+Object wrapper for the C language type @code{int8_t}.
+@end deftp
+
+
+@deffn {Generic Function} cc-int8 (@var{INIT})
+@deffnx {Method} cc-int8 ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-int8} initialised with @var{INIT}, which must be an
+exact integer object in the range of the C language type @code{int8_t}.
+@end deffn
+
+
+@defun cc-int8-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-int8}, otherwise return false.
+@end defun
+
+
+@defun cc-int8-obj @var{CH}
+Given an instance of @objtype{cc-int8}: return the exact integer representing its @ascii{} code.
+@end defun
+
+
+@defun cc-range-int8-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{int8_t}.
+@end defun
+
+@c page
+@node ctypes uint8
+@section Wrapper for @code{uint8_t}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-uint8
+Object wrapper for the C language type @code{uint8_t}.
+@end deftp
+
+
+@deffn {Generic Function} cc-uint8 (@var{INIT})
+@deffnx {Method} cc-uint8 ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-uint8} initialised with @var{INIT}, which must be an
+exact integer object in the range of the C language type @code{uint8_t}.
+@end deffn
+
+
+@defun cc-uint8-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-uint8}, otherwise return false.
+@end defun
+
+
+@defun cc-uint8-obj @var{CH}
+Given an instance of @objtype{cc-uint8}: return the exact integer representing its @ascii{} code.
+@end defun
+
+
+@defun cc-range-uint8-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{uint8_t}.
+@end defun
+
+@c page
+@node ctypes int16
+@section Wrapper for @code{int16_t}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-int16
+Object wrapper for the C language type @code{int16_t}.
+@end deftp
+
+
+@deffn {Generic Function} cc-int16 (@var{INIT})
+@deffnx {Method} cc-int16 ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-int16} initialised with @var{INIT}, which must be an
+exact integer object in the range of the C language type @code{int16_t}.
+@end deffn
+
+
+@defun cc-int16-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-int16}, otherwise return false.
+@end defun
+
+
+@defun cc-int16-obj @var{CH}
+Given an instance of @objtype{cc-int16}: return the exact integer representing its @ascii{} code.
+@end defun
+
+
+@defun cc-range-int16-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{int16_t}.
+@end defun
+
+@c page
+@node ctypes uint16
+@section Wrapper for @code{uint16_t}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-uint16
+Object wrapper for the C language type @code{uint16_t}.
+@end deftp
+
+
+@deffn {Generic Function} cc-uint16 (@var{INIT})
+@deffnx {Method} cc-uint16 ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-uint16} initialised with @var{INIT}, which must be an
+exact integer object in the range of the C language type @code{uint16_t}.
+@end deffn
+
+
+@defun cc-uint16-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-uint16}, otherwise return false.
+@end defun
+
+
+@defun cc-uint16-obj @var{CH}
+Given an instance of @objtype{cc-uint16}: return the exact integer representing its @ascii{} code.
+@end defun
+
+
+@defun cc-range-uint16-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{uint16_t}.
+@end defun
+
+@c page
+@node ctypes int32
+@section Wrapper for @code{int32_t}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-int32
+Object wrapper for the C language type @code{int32_t}.
+@end deftp
+
+
+@deffn {Generic Function} cc-int32 (@var{INIT})
+@deffnx {Method} cc-int32 ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-int32} initialised with @var{INIT}, which must be an
+exact integer object in the range of the C language type @code{int32_t}.
+@end deffn
+
+
+@defun cc-int32-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-int32}, otherwise return false.
+@end defun
+
+
+@defun cc-int32-obj @var{CH}
+Given an instance of @objtype{cc-int32}: return the exact integer representing its @ascii{} code.
+@end defun
+
+
+@defun cc-range-int32-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{int32_t}.
+@end defun
+
+@c page
+@node ctypes uint32
+@section Wrapper for @code{uint32_t}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-uint32
+Object wrapper for the C language type @code{uint32_t}.
+@end deftp
+
+
+@deffn {Generic Function} cc-uint32 (@var{INIT})
+@deffnx {Method} cc-uint32 ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-uint32} initialised with @var{INIT}, which must be an
+exact integer object in the range of the C language type @code{uint32_t}.
+@end deffn
+
+
+@defun cc-uint32-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-uint32}, otherwise return false.
+@end defun
+
+
+@defun cc-uint32-obj @var{CH}
+Given an instance of @objtype{cc-uint32}: return the exact integer representing its @ascii{} code.
+@end defun
+
+
+@defun cc-range-uint32-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{uint32_t}.
+@end defun
+
+@c page
+@node ctypes int64
+@section Wrapper for @code{int64_t}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-int64
+Object wrapper for the C language type @code{int64_t}.
+@end deftp
+
+
+@deffn {Generic Function} cc-int64 (@var{INIT})
+@deffnx {Method} cc-int64 ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-int64} initialised with @var{INIT}, which must be an
+exact integer object in the range of the C language type @code{int64_t}.
+@end deffn
+
+
+@defun cc-int64-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-int64}, otherwise return false.
+@end defun
+
+
+@defun cc-int64-obj @var{CH}
+Given an instance of @objtype{cc-int64}: return the exact integer representing its @ascii{} code.
+@end defun
+
+
+@defun cc-range-int64-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{int64_t}.
+@end defun
+
+@c page
+@node ctypes uint64
+@section Wrapper for @code{uint64_t}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-uint64
+Object wrapper for the C language type @code{uint64_t}.
+@end deftp
+
+
+@deffn {Generic Function} cc-uint64 (@var{INIT})
+@deffnx {Method} cc-uint64 ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-uint64} initialised with @var{INIT}, which must be an
+exact integer object in the range of the C language type @code{uint64_t}.
+@end deffn
+
+
+@defun cc-uint64-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-uint64}, otherwise return false.
+@end defun
+
+
+@defun cc-uint64-obj @var{CH}
+Given an instance of @objtype{cc-uint64}: return the exact integer representing its @ascii{} code.
+@end defun
+
+
+@defun cc-range-uint64-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{uint64_t}.
+@end defun
 
 @c page
 @c ------------------------------------------------------------

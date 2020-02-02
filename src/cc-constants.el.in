@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-01 18:36:49 marco>
+;; Time-stamp: <2020-02-02 06:26:04 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -139,6 +139,60 @@
 (defconst cc-SIZEOF_UINTMAX_T
   @VALUEOF_MMUX_SIZEOF_UINTMAX_T@
   "Size of `uintmax_t' measured in bytes.")
+
+;;; --------------------------------------------------------------------
+
+(defconst cc-SIZEOF_INT8_T
+  1
+  "Size of `int8_t' measured in bytes.")
+
+(defconst cc-SIZEOF_UINT8_T
+  1
+  "Size of `uint8_t' measured in bytes.")
+
+;;; --------------------------------------------------------------------
+
+(defconst cc-SIZEOF_INT16_T
+  2
+  "Size of `int16_t' measured in bytes.")
+
+(defconst cc-SIZEOF_UINT16_T
+  2
+  "Size of `uint16_t' measured in bytes.")
+
+;;; --------------------------------------------------------------------
+
+(defconst cc-SIZEOF_INT32_T
+  4
+  "Size of `int32_t' measured in bytes.")
+
+(defconst cc-SIZEOF_UINT32_T
+  4
+  "Size of `uint32_t' measured in bytes.")
+
+;;; --------------------------------------------------------------------
+
+(defconst cc-SIZEOF_INT64_T
+  8
+  "Size of `int64_t' measured in bytes.")
+
+(defconst cc-SIZEOF_UINT64_T
+  8
+  "Size of `uint64_t' measured in bytes.")
+
+;;; --------------------------------------------------------------------
+
+(defconst cc-SIZEOF_FLOAT
+  @VALUEOF_MMUX_SIZEOF_FLOAT@
+  "Size of `float' measured in bytes.")
+
+(defconst cc-SIZEOF_DOUBLE
+  @VALUEOF_MMUX_SIZEOF_DOUBLE@
+  "Size of `double' measured in bytes.")
+
+(defconst cc-SIZEOF_LONG_DOUBLE
+  @VALUEOF_MMUX_SIZEOF_LONG_DOUBLE@
+  "Size of `long double' measured in bytes.")
 
 
 ;;;; integer representation range limits
@@ -304,6 +358,86 @@
 	((= cc-SIZEOF_UINTMAX_T cc-SIZEOF_SIGNED_LONG_LONG_INT)	cc-LLONG_MAX)
 	(t							0))
   "Exact integer representing the maximum value representable by a `uintmax_t'.")
+
+;;; --------------------------------------------------------------------
+
+(defconst cc-INT8_MIN
+  (- (expt 2 (1- (* 8 cc-SIZEOF_INT8_T))))
+  "Exact integer representing the minimum value representable by a `int8_t'.")
+
+(defconst cc-INT8_MAX
+  (1- (expt 2 (1- (* 8 cc-SIZEOF_INT8_T))))
+  "Exact integer representing the maximum value representable by a `int8_t'.")
+
+;;; --------------------------------------------------------------------
+
+(defconst cc-UINT8_MIN
+  0
+  "Exact integer representing the minimum value representable by a `uint8_t'.")
+
+(defconst cc-UINT8_MAX
+  (1- (expt 2 (* 8 cc-SIZEOF_UINT8_T)))
+  "Exact integer representing the maximum value representable by a `uint8_t'.")
+
+;;; --------------------------------------------------------------------
+
+(defconst cc-INT16_MIN
+  (- (expt 2 (1- (* 8 cc-SIZEOF_INT16_T))))
+  "Exact integer representing the minimum value representable by a `int16_t'.")
+
+(defconst cc-INT16_MAX
+  (1- (expt 2 (1- (* 8 cc-SIZEOF_INT16_T))))
+  "Exact integer representing the maximum value representable by a `int16_t'.")
+
+;;; --------------------------------------------------------------------
+
+(defconst cc-UINT16_MIN
+  0
+  "Exact integer representing the minimum value representable by a `uint16_t'.")
+
+(defconst cc-UINT16_MAX
+  (1- (expt 2 (* 8 cc-SIZEOF_UINT16_T)))
+  "Exact integer representing the maximum value representable by a `uint16_t'.")
+
+;;; --------------------------------------------------------------------
+
+(defconst cc-INT32_MIN
+  (- (expt 2 (1- (* 8 cc-SIZEOF_INT32_T))))
+  "Exact integer representing the minimum value representable by a `int32_t'.")
+
+(defconst cc-INT32_MAX
+  (1- (expt 2 (1- (* 8 cc-SIZEOF_INT32_T))))
+  "Exact integer representing the maximum value representable by a `int32_t'.")
+
+;;; --------------------------------------------------------------------
+
+(defconst cc-UINT32_MIN
+  0
+  "Exact integer representing the minimum value representable by a `uint32_t'.")
+
+(defconst cc-UINT32_MAX
+  (1- (expt 2 (* 8 cc-SIZEOF_UINT32_T)))
+  "Exact integer representing the maximum value representable by a `uint32_t'.")
+
+;;; --------------------------------------------------------------------
+
+(defconst cc-INT64_MIN
+  (- (expt 2 (1- (* 8 cc-SIZEOF_INT64_T))))
+  "Exact integer representing the minimum value representable by a `int64_t'.")
+
+(defconst cc-INT64_MAX
+  (1- (expt 2 (1- (* 8 cc-SIZEOF_INT64_T))))
+  "Exact integer representing the maximum value representable by a `int64_t'.")
+
+;;; --------------------------------------------------------------------
+
+(defconst cc-UINT64_MIN
+  0
+  "Exact integer representing the minimum value representable by a `uint64_t'.")
+
+(defconst cc-UINT64_MAX
+  (1- (expt 2 (* 8 cc-SIZEOF_UINT64_T)))
+  "Exact integer representing the maximum value representable by a `uint64_t'.")
 
 
 ;;;; done

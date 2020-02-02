@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-02 06:11:37 marco>
+;; Time-stamp: <2020-02-02 17:53:59 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -34,7 +34,6 @@
 (eval-when-compile
   (load "libmmux-emacs-core"))
 (load "libmmux-emacs-core")
-
 (require 'cl-lib)
 (require 'cc-constants)
 
@@ -468,42 +467,246 @@
        (<= cc-UINT64_MIN op cc-UINT64_MAX)))
 
 
-;;;; bytevector objects: object definition
+;;;; basic integer operations
 
-(cl-defstruct (cc-bytevector (:constructor cc--make-bytevector))
+(defmacro cc--define-integer-comparison-method (OPERATION TYPE)
+  (let* ((OPERATION.str	(symbol-name OPERATION))
+	 (CC-FUNC	(intern (concat "cc" (symbol-name OPERATION))))
+	 (GETTER	(intern (concat (symbol-name TYPE) "-obj")))
+	 (DOCSTRING	(concat "Return true if OP1 " OPERATION.str " OP2; otherwise return false.")))
+    `(progn
+       (cl-defmethod ,CC-FUNC ((op1 ,TYPE) (op2 t))
+	 ,DOCSTRING
+	 (,CC-FUNC (,GETTER op1) op2))
+       (cl-defmethod ,CC-FUNC ((op1 t) (op2 ,TYPE))
+	 ,DOCSTRING
+	 (,CC-FUNC op1 (,GETTER op2)))
+       )))
+
+(defmacro cc--define-integer-comparison (OPERATION)
+  (let* ((OPERATION.str	(symbol-name OPERATION))
+	 (CC-FUNC	(intern (concat "cc" OPERATION.str)))
+	 (DOCSTRING	(concat "Return true if OP1 " OPERATION.str " OP2; otherwise return false.")))
+    `(progn
+       (cl-defgeneric ,CC-FUNC (op1 op2)
+    	 ,DOCSTRING)
+       (cl-defmethod  ,CC-FUNC ((op1 integer) (op2 integer))
+    	 ,DOCSTRING
+    	 (,OPERATION op1 op2))
+       (cc--define-integer-comparison-method ,OPERATION cc-char)
+       (cc--define-integer-comparison-method ,OPERATION cc-schar)
+       (cc--define-integer-comparison-method ,OPERATION cc-uchar)
+       (cc--define-integer-comparison-method ,OPERATION cc-wchar)
+       (cc--define-integer-comparison-method ,OPERATION cc-signed-short-int)
+       (cc--define-integer-comparison-method ,OPERATION cc-unsigned-short-int)
+       (cc--define-integer-comparison-method ,OPERATION cc-signed-int)
+       (cc--define-integer-comparison-method ,OPERATION cc-unsigned-int)
+       (cc--define-integer-comparison-method ,OPERATION cc-signed-long-int)
+       (cc--define-integer-comparison-method ,OPERATION cc-unsigned-long-int)
+       (cc--define-integer-comparison-method ,OPERATION cc-signed-long-int)
+       (cc--define-integer-comparison-method ,OPERATION cc-unsigned-long-int)
+       (cc--define-integer-comparison-method ,OPERATION cc-signed-long-long-int)
+       (cc--define-integer-comparison-method ,OPERATION cc-unsigned-long-long-int)
+       (cc--define-integer-comparison-method ,OPERATION cc-ssize)
+       (cc--define-integer-comparison-method ,OPERATION cc-usize)
+       (cc--define-integer-comparison-method ,OPERATION cc-intmax)
+       (cc--define-integer-comparison-method ,OPERATION cc-uintmax)
+       (cc--define-integer-comparison-method ,OPERATION cc-int8)
+       (cc--define-integer-comparison-method ,OPERATION cc-uint8)
+       (cc--define-integer-comparison-method ,OPERATION cc-int16)
+       (cc--define-integer-comparison-method ,OPERATION cc-uint16)
+       (cc--define-integer-comparison-method ,OPERATION cc-int32)
+       (cc--define-integer-comparison-method ,OPERATION cc-uint32)
+       (cc--define-integer-comparison-method ,OPERATION cc-int64)
+       (cc--define-integer-comparison-method ,OPERATION cc-uint64)
+       )))
+
+(cc--define-integer-comparison =)
+(cc--define-integer-comparison <)
+(cc--define-integer-comparison >)
+(cc--define-integer-comparison <=)
+(cc--define-integer-comparison >=)
+(cc--define-integer-comparison /=)
+
+
+;;;; bytevector objects: object definitions
+;;
+;; mmux-core-c-bytevector-make NUMBER-OF-SLOTS SLOT-SIZE SIGNED
+;;
+;;Defined a the C language level.  Build and return a new custom pointer object.
+;;
+;;The argument NUMBER-OF-SLOTS must be a non-negative exact integer representing the number of slots
+;;in the bytevector.
+;;
+;;The argument  SLOT-SIZE must be a  non-negative exact integer  representing the size of  each slot
+;;measured in bytes; valid values are: 1, 2, 4, 8.
+;;
+;;The argument SIGNED must be 1 or 0: if the value is 1, the bytevector holds signed integers in its
+;;slots; if the value is 0, the bytevector holds unsigned integers in its slots.
+;;
+
+(cl-defstruct cc-bytevector
+  number-of-slots
+  slot-size
+  number-of-allocated-bytes
+  signed
   obj)
 
-(cl-defgeneric cc-bytevector (init)
-  "Build and return a new instance of `cc-bytevector'.")
-(cl-defgeneric cc-bytevector ((len integer))
-  "Build and return a new instance of `cc-bytevector'."
-  (cc--make-bytevector :obj (mmux-core-c-bytevector-make len)))
+;;; --------------------------------------------------------------------
+
+(cl-defstruct (cc-bytevector-u8 (:constructor	cc--make-bytevector-u8)
+				(:include	cc-bytevector)))
+
+(cl-defgeneric cc-bytevector-u8 (number-of-slots)
+  "Build and return a new instance of `cc-bytevector-u8'.")
+(cl-defgeneric cc-bytevector-u8 ((number-of-slots integer))
+  "Build and return a new instance of `cc-bytevector-u8'."
+  (cl-assert (<= 0 number-of-slots))
+  (cc--make-bytevector-u8
+   :number-of-slots		number-of-slots
+   :slot-size			1
+   :signed			nil
+   :obj				(mmux-core-c-bytevector-make number-of-slots 1 0)
+   :number-of-allocated-bytes	(* number-of-slots 1)))
+
+(cl-defstruct (cc-bytevector-s8 (:constructor	cc--make-bytevector-s8)
+				(:include	cc-bytevector)))
+
+(cl-defgeneric cc-bytevector-s8 (number-of-slots)
+  "Build and return a new instance of `cc-bytevector-s8'.")
+(cl-defgeneric cc-bytevector-s8 ((number-of-slots integer))
+  "Build and return a new instance of `cc-bytevector-s8'."
+  (cl-assert (<= 0 number-of-slots))
+  (cc--make-bytevector-s8
+   :number-of-slots		number-of-slots
+   :slot-size			1
+   :signed			t
+   :obj				(mmux-core-c-bytevector-make number-of-slots 1 1)
+   :number-of-allocated-bytes	(* number-of-slots 1)))
+
+;;; --------------------------------------------------------------------
+
+(cl-defstruct (cc-bytevector-u16 (:constructor	cc--make-bytevector-u16)
+				 (:include	cc-bytevector)))
+
+(cl-defgeneric cc-bytevector-u16 (number-of-slots)
+  "Build and return a new instance of `cc-bytevector-u16'.")
+(cl-defgeneric cc-bytevector-u16 ((number-of-slots integer))
+  "Build and return a new instance of `cc-bytevector-u16'."
+  (cl-assert (<= 0 number-of-slots))
+  (cc--make-bytevector-u16
+   :number-of-slots		number-of-slots
+   :slot-size			2
+   :signed			nil
+   :obj				(mmux-core-c-bytevector-make number-of-slots 2 0)
+   :number-of-allocated-bytes	(* number-of-slots 2)))
+
+(cl-defstruct (cc-bytevector-s16 (:constructor	cc--make-bytevector-s16)
+				 (:include	cc-bytevector)))
+
+(cl-defgeneric cc-bytevector-s16 (number-of-slots)
+  "Build and return a new instance of `cc-bytevector-s16'.")
+(cl-defgeneric cc-bytevector-s16 ((number-of-slots integer))
+  "Build and return a new instance of `cc-bytevector-s16'."
+  (cl-assert (<= 0 number-of-slots))
+  (cc--make-bytevector-s16
+   :number-of-slots		number-of-slots
+   :slot-size			2
+   :signed			t
+   :obj				(mmux-core-c-bytevector-make number-of-slots 2 1)
+   :number-of-allocated-bytes	(* number-of-slots 2)))
+
+;;; --------------------------------------------------------------------
+
+(cl-defstruct (cc-bytevector-u32 (:constructor	cc--make-bytevector-u32)
+				 (:include	cc-bytevector)))
+
+(cl-defgeneric cc-bytevector-u32 (number-of-slots)
+  "Build and return a new instance of `cc-bytevector-u32'.")
+(cl-defgeneric cc-bytevector-u32 ((number-of-slots integer))
+  "Build and return a new instance of `cc-bytevector-u32'."
+  (cl-assert (<= 0 number-of-slots))
+  (cc--make-bytevector-u32
+   :number-of-slots		number-of-slots
+   :slot-size			4
+   :signed			nil
+   :obj				(mmux-core-c-bytevector-make number-of-slots 4 0)
+   :number-of-allocated-bytes	(* number-of-slots 4)))
+
+(cl-defstruct (cc-bytevector-s32 (:constructor	cc--make-bytevector-s32)
+				 (:include	cc-bytevector)))
+
+(cl-defgeneric cc-bytevector-s32 (number-of-slots)
+  "Build and return a new instance of `cc-bytevector-s32'.")
+(cl-defgeneric cc-bytevector-s32 ((number-of-slots integer))
+  "Build and return a new instance of `cc-bytevector-s32'."
+  (cl-assert (<= 0 number-of-slots))
+  (cc--make-bytevector-s32
+   :number-of-slots		number-of-slots
+   :slot-size			4
+   :signed			t
+   :obj				(mmux-core-c-bytevector-make number-of-slots 4 1)
+   :number-of-allocated-bytes	(* number-of-slots 4)))
+
+;;; --------------------------------------------------------------------
+
+(cl-defstruct (cc-bytevector-u64 (:constructor	cc--make-bytevector-u64)
+				 (:include	cc-bytevector)))
+
+(cl-defgeneric cc-bytevector-u64 (number-of-slots)
+  "Build and return a new instance of `cc-bytevector-u64'.")
+(cl-defgeneric cc-bytevector-u64 ((number-of-slots integer))
+  "Build and return a new instance of `cc-bytevector-u64'."
+  (cl-assert (<= 0 number-of-slots))
+  (cc--make-bytevector-u64
+   :number-of-slots		number-of-slots
+   :slot-size			8
+   :signed			nil
+   :obj				(mmux-core-c-bytevector-make number-of-slots 8 0)
+   :number-of-allocated-bytes	(* number-of-slots 8)))
+
+(cl-defstruct (cc-bytevector-s64 (:constructor	cc--make-bytevector-s64)
+				 (:include	cc-bytevector)))
+
+(cl-defgeneric cc-bytevector-s64 (number-of-slots)
+  "Build and return a new instance of `cc-bytevector-s64'.")
+(cl-defgeneric cc-bytevector-s64 ((number-of-slots integer))
+  "Build and return a new instance of `cc-bytevector-s64'."
+  (cl-assert (<= 0 number-of-slots))
+  (cc--make-bytevector-s64
+   :number-of-slots		number-of-slots
+   :slot-size			8
+   :signed			t
+   :obj				(mmux-core-c-bytevector-make number-of-slots 8 1)
+   :number-of-allocated-bytes	(* number-of-slots 8)))
 
 
 ;;;; bytevector objects: inspection
 
 (cl-defgeneric cc-bytevector-length (bv)
-  "Return an exact integer representing the length of a `cc-bytevector' object.")
+  "Return an exact integer representing the length of a `cc-bytevector' object measured in bytes.")
+
 (cl-defgeneric cc-bytevector-length ((bv cc-bytevector))
-  "Return an exact integer representing the length of a `cc-bytevector' object."
-  (mmux-core-c-bytevector-length (cc-bytevector-obj bv)))
+  "Return an exact integer representing the length of a `cc-bytevector' object measured in bytes."
+  (* (cc-bytevector-number-of-slots bv)
+     (cc-bytevector-slot-size bv)))
 
 
 ;;;; bytevector objects: setters and getters
 
-(cl-defgeneric cl-bytevector-ref (bv idx)
+(cl-defgeneric cc-bytevector-ref (bv idx)
   "Extract a value from a bytevector.")
 
-(cl-defmethod cl-bytevector-ref ((bv cc-bytevector) (idx integer))
+(cl-defmethod cc-bytevector-ref ((bv cc-bytevector) (idx integer))
   "Extract a value from a bytevector."
   (mmux-core-c-bytevector-u8-ref (cc-bytevector-obj bv) idx))
 
 ;;; --------------------------------------------------------------------
 
-(cl-defgeneric cl-bytevector-set! (bv idx val)
+(cl-defgeneric cc-bytevector-set! (bv idx val)
   "Extract a value from a bytevector.")
 
-(cl-defmethod cl-bytevector-set! ((bv cc-bytevector) (idx integer) (val integer))
+(cl-defmethod cc-bytevector-set! ((bv cc-bytevector) (idx integer) (val integer))
   "Extract a value from a bytevector."
   (mmux-core-c-bytevector-u8-set! (cc-bytevector-obj bv) idx val))
 

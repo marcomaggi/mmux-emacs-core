@@ -1,4 +1,4 @@
-;;; user-pointer-objects.el --- dynamic module test
+;;; ctypes-comparison.el --- dynamic module test
 
 ;; Copyright (C) 2020 by Marco Maggi
 
@@ -22,9 +22,13 @@
 (require 'ert)
 (require 'cc-core)
 
-(ert-deftest make-bytevector ()
-  "Build a `bytevector' object."
-  (should (cc-bytevector-u8 123)))
+(ert-deftest cc= ()
+  "Compare operands.."
+  (should (cc= 1 1))
+  (should (not (cc= 1 2)))
+  (should (cc= (cc-char 1) (cc-char 1)))
+  (should (not (cc= (cc-char 1) (cc-char 2))))
+  )
 
 (ert-run-tests-batch-and-exit)
 

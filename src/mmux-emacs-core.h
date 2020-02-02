@@ -392,7 +392,9 @@ mmux_emacs_core_make_int64 (emacs_env * env, int64_t arg)
 typedef struct mmux_emacs_core_bytevector_t	mmux_emacs_core_bytevector_t;
 
 struct mmux_emacs_core_bytevector_t {
-  size_t	len;
+  size_t	number_of_slots;
+  size_t	slot_size;
+  int		hold_signed_values;
   uint8_t	* ptr;
 };
 

@@ -30,20 +30,6 @@
 
 
 /** --------------------------------------------------------------------
- ** Inspection.
- ** ----------------------------------------------------------------- */
-
-static emacs_value
-Fmmux_emacs_core_bytevector_length (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
-{
-  assert(1 == nargs);
-  mmux_emacs_core_bytevector_t	*bv	= mmux_emacs_core_get_bytevector(env, args[0]);
-
-  return mmux_emacs_core_make_intmax(env, bv->len);
-}
-
-
-/** --------------------------------------------------------------------
  ** Setters and getters.
  ** ----------------------------------------------------------------- */
 
@@ -74,17 +60,8 @@ Fmmux_emacs_core_bytevector_u8_set (emacs_env *env, ptrdiff_t nargs, emacs_value
  ** Elisp functions table.
  ** ----------------------------------------------------------------- */
 
-#define NUMBER_OF_MODULE_FUNCTIONS	3
+#define NUMBER_OF_MODULE_FUNCTIONS	2
 static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNCTIONS] = {
-  /* Inspection. */
-  {
-    .name		= "mmux-core-c-bytevector-length",
-    .implementation	= Fmmux_emacs_core_bytevector_length,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return an exact integer representing the length of a `cc-bytevector' object."
-  },
-
   /* Getters and setters. */
   {
     .name		= "mmux-core-c-bytevector-u8-ref",

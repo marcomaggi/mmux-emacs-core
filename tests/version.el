@@ -1,4 +1,4 @@
-;;; Jan 14, 2020 --- dynamic module test
+;;; version.el --- dynamic module test
 
 ;; Copyright (C) 2020 by Marco Maggi
 

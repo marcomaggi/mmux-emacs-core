@@ -46,18 +46,23 @@ mmux_emacs_core_bytevector_finalizer (void * _obj)
 }
 
 static emacs_value
-Fmmux_emacs_core_bytevector_cmake (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+Fmmux_emacs_core_bytevector_make (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
 {
-  size_t			len = mmux_emacs_core_get_size(env, args[0]);
+  assert(nargs == 3);
+  size_t	number_of_slots		= mmux_emacs_core_get_size(env, args[0]);
+  size_t	slot_size		= mmux_emacs_core_get_size(env, args[1]);
+  int		hold_signed_values	= mmux_emacs_core_get_sint(env, args[2]);
   mmux_emacs_core_bytevector_t	* obj;
 
   errno = 0;
   obj   = malloc(sizeof(mmux_emacs_core_bytevector_t));
   if (obj) {
     errno	= 0;
-    obj->ptr	= malloc(len * sizeof(uint8_t));
+    obj->ptr	= calloc(number_of_slots, slot_size);
     if (obj->ptr) {
-      obj->len	= len;
+      obj->number_of_slots	= number_of_slots;
+      obj->slot_size		= slot_size;
+      obj->hold_signed_values	= hold_signed_values;
       return mmux_emacs_core_make_user_ptr(env, mmux_emacs_core_bytevector_finalizer, obj);
     } else
       goto memory_allocation_error;
@@ -90,9 +95,9 @@ Fmmux_emacs_core_bytevector_cmake (emacs_env *env, ptrdiff_t nargs, emacs_value 
 static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNCTIONS] = {
   {
     .name		= "mmux-core-c-bytevector-make",
-    .implementation	= Fmmux_emacs_core_bytevector_cmake,
-    .min_arity		= 1,
-    .max_arity		= 1,
+    .implementation	= Fmmux_emacs_core_bytevector_make,
+    .min_arity		= 3,
+    .max_arity		= 3,
     .documentation	= "Build and return a new bytevector user pointer object."
   },
 };

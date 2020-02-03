@@ -91,12 +91,14 @@ src/cc-core.elc: src/cc-constants.elc libmmux-emacs-core.la
 MMUX_EMACS_CORE_TESTS_SRC = \
 	tests/version.el		\
 	tests/user-pointer-objects.el	\
-	tests/ctypes-comparison.el
+	tests/ctypes-comparison.el	\
+	tests/bytevector-objects.el
 
 MMUX_EMACS_CORE_TESTS = \
 	tests/version.elc		\
 	tests/user-pointer-objects.elc	\
-	tests/ctypes-comparison.elc
+	tests/ctypes-comparison.elc	\
+	tests/bytevector-objects.elc
 
 EXTRA_DIST	+= $(MMUX_EMACS_CORE_TESTS_SRC)
 TESTS		 = $(MMUX_EMACS_CORE_TESTS)

@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/marcomaggi/mmux-emacs-core.svg?branch=master)](https://travis-ci.org/marcomaggi/mmux-emacs-core)
 [![codecov](https://codecov.io/gh/marcomaggi/mmux-emacs-core/branch/master/graph/badge.svg)](https://codecov.io/gh/marcomaggi/mmux-emacs-core)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b41898f85f6e4e4bad28a1236c086ff3)](https://www.codacy.com/manual/marcomaggi_2/mmux-emacs-core?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=marcomaggi/mmux-emacs-core&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/3b5e1a40f1c2415398f737b6d5ad507c)](https://www.codacy.com/manual/marcomaggi_2/mmux-emacs-core?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=marcomaggi/mmux-emacs-core&amp;utm_campaign=Badge_Grade)
 
 ## Introduction
 

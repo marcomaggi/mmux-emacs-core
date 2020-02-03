@@ -883,15 +883,15 @@ range of such type is available.
 * ctypes ullong::               Wrapper for @code{unsigned long long int}.
 * ctypes ssize::                Wrapper for @code{ssize_t}.
 * ctypes usize::                Wrapper for @code{size_t}.
-* ctypes intmax::               Wrapper for @code{intmax_t}.
+* ctypes sintmax::              Wrapper for @code{intmax_t}.
 * ctypes uintmax::              Wrapper for @code{uintmax_t}.
-* ctypes int8::                 Wrapper for @code{int8_t}.
+* ctypes sint8::                Wrapper for @code{int8_t}.
 * ctypes uint8::                Wrapper for @code{uint8_t}.
-* ctypes int16::                Wrapper for @code{int16_t}.
+* ctypes sint16::               Wrapper for @code{int16_t}.
 * ctypes uint16::               Wrapper for @code{uint16_t}.
-* ctypes int32::                Wrapper for @code{int32_t}.
+* ctypes sint32::               Wrapper for @code{int32_t}.
 * ctypes uint32::               Wrapper for @code{uint32_t}.
-* ctypes int64::                Wrapper for @code{int64_t}.
+* ctypes sint64::               Wrapper for @code{int64_t}.
 * ctypes uint64::               Wrapper for @code{uint64_t}.
 @end menu
 
@@ -925,7 +925,7 @@ Given an instance of @objtype{cc-char}: return the exact integer representing it
 @end defun
 
 
-@defun cc-range-char-p @var{OBJ}
+@defun cc-char-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{char}.
 @end defun
@@ -960,7 +960,7 @@ Given an instance of @objtype{cc-schar}: return the exact integer representing i
 @end defun
 
 
-@defun cc-range-schar-p @var{OBJ}
+@defun cc-schar-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{signed char}.
 @end defun
@@ -995,7 +995,7 @@ Given an instance of @objtype{cc-uchar}: return the exact integer representing i
 @end defun
 
 
-@defun cc-range-uchar-p @var{OBJ}
+@defun cc-uchar-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{unsigned char}.
 @end defun
@@ -1030,7 +1030,7 @@ Given an instance of @objtype{cc-wchar}: return the exact integer representing i
 @end defun
 
 
-@defun cc-range-wchar-p @var{OBJ}
+@defun cc-wchar-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{wchar_t}.
 @end defun
@@ -1066,7 +1066,7 @@ Given an instance of @objtype{cc-signed-short-int}: return the exact integer rep
 @end defun
 
 
-@defun cc-range-signed-short-int-p @var{OBJ}
+@defun cc-signed-short-int-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{signed short int}.
 @end defun
@@ -1102,7 +1102,7 @@ Given an instance of @objtype{cc-unsigned-short-int}: return the exact integer r
 @end defun
 
 
-@defun cc-range-unsigned-short-int-p @var{OBJ}
+@defun cc-unsigned-short-int-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{unsigned short int}.
 @end defun
@@ -1138,7 +1138,7 @@ Given an instance of @objtype{cc-signed-int}: return the exact integer represent
 @end defun
 
 
-@defun cc-range-signed-int-p @var{OBJ}
+@defun cc-signed-int-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{signed int}.
 @end defun
@@ -1174,7 +1174,7 @@ code.
 @end defun
 
 
-@defun cc-range-unsigned-int-p @var{OBJ}
+@defun cc-unsigned-int-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{unsigned int}.
 @end defun
@@ -1210,7 +1210,7 @@ Given an instance of @objtype{cc-signed-long-int}: return the exact integer repr
 @end defun
 
 
-@defun cc-range-signed-long-int-p @var{OBJ}
+@defun cc-signed-long-int-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{signed long int}.
 @end defun
@@ -1246,7 +1246,7 @@ Given an instance of @objtype{cc-unsigned-long-int}: return the exact integer re
 @end defun
 
 
-@defun cc-range-unsigned-long-int-p @var{OBJ}
+@defun cc-unsigned-long-int-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{unsigned long int}.
 @end defun
@@ -1284,7 +1284,7 @@ Given an instance of @objtype{cc-signed-long-long-int}: return the exact integer
 @end defun
 
 
-@defun cc-range-signed-long-long-int-p @var{OBJ}
+@defun cc-signed-long-long-int-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{signed long long int}.
 @end defun
@@ -1322,7 +1322,7 @@ Given an instance of @objtype{cc-unsigned-long-long-int}: return the exact integ
 @end defun
 
 
-@defun cc-range-unsigned-long-long-int-p @var{OBJ}
+@defun cc-unsigned-long-long-int-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{unsigned long long int}.
 @end defun
@@ -1357,7 +1357,7 @@ Given an instance of @objtype{cc-ssize}: return the exact integer representing i
 @end defun
 
 
-@defun cc-range-ssize-p @var{OBJ}
+@defun cc-ssize-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{ssize_t}.
 @end defun
@@ -1392,42 +1392,42 @@ Given an instance of @objtype{cc-usize}: return the exact integer representing i
 @end defun
 
 
-@defun cc-range-usize-p @var{OBJ}
+@defun cc-usize-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{size_t}.
 @end defun
 
 @c page
-@node ctypes intmax
+@node ctypes sintmax
 @section Wrapper for @code{intmax_t}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-intmax
+@deftp {Object Type} cc-sintmax
 Object wrapper for the C language type @code{intmax_t}.
 @end deftp
 
 
-@deffn {Generic Function} cc-intmax (@var{INIT})
-@deffnx {Method} cc-intmax ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-intmax} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} cc-sintmax (@var{INIT})
+@deffnx {Method} cc-sintmax ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-sintmax} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{intmax_t}.
 @end deffn
 
 
-@defun cc-intmax-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-intmax}, otherwise return false.
+@defun cc-sintmax-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-sintmax}, otherwise return false.
 @end defun
 
 
-@defun cc-intmax-obj @var{CH}
-Given an instance of @objtype{cc-intmax}: return the exact integer representing its @ascii{} code.
+@defun cc-sintmax-obj @var{CH}
+Given an instance of @objtype{cc-sintmax}: return the exact integer representing its @ascii{} code.
 @end defun
 
 
-@defun cc-range-intmax-p @var{OBJ}
+@defun cc-sintmax-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{intmax_t}.
 @end defun
@@ -1462,42 +1462,42 @@ Given an instance of @objtype{cc-uintmax}: return the exact integer representing
 @end defun
 
 
-@defun cc-range-uintmax-p @var{OBJ}
+@defun cc-uintmax-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{uintmax}.
 @end defun
 
 @c page
-@node ctypes int8
+@node ctypes sint8
 @section Wrapper for @code{int8_t}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-int8
+@deftp {Object Type} cc-sint8
 Object wrapper for the C language type @code{int8_t}.
 @end deftp
 
 
-@deffn {Generic Function} cc-int8 (@var{INIT})
-@deffnx {Method} cc-int8 ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-int8} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} cc-sint8 (@var{INIT})
+@deffnx {Method} cc-sint8 ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-sint8} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{int8_t}.
 @end deffn
 
 
-@defun cc-int8-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-int8}, otherwise return false.
+@defun cc-sint8-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-sint8}, otherwise return false.
 @end defun
 
 
-@defun cc-int8-obj @var{CH}
-Given an instance of @objtype{cc-int8}: return the exact integer representing its @ascii{} code.
+@defun cc-sint8-obj @var{CH}
+Given an instance of @objtype{cc-sint8}: return the exact integer representing its @ascii{} code.
 @end defun
 
 
-@defun cc-range-int8-p @var{OBJ}
+@defun cc-sint8-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{int8_t}.
 @end defun
@@ -1532,42 +1532,42 @@ Given an instance of @objtype{cc-uint8}: return the exact integer representing i
 @end defun
 
 
-@defun cc-range-uint8-p @var{OBJ}
+@defun cc-uint8-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{uint8_t}.
 @end defun
 
 @c page
-@node ctypes int16
+@node ctypes sint16
 @section Wrapper for @code{int16_t}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-int16
+@deftp {Object Type} cc-sint16
 Object wrapper for the C language type @code{int16_t}.
 @end deftp
 
 
-@deffn {Generic Function} cc-int16 (@var{INIT})
-@deffnx {Method} cc-int16 ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-int16} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} cc-sint16 (@var{INIT})
+@deffnx {Method} cc-sint16 ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-sint16} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{int16_t}.
 @end deffn
 
 
-@defun cc-int16-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-int16}, otherwise return false.
+@defun cc-sint16-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-sint16}, otherwise return false.
 @end defun
 
 
-@defun cc-int16-obj @var{CH}
-Given an instance of @objtype{cc-int16}: return the exact integer representing its @ascii{} code.
+@defun cc-sint16-obj @var{CH}
+Given an instance of @objtype{cc-sint16}: return the exact integer representing its @ascii{} code.
 @end defun
 
 
-@defun cc-range-int16-p @var{OBJ}
+@defun cc-sint16-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{int16_t}.
 @end defun
@@ -1602,42 +1602,42 @@ Given an instance of @objtype{cc-uint16}: return the exact integer representing 
 @end defun
 
 
-@defun cc-range-uint16-p @var{OBJ}
+@defun cc-uint16-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{uint16_t}.
 @end defun
 
 @c page
-@node ctypes int32
+@node ctypes sint32
 @section Wrapper for @code{int32_t}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-int32
+@deftp {Object Type} cc-sint32
 Object wrapper for the C language type @code{int32_t}.
 @end deftp
 
 
-@deffn {Generic Function} cc-int32 (@var{INIT})
-@deffnx {Method} cc-int32 ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-int32} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} cc-sint32 (@var{INIT})
+@deffnx {Method} cc-sint32 ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-sint32} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{int32_t}.
 @end deffn
 
 
-@defun cc-int32-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-int32}, otherwise return false.
+@defun cc-sint32-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-sint32}, otherwise return false.
 @end defun
 
 
-@defun cc-int32-obj @var{CH}
-Given an instance of @objtype{cc-int32}: return the exact integer representing its @ascii{} code.
+@defun cc-sint32-obj @var{CH}
+Given an instance of @objtype{cc-sint32}: return the exact integer representing its @ascii{} code.
 @end defun
 
 
-@defun cc-range-int32-p @var{OBJ}
+@defun cc-sint32-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{int32_t}.
 @end defun
@@ -1672,42 +1672,42 @@ Given an instance of @objtype{cc-uint32}: return the exact integer representing 
 @end defun
 
 
-@defun cc-range-uint32-p @var{OBJ}
+@defun cc-uint32-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{uint32_t}.
 @end defun
 
 @c page
-@node ctypes int64
+@node ctypes sint64
 @section Wrapper for @code{int64_t}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-int64
+@deftp {Object Type} cc-sint64
 Object wrapper for the C language type @code{int64_t}.
 @end deftp
 
 
-@deffn {Generic Function} cc-int64 (@var{INIT})
-@deffnx {Method} cc-int64 ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-int64} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} cc-sint64 (@var{INIT})
+@deffnx {Method} cc-sint64 ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-sint64} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{int64_t}.
 @end deffn
 
 
-@defun cc-int64-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-int64}, otherwise return false.
+@defun cc-sint64-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-sint64}, otherwise return false.
 @end defun
 
 
-@defun cc-int64-obj @var{CH}
-Given an instance of @objtype{cc-int64}: return the exact integer representing its @ascii{} code.
+@defun cc-sint64-obj @var{CH}
+Given an instance of @objtype{cc-sint64}: return the exact integer representing its @ascii{} code.
 @end defun
 
 
-@defun cc-range-int64-p @var{OBJ}
+@defun cc-sint64-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{int64_t}.
 @end defun
@@ -1742,7 +1742,7 @@ Given an instance of @objtype{cc-uint64}: return the exact integer representing 
 @end defun
 
 
-@defun cc-range-uint64-p @var{OBJ}
+@defun cc-uint64-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{uint64_t}.
 @end defun

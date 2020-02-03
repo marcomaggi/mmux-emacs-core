@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-02 07:05:26 marco>
+;; Time-stamp: <2020-02-03 18:18:26 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -30,6 +30,19 @@
 ;;
 
 ;;; Code:
+
+
+;;;; helpers
+
+(defun cc--or-most-positive-fixnum (N)
+  (if (<= N 0)
+      most-positive-fixnum
+    N))
+
+(defun cc--or-most-negative-fixnum (N)
+  (if (>= N 0)
+      most-negative-fixnum
+    N))
 
 
 ;;;; size of basic types in measured in bytes
@@ -260,11 +273,11 @@
 ;;; --------------------------------------------------------------------
 
 (defconst cc-LONG_MIN
-  (max most-negative-fixnum @VALUEOF_LONG_MIN@)
+  (cc--or-most-negative-fixnum @VALUEOF_LONG_MIN@)
   "Exact integer representing the minimum value representable by a `signed long int'.")
 
 (defconst cc-LONG_MAX
-  (min most-positive-fixnum @VALUEOF_LONG_MAX@)
+  (cc--or-most-positive-fixnum @VALUEOF_LONG_MAX@)
   "Exact integer representing the maximum value representable by a `signed long int'.")
 
 (defconst cc-ULONG_MIN
@@ -272,17 +285,17 @@
   "Exact integer representing the minimum value representable by a `unsigned long int'.")
 
 (defconst cc-ULONG_MAX
-  (min most-positive-fixnum @VALUEOF_ULONG_MAX@)
+  (cc--or-most-positive-fixnum @VALUEOF_ULONG_MAX@)
   "Exact integer representing the maximum value representable by a `unsigned long int'.")
 
 ;;; --------------------------------------------------------------------
 
 (defconst cc-LLONG_MIN
-  (max most-negative-fixnum @VALUEOF_LLONG_MIN@)
+  (cc--or-most-negative-fixnum @VALUEOF_LLONG_MIN@)
   "Exact integer representing the minimum value representable by a `signed long long int'.")
 
 (defconst cc-LLONG_MAX
-  (min most-positive-fixnum @VALUEOF_LLONG_MAX@)
+  (cc--or-most-positive-fixnum @VALUEOF_LLONG_MAX@)
   "Exact integer representing the maximum value representable by a `signed long long int'.")
 
 (defconst cc-ULLONG_MIN
@@ -422,11 +435,11 @@
 ;;; --------------------------------------------------------------------
 
 (defconst cc-INT64_MIN
-  (- (expt 2 (1- (* 8 cc-SIZEOF_INT64_T))))
+  (cc--or-most-negative-fixnum (- (expt 2 (1- (* 8 cc-SIZEOF_INT64_T)))))
   "Exact integer representing the minimum value representable by a `int64_t'.")
 
 (defconst cc-INT64_MAX
-  (1- (expt 2 (1- (* 8 cc-SIZEOF_INT64_T))))
+  (cc--or-most-positive-fixnum (1- (expt 2 (1- (* 8 cc-SIZEOF_INT64_T)))))
   "Exact integer representing the maximum value representable by a `int64_t'.")
 
 ;;; --------------------------------------------------------------------
@@ -436,7 +449,7 @@
   "Exact integer representing the minimum value representable by a `uint64_t'.")
 
 (defconst cc-UINT64_MAX
-  (1- (expt 2 (* 8 cc-SIZEOF_UINT64_T)))
+  (cc--or-most-positive-fixnum (1- (expt 2 (* 8 cc-SIZEOF_UINT64_T))))
   "Exact integer representing the maximum value representable by a `uint64_t'.")
 
 

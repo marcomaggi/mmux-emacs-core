@@ -107,7 +107,7 @@ Fmmux_emacs_core_bytevector_u32_ref (emacs_env *env, ptrdiff_t nargs, emacs_valu
   size_t			idx	= mmux_emacs_core_get_size(env, args[1]);
 
   if (idx <= bv->number_of_slots) {
-    uint32_t	*slots	= ((uint32_t*)(bv->ptr));
+    uint32_t	*slots	= ((uint32_t *)(bv->ptr));
 
     return mmux_emacs_core_make_intmax(env, slots[idx]);
   } else {
@@ -253,7 +253,7 @@ Fmmux_emacs_core_bytevector_u32_set (emacs_env *env, ptrdiff_t nargs, emacs_valu
   uint32_t			val	= mmux_emacs_core_get_uint32(env, args[2]);
 
   if (idx <= bv->number_of_slots) {
-    uint16_t	*slots	= ((uint16_t*)(bv->ptr));
+    uint32_t	*slots	= ((uint32_t*)(bv->ptr));
 
     slots[idx] = val;
     return mmux_emacs_core_make_nil(env);

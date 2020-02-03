@@ -104,6 +104,75 @@
     		   (cc-bytevector-ref bv (cc-usize i)))))))
 
 
+;;;; slots inspection
+
+(ert-deftest cc-bytevector-u8-slots ()
+  "Inspect the slots of a `cc-bytevector-u8' object."
+  (let ((bv	(cc-bytevector-u8 10)))
+    (should (= 10 (cc-bytevector-number-of-slots bv)))
+    (should (= 1 (cc-bytevector-slot-size bv)))
+    (should (= (* 10 1) (cc-bytevector-number-of-allocated-bytes bv)))
+    (should (not (cc-bytevector-signed bv)))))
+
+(ert-deftest cc-bytevector-u16-slots ()
+  "Inspect the slots of a `cc-bytevector-u16' object."
+  (let ((bv	(cc-bytevector-u16 10)))
+    (should (= 10 (cc-bytevector-number-of-slots bv)))
+    (should (= 2 (cc-bytevector-slot-size bv)))
+    (should (= (* 10 2) (cc-bytevector-number-of-allocated-bytes bv)))
+    (should (not (cc-bytevector-signed bv)))))
+
+(ert-deftest cc-bytevector-u32-slots ()
+  "Inspect the slots of a `cc-bytevector-u32' object."
+  (let ((bv	(cc-bytevector-u32 10)))
+    (should (= 10 (cc-bytevector-number-of-slots bv)))
+    (should (= 4 (cc-bytevector-slot-size bv)))
+    (should (= (* 10 4) (cc-bytevector-number-of-allocated-bytes bv)))
+    (should (not (cc-bytevector-signed bv)))))
+
+(ert-deftest cc-bytevector-u64-slots ()
+  "Inspect the slots of a `cc-bytevector-u64' object."
+  (let ((bv	(cc-bytevector-u64 10)))
+    (should (= 10 (cc-bytevector-number-of-slots bv)))
+    (should (= 8 (cc-bytevector-slot-size bv)))
+    (should (= (* 10 8) (cc-bytevector-number-of-allocated-bytes bv)))
+    (should (not (cc-bytevector-signed bv)))))
+
+;;; --------------------------------------------------------------------
+
+(ert-deftest cc-bytevector-s8-slots ()
+  "Inspect the slots of a `cc-bytevector-s8' object."
+  (let ((bv	(cc-bytevector-s8 10)))
+    (should (= 10 (cc-bytevector-number-of-slots bv)))
+    (should (= 1 (cc-bytevector-slot-size bv)))
+    (should (= (* 10 1) (cc-bytevector-number-of-allocated-bytes bv)))
+    (should (cc-bytevector-signed bv))))
+
+(ert-deftest cc-bytevector-s16-slots ()
+  "Inspect the slots of a `cc-bytevector-s16' object."
+  (let ((bv	(cc-bytevector-s16 10)))
+    (should (= 10 (cc-bytevector-number-of-slots bv)))
+    (should (= 2 (cc-bytevector-slot-size bv)))
+    (should (= (* 10 2) (cc-bytevector-number-of-allocated-bytes bv)))
+    (should (cc-bytevector-signed bv))))
+
+(ert-deftest cc-bytevector-s32-slots ()
+  "Inspect the slots of a `cc-bytevector-s32' object."
+  (let ((bv	(cc-bytevector-s32 10)))
+    (should (= 10 (cc-bytevector-number-of-slots bv)))
+    (should (= 4 (cc-bytevector-slot-size bv)))
+    (should (= (* 10 4) (cc-bytevector-number-of-allocated-bytes bv)))
+    (should (cc-bytevector-signed bv))))
+
+(ert-deftest cc-bytevector-s64-slots ()
+  "Inspect the slots of a `cc-bytevector-s64' object."
+  (let ((bv	(cc-bytevector-s64 10)))
+    (should (= 10 (cc-bytevector-number-of-slots bv)))
+    (should (= 8 (cc-bytevector-slot-size bv)))
+    (should (= (* 10 8) (cc-bytevector-number-of-allocated-bytes bv)))
+    (should (cc-bytevector-signed bv))))
+
+
 ;;;; done
 
 (ert-run-tests-batch-and-exit)

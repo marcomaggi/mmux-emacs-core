@@ -62,6 +62,14 @@ mmux_emacs_core_private_decl void mmux_emacs_core_user_ptr_objects_init (emacs_e
 mmux_emacs_core_private_decl void mmux_emacs_core_bytevectors_init (emacs_env * env)
   __attribute__((__nonnull__(1)));
 
+/* ------------------------------------------------------------------ */
+
+mmux_emacs_core_private_decl emacs_value mmux_emacs_core_error_memory_allocation (emacs_env * env)
+  __attribute__((__nonnull__(1)));
+
+mmux_emacs_core_private_decl emacs_value mmux_emacs_core_error_bytevector_index_out_of_range (emacs_env * env)
+  __attribute__((__nonnull__(1)));
+
 
 /** --------------------------------------------------------------------
  ** Done.

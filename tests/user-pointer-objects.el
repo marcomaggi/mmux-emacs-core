@@ -22,9 +22,113 @@
 (require 'ert)
 (require 'cc-core)
 
-(ert-deftest make-bytevector ()
-  "Build a `bytevector' object."
-  (should (cc-bytevector-u8 123)))
+
+;;;; bytevector makers
+
+(ert-deftest cc-bytevector-u8 ()
+  "Build a `cc-bytevector-u8' object."
+  (should	(cc-bytevector-p	(cc-bytevector-u8 123)))
+  (should	(cc-bytevector-u8-p	(cc-bytevector-u8 123)))
+  (should (not	(cc-bytevector-u16-p	(cc-bytevector-u8 123))))
+  (should (not	(cc-bytevector-u32-p	(cc-bytevector-u8 123))))
+  (should (not	(cc-bytevector-u64-p	(cc-bytevector-u8 123))))
+  (should (not	(cc-bytevector-s8-p	(cc-bytevector-u8 123))))
+  (should (not	(cc-bytevector-s16-p	(cc-bytevector-u8 123))))
+  (should (not	(cc-bytevector-s32-p	(cc-bytevector-u8 123))))
+  (should (not	(cc-bytevector-s64-p	(cc-bytevector-u8 123)))))
+
+(ert-deftest cc-bytevector-s8 ()
+  "Build a `cc-bytevector-s8' object."
+  (should	(cc-bytevector-p	(cc-bytevector-s8 123)))
+  (should (not	(cc-bytevector-u8-p	(cc-bytevector-s8 123))))
+  (should (not	(cc-bytevector-u16-p	(cc-bytevector-s8 123))))
+  (should (not	(cc-bytevector-u32-p	(cc-bytevector-s8 123))))
+  (should (not	(cc-bytevector-u64-p	(cc-bytevector-s8 123))))
+  (should 	(cc-bytevector-s8-p	(cc-bytevector-s8 123)))
+  (should (not	(cc-bytevector-s16-p	(cc-bytevector-s8 123))))
+  (should (not	(cc-bytevector-s32-p	(cc-bytevector-s8 123))))
+  (should (not	(cc-bytevector-s64-p	(cc-bytevector-s8 123)))))
+
+;;; --------------------------------------------------------------------
+
+(ert-deftest cc-bytevector-u16 ()
+  "Build a `cc-bytevector-u16' object."
+  (should	(cc-bytevector-p	(cc-bytevector-u16 123)))
+  (should (not	(cc-bytevector-u8-p	(cc-bytevector-u16 123))))
+  (should 	(cc-bytevector-u16-p	(cc-bytevector-u16 123)))
+  (should (not	(cc-bytevector-u32-p	(cc-bytevector-u16 123))))
+  (should (not	(cc-bytevector-u64-p	(cc-bytevector-u16 123))))
+  (should (not	(cc-bytevector-s8-p	(cc-bytevector-u16 123))))
+  (should (not	(cc-bytevector-s16-p	(cc-bytevector-u16 123))))
+  (should (not	(cc-bytevector-s32-p	(cc-bytevector-u16 123))))
+  (should (not	(cc-bytevector-s64-p	(cc-bytevector-u16 123)))))
+
+(ert-deftest cc-bytevector-s16 ()
+  "Build a `cc-bytevector-s16' object."
+  (should	(cc-bytevector-p	(cc-bytevector-s16 123)))
+  (should (not	(cc-bytevector-u8-p	(cc-bytevector-s16 123))))
+  (should (not	(cc-bytevector-u16-p	(cc-bytevector-s16 123))))
+  (should (not	(cc-bytevector-u32-p	(cc-bytevector-s16 123))))
+  (should (not	(cc-bytevector-u64-p	(cc-bytevector-s16 123))))
+  (should (not	(cc-bytevector-s8-p	(cc-bytevector-s16 123))))
+  (should 	(cc-bytevector-s16-p	(cc-bytevector-s16 123)))
+  (should (not	(cc-bytevector-s32-p	(cc-bytevector-s16 123))))
+  (should (not	(cc-bytevector-s64-p	(cc-bytevector-s16 123)))))
+
+;;; --------------------------------------------------------------------
+
+(ert-deftest cc-bytevector-u32 ()
+  "Build a `cc-bytevector-u32' object."
+  (should	(cc-bytevector-p	(cc-bytevector-u32 123)))
+  (should (not	(cc-bytevector-u8-p	(cc-bytevector-u32 123))))
+  (should (not	(cc-bytevector-u16-p	(cc-bytevector-u32 123))))
+  (should 	(cc-bytevector-u32-p	(cc-bytevector-u32 123)))
+  (should (not	(cc-bytevector-u64-p	(cc-bytevector-u32 123))))
+  (should (not	(cc-bytevector-s8-p	(cc-bytevector-u32 123))))
+  (should (not	(cc-bytevector-s16-p	(cc-bytevector-u32 123))))
+  (should (not	(cc-bytevector-s32-p	(cc-bytevector-u32 123))))
+  (should (not	(cc-bytevector-s64-p	(cc-bytevector-u32 123)))))
+
+(ert-deftest cc-bytevector-s32 ()
+  "Build a `cc-bytevector-s32' object."
+  (should	(cc-bytevector-p	(cc-bytevector-s32 123)))
+  (should (not	(cc-bytevector-u8-p	(cc-bytevector-s32 123))))
+  (should (not	(cc-bytevector-u16-p	(cc-bytevector-s32 123))))
+  (should (not	(cc-bytevector-u32-p	(cc-bytevector-s32 123))))
+  (should (not	(cc-bytevector-u64-p	(cc-bytevector-s32 123))))
+  (should (not 	(cc-bytevector-s8-p	(cc-bytevector-s32 123))))
+  (should (not	(cc-bytevector-s16-p	(cc-bytevector-s32 123))))
+  (should 	(cc-bytevector-s32-p	(cc-bytevector-s32 123)))
+  (should (not	(cc-bytevector-s64-p	(cc-bytevector-s32 123)))))
+
+;;; --------------------------------------------------------------------
+
+(ert-deftest cc-bytevector-u64 ()
+  "Build a `cc-bytevector-u64' object."
+  (should	(cc-bytevector-p	(cc-bytevector-u64 123)))
+  (should (not	(cc-bytevector-u8-p	(cc-bytevector-u64 123))))
+  (should (not	(cc-bytevector-u16-p	(cc-bytevector-u64 123))))
+  (should (not 	(cc-bytevector-u32-p	(cc-bytevector-u64 123))))
+  (should 	(cc-bytevector-u64-p	(cc-bytevector-u64 123)))
+  (should (not	(cc-bytevector-s8-p	(cc-bytevector-u64 123))))
+  (should (not	(cc-bytevector-s16-p	(cc-bytevector-u64 123))))
+  (should (not	(cc-bytevector-s32-p	(cc-bytevector-u64 123))))
+  (should (not	(cc-bytevector-s64-p	(cc-bytevector-u64 123)))))
+
+(ert-deftest cc-bytevector-s64 ()
+  "Build a `cc-bytevector-642' object."
+  (should	(cc-bytevector-p	(cc-bytevector-s64 123)))
+  (should (not	(cc-bytevector-u8-p	(cc-bytevector-s64 123))))
+  (should (not	(cc-bytevector-u16-p	(cc-bytevector-s64 123))))
+  (should (not	(cc-bytevector-u32-p	(cc-bytevector-s64 123))))
+  (should (not	(cc-bytevector-u64-p	(cc-bytevector-s64 123))))
+  (should (not 	(cc-bytevector-s8-p	(cc-bytevector-s64 123))))
+  (should (not	(cc-bytevector-s16-p	(cc-bytevector-s64 123))))
+  (should (not 	(cc-bytevector-s32-p	(cc-bytevector-s64 123))))
+  (should 	(cc-bytevector-s64-p	(cc-bytevector-s64 123))))
+
+
+;;;; done
 
 (ert-run-tests-batch-and-exit)
 

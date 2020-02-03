@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-02 17:53:59 marco>
+;; Time-stamp: <2020-02-03 07:11:24 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -37,6 +37,24 @@
 (require 'cl-lib)
 (require 'cc-constants)
 
+
+;;;; error symbols
+
+(define-error 'mmux-core-error
+  "Error while executing a MMUX Emacs Core operation."
+  'error)
+
+(define-error 'mmux-core-no-memory-error
+  "Error allocating memory."
+  'mmux-core-error)
+
+(define-error 'mmux-core-index-out-of-range
+  "Attempt to access the internal represenation of an object with an index out of range."
+  'mmux-core-error)
+
+(define-error 'mmux-core-bytevector-index-out-of-range
+  "Attempt to access the internal represenation of a bytevector object with an index out of range."
+  'mmux-core-index-out-of-range)
 
 
 ;;;; C language type wrappers: char
@@ -692,23 +710,80 @@
      (cc-bytevector-slot-size bv)))
 
 
-;;;; bytevector objects: setters and getters
+;;;; bytevector objects: getters
 
 (cl-defgeneric cc-bytevector-ref (bv idx)
   "Extract a value from a bytevector.")
 
-(cl-defmethod cc-bytevector-ref ((bv cc-bytevector) (idx integer))
-  "Extract a value from a bytevector."
+(cl-defmethod cc-bytevector-ref ((bv cc-bytevector-u8) (idx integer))
+  "Extract an `uint8_t' value from a bytevector."
   (mmux-core-c-bytevector-u8-ref (cc-bytevector-obj bv) idx))
 
-;;; --------------------------------------------------------------------
+(cl-defmethod cc-bytevector-ref ((bv cc-bytevector-s8) (idx integer))
+  "Extract an `int8_t' value from a bytevector."
+  (mmux-core-c-bytevector-u8-ref (cc-bytevector-obj bv) idx))
+
+(cl-defmethod cc-bytevector-ref ((bv cc-bytevector-u16) (idx integer))
+  "Extract an `uint16_t' value from a bytevector."
+  (mmux-core-c-bytevector-u16-ref (cc-bytevector-obj bv) idx))
+
+(cl-defmethod cc-bytevector-ref ((bv cc-bytevector-s16) (idx integer))
+  "Extract an `int16_t' value from a bytevector."
+  (mmux-core-c-bytevector-u16-ref (cc-bytevector-obj bv) idx))
+
+(cl-defmethod cc-bytevector-ref ((bv cc-bytevector-u32) (idx integer))
+  "Extract an `uint32_t' value from a bytevector."
+  (mmux-core-c-bytevector-u32-ref (cc-bytevector-obj bv) idx))
+
+(cl-defmethod cc-bytevector-ref ((bv cc-bytevector-s32) (idx integer))
+  "Extract an `int32_t' value from a bytevector."
+  (mmux-core-c-bytevector-u32-ref (cc-bytevector-obj bv) idx))
+
+(cl-defmethod cc-bytevector-ref ((bv cc-bytevector-u64) (idx integer))
+  "Extract an `uint64_t' value from a bytevector."
+  (mmux-core-c-bytevector-u64-ref (cc-bytevector-obj bv) idx))
+
+(cl-defmethod cc-bytevector-ref ((bv cc-bytevector-s64) (idx integer))
+  "Extract an `int64_t' value from a bytevector."
+  (mmux-core-c-bytevector-u64-ref (cc-bytevector-obj bv) idx))
+
+
+;;;; bytevector objects: setters and getters
 
 (cl-defgeneric cc-bytevector-set! (bv idx val)
   "Extract a value from a bytevector.")
 
-(cl-defmethod cc-bytevector-set! ((bv cc-bytevector) (idx integer) (val integer))
-  "Extract a value from a bytevector."
-  (mmux-core-c-bytevector-u8-set! (cc-bytevector-obj bv) idx val))
+(cl-defmethod cc-bytevector-set! ((bv cc-bytevector-u8) (idx integer))
+  "Extract an `uint8_t' value from a bytevector."
+  (mmux-core-c-bytevector-u8-set! (cc-bytevector-obj bv) idx))
+
+(cl-defmethod cc-bytevector-set! ((bv cc-bytevector-s8) (idx integer))
+  "Extract an `int8_t' value from a bytevector."
+  (mmux-core-c-bytevector-u8-set! (cc-bytevector-obj bv) idx))
+
+(cl-defmethod cc-bytevector-set! ((bv cc-bytevector-u16) (idx integer))
+  "Extract an `uint16_t' value from a bytevector."
+  (mmux-core-c-bytevector-u16-set! (cc-bytevector-obj bv) idx))
+
+(cl-defmethod cc-bytevector-set! ((bv cc-bytevector-s16) (idx integer))
+  "Extract an `int16_t' value from a bytevector."
+  (mmux-core-c-bytevector-u16-set! (cc-bytevector-obj bv) idx))
+
+(cl-defmethod cc-bytevector-set! ((bv cc-bytevector-u32) (idx integer))
+  "Extract an `uint32_t' value from a bytevector."
+  (mmux-core-c-bytevector-u32-set! (cc-bytevector-obj bv) idx))
+
+(cl-defmethod cc-bytevector-set! ((bv cc-bytevector-s32) (idx integer))
+  "Extract an `int32_t' value from a bytevector."
+  (mmux-core-c-bytevector-u32-set! (cc-bytevector-obj bv) idx))
+
+(cl-defmethod cc-bytevector-set! ((bv cc-bytevector-u64) (idx integer))
+  "Extract an `uint64_t' value from a bytevector."
+  (mmux-core-c-bytevector-u64-set! (cc-bytevector-obj bv) idx))
+
+(cl-defmethod cc-bytevector-set! ((bv cc-bytevector-s64) (idx integer))
+  "Extract an `int64_t' value from a bytevector."
+  (mmux-core-c-bytevector-u64-set! (cc-bytevector-obj bv) idx))
 
 
 ;;;; done

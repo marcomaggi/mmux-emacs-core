@@ -69,7 +69,8 @@ libmmux_emacs_core_la_SOURCES	= \
 	src/mmux-emacs-core-internals.h			\
 	src/mmux-emacs-core-library.c			\
 	src/mmux-emacs-core-user-pointer-objects.c	\
-	src/mmux-emacs-core-bytevectors.c
+	src/mmux-emacs-core-bytevectors.c		\
+	src/mmux-emacs-core-errors.c
 
 
 #### Emacs code

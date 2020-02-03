@@ -64,25 +64,11 @@ Fmmux_emacs_core_bytevector_make (emacs_env *env, ptrdiff_t nargs, emacs_value a
       obj->slot_size		= slot_size;
       obj->hold_signed_values	= hold_signed_values;
       return mmux_emacs_core_make_user_ptr(env, mmux_emacs_core_bytevector_finalizer, obj);
-    } else
-      goto memory_allocation_error;
+    } else {
+      return mmux_emacs_core_error_memory_allocation(env);
+    }
   } else {
-    goto memory_allocation_error;
-  }
-
-  return env->intern(env, "nil");
-
- memory_allocation_error:
-  {
-    char const		* errmsg = strerror(errno);
-    emacs_value		Serrmsg = mmux_emacs_core_make_string(env, errmsg, strlen(errmsg));
-
-    /* Signal an error,  then immediately return.  In the "elisp"  Info file: see the
-       node "Standard Errors" for a list of  the standard error symbols; see the node
-       "Error Symbols"  for methods to define  error symbols.  (Marco Maggi;  Jan 14,
-       2020) */
-    env->non_local_exit_signal(env, env->intern(env, "mmux-core-no-memory-error"), Serrmsg);
-    return env->intern(env, "nil");
+    return mmux_emacs_core_error_memory_allocation(env);
   }
 }
 

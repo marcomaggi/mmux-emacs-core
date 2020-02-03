@@ -151,6 +151,7 @@ included in the section entitled ``@gnu{} Free Documentation License''.
 * version::                     Version functions.
 * constants::                   Constant values.
 * ctypes::                      Object wrappers for C language types.
+* errors::                      How errors are signalled.
 
 Appendices
 
@@ -1745,6 +1746,38 @@ Given an instance of @objtype{cc-uint64}: return the exact integer representing 
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{uint64_t}.
 @end defun
+
+@c page
+@node errors
+@chapter How errors are signalled
+
+
+Occasionally the functions in @value{PACKAGE} signal an error; the following error symbols are
+defined.
+
+
+@defvr {Error Symbol} mmux-core-error
+The base type of all the error symbols.
+@end defvr
+
+
+@defvr {Error Symbol} mmux-core-no-memory-error
+@defvrx {Parent Error Symbol} mmux-core-error
+Used to signal that there was not enough memory to allocate an object.
+@end defvr
+
+
+@defvr {Error Symbol} mmux-core-index-out-of-range
+@defvrx {Parent Error Symbol} mmux-core-error
+Used to signal an attempt to access the internal represenation of an object with an index out of
+range.
+@end defvr
+
+
+@defvr {Error Symbol} mmux-core-bytevector-index-out-of-range
+@defvrx {Parent Error Symbol} mmux-core-index-out-of-range
+Attempt to access the internal represenation of a bytevector object with an index out of range.
+@end defvr
 
 @c page
 @c ------------------------------------------------------------

@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-03 15:23:42 marco>
+;; Time-stamp: <2020-02-03 15:27:48 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -755,35 +755,43 @@
 
 (cl-defmethod  cc-bytevector-set! ((bv cc-bytevector-u8) (idx integer) (val integer))
   "Extract an `uint8_t' value from a bytevector."
+  (cl-assert (cc-range-uint8-p val))
   (mmux-core-c-bytevector-u8-set! (cc-bytevector-obj bv) idx val))
 
 (cl-defmethod  cc-bytevector-set! ((bv cc-bytevector-s8) (idx integer) (val integer))
   "Extract an `int8_t' value from a bytevector."
-  (mmux-core-c-bytevector-u8-set! (cc-bytevector-obj bv) idx val))
+  (cl-assert (cc-range-int8-p val))
+  (mmux-core-c-bytevector-s8-set! (cc-bytevector-obj bv) idx val))
 
 (cl-defmethod  cc-bytevector-set! ((bv cc-bytevector-u16) (idx integer) (val integer))
   "Extract an `uint16_t' value from a bytevector."
+  (cl-assert (cc-range-uint16-p val))
   (mmux-core-c-bytevector-u16-set! (cc-bytevector-obj bv) idx val))
 
 (cl-defmethod  cc-bytevector-set! ((bv cc-bytevector-s16) (idx integer) (val integer))
   "Extract an `int16_t' value from a bytevector."
-  (mmux-core-c-bytevector-u16-set! (cc-bytevector-obj bv) idx val))
+  (cl-assert (cc-range-int16-p val))
+  (mmux-core-c-bytevector-s16-set! (cc-bytevector-obj bv) idx val))
 
 (cl-defmethod  cc-bytevector-set! ((bv cc-bytevector-u32) (idx integer) (val integer))
   "Extract an `uint32_t' value from a bytevector."
+  (cl-assert (cc-range-uint32-p val))
   (mmux-core-c-bytevector-u32-set! (cc-bytevector-obj bv) idx val))
 
 (cl-defmethod  cc-bytevector-set! ((bv cc-bytevector-s32) (idx integer) (val integer))
   "Extract an `int32_t' value from a bytevector."
-  (mmux-core-c-bytevector-u32-set! (cc-bytevector-obj bv) idx val))
+  (cl-assert (cc-range-int8-p val))
+  (mmux-core-c-bytevector-s32-set! (cc-bytevector-obj bv) idx val))
 
 (cl-defmethod  cc-bytevector-set! ((bv cc-bytevector-u64) (idx integer) (val integer))
   "Extract an `uint64_t' value from a bytevector."
+  (cl-assert (cc-range-uint64-p val))
   (mmux-core-c-bytevector-u64-set! (cc-bytevector-obj bv) idx val))
 
 (cl-defmethod  cc-bytevector-set! ((bv cc-bytevector-s64) (idx integer) (val integer))
   "Extract an `int64_t' value from a bytevector."
-  (mmux-core-c-bytevector-u64-set! (cc-bytevector-obj bv) idx val))
+  (cl-assert (cc-range-int64-p val))
+  (mmux-core-c-bytevector-s64-set! (cc-bytevector-obj bv) idx val))
 
 
 ;;;; done

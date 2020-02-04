@@ -886,6 +886,7 @@ range of such type is available.
 * ctypes usize::                Wrapper for @code{size_t}.
 * ctypes sintmax::              Wrapper for @code{intmax_t}.
 * ctypes uintmax::              Wrapper for @code{uintmax_t}.
+* ctypes ptrdiff::              Wrapper for @code{ptrdiff_t}.
 * ctypes sint8::                Wrapper for @code{int8_t}.
 * ctypes uint8::                Wrapper for @code{uint8_t}.
 * ctypes sint16::               Wrapper for @code{int16_t}.
@@ -894,6 +895,8 @@ range of such type is available.
 * ctypes uint32::               Wrapper for @code{uint32_t}.
 * ctypes sint64::               Wrapper for @code{int64_t}.
 * ctypes uint64::               Wrapper for @code{uint64_t}.
+* ctypes float::                Wrapper for @code{float}.
+* ctypes long double::          Wrapper for @code{long double}.
 @end menu
 
 @c page
@@ -1134,8 +1137,8 @@ Return true if @var{obj} is an instance of @objtype{cc-signed-int}, otherwise re
 
 
 @defun cc-signed-int-obj @var{CH}
-Given an instance of @objtype{cc-signed-int}: return the exact integer representing its
-@ascii{} code.
+Given an instance of @objtype{cc-signed-int}: return the its internal representation as
+user--pointer object.
 @end defun
 
 
@@ -1170,8 +1173,8 @@ Return true if @var{obj} is an instance of @objtype{cc-unsigned-int}, otherwise 
 
 
 @defun cc-unsigned-int-obj @var{CH}
-Given an instance of @objtype{cc-unsigned-int}: return the exact integer representing its @ascii{}
-code.
+Given an instance of @objtype{cc-unsigned-int}: return the its internal representation as
+user--pointer object.
 @end defun
 
 
@@ -1206,8 +1209,8 @@ Return true if @var{obj} is an instance of @objtype{cc-signed-long-int}, otherwi
 
 
 @defun cc-signed-long-int-obj @var{CH}
-Given an instance of @objtype{cc-signed-long-int}: return the exact integer representing its
-@ascii{} code.
+Given an instance of @objtype{cc-signed-long-int}: return the its internal representation as
+user--pointer object.
 @end defun
 
 
@@ -1242,8 +1245,8 @@ Return true if @var{obj} is an instance of @objtype{cc-unsigned-long-int}, other
 
 
 @defun cc-unsigned-long-int-obj @var{CH}
-Given an instance of @objtype{cc-unsigned-long-int}: return the exact integer representing its
-@ascii{} code.
+Given an instance of @objtype{cc-unsigned-long-int}: return the its internal representation as
+user--pointer object.
 @end defun
 
 
@@ -1280,8 +1283,8 @@ false.
 
 
 @defun cc-signed-long-long-int-obj @var{CH}
-Given an instance of @objtype{cc-signed-long-long-int}: return the exact integer representing its
-@ascii{} code.
+Given an instance of @objtype{cc-signed-long-long-int}: return the its internal representation as
+user--pointer object.
 @end defun
 
 
@@ -1318,8 +1321,8 @@ false.
 
 
 @defun cc-unsigned-long-long-int-obj @var{CH}
-Given an instance of @objtype{cc-unsigned-long-long-int}: return the exact integer representing its
-@ascii{} code.
+Given an instance of @objtype{cc-unsigned-long-long-int}: return the its internal representation as
+user--pointer object.
 @end defun
 
 
@@ -1354,7 +1357,8 @@ Return true if @var{obj} is an instance of @objtype{cc-ssize}, otherwise return 
 
 
 @defun cc-ssize-obj @var{CH}
-Given an instance of @objtype{cc-ssize}: return the exact integer representing its @ascii{} code.
+Given an instance of @objtype{cc-ssize}: return the its internal representation as user--pointer
+object.
 @end defun
 
 
@@ -1389,7 +1393,8 @@ Return true if @var{obj} is an instance of @objtype{cc-usize}, otherwise return 
 
 
 @defun cc-usize-obj @var{CH}
-Given an instance of @objtype{cc-usize}: return the exact integer representing its @ascii{} code.
+Given an instance of @objtype{cc-usize}: return the its internal representation as user--pointer
+object.
 @end defun
 
 
@@ -1424,7 +1429,8 @@ Return true if @var{obj} is an instance of @objtype{cc-sintmax}, otherwise retur
 
 
 @defun cc-sintmax-obj @var{CH}
-Given an instance of @objtype{cc-sintmax}: return the exact integer representing its @ascii{} code.
+Given an instance of @objtype{cc-sintmax}: return the its internal representation as user--pointer
+object.
 @end defun
 
 
@@ -1459,13 +1465,50 @@ Return true if @var{obj} is an instance of @objtype{cc-uintmax}, otherwise retur
 
 
 @defun cc-uintmax-obj @var{CH}
-Given an instance of @objtype{cc-uintmax}: return the exact integer representing its @ascii{} code.
+Given an instance of @objtype{cc-uintmax}: return the its internal representation as user--pointer
+object.
 @end defun
 
 
 @defun cc-uintmax-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{uintmax}.
+@end defun
+
+@c page
+@node ctypes ptrdiff
+@section Wrapper for @code{ptrdiff_t}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-ptrdiff
+Object wrapper for the C language type @code{ptrdiff_t}.
+@end deftp
+
+
+@deffn {Generic Function} cc-ptrdiff (@var{INIT})
+@deffnx {Method} cc-ptrdiff ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-ptrdiff} initialised with @var{INIT}, which must be
+an exact integer object in the range of the C language type @code{ptrdiff_t}.
+@end deffn
+
+
+@defun cc-ptrdiff-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-ptrdiff}, otherwise return false.
+@end defun
+
+
+@defun cc-ptrdiff-obj @var{CH}
+Given an instance of @objtype{cc-ptrdiff}: return the its internal representation as user--pointer
+object.
+@end defun
+
+
+@defun cc-ptrdiff-range-p @var{OBJ}
+Return true if @var{OBJ} is an exact integer object and it is in the range representable by
+@code{ptrdiff}.
 @end defun
 
 @c page
@@ -1494,7 +1537,8 @@ Return true if @var{obj} is an instance of @objtype{cc-sint8}, otherwise return 
 
 
 @defun cc-sint8-obj @var{CH}
-Given an instance of @objtype{cc-sint8}: return the exact integer representing its @ascii{} code.
+Given an instance of @objtype{cc-sint8}: return the its internal representation as user--pointer
+object.
 @end defun
 
 
@@ -1529,7 +1573,8 @@ Return true if @var{obj} is an instance of @objtype{cc-uint8}, otherwise return 
 
 
 @defun cc-uint8-obj @var{CH}
-Given an instance of @objtype{cc-uint8}: return the exact integer representing its @ascii{} code.
+Given an instance of @objtype{cc-uint8}: return the its internal representation as user--pointer
+object.
 @end defun
 
 
@@ -1564,7 +1609,8 @@ Return true if @var{obj} is an instance of @objtype{cc-sint16}, otherwise return
 
 
 @defun cc-sint16-obj @var{CH}
-Given an instance of @objtype{cc-sint16}: return the exact integer representing its @ascii{} code.
+Given an instance of @objtype{cc-sint16}: return the its internal representation as user--pointer
+object.
 @end defun
 
 
@@ -1599,7 +1645,8 @@ Return true if @var{obj} is an instance of @objtype{cc-uint16}, otherwise return
 
 
 @defun cc-uint16-obj @var{CH}
-Given an instance of @objtype{cc-uint16}: return the exact integer representing its @ascii{} code.
+Given an instance of @objtype{cc-uint16}: return the its internal representation as user--pointer
+object.
 @end defun
 
 
@@ -1634,7 +1681,8 @@ Return true if @var{obj} is an instance of @objtype{cc-sint32}, otherwise return
 
 
 @defun cc-sint32-obj @var{CH}
-Given an instance of @objtype{cc-sint32}: return the exact integer representing its @ascii{} code.
+Given an instance of @objtype{cc-sint32}: return the its internal representation as user--pointer
+object.
 @end defun
 
 
@@ -1669,7 +1717,8 @@ Return true if @var{obj} is an instance of @objtype{cc-uint32}, otherwise return
 
 
 @defun cc-uint32-obj @var{CH}
-Given an instance of @objtype{cc-uint32}: return the exact integer representing its @ascii{} code.
+Given an instance of @objtype{cc-uint32}: return the its internal representation as user--pointer
+object.
 @end defun
 
 
@@ -1704,7 +1753,8 @@ Return true if @var{obj} is an instance of @objtype{cc-sint64}, otherwise return
 
 
 @defun cc-sint64-obj @var{CH}
-Given an instance of @objtype{cc-sint64}: return the exact integer representing its @ascii{} code.
+Given an instance of @objtype{cc-sint64}: return the its internal representation as user--pointer
+object.
 @end defun
 
 
@@ -1739,13 +1789,86 @@ Return true if @var{obj} is an instance of @objtype{cc-uint64}, otherwise return
 
 
 @defun cc-uint64-obj @var{CH}
-Given an instance of @objtype{cc-uint64}: return the exact integer representing its @ascii{} code.
+Given an instance of @objtype{cc-uint64}: return the its internal representation as user--pointer
+object.
 @end defun
 
 
 @defun cc-uint64-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{uint64_t}.
+@end defun
+
+@c page
+@node ctypes float
+@section Wrapper for @code{float}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-float
+Object wrapper for the C language type @code{float}.
+@end deftp
+
+
+@deffn {Generic Function} cc-float (@var{INIT})
+@deffnx {Method} cc-float ((@var{INIT} float))
+Build and return a new instance of @objtype{cc-float} initialised with @var{INIT}, which must be a
+floating--point object in the range of the C language type @code{float}.
+@end deffn
+
+
+@defun cc-float-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-float}, otherwise return false.
+@end defun
+
+
+@defun cc-float-obj @var{CH}
+Given an instance of @objtype{cc-float}: return the its internal representation as user--pointer
+object.
+@end defun
+
+
+@defun cc-float-range-p @var{OBJ}
+Return true if @var{OBJ} is a floating--point object and it is in the range representable by
+@code{float}.
+@end defun
+
+@c page
+@node ctypes long double
+@section Wrapper for @code{long double}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-long-double
+Object wrapper for the C language type @code{long double}.
+@end deftp
+
+
+@deffn {Generic Function} cc-long-double (@var{INIT})
+@deffnx {Method} cc-long-double ((@var{INIT} float))
+Build and return a new instance of @objtype{cc-long-double} initialised with @var{INIT}, which must
+be a floating--point object in the range of the C language type @code{long double}.
+@end deffn
+
+
+@defun cc-long-double-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-long-double}, otherwise return false.
+@end defun
+
+
+@defun cc-long-double-obj @var{CH}
+Given an instance of @objtype{cc-long-double}: return the its internal representation as
+user--pointer object.
+@end defun
+
+
+@defun cc-long-double-range-p @var{OBJ}
+Return true if @var{OBJ} is a floating--point object and it is in the range representable by
+@code{long double}.
 @end defun
 
 @c page

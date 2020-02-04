@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-04 07:23:33 marco>
+;; Time-stamp: <2020-02-04 10:13:55 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -121,7 +121,7 @@
 (cl-defgeneric cc-wchar ((init integer))
   "Build and return a new instance of `cc-wchar'."
   (cl-assert (cc-wchar-range-p init))
-  (cc--make-wchar :obj init))
+  (cc--make-wchar :obj (mmux-core-c-make-wchar init)))
 
 (defun cc-wchar-range-p (op)
   "Return true if OP is an exact integer object and it is in the range representable by `wchar_t'."
@@ -175,7 +175,7 @@
 (cl-defgeneric cc-signed-int ((init integer))
   "Build and return a new instance of `cc-signed-int'."
   (cl-assert (cc-signed-int-range-p init))
-  (cc--make-signed-int :obj init))
+  (cc--make-signed-int :obj (mmux-core-c-make-sint init)))
 
 (defun cc-signed-int-range-p (op)
   "Return true if OP is an exact integer object and it is in the range representable by `signed int'."
@@ -193,7 +193,7 @@
 (cl-defgeneric cc-unsigned-int ((init integer))
   "Build and return a new instance of `cc-unsigned-int'."
   (cl-assert (cc-unsigned-int-range-p init))
-  (cc--make-unsigned-int :obj init))
+  (cc--make-unsigned-int :obj (mmux-core-c-make-uint init)))
 
 (defun cc-unsigned-int-range-p (op)
   "Return true if OP is an exact integer object and it is in the range representable by `unsigned int'."
@@ -211,7 +211,7 @@
 (cl-defgeneric cc-signed-long-int ((init integer))
   "Build and return a new instance of `cc-signed-long-int'."
   (cl-assert (cc-signed-long-int-range-p init))
-  (cc--make-signed-long-int :obj init))
+  (cc--make-signed-long-int :obj (mmux-core-c-make-slong init)))
 
 (defun cc-signed-long-int-range-p (op)
   "Return true if OP is an exact integer object and it is in the range representable by `signed long int'."
@@ -229,7 +229,7 @@
 (cl-defgeneric cc-unsigned-long-int ((init integer))
   "Build and return a new instance of `cc-unsigned-long-int'."
   (cl-assert (cc-unsigned-long-int-range-p init))
-  (cc--make-unsigned-long-int :obj init))
+  (cc--make-unsigned-long-int :obj (mmux-core-c-make-ulong init)))
 
 (defun cc-unsigned-long-int-range-p (op)
   "Return true if OP is an exact integer object and it is in the range representable by `unsigned long int'."
@@ -247,7 +247,7 @@
 (cl-defgeneric cc-signed-long-long-int ((init integer))
   "Build and return a new instance of `cc-signed-long-long-int'."
   (cl-assert (cc-signed-long-long-int-range-p init))
-  (cc--make-signed-long-long-int :obj init))
+  (cc--make-signed-long-long-int :obj (mmux-core-c-make-sllong init)))
 
 (defun cc-signed-long-long-int-range-p (op)
   "Return true if OP is an exact integer object and it is in the range representable by `signed long long int'."
@@ -265,7 +265,7 @@
 (cl-defgeneric cc-unsigned-long-long-int ((init integer))
   "Build and return a new instance of `cc-unsigned-long-long-int'."
   (cl-assert (cc-unsigned-long-long-int-range-p init))
-  (cc--make-unsigned-long-long-int :obj init))
+  (cc--make-unsigned-long-long-int :obj (mmux-core-c-make-ullong init)))
 
 (defun cc-unsigned-long-long-int-range-p (op)
   "Return true if OP is an exact integer object and it is in the range representable by `unsigned long long int'."
@@ -283,7 +283,7 @@
 (cl-defgeneric cc-usize ((init integer))
   "Build and return a new instance of `cc-usize'."
   (cl-assert (cc-usize-range-p init))
-  (cc--make-usize :obj init))
+  (cc--make-usize :obj (mmux-core-c-make-usize init)))
 
 (defun cc-usize-range-p (op)
   "Return true if OP is an exact integer object and it is in the range representable by `size_t'."
@@ -301,7 +301,7 @@
 (cl-defgeneric cc-ssize ((init integer))
   "Build and return a new instance of `cc-ssize'."
   (cl-assert (cc-ssize-range-p init))
-  (cc--make-ssize :obj init))
+  (cc--make-ssize :obj (mmux-core-c-make-ssize init)))
 
 (defun cc-ssize-range-p (op)
   "Return true if OP is an exact integer object and it is in the range representable by `ssize_t'."
@@ -319,7 +319,7 @@
 (cl-defgeneric cc-sintmax ((init integer))
   "Build and return a new instance of `cc-sintmax'."
   (cl-assert (cc-sintmax-range-p init))
-  (cc--make-intmax :obj init))
+  (cc--make-intmax :obj (mmux-core-c-make-sintmax init)))
 
 (defun cc-sintmax-range-p (op)
   "Return true if OP is an exact integer object and it is in the range representable by `intmax_t'."
@@ -337,12 +337,30 @@
 (cl-defgeneric cc-uintmax ((init integer))
   "Build and return a new instance of `cc-uintmax'."
   (cl-assert (cc-uintmax-range-p init))
-  (cc--make-uintmax :obj init))
+  (cc--make-uintmax :obj (mmux-core-c-make-uintmax init)))
 
 (defun cc-uintmax-range-p (op)
   "Return true if OP is an exact integer object and it is in the range representable by `uintmax_t'."
   (and (integerp op)
        (<= cc-UINTMAX_MIN op cc-UINTMAX_MAX)))
+
+
+;;;; C language type wrappers: signed intmax
+
+(cl-defstruct (cc-ptrdiff (:constructor cc--make-ptrdiff))
+  obj)
+
+(cl-defgeneric cc-ptrdiff (init)
+  "Build and return a new instance of `cc-ptrdiff'.")
+(cl-defgeneric cc-ptrdiff ((init integer))
+  "Build and return a new instance of `cc-ptrdiff'."
+  (cl-assert (cc-ptrdiff-range-p init))
+  (cc--make-ptrdiff :obj (mmux-core-c-make-ptrdiff init)))
+
+(defun cc-ptrdiff-range-p (op)
+  "Return true if OP is an exact integer object and it is in the range representable by `intmax_t'."
+  (and (integerp op)
+       (<= cc-PTRDIFF_MIN op cc-PTRDIFF_MAX)))
 
 
 ;;;; C language type wrappers: int8_t, uint8_t
@@ -425,7 +443,7 @@
 (cl-defgeneric cc-sint32 ((init integer))
   "Build and return a new instance of `cc-sint32'."
   (cl-assert (cc-sint32-range-p init))
-  (cc--make-int32 :obj init))
+  (cc--make-int32 :obj (mmux-core-c-make-sint32 init)))
 
 (defun cc-sint32-range-p (op)
   "Return true if OP is an exact integer object and it is in the range representable by `int32_t'."
@@ -442,7 +460,7 @@
 (cl-defgeneric cc-uint32 ((init integer))
   "Build and return a new instance of `cc-uint32'."
   (cl-assert (cc-uint32-range-p init))
-  (cc--make-uint32 :obj init))
+  (cc--make-uint32 :obj (mmux-core-c-make-uint32 init)))
 
 (defun cc-uint32-range-p (op)
   "Return true if OP is an exact integer object and it is in the range representable by `uint32_t'."
@@ -460,7 +478,7 @@
 (cl-defgeneric cc-sint64 ((init integer))
   "Build and return a new instance of `cc-sint64'."
   (cl-assert (cc-sint64-range-p init))
-  (cc--make-int64 :obj init))
+  (cc--make-int64 :obj (mmux-core-c-make-sint64 init)))
 
 (defun cc-sint64-range-p (op)
   "Return true if OP is an exact integer object and it is in the range representable by `int64_t'."
@@ -477,12 +495,48 @@
 (cl-defgeneric cc-uint64 ((init integer))
   "Build and return a new instance of `cc-uint64'."
   (cl-assert (cc-uint64-range-p init))
-  (cc--make-uint64 :obj init))
+  (cc--make-uint64 :obj (mmux-core-c-make-uint64 init)))
 
 (defun cc-uint64-range-p (op)
   "Return true if OP is an exact integer object and it is in the range representable by `uint64_t'."
   (and (integerp op)
        (<= cc-UINT64_MIN op cc-UINT64_MAX)))
+
+
+;;;; C language type wrappers: float
+
+(cl-defstruct (cc-float (:constructor cc--make-float))
+  obj)
+
+(cl-defgeneric cc-float (init)
+  "Build and return a new instance of `cc-float'.")
+(cl-defgeneric cc-float ((init float))
+  "Build and return a new instance of `cc-float'."
+  (cl-assert (cc-float-range-p init))
+  (cc--make-float :obj (mmux-core-c-make-float init)))
+
+(defun cc-float-range-p (op)
+  "Return true if OP is a floating-point object and it is in the range representable `float'."
+  (and (floatp op)
+       (<= cc-FLT_MIN op cc-FLT_MAX)))
+
+
+;;;; C language type wrappers: long double
+
+(cl-defstruct (cc-long-double (:constructor cc--make-long-double))
+  obj)
+
+(cl-defgeneric cc-long-double (init)
+  "Build and return a new instance of `cc-long-double'.")
+(cl-defgeneric cc-long-double ((init float))
+  "Build and return a new instance of `cc-long-double'."
+  (cl-assert (cc-long-double-range-p init))
+  (cc--make-long-double :obj (mmux-core-c-make-long-double init)))
+
+(defun cc-long-double-range-p (op)
+  "Return true if OP is a floating-point object and it is in the range representable `long double'."
+  (and (floatp op)
+       (<= cc-LDBL_MIN op cc-LDBL_MAX)))
 
 
 ;;;; basic integer operations
@@ -537,6 +591,7 @@
        (cc--define-integer-comparison-method ,OPERATION cc-uint32)
        (cc--define-integer-comparison-method ,OPERATION cc-sint64)
        (cc--define-integer-comparison-method ,OPERATION cc-uint64)
+       (cc--define-integer-comparison-method ,OPERATION cc-ptrdiff)
        )))
 
 (cc--define-integer-comparison =)
@@ -553,11 +608,12 @@
 ;;
 ;;Defined a the C language level.  Build and return a new custom pointer object.
 ;;
-;;The argument NUMBER-OF-SLOTS must be a non-negative exact integer representing the number of slots
-;;in the bytevector.
+;;The  argument NUMBER-OF-SLOTS  must be  a  non-negative exact  integer  in the  range of  "size_t"
+;;representing the number of slots in the bytevector.
 ;;
-;;The argument  SLOT-SIZE must be a  non-negative exact integer  representing the size of  each slot
-;;measured in bytes; valid values are: 1, 2, 4, 8.
+;;The argument SLOT-SIZE must be a non-negative  exact integer in the range of "size_t" representing
+;;the  size  of  each slot  measured  in  bytes;  valid  values  are:  1, 2,  4,  8,  sizeof(float),
+;;sizeof(double), sizeof(long double).
 ;;
 ;;The argument SIGNED must be 1 or 0: if the value is 1, the bytevector holds signed integers in its
 ;;slots; if the value is 0, the bytevector holds unsigned integers in its slots.
@@ -779,9 +835,10 @@
 	 (DOCSTRING		(concat "Extract a value of type `" (symbol-name CTYPE) "' from the bytevector BV at index IDX."))
 	 (MAKE-LTYPE		LTYPE)
 	 (C-FUNC		(intern (concat "mmux-core-c-bytevector-" TYPESTEM.str "-ref"))))
-    `(cl-defmethod cc-bytevector-ref ((bv ,BYTEVECTOR-TYPE) (idx cc-usize))
+    `(cl-defmethod cc-bytevector-ref ((bv ,BYTEVECTOR-TYPE) (idx integer))
        ,DOCSTRING
-       (,MAKE-LTYPE (,C-FUNC (cc-bytevector-obj bv) (cc-usize-obj idx))))))
+       (cl-assert (cc-usize-range-p idx))
+       (,MAKE-LTYPE (,C-FUNC (cc-bytevector-obj bv) idx)))))
 
 (defmacro cc--define-bytevector-setter (TYPESTEM LTYPE CTYPE)
   (let* ((TYPESTEM.str		(symbol-name TYPESTEM))
@@ -790,9 +847,10 @@
 	 (DOCSTRING		(concat "Store a value VAL of type `" (symbol-name CTYPE) "' into the bytevector BV at index IDX."))
 	 (LTYPE-OBJ		(intern (concat LTYPE.str "-obj")))
 	 (C-FUNC		(intern (concat "mmux-core-c-bytevector-" TYPESTEM.str "-set!"))))
-    `(cl-defmethod cc-bytevector-set! ((bv ,BYTEVECTOR-TYPE) (idx cc-usize) (val ,LTYPE))
+    `(cl-defmethod cc-bytevector-set! ((bv ,BYTEVECTOR-TYPE) (idx integer) (val ,LTYPE))
        ,DOCSTRING
-       (,C-FUNC (cc-bytevector-obj bv) (cc-usize-obj idx) (,LTYPE-OBJ val)))))
+       (cl-assert (cc-usize-range-p idx))
+       (,C-FUNC (cc-bytevector-obj bv) idx (,LTYPE-OBJ val)))))
 
 (defmacro cc--define-bytevector-getter-and-setter (TYPESTEM LTYPE CTYPE)
   `(progn

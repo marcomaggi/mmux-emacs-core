@@ -78,21 +78,21 @@ Fmmux_emacs_core_version_interface_current (MMUX_EMACS_IFACE_FUNCTION_UNUSED_ARG
 {
   int	N = mmux_emacs_core_version_interface_current();
 
-  return mmux_emacs_core_make_intmax(env, (intmax_t)N);
+  return mmux_emacs_core_make_integer(env, (intmax_t)N);
 }
 static emacs_value
 Fmmux_emacs_core_version_interface_revision (MMUX_EMACS_IFACE_FUNCTION_UNUSED_ARGS)
 {
   int	N = mmux_emacs_core_version_interface_revision();
 
-  return mmux_emacs_core_make_intmax(env, (intmax_t)N);
+  return mmux_emacs_core_make_integer(env, (intmax_t)N);
 }
 static emacs_value
 Fmmux_emacs_core_version_interface_age (MMUX_EMACS_IFACE_FUNCTION_UNUSED_ARGS)
 {
   int	N = mmux_emacs_core_version_interface_age();
 
-  return mmux_emacs_core_make_intmax(env, (intmax_t)N);
+  return mmux_emacs_core_make_integer(env, (intmax_t)N);
 }
 
 

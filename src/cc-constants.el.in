@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-03 18:18:26 marco>
+;; Time-stamp: <2020-02-04 07:32:38 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -152,6 +152,12 @@
 (defconst cc-SIZEOF_UINTMAX_T
   @VALUEOF_MMUX_SIZEOF_UINTMAX_T@
   "Size of `uintmax_t' measured in bytes.")
+
+;;; --------------------------------------------------------------------
+
+(defconst cc-SIZEOF_PTRDIFF_T
+  @VALUEOF_MMUX_SIZEOF_PTRDIFF_T@
+  "Size of `ptrdiff_t' measured in bytes.")
 
 ;;; --------------------------------------------------------------------
 
@@ -371,6 +377,22 @@
 	((= cc-SIZEOF_UINTMAX_T cc-SIZEOF_SIGNED_LONG_LONG_INT)	cc-LLONG_MAX)
 	(t							0))
   "Exact integer representing the maximum value representable by a `uintmax_t'.")
+
+;;; --------------------------------------------------------------------
+
+(defconst cc-PTRDIFF_MIN
+  (cond ((= cc-SIZEOF_PTRDIFF_T cc-SIZEOF_SIGNED_INT)		cc-INT_MIN)
+	((= cc-SIZEOF_PTRDIFF_T cc-SIZEOF_SIGNED_LONG_INT)	cc-LONG_MIN)
+	((= cc-SIZEOF_PTRDIFF_T cc-SIZEOF_SIGNED_LONG_LONG_INT)	cc-LLONG_MIN)
+	(t							0))
+  "Exact integer representing the minimum value representable by a `ptrdiff_t'.")
+
+(defconst cc-PTRDIFF_MAX
+  (cond ((= cc-SIZEOF_PTRDIFF_T cc-SIZEOF_SIGNED_INT)		cc-INT_MAX)
+	((= cc-SIZEOF_PTRDIFF_T cc-SIZEOF_SIGNED_LONG_INT)	cc-LONG_MAX)
+	((= cc-SIZEOF_PTRDIFF_T cc-SIZEOF_SIGNED_LONG_LONG_INT)	cc-LLONG_MAX)
+	(t							0))
+  "Exact integer representing the maximum value representable by a `ptrdiff_t'.")
 
 ;;; --------------------------------------------------------------------
 

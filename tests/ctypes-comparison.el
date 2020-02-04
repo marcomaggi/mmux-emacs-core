@@ -30,6 +30,10 @@
   (should (not (cc= (cc-char 1) (cc-char 2))))
   )
 
+
+;;;; done
+
 (ert-run-tests-batch-and-exit)
+(garbage-collect)
 
 ;;; test.el ends here

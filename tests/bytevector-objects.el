@@ -112,7 +112,7 @@
     (should (= 10 (cc-bytevector-number-of-slots bv)))
     (should (= 1 (cc-bytevector-slot-size bv)))
     (should (= (* 10 1) (cc-bytevector-number-of-allocated-bytes bv)))
-    (should (not (cc-bytevector-signed bv)))))
+    (should (not (cc-integer-bytevector-signed bv)))))
 
 (ert-deftest cc-bytevector-u16-slots ()
   "Inspect the slots of a `cc-bytevector-u16' object."
@@ -120,7 +120,7 @@
     (should (= 10 (cc-bytevector-number-of-slots bv)))
     (should (= 2 (cc-bytevector-slot-size bv)))
     (should (= (* 10 2) (cc-bytevector-number-of-allocated-bytes bv)))
-    (should (not (cc-bytevector-signed bv)))))
+    (should (not (cc-integer-bytevector-signed bv)))))
 
 (ert-deftest cc-bytevector-u32-slots ()
   "Inspect the slots of a `cc-bytevector-u32' object."
@@ -128,7 +128,7 @@
     (should (= 10 (cc-bytevector-number-of-slots bv)))
     (should (= 4 (cc-bytevector-slot-size bv)))
     (should (= (* 10 4) (cc-bytevector-number-of-allocated-bytes bv)))
-    (should (not (cc-bytevector-signed bv)))))
+    (should (not (cc-integer-bytevector-signed bv)))))
 
 (ert-deftest cc-bytevector-u64-slots ()
   "Inspect the slots of a `cc-bytevector-u64' object."
@@ -136,7 +136,7 @@
     (should (= 10 (cc-bytevector-number-of-slots bv)))
     (should (= 8 (cc-bytevector-slot-size bv)))
     (should (= (* 10 8) (cc-bytevector-number-of-allocated-bytes bv)))
-    (should (not (cc-bytevector-signed bv)))))
+    (should (not (cc-integer-bytevector-signed bv)))))
 
 ;;; --------------------------------------------------------------------
 
@@ -146,7 +146,7 @@
     (should (= 10 (cc-bytevector-number-of-slots bv)))
     (should (= 1 (cc-bytevector-slot-size bv)))
     (should (= (* 10 1) (cc-bytevector-number-of-allocated-bytes bv)))
-    (should (cc-bytevector-signed bv))))
+    (should (cc-integer-bytevector-signed bv))))
 
 (ert-deftest cc-bytevector-s16-slots ()
   "Inspect the slots of a `cc-bytevector-s16' object."
@@ -154,7 +154,7 @@
     (should (= 10 (cc-bytevector-number-of-slots bv)))
     (should (= 2 (cc-bytevector-slot-size bv)))
     (should (= (* 10 2) (cc-bytevector-number-of-allocated-bytes bv)))
-    (should (cc-bytevector-signed bv))))
+    (should (cc-integer-bytevector-signed bv))))
 
 (ert-deftest cc-bytevector-s32-slots ()
   "Inspect the slots of a `cc-bytevector-s32' object."
@@ -162,7 +162,7 @@
     (should (= 10 (cc-bytevector-number-of-slots bv)))
     (should (= 4 (cc-bytevector-slot-size bv)))
     (should (= (* 10 4) (cc-bytevector-number-of-allocated-bytes bv)))
-    (should (cc-bytevector-signed bv))))
+    (should (cc-integer-bytevector-signed bv))))
 
 (ert-deftest cc-bytevector-s64-slots ()
   "Inspect the slots of a `cc-bytevector-s64' object."
@@ -170,11 +170,35 @@
     (should (= 10 (cc-bytevector-number-of-slots bv)))
     (should (= 8 (cc-bytevector-slot-size bv)))
     (should (= (* 10 8) (cc-bytevector-number-of-allocated-bytes bv)))
-    (should (cc-bytevector-signed bv))))
+    (should (cc-integer-bytevector-signed bv))))
+
+;;; --------------------------------------------------------------------
+
+(ert-deftest cc-bytevector-float-slots ()
+  "Inspect the slots of a `cc-bytevector-float' object."
+  (let ((bv	(cc-bytevector-float 10)))
+    (should (= 10 (cc-bytevector-number-of-slots bv)))
+    (should (= cc-SIZEOF_FLOAT (cc-bytevector-slot-size bv)))
+    (should (= (* 10 cc-SIZEOF_FLOAT) (cc-bytevector-number-of-allocated-bytes bv)))))
+
+(ert-deftest cc-bytevector-double-slots ()
+  "Inspect the slots of a `cc-bytevector-double' object."
+  (let ((bv	(cc-bytevector-double 10)))
+    (should (= 10 (cc-bytevector-number-of-slots bv)))
+    (should (= cc-SIZEOF_DOUBLE (cc-bytevector-slot-size bv)))
+    (should (= (* 10 cc-SIZEOF_DOUBLE) (cc-bytevector-number-of-allocated-bytes bv)))))
+
+(ert-deftest cc-bytevector-long-double-slots ()
+  "Inspect the slots of a `cc-bytevector-long-double' object."
+  (let ((bv	(cc-bytevector-long-double 10)))
+    (should (= 10 (cc-bytevector-number-of-slots bv)))
+    (should (= cc-SIZEOF_LONG_DOUBLE (cc-bytevector-slot-size bv)))
+    (should (= (* 10 cc-SIZEOF_LONG_DOUBLE) (cc-bytevector-number-of-allocated-bytes bv)))))
 
 
 ;;;; done
 
 (ert-run-tests-batch-and-exit)
+(garbage-collect)
 
 ;;; test.el ends here

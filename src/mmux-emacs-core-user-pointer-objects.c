@@ -39,14 +39,14 @@
 static void
 mmux_emacs_core_bytevector_finalizer (void * _obj)
 {
-  mmux_emacs_core_bytevector_t	* obj = (mmux_emacs_core_bytevector_t *)_obj;
+  MMUX_EMACS_CORE_PC(mmux_emacs_core_bytevector_t, obj, _obj);
 
   free(obj->ptr);
   free(obj);
 }
 
 static emacs_value
-Fmmux_emacs_core_bytevector_make (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+Fmmux_emacs_core_make_bytevector (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
 {
   assert(nargs == 3);
   size_t	number_of_slots		= mmux_emacs_core_get_size(env, args[0]);
@@ -55,14 +55,14 @@ Fmmux_emacs_core_bytevector_make (emacs_env *env, ptrdiff_t nargs, emacs_value a
   mmux_emacs_core_bytevector_t	* obj;
 
   errno = 0;
-  obj   = malloc(sizeof(mmux_emacs_core_bytevector_t));
+  obj   = (mmux_emacs_core_bytevector_t *)malloc(sizeof(mmux_emacs_core_bytevector_t));
   if (obj) {
     errno	= 0;
-    obj->ptr	= calloc(number_of_slots, slot_size);
+    obj->ptr	= (uint8_t *)calloc(number_of_slots, slot_size);
     if (obj->ptr) {
       obj->number_of_slots	= number_of_slots;
       obj->slot_size		= slot_size;
-      obj->hold_signed_values	= hold_signed_values;
+      obj->hold_signed_values	= hold_signed_values? 1 : 0;
       return mmux_emacs_core_make_user_ptr(env, mmux_emacs_core_bytevector_finalizer, obj);
     } else {
       return mmux_emacs_core_error_memory_allocation(env);
@@ -81,7 +81,7 @@ Fmmux_emacs_core_bytevector_make (emacs_env *env, ptrdiff_t nargs, emacs_value a
 static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNCTIONS] = {
   {
     .name		= "mmux-core-c-bytevector-make",
-    .implementation	= Fmmux_emacs_core_bytevector_make,
+    .implementation	= Fmmux_emacs_core_make_bytevector,
     .min_arity		= 3,
     .max_arity		= 3,
     .documentation	= "Build and return a new bytevector user pointer object."

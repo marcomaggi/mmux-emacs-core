@@ -151,6 +151,7 @@ included in the section entitled ``@gnu{} Free Documentation License''.
 * version::                     Version functions.
 * constants::                   Constant values.
 * ctypes::                      Object wrappers for C language types.
+* bytevectors::                 Bytevector objects.
 * errors::                      How errors are signalled.
 
 Appendices
@@ -1745,6 +1746,223 @@ Given an instance of @objtype{cc-uint64}: return the exact integer representing 
 @defun cc-uint64-range-p @var{OBJ}
 Return true if @var{OBJ} is an exact integer object and it is in the range representable by
 @code{uint64_t}.
+@end defun
+
+@c page
+@node bytevectors
+@chapter Bytevector objects
+
+
+@menu
+* bytevectors typedefs::        Type definition.
+* bytevectors pred::            Type predicates.
+@end menu
+
+@c page
+@node bytevectors typedefs
+@section Type definition
+
+
+@deftp {Object Type} cc-bytevector
+Base type of bytevector objects: it can represent binary data with a C language array.  Objects of
+this type are correctly garbage collected.  It has the following fields:
+
+@table @code
+@item number-of-slots
+Non--negative exact integer representing the number of slots in a bytevector.
+
+@item slot-size
+Non--negative exact integer representing the size of a slot measured in bytes.
+
+@item number-of-allocated-bytes
+Non--negative exact integer representing the number of bytes allocated in the data area.
+
+@item obj
+Pointer object.
+@end table
+@end deftp
+
+
+@deftp {Object Type} cc-integer-bytevector
+@deftpx {Parent Type} cc-bytevector
+Base type of bytevector objects holding C language integers in their slots.  Objects of this type
+are correctly garbage collected.  In addition to the slots of @objtype{cc-bytevector}, it has the
+following fields:
+
+@table @code
+@item signed
+Boolean, true if the data in each slot is to be interpreted as a signed integer; false if it has to
+be interpreted as an unsigned integer.
+@end table
+@end deftp
+
+
+@deftp {Object Type} cc-float-bytevector
+@deftpx {Parent Type} cc-bytevector
+Base type of bytevector objects holding C language floating--point values in their slots.  Objects
+of this type are correctly garbage collected.
+@end deftp
+
+@c ------------------------------------------------------------------------
+
+@deftp {Object Type} cc-bytevector-u8
+@deftpx {Parent Type} cc-integer-bytevector
+Type of bytevector objects holding C language integer of type @code{uint8_t} in their slots.
+Objects of this type are correctly garbage collected.
+@end deftp
+
+
+@deftp {Object Type} cc-bytevector-s8
+@deftpx {Parent Type} cc-integer-bytevector
+Type of bytevector objects holding C language integer of type @code{int8_t} in their slots.  Objects
+of this type are correctly garbage collected.
+@end deftp
+
+@c ------------------------------------------------------------------------
+
+@deftp {Object Type} cc-bytevector-u16
+@deftpx {Parent Type} cc-integer-bytevector
+Type of bytevector objects holding C language integer of type @code{uint16_t} in their slots.
+Objects of this type are correctly garbage collected.
+@end deftp
+
+
+@deftp {Object Type} cc-bytevector-s16
+@deftpx {Parent Type} cc-integer-bytevector
+Type of bytevector objects holding C language integer of type @code{int16_t} in their slots.
+Objects of this type are correctly garbage collected.
+@end deftp
+
+@c ------------------------------------------------------------------------
+
+@deftp {Object Type} cc-bytevector-u32
+@deftpx {Parent Type} cc-integer-bytevector
+Type of bytevector objects holding C language integer of type @code{uint32_t} in their slots.
+Objects of this type are correctly garbage collected.
+@end deftp
+
+
+@deftp {Object Type} cc-bytevector-s32
+@deftpx {Parent Type} cc-integer-bytevector
+Type of bytevector objects holding C language integer of type @code{int32_t} in their slots.
+Objects of this type are correctly garbage collected.
+@end deftp
+
+@c ------------------------------------------------------------------------
+
+@deftp {Object Type} cc-bytevector-u64
+@deftpx {Parent Type} cc-integer-bytevector
+Type of bytevector objects holding C language integer of type @code{uint64_t} in their slots.
+Objects of this type are correctly garbage collected.
+@end deftp
+
+
+@deftp {Object Type} cc-bytevector-s64
+@deftpx {Parent Type} cc-integer-bytevector
+Type of bytevector objects holding C language integer of type @code{int64_t} in their slots.
+Objects of this type are correctly garbage collected.
+@end deftp
+
+@c ------------------------------------------------------------------------
+
+@deftp {Object Type} cc-bytevector-float
+@deftpx {Parent Type} cc-float-bytevector
+Type of bytevector objects holding C language values of type @code{float} in their slots.  Objects
+of this type are correctly garbage collected.
+@end deftp
+
+
+@deftp {Object Type} cc-bytevector-double
+@deftpx {Parent Type} cc-float-bytevector
+Type of bytevector objects holding C language values of type @code{double} in their slots.  Objects
+of this type are correctly garbage collected.
+@end deftp
+
+
+@deftp {Object Type} cc-bytevector-long-double
+@deftpx {Parent Type} cc-float-bytevector
+Type of bytevector objects holding C language values of type @code{long double} in their slots.
+Objects of this type are correctly garbage collected.
+@end deftp
+
+@c page
+@node bytevectors pred
+@section Type predicates
+
+
+@defun cc-bytevector-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{cc-bytevector}; otherwise return false.
+@end defun
+
+
+@defun cc-integer-bytevector-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{cc-integer-bytevector}; otherwise return false.
+@end defun
+
+
+@defun cc-float-bytevector-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{cc-float-bytevector}; otherwise return false.
+@end defun
+
+@c ------------------------------------------------------------------------
+
+@defun cc-bytevector-u8-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-u8}; otherwise return false.
+@end defun
+
+
+@defun cc-bytevector-s8-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-s8}; otherwise return false.
+@end defun
+
+@c ------------------------------------------------------------------------
+
+@defun cc-bytevector-u16-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-u16}; otherwise return false.
+@end defun
+
+
+@defun cc-bytevector-s16-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-s16}; otherwise return false.
+@end defun
+
+@c ------------------------------------------------------------------------
+
+@defun cc-bytevector-u32-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-u32}; otherwise return false.
+@end defun
+
+
+@defun cc-bytevector-s32-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-s32}; otherwise return false.
+@end defun
+
+@c ------------------------------------------------------------------------
+
+@defun cc-bytevector-u64-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-u64}; otherwise return false.
+@end defun
+
+
+@defun cc-bytevector-s64-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-s64}; otherwise return false.
+@end defun
+
+@c ------------------------------------------------------------------------
+
+@defun cc-bytevector-float-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-float}; otherwise return false.
+@end defun
+
+
+@defun cc-bytevector-double-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-double}; otherwise return false.
+@end defun
+
+
+@defun cc-bytevector-long-double-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-long-double}; otherwise return
+false.
 @end defun
 
 @c page

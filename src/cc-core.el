@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-03 18:06:36 marco>
+;; Time-stamp: <2020-02-04 06:59:59 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -567,13 +567,20 @@
   number-of-slots
   slot-size
   number-of-allocated-bytes
-  signed
   obj)
+
+(cl-defstruct (cc-integer-bytevector
+	       (:include cc-bytevector))
+  signed)
+
+(cl-defstruct (cc-float-bytevector
+	       (:include cc-bytevector)))
 
 ;;; --------------------------------------------------------------------
 
-(cl-defstruct (cc-bytevector-u8 (:constructor	cc--make-bytevector-u8)
-				(:include	cc-bytevector)))
+(cl-defstruct (cc-bytevector-u8
+	       (:constructor	cc--make-bytevector-u8)
+	       (:include	cc-integer-bytevector)))
 
 (cl-defgeneric cc-bytevector-u8 (number-of-slots)
   "Build and return a new instance of `cc-bytevector-u8'.")
@@ -587,8 +594,9 @@
    :obj				(mmux-core-c-bytevector-make number-of-slots 1 0)
    :number-of-allocated-bytes	(* number-of-slots 1)))
 
-(cl-defstruct (cc-bytevector-s8 (:constructor	cc--make-bytevector-s8)
-				(:include	cc-bytevector)))
+(cl-defstruct (cc-bytevector-s8
+	       (:constructor	cc--make-bytevector-s8)
+	       (:include	cc-integer-bytevector)))
 
 (cl-defgeneric cc-bytevector-s8 (number-of-slots)
   "Build and return a new instance of `cc-bytevector-s8'.")
@@ -604,8 +612,9 @@
 
 ;;; --------------------------------------------------------------------
 
-(cl-defstruct (cc-bytevector-u16 (:constructor	cc--make-bytevector-u16)
-				 (:include	cc-bytevector)))
+(cl-defstruct (cc-bytevector-u16
+	       (:constructor	cc--make-bytevector-u16)
+	       (:include	cc-integer-bytevector)))
 
 (cl-defgeneric cc-bytevector-u16 (number-of-slots)
   "Build and return a new instance of `cc-bytevector-u16'.")
@@ -619,8 +628,9 @@
    :obj				(mmux-core-c-bytevector-make number-of-slots 2 0)
    :number-of-allocated-bytes	(* number-of-slots 2)))
 
-(cl-defstruct (cc-bytevector-s16 (:constructor	cc--make-bytevector-s16)
-				 (:include	cc-bytevector)))
+(cl-defstruct (cc-bytevector-s16
+	       (:constructor	cc--make-bytevector-s16)
+	       (:include	cc-integer-bytevector)))
 
 (cl-defgeneric cc-bytevector-s16 (number-of-slots)
   "Build and return a new instance of `cc-bytevector-s16'.")
@@ -636,8 +646,9 @@
 
 ;;; --------------------------------------------------------------------
 
-(cl-defstruct (cc-bytevector-u32 (:constructor	cc--make-bytevector-u32)
-				 (:include	cc-bytevector)))
+(cl-defstruct (cc-bytevector-u32
+	       (:constructor	cc--make-bytevector-u32)
+	       (:include	cc-integer-bytevector)))
 
 (cl-defgeneric cc-bytevector-u32 (number-of-slots)
   "Build and return a new instance of `cc-bytevector-u32'.")
@@ -651,8 +662,9 @@
    :obj				(mmux-core-c-bytevector-make number-of-slots 4 0)
    :number-of-allocated-bytes	(* number-of-slots 4)))
 
-(cl-defstruct (cc-bytevector-s32 (:constructor	cc--make-bytevector-s32)
-				 (:include	cc-bytevector)))
+(cl-defstruct (cc-bytevector-s32
+	       (:constructor	cc--make-bytevector-s32)
+	       (:include	cc-integer-bytevector)))
 
 (cl-defgeneric cc-bytevector-s32 (number-of-slots)
   "Build and return a new instance of `cc-bytevector-s32'.")
@@ -668,8 +680,9 @@
 
 ;;; --------------------------------------------------------------------
 
-(cl-defstruct (cc-bytevector-u64 (:constructor	cc--make-bytevector-u64)
-				 (:include	cc-bytevector)))
+(cl-defstruct (cc-bytevector-u64
+	       (:constructor	cc--make-bytevector-u64)
+	       (:include	cc-integer-bytevector)))
 
 (cl-defgeneric cc-bytevector-u64 (number-of-slots)
   "Build and return a new instance of `cc-bytevector-u64'.")
@@ -683,8 +696,9 @@
    :obj				(mmux-core-c-bytevector-make number-of-slots 8 0)
    :number-of-allocated-bytes	(* number-of-slots 8)))
 
-(cl-defstruct (cc-bytevector-s64 (:constructor	cc--make-bytevector-s64)
-				 (:include	cc-bytevector)))
+(cl-defstruct (cc-bytevector-s64
+	       (:constructor	cc--make-bytevector-s64)
+	       (:include	cc-integer-bytevector)))
 
 (cl-defgeneric cc-bytevector-s64 (number-of-slots)
   "Build and return a new instance of `cc-bytevector-s64'.")
@@ -698,16 +712,56 @@
    :obj				(mmux-core-c-bytevector-make number-of-slots 8 1)
    :number-of-allocated-bytes	(* number-of-slots 8)))
 
-
-;;;; bytevector objects: inspection
+;;; --------------------------------------------------------------------
 
-(cl-defgeneric cc-bytevector-length (bv)
-  "Return an exact integer representing the length of a `cc-bytevector' object measured in bytes.")
+(cl-defstruct (cc-bytevector-float
+	       (:constructor	cc--make-bytevector-float)
+	       (:include	cc-float-bytevector)))
 
-(cl-defgeneric cc-bytevector-length ((bv cc-bytevector))
-  "Return an exact integer representing the length of a `cc-bytevector' object measured in bytes."
-  (* (cc-bytevector-number-of-slots bv)
-     (cc-bytevector-slot-size bv)))
+(cl-defgeneric cc-bytevector-float (number-of-slots)
+  "Build and return a new instance of `cc-bytevector-float'.")
+(cl-defgeneric cc-bytevector-float ((number-of-slots integer))
+  "Build and return a new instance of `cc-bytevector-float'."
+  (cl-assert (<= 0 number-of-slots))
+  (cc--make-bytevector-float
+   :number-of-slots		number-of-slots
+   :slot-size			cc-SIZEOF_FLOAT
+   :obj				(mmux-core-c-bytevector-make number-of-slots cc-SIZEOF_FLOAT 1)
+   :number-of-allocated-bytes	(* number-of-slots cc-SIZEOF_FLOAT)))
+
+;;; --------------------------------------------------------------------
+
+(cl-defstruct (cc-bytevector-double
+	       (:constructor	cc--make-bytevector-double)
+	       (:include	cc-float-bytevector)))
+
+(cl-defgeneric cc-bytevector-double (number-of-slots)
+  "Build and return a new instance of `cc-bytevector-double'.")
+(cl-defgeneric cc-bytevector-double ((number-of-slots integer))
+  "Build and return a new instance of `cc-bytevector-double'."
+  (cl-assert (<= 0 number-of-slots))
+  (cc--make-bytevector-double
+   :number-of-slots		number-of-slots
+   :slot-size			cc-SIZEOF_DOUBLE
+   :obj				(mmux-core-c-bytevector-make number-of-slots cc-SIZEOF_DOUBLE 1)
+   :number-of-allocated-bytes	(* number-of-slots cc-SIZEOF_DOUBLE)))
+
+;;; --------------------------------------------------------------------
+
+(cl-defstruct (cc-bytevector-long-double
+	       (:constructor	cc--make-bytevector-long-double)
+	       (:include	cc-float-bytevector)))
+
+(cl-defgeneric cc-bytevector-long-double (number-of-slots)
+  "Build and return a new instance of `cc-bytevector-long-double'.")
+(cl-defgeneric cc-bytevector-long-double ((number-of-slots integer))
+  "Build and return a new instance of `cc-bytevector-long-double'."
+  (cl-assert (<= 0 number-of-slots))
+  (cc--make-bytevector-long-double
+   :number-of-slots		number-of-slots
+   :slot-size			cc-SIZEOF_LONG_DOUBLE
+   :obj				(mmux-core-c-bytevector-make number-of-slots cc-SIZEOF_LONG_DOUBLE 1)
+   :number-of-allocated-bytes	(* number-of-slots cc-SIZEOF_LONG_DOUBLE)))
 
 
 ;;;; bytevector objects: getters

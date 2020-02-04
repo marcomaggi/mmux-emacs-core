@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-04 06:59:59 marco>
+;; Time-stamp: <2020-02-04 07:23:33 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -764,80 +764,49 @@
    :number-of-allocated-bytes	(* number-of-slots cc-SIZEOF_LONG_DOUBLE)))
 
 
-;;;; bytevector objects: getters
+;;;; bytevector objects: getters and setters
 
 (cl-defgeneric cc-bytevector-ref (bv idx)
   "Extract a value from a bytevector.")
 
-(cl-defmethod  cc-bytevector-ref ((bv cc-bytevector-u8) (idx cc-usize))
-  "Extract an `uint8_t' value from a bytevector and wrap it into a `cc-uint8' object."
-  (cc-uint8 (mmux-core-c-bytevector-u8-ref (cc-bytevector-obj bv) (cc-usize-obj idx))))
-
-(cl-defmethod  cc-bytevector-ref ((bv cc-bytevector-s8) (idx cc-usize))
-  "Extract an `int8_t' value from a bytevector and wrap it into a `cc-sint8' object."
-  (cc-sint8 (mmux-core-c-bytevector-s8-ref (cc-bytevector-obj bv) (cc-usize-obj idx))))
-
-(cl-defmethod  cc-bytevector-ref ((bv cc-bytevector-u16) (idx cc-usize))
-  "Extract an `uint16_t' value from a bytevector and wrap it into a `cc-uin1t16' object."
-  (cc-uint16 (mmux-core-c-bytevector-u16-ref (cc-bytevector-obj bv) (cc-usize-obj idx))))
-
-(cl-defmethod  cc-bytevector-ref ((bv cc-bytevector-s16) (idx cc-usize))
-  "Extract an `int16_t' value from a bytevector and wrap it into a `cc-sint16' object."
-  (cc-sint16 (mmux-core-c-bytevector-s16-ref (cc-bytevector-obj bv) (cc-usize-obj idx))))
-
-(cl-defmethod  cc-bytevector-ref ((bv cc-bytevector-u32) (idx cc-usize))
-  "Extract an `uint32_t' value from a bytevector and wrap it into a `cc-uint32' object."
-  (cc-uint32 (mmux-core-c-bytevector-u32-ref (cc-bytevector-obj bv) (cc-usize-obj idx))))
-
-(cl-defmethod  cc-bytevector-ref ((bv cc-bytevector-s32) (idx cc-usize))
-  "Extract an `int32_t' value from a bytevector and wrap it into a `cc-sint32' object."
-  (cc-sint32 (mmux-core-c-bytevector-s32-ref (cc-bytevector-obj bv) (cc-usize-obj idx))))
-
-(cl-defmethod  cc-bytevector-ref ((bv cc-bytevector-u64) (idx cc-usize))
-  "Extract an `uint64_t' value from a bytevector and wrap it into a `cc-uint64' object."
-  (cc-uint64 (mmux-core-c-bytevector-u64-ref (cc-bytevector-obj bv) (cc-usize-obj idx))))
-
-(cl-defmethod  cc-bytevector-ref ((bv cc-bytevector-s64) (idx cc-usize))
-  "Extract an `int64_t' value from a bytevector and wrap it into a `cc-sint64' object."
-  (cc-sint64 (mmux-core-c-bytevector-s64-ref (cc-bytevector-obj bv) (cc-usize-obj idx))))
-
-
-;;;; bytevector objects: setters and getters
-
 (cl-defgeneric cc-bytevector-set! (bv idx val)
-  "Extract a value from a bytevector.")
+  "Store the value VAL into the bytevector BV at index IDX.")
 
-(cl-defmethod  cc-bytevector-set! ((bv cc-bytevector-u8) (idx cc-usize) (val cc-uint8))
-  "Extract an `uint8_t' value from a bytevector."
-  (mmux-core-c-bytevector-u8-set! (cc-bytevector-obj bv) (cc-usize-obj idx) (cc-uint8-obj val)))
+(defmacro cc--define-bytevector-getter (TYPESTEM LTYPE CTYPE)
+  (let* ((TYPESTEM.str		(symbol-name TYPESTEM))
+	 (LTYPE.str		(symbol-name LTYPE))
+	 (BYTEVECTOR-TYPE	(intern (concat "cc-bytevector-" TYPESTEM.str)))
+	 (DOCSTRING		(concat "Extract a value of type `" (symbol-name CTYPE) "' from the bytevector BV at index IDX."))
+	 (MAKE-LTYPE		LTYPE)
+	 (C-FUNC		(intern (concat "mmux-core-c-bytevector-" TYPESTEM.str "-ref"))))
+    `(cl-defmethod cc-bytevector-ref ((bv ,BYTEVECTOR-TYPE) (idx cc-usize))
+       ,DOCSTRING
+       (,MAKE-LTYPE (,C-FUNC (cc-bytevector-obj bv) (cc-usize-obj idx))))))
 
-(cl-defmethod  cc-bytevector-set! ((bv cc-bytevector-s8) (idx cc-usize) (val cc-sint8))
-  "Extract an `int8_t' value from a bytevector."
-  (mmux-core-c-bytevector-s8-set! (cc-bytevector-obj bv) (cc-usize-obj idx) (cc-sint8-obj val)))
+(defmacro cc--define-bytevector-setter (TYPESTEM LTYPE CTYPE)
+  (let* ((TYPESTEM.str		(symbol-name TYPESTEM))
+	 (LTYPE.str		(symbol-name LTYPE))
+	 (BYTEVECTOR-TYPE	(intern (concat "cc-bytevector-" TYPESTEM.str)))
+	 (DOCSTRING		(concat "Store a value VAL of type `" (symbol-name CTYPE) "' into the bytevector BV at index IDX."))
+	 (LTYPE-OBJ		(intern (concat LTYPE.str "-obj")))
+	 (C-FUNC		(intern (concat "mmux-core-c-bytevector-" TYPESTEM.str "-set!"))))
+    `(cl-defmethod cc-bytevector-set! ((bv ,BYTEVECTOR-TYPE) (idx cc-usize) (val ,LTYPE))
+       ,DOCSTRING
+       (,C-FUNC (cc-bytevector-obj bv) (cc-usize-obj idx) (,LTYPE-OBJ val)))))
 
-(cl-defmethod  cc-bytevector-set! ((bv cc-bytevector-u16) (idx cc-usize) (val cc-uint16))
-  "Extract an `uint16_t' value from a bytevector."
-  (mmux-core-c-bytevector-u16-set! (cc-bytevector-obj bv) (cc-usize-obj idx) (cc-uint16-obj val)))
+(defmacro cc--define-bytevector-getter-and-setter (TYPESTEM LTYPE CTYPE)
+  `(progn
+     (cc--define-bytevector-getter ,TYPESTEM ,LTYPE ,CTYPE)
+     (cc--define-bytevector-setter ,TYPESTEM ,LTYPE ,CTYPE)))
 
-(cl-defmethod  cc-bytevector-set! ((bv cc-bytevector-s16) (idx cc-usize) (val cc-sint16))
-  "Extract an `int16_t' value from a bytevector."
-  (mmux-core-c-bytevector-s16-set! (cc-bytevector-obj bv) (cc-usize-obj idx) (cc-sint16-obj val)))
-
-(cl-defmethod  cc-bytevector-set! ((bv cc-bytevector-u32) (idx cc-usize) (val cc-uint32))
-  "Extract an `uint32_t' value from a bytevector."
-  (mmux-core-c-bytevector-u32-set! (cc-bytevector-obj bv) (cc-usize-obj idx) (cc-uint32-obj val)))
-
-(cl-defmethod  cc-bytevector-set! ((bv cc-bytevector-s32) (idx cc-usize) (val cc-sint32))
-  "Extract an `int32_t' value from a bytevector."
-  (mmux-core-c-bytevector-s32-set! (cc-bytevector-obj bv) (cc-usize-obj idx) (cc-sint32-obj val)))
-
-(cl-defmethod  cc-bytevector-set! ((bv cc-bytevector-u64) (idx cc-usize) (val cc-uint64))
-  "Extract an `uint64_t' value from a bytevector."
-  (mmux-core-c-bytevector-u64-set! (cc-bytevector-obj bv) (cc-usize-obj idx) (cc-uint64-obj val)))
-
-(cl-defmethod  cc-bytevector-set! ((bv cc-bytevector-s64) (idx cc-usize) (val cc-sint64))
-  "Extract an `int64_t' value from a bytevector."
-  (mmux-core-c-bytevector-s64-set! (cc-bytevector-obj bv) (cc-usize-obj idx) (cc-sint64-obj val)))
+(cc--define-bytevector-getter-and-setter u8	cc-uint8	uint8_t)
+(cc--define-bytevector-getter-and-setter s8	cc-sint8	int8_t)
+(cc--define-bytevector-getter-and-setter u16	cc-uint16	uint16_t)
+(cc--define-bytevector-getter-and-setter s16	cc-sint16	int16_t)
+(cc--define-bytevector-getter-and-setter u32	cc-uint32	uint32_t)
+(cc--define-bytevector-getter-and-setter s32	cc-sint32	int32_t)
+(cc--define-bytevector-getter-and-setter u64	cc-uint64	uint64_t)
+(cc--define-bytevector-getter-and-setter s64	cc-sint64	int64_t)
 
 
 ;;;; done

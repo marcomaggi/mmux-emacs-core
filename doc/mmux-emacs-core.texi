@@ -1756,6 +1756,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @menu
 * bytevectors typedefs::        Type definition.
 * bytevectors pred::            Type predicates.
+* bytevectors getters::         Bytevector getters.
+* bytevectors setters::         Bytevector setters.
 @end menu
 
 @c page
@@ -1964,6 +1966,104 @@ Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-double}; other
 Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-long-double}; otherwise return
 false.
 @end defun
+
+@c page
+@node bytevectors getters
+@section Bytevector getters
+
+
+@deffn {Generic Function} cc-bytevector-ref (@var{BV} @var{IDX})
+Extract the value at index @var{IDX} from the bytevector @var{BV}.
+@end deffn
+
+
+@deffn {Method} cc-bytevector-ref ((@var{BV} cc-bytevector-u8) (@var{IDX} cc-usize))
+Extract an @code{uint8_t} value from a bytevector and wrap it into a @objtype{cc-uint8} object.
+@end deffn
+
+
+@deffn {Method} cc-bytevector-ref ((@var{BV} cc-bytevector-s8) (@var{IDX} cc-usize))
+Extract an @code{int8_t} value from a bytevector and wrap it into a @objtype{cc-sint8} object.
+@end deffn
+
+
+@deffn {Method} cc-bytevector-ref ((@var{BV} cc-bytevector-u16) (@var{IDX} cc-usize))
+Extract an @code{uint16_t} value from a bytevector and wrap it into a @objtype{cc-uin1t16} object.
+@end deffn
+
+
+@deffn {Method} cc-bytevector-ref ((@var{BV} cc-bytevector-s16) (@var{IDX} cc-usize))
+Extract an @code{int16_t} value from a bytevector and wrap it into a @objtype{cc-sint16} object.
+@end deffn
+
+
+@deffn {Method} cc-bytevector-ref ((@var{BV} cc-bytevector-u32) (@var{IDX} cc-usize))
+Extract an @code{uint32_t} value from a bytevector and wrap it into a @objtype{cc-uint32} object.
+@end deffn
+
+
+@deffn {Method} cc-bytevector-ref ((@var{BV} cc-bytevector-s32) (@var{IDX} cc-usize))
+Extract an @code{int32_t} value from a bytevector and wrap it into a @objtype{cc-sint32} object.
+@end deffn
+
+
+@deffn {Method} cc-bytevector-ref ((@var{BV} cc-bytevector-u64) (@var{IDX} cc-usize))
+Extract an @code{uint64_t} value from a bytevector and wrap it into a @objtype{cc-uint64} object.
+@end deffn
+
+
+@deffn {Method} cc-bytevector-ref ((@var{BV} cc-bytevector-s64) (@var{IDX} cc-usize))
+Extract an @code{int64_t} value from a bytevector and wrap it into a @objtype{cc-sint64} object.
+@end deffn
+
+@c page
+@node bytevectors setters
+@section Bytevector setters
+
+
+@deffn {Generic Function} cc-bytevector-set! (bv idx val)
+Store the value @var{VAL} into the bytevector @var{BV} at index @var{idx}.
+@end deffn
+
+
+@deffn {Method} cc-bytevector-set! ((@var{BV} cc-bytevector-u8) (@var{IDX} cc-usize) (@var{VAL} cc-uint8))
+Store the value @var{VAL} of type @code{uint8_t} into the bytevector @var{BV} at index @var{IDX}.
+@end deffn
+
+
+@deffn {Method} cc-bytevector-set! ((@var{BV} cc-bytevector-s8) (@var{IDX} cc-usize) (@var{VAL} cc-sint8))
+Store the value @var{VAL} of type @code{int8_t} into the bytevector @var{BV} at index @var{IDX}.
+@end deffn
+
+
+@deffn {Method} cc-bytevector-set! ((@var{BV} cc-bytevector-u16) (@var{IDX} cc-usize) (@var{VAL} cc-uint16))
+Store the value @var{VAL} of type @code{uint16_t} into the bytevector @var{BV} at index @var{IDX}.
+@end deffn
+
+
+@deffn {Method} cc-bytevector-set! ((@var{BV} cc-bytevector-s16) (@var{IDX} cc-usize) (@var{VAL} cc-sint16))
+Store the value @var{VAL} of type @code{int16_t} into the bytevector @var{BV} at index @var{IDX}.
+@end deffn
+
+
+@deffn {Method} cc-bytevector-set! ((@var{BV} cc-bytevector-u32) (@var{IDX} cc-usize) (@var{VAL} cc-uint32))
+Store the value @var{VAL} of type @code{uint32_t} into the bytevector @var{BV} at index @var{IDX}.
+@end deffn
+
+
+@deffn {Method} cc-bytevector-set! ((@var{BV} cc-bytevector-s32) (@var{IDX} cc-usize) (@var{VAL} cc-sint32))
+Store the value @var{VAL} of type @code{int32_t} into the bytevector @var{BV} at index @var{IDX}.
+@end deffn
+
+
+@deffn {Method} cc-bytevector-set! ((@var{BV} cc-bytevector-u64) (@var{IDX} cc-usize) (@var{VAL} cc-uint64))
+Store the value @var{VAL} of type @code{uint64_t} into the bytevector @var{BV} at index @var{IDX}.
+@end deffn
+
+
+@deffn {Method} cc-bytevector-set! ((@var{BV} cc-bytevector-s64) (@var{IDX} cc-usize) (@var{VAL} cc-sint64))
+Store the value @var{VAL} of type @code{int64_t} into the bytevector @var{BV} at index @var{IDX}.
+@end deffn
 
 @c page
 @node errors

@@ -207,6 +207,430 @@
 (mmux-core-test--floating-point--not-equal-tests cc-long-double)
 
 
+;;;; less-than tests
+
+(defmacro mmux-core-test--integers--less-than-tests (TYPE)
+  (let* ((TYPE.str	(symbol-name TYPE))
+	 (TESTNAME	(intern (concat "less-than-" TYPE.str)))
+	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
+    `(progn
+       (ert-deftest ,TESTNAME ()
+	 ,DOCSTRING
+	 ;; Compare integers of same type.
+	 (should 	(cc< (,TYPE 1) (,TYPE 2)))
+	 (should (not	(cc< (,TYPE 1) (,TYPE 1))))
+	 (should (not	(cc< (,TYPE 2) (,TYPE 1))))
+	 ;; Compare with a signed integer.
+	 (should 	(cc< (,TYPE 1) (cc-signed-int 2)))
+	 (should (not	(cc< (,TYPE 1) (cc-signed-int 1))))
+	 (should (not	(cc< (,TYPE 2) (cc-signed-int 1))))
+	 (should 	(cc< (cc-signed-int 1) (,TYPE 2)))
+	 (should (not	(cc< (cc-signed-int 1) (,TYPE 1))))
+	 (should (not	(cc< (cc-signed-int 2) (,TYPE 1))))
+	 ;; Compare with an unsigned integer.
+	 (should 	(cc< (,TYPE 1) (cc-unsigned-int 2)))
+	 (should (not	(cc< (,TYPE 1) (cc-unsigned-int 1))))
+	 (should (not	(cc< (,TYPE 2) (cc-unsigned-int 1))))
+	 (should 	(cc< (cc-unsigned-int 1) (,TYPE 2)))
+	 (should (not	(cc< (cc-unsigned-int 1) (,TYPE 1))))
+	 (should (not	(cc< (cc-unsigned-int 2) (,TYPE 1))))
+	 ))))
+
+(defmacro mmux-core-test--floating-point--less-than-tests (TYPE)
+  (let* ((TYPE.str	(symbol-name TYPE))
+	 (TESTNAME	(intern (concat "less-than-" TYPE.str)))
+	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
+    `(progn
+       (ert-deftest ,TESTNAME ()
+	 ,DOCSTRING
+	 ;; Compare integers of same type.
+	 (should 	(cc< (,TYPE 1.0) (,TYPE 2.0)))
+	 (should (not	(cc< (,TYPE 1.0) (,TYPE 1.0))))
+	 (should (not	(cc< (,TYPE 2.0) (,TYPE 1.0))))
+	 ;; Compare with a float.
+	 (should 	(cc< (,TYPE 1.0) 2.0))
+	 (should (not	(cc< (,TYPE 1.0) 1.0)))
+	 (should (not	(cc< (,TYPE 2.0) 1.0)))
+	 (should 	(cc< 1.0 (,TYPE 2.0)))
+	 (should (not	(cc< 1.0 (,TYPE 1.0))))
+	 (should (not	(cc< 2.0 (,TYPE 1.0))))
+	 ;; Compare with a cc-float.
+	 (should 	(cc< (,TYPE 1.0) (cc-float 2.0)))
+	 (should (not	(cc< (,TYPE 1.0) (cc-float 1.0))))
+	 (should (not	(cc< (,TYPE 2.0) (cc-float 1.0))))
+	 (should 	(cc< (cc-float 1.0) (,TYPE 2.0)))
+	 (should (not	(cc< (cc-float 1.0) (,TYPE 1.0))))
+	 (should (not	(cc< (cc-float 2.0) (,TYPE 1.0))))
+	 ;; Compare with a cc-long-double.
+	 (should 	(cc< (,TYPE 1.0) (cc-long-double 2.0)))
+	 (should (not	(cc< (,TYPE 1.0) (cc-long-double 1.0))))
+	 (should (not	(cc< (,TYPE 2.0) (cc-long-double 1.0))))
+	 (should 	(cc< (cc-long-double 1.0) (,TYPE 2.0)))
+	 (should (not	(cc< (cc-long-double 1.0) (,TYPE 1.0))))
+	 (should (not	(cc< (cc-long-double 2.0) (,TYPE 1.0))))
+	 ))))
+
+(ert-deftest less-than-integer ()
+  "Compare objects of type `integer' for equality."
+  (should 	(cc< 1 2))
+  (should (not	(cc< 1 1)))
+  (should (not	(cc< 2 1))))
+
+(ert-deftest less-than-float ()
+  "Compare objects of type `float' for equality."
+  (should 	(cc< 1.0 2.0))
+  (should (not	(cc< 1.0 1.0)))
+  (should (not	(cc< 2.0 1.0))))
+
+(mmux-core-test--integers--less-than-tests cc-char)
+(mmux-core-test--integers--less-than-tests cc-uchar)
+(mmux-core-test--integers--less-than-tests cc-schar)
+(mmux-core-test--integers--less-than-tests cc-wchar)
+(mmux-core-test--integers--less-than-tests cc-signed-short-int)
+(mmux-core-test--integers--less-than-tests cc-unsigned-short-int)
+(mmux-core-test--integers--less-than-tests cc-signed-int)
+(mmux-core-test--integers--less-than-tests cc-unsigned-int)
+(mmux-core-test--integers--less-than-tests cc-signed-long-int)
+(mmux-core-test--integers--less-than-tests cc-unsigned-long-int)
+(mmux-core-test--integers--less-than-tests cc-signed-long-long-int)
+(mmux-core-test--integers--less-than-tests cc-unsigned-long-long-int)
+(mmux-core-test--integers--less-than-tests cc-sint8)
+(mmux-core-test--integers--less-than-tests cc-uint8)
+(mmux-core-test--integers--less-than-tests cc-sint16)
+(mmux-core-test--integers--less-than-tests cc-uint16)
+(mmux-core-test--integers--less-than-tests cc-sint32)
+(mmux-core-test--integers--less-than-tests cc-uint32)
+(mmux-core-test--integers--less-than-tests cc-sint64)
+(mmux-core-test--integers--less-than-tests cc-uint64)
+(mmux-core-test--integers--less-than-tests cc-ssize)
+(mmux-core-test--integers--less-than-tests cc-usize)
+(mmux-core-test--integers--less-than-tests cc-sintmax)
+(mmux-core-test--integers--less-than-tests cc-uintmax)
+(mmux-core-test--integers--less-than-tests cc-ptrdiff)
+
+(mmux-core-test--floating-point--less-than-tests float)
+(mmux-core-test--floating-point--less-than-tests cc-float)
+(mmux-core-test--floating-point--less-than-tests cc-long-double)
+
+
+;;;; greater-than tests
+
+(defmacro mmux-core-test--integers--greater-than-tests (TYPE)
+  (let* ((TYPE.str	(symbol-name TYPE))
+	 (TESTNAME	(intern (concat "greater-than-" TYPE.str)))
+	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
+    `(progn
+       (ert-deftest ,TESTNAME ()
+	 ,DOCSTRING
+	 ;; Compare integers of same type.
+	 (should (not 	(cc> (,TYPE 1) (,TYPE 2))))
+	 (should (not	(cc> (,TYPE 1) (,TYPE 1))))
+	 (should 	(cc> (,TYPE 2) (,TYPE 1)))
+	 ;; Compare with a signed integer.
+	 (should (not 	(cc> (,TYPE 1) (cc-signed-int 2))))
+	 (should (not	(cc> (,TYPE 1) (cc-signed-int 1))))
+	 (should 	(cc> (,TYPE 2) (cc-signed-int 1)))
+	 (should (not	(cc> (cc-signed-int 1) (,TYPE 2))))
+	 (should (not	(cc> (cc-signed-int 1) (,TYPE 1))))
+	 (should 	(cc> (cc-signed-int 2) (,TYPE 1)))
+	 ;; Compare with an unsigned integer.
+	 (should (not	(cc> (,TYPE 1) (cc-unsigned-int 2))))
+	 (should (not	(cc> (,TYPE 1) (cc-unsigned-int 1))))
+	 (should 	(cc> (,TYPE 2) (cc-unsigned-int 1)))
+	 (should (not 	(cc> (cc-unsigned-int 1) (,TYPE 2))))
+	 (should (not	(cc> (cc-unsigned-int 1) (,TYPE 1))))
+	 (should 	(cc> (cc-unsigned-int 2) (,TYPE 1)))
+	 ))))
+
+(defmacro mmux-core-test--floating-point--greater-than-tests (TYPE)
+  (let* ((TYPE.str	(symbol-name TYPE))
+	 (TESTNAME	(intern (concat "greater-than-" TYPE.str)))
+	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
+    `(progn
+       (ert-deftest ,TESTNAME ()
+	 ,DOCSTRING
+	 ;; Compare integers of same type.
+	 (should (not 	(cc> (,TYPE 1.0) (,TYPE 2.0))))
+	 (should (not	(cc> (,TYPE 1.0) (,TYPE 1.0))))
+	 (should 	(cc> (,TYPE 2.0) (,TYPE 1.0)))
+	 ;; Compare with a float.
+	 (should (not 	(cc> (,TYPE 1.0) 2.0)))
+	 (should (not	(cc> (,TYPE 1.0) 1.0)))
+	 (should 	(cc> (,TYPE 2.0) 1.0))
+	 (should (not 	(cc> 1.0 (,TYPE 2.0))))
+	 (should (not	(cc> 1.0 (,TYPE 1.0))))
+	 (should 	(cc> 2.0 (,TYPE 1.0)))
+	 ;; Compare with a cc-float.
+	 (should (not 	(cc> (,TYPE 1.0) (cc-float 2.0))))
+	 (should (not	(cc> (,TYPE 1.0) (cc-float 1.0))))
+	 (should 	(cc> (,TYPE 2.0) (cc-float 1.0)))
+	 (should (not 	(cc> (cc-float 1.0) (,TYPE 2.0))))
+	 (should (not	(cc> (cc-float 1.0) (,TYPE 1.0))))
+	 (should 	(cc> (cc-float 2.0) (,TYPE 1.0)))
+	 ;; Compare with a cc-long-double.
+	 (should (not 	(cc> (,TYPE 1.0) (cc-long-double 2.0))))
+	 (should (not	(cc> (,TYPE 1.0) (cc-long-double 1.0))))
+	 (should 	(cc> (,TYPE 2.0) (cc-long-double 1.0)))
+	 (should (not 	(cc> (cc-long-double 1.0) (,TYPE 2.0))))
+	 (should (not	(cc> (cc-long-double 1.0) (,TYPE 1.0))))
+	 (should 	(cc> (cc-long-double 2.0) (,TYPE 1.0)))
+	 ))))
+
+(ert-deftest greater-than-integer ()
+  "Compare objects of type `integer' for equality."
+  (should (not 	(cc> 1 2)))
+  (should (not	(cc> 1 1)))
+  (should 	(cc> 2 1)))
+
+(ert-deftest greater-than-float ()
+  "Compare objects of type `float' for equality."
+  (should (not 	(cc> 1.0 2.0)))
+  (should (not	(cc> 1.0 1.0)))
+  (should 	(cc> 2.0 1.0)))
+
+(mmux-core-test--integers--greater-than-tests cc-char)
+(mmux-core-test--integers--greater-than-tests cc-uchar)
+(mmux-core-test--integers--greater-than-tests cc-schar)
+(mmux-core-test--integers--greater-than-tests cc-wchar)
+(mmux-core-test--integers--greater-than-tests cc-signed-short-int)
+(mmux-core-test--integers--greater-than-tests cc-unsigned-short-int)
+(mmux-core-test--integers--greater-than-tests cc-signed-int)
+(mmux-core-test--integers--greater-than-tests cc-unsigned-int)
+(mmux-core-test--integers--greater-than-tests cc-signed-long-int)
+(mmux-core-test--integers--greater-than-tests cc-unsigned-long-int)
+(mmux-core-test--integers--greater-than-tests cc-signed-long-long-int)
+(mmux-core-test--integers--greater-than-tests cc-unsigned-long-long-int)
+(mmux-core-test--integers--greater-than-tests cc-sint8)
+(mmux-core-test--integers--greater-than-tests cc-uint8)
+(mmux-core-test--integers--greater-than-tests cc-sint16)
+(mmux-core-test--integers--greater-than-tests cc-uint16)
+(mmux-core-test--integers--greater-than-tests cc-sint32)
+(mmux-core-test--integers--greater-than-tests cc-uint32)
+(mmux-core-test--integers--greater-than-tests cc-sint64)
+(mmux-core-test--integers--greater-than-tests cc-uint64)
+(mmux-core-test--integers--greater-than-tests cc-ssize)
+(mmux-core-test--integers--greater-than-tests cc-usize)
+(mmux-core-test--integers--greater-than-tests cc-sintmax)
+(mmux-core-test--integers--greater-than-tests cc-uintmax)
+(mmux-core-test--integers--greater-than-tests cc-ptrdiff)
+
+(mmux-core-test--floating-point--greater-than-tests float)
+(mmux-core-test--floating-point--greater-than-tests cc-float)
+(mmux-core-test--floating-point--greater-than-tests cc-long-double)
+
+
+;;;; less-than or equal-to tests
+
+(defmacro mmux-core-test--integers--less-than-or-equal-to-tests (TYPE)
+  (let* ((TYPE.str	(symbol-name TYPE))
+	 (TESTNAME	(intern (concat "less-than-or-equal-to-" TYPE.str)))
+	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
+    `(progn
+       (ert-deftest ,TESTNAME ()
+	 ,DOCSTRING
+	 ;; Compare integers of same type.
+	 (should 	(cc<= (,TYPE 1) (,TYPE 2)))
+	 (should 	(cc<= (,TYPE 1) (,TYPE 1)))
+	 (should (not	(cc<= (,TYPE 2) (,TYPE 1))))
+	 ;; Compare with a signed integer.
+	 (should 	(cc<= (,TYPE 1) (cc-signed-int 2)))
+	 (should 	(cc<= (,TYPE 1) (cc-signed-int 1)))
+	 (should (not	(cc<= (,TYPE 2) (cc-signed-int 1))))
+	 (should 	(cc<= (cc-signed-int 1) (,TYPE 2)))
+	 (should 	(cc<= (cc-signed-int 1) (,TYPE 1)))
+	 (should (not	(cc<= (cc-signed-int 2) (,TYPE 1))))
+	 ;; Compare with an unsigned integer.
+	 (should 	(cc<= (,TYPE 1) (cc-unsigned-int 2)))
+	 (should 	(cc<= (,TYPE 1) (cc-unsigned-int 1)))
+	 (should (not	(cc<= (,TYPE 2) (cc-unsigned-int 1))))
+	 (should 	(cc<= (cc-unsigned-int 1) (,TYPE 2)))
+	 (should 	(cc<= (cc-unsigned-int 1) (,TYPE 1)))
+	 (should (not	(cc<= (cc-unsigned-int 2) (,TYPE 1))))
+	 ))))
+
+(defmacro mmux-core-test--floating-point--less-than-or-equal-to-tests (TYPE)
+  (let* ((TYPE.str	(symbol-name TYPE))
+	 (TESTNAME	(intern (concat "less-than-or-equal-to-" TYPE.str)))
+	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
+    `(progn
+       (ert-deftest ,TESTNAME ()
+	 ,DOCSTRING
+	 ;; Compare integers of same type.
+	 (should 	(cc<= (,TYPE 1.0) (,TYPE 2.0)))
+	 (should 	(cc<= (,TYPE 1.0) (,TYPE 1.0)))
+	 (should (not	(cc<= (,TYPE 2.0) (,TYPE 1.0))))
+	 ;; Compare with a float.
+	 (should 	(cc<= (,TYPE 1.0) 2.0))
+	 (should 	(cc<= (,TYPE 1.0) 1.0))
+	 (should (not	(cc<= (,TYPE 2.0) 1.0)))
+	 (should 	(cc<= 1.0 (,TYPE 2.0)))
+	 (should 	(cc<= 1.0 (,TYPE 1.0)))
+	 (should (not	(cc<= 2.0 (,TYPE 1.0))))
+	 ;; Compare with a cc-float.
+	 (should 	(cc<= (,TYPE 1.0) (cc-float 2.0)))
+	 (should 	(cc<= (,TYPE 1.0) (cc-float 1.0)))
+	 (should (not	(cc<= (,TYPE 2.0) (cc-float 1.0))))
+	 (should 	(cc<= (cc-float 1.0) (,TYPE 2.0)))
+	 (should 	(cc<= (cc-float 1.0) (,TYPE 1.0)))
+	 (should (not	(cc<= (cc-float 2.0) (,TYPE 1.0))))
+	 ;; Compare with a cc-long-double.
+	 (should 	(cc<= (,TYPE 1.0) (cc-long-double 2.0)))
+	 (should 	(cc<= (,TYPE 1.0) (cc-long-double 1.0)))
+	 (should (not	(cc<= (,TYPE 2.0) (cc-long-double 1.0))))
+	 (should 	(cc<= (cc-long-double 1.0) (,TYPE 2.0)))
+	 (should 	(cc<= (cc-long-double 1.0) (,TYPE 1.0)))
+	 (should (not	(cc<= (cc-long-double 2.0) (,TYPE 1.0))))
+	 ))))
+
+(ert-deftest less-than-or-equal-to-integer ()
+  "Compare objects of type `integer' for equality."
+  (should 	(cc<= 1 2))
+  (should 	(cc<= 1 1))
+  (should (not	(cc<= 2 1))))
+
+(ert-deftest less-than-or-equal-to-float ()
+  "Compare objects of type `float' for equality."
+  (should 	(cc<= 1.0 2.0))
+  (should 	(cc<= 1.0 1.0))
+  (should (not	(cc<= 2.0 1.0))))
+
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-char)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-uchar)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-schar)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-wchar)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-signed-short-int)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-unsigned-short-int)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-signed-int)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-unsigned-int)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-signed-long-int)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-unsigned-long-int)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-signed-long-long-int)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-unsigned-long-long-int)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-sint8)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-uint8)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-sint16)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-uint16)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-sint32)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-uint32)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-sint64)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-uint64)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-ssize)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-usize)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-sintmax)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-uintmax)
+(mmux-core-test--integers--less-than-or-equal-to-tests cc-ptrdiff)
+
+(mmux-core-test--floating-point--less-than-or-equal-to-tests float)
+(mmux-core-test--floating-point--less-than-or-equal-to-tests cc-float)
+(mmux-core-test--floating-point--less-than-or-equal-to-tests cc-long-double)
+
+
+;;;; greater-than or equal-to tests
+
+(defmacro mmux-core-test--integers--greater-than-or-equal-to-tests (TYPE)
+  (let* ((TYPE.str	(symbol-name TYPE))
+	 (TESTNAME	(intern (concat "greater-than-or-equal-to-" TYPE.str)))
+	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
+    `(progn
+       (ert-deftest ,TESTNAME ()
+	 ,DOCSTRING
+	 ;; Compare integers of same type.
+	 (should (not 	(cc>= (,TYPE 1) (,TYPE 2))))
+	 (should 	(cc>= (,TYPE 1) (,TYPE 1)))
+	 (should 	(cc>= (,TYPE 2) (,TYPE 1)))
+	 ;; Compare with a signed integer.
+	 (should (not 	(cc>= (,TYPE 1) (cc-signed-int 2))))
+	 (should 	(cc>= (,TYPE 1) (cc-signed-int 1)))
+	 (should 	(cc>= (,TYPE 2) (cc-signed-int 1)))
+	 (should (not	(cc>= (cc-signed-int 1) (,TYPE 2))))
+	 (should 	(cc>= (cc-signed-int 1) (,TYPE 1)))
+	 (should 	(cc>= (cc-signed-int 2) (,TYPE 1)))
+	 ;; Compare with an unsigned integer.
+	 (should (not	(cc>= (,TYPE 1) (cc-unsigned-int 2))))
+	 (should 	(cc>= (,TYPE 1) (cc-unsigned-int 1)))
+	 (should 	(cc>= (,TYPE 2) (cc-unsigned-int 1)))
+	 (should (not 	(cc>= (cc-unsigned-int 1) (,TYPE 2))))
+	 (should 	(cc>= (cc-unsigned-int 1) (,TYPE 1)))
+	 (should 	(cc>= (cc-unsigned-int 2) (,TYPE 1)))
+	 ))))
+
+(defmacro mmux-core-test--floating-point--greater-than-or-equal-to-tests (TYPE)
+  (let* ((TYPE.str	(symbol-name TYPE))
+	 (TESTNAME	(intern (concat "greater-than-or-equal-to-" TYPE.str)))
+	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
+    `(progn
+       (ert-deftest ,TESTNAME ()
+	 ,DOCSTRING
+	 ;; Compare integers of same type.
+	 (should (not 	(cc>= (,TYPE 1.0) (,TYPE 2.0))))
+	 (should 	(cc>= (,TYPE 1.0) (,TYPE 1.0)))
+	 (should 	(cc>= (,TYPE 2.0) (,TYPE 1.0)))
+	 ;; Compare with a float.
+	 (should (not 	(cc>= (,TYPE 1.0) 2.0)))
+	 (should 	(cc>= (,TYPE 1.0) 1.0))
+	 (should 	(cc>= (,TYPE 2.0) 1.0))
+	 (should (not 	(cc>= 1.0 (,TYPE 2.0))))
+	 (should 	(cc>= 1.0 (,TYPE 1.0)))
+	 (should 	(cc>= 2.0 (,TYPE 1.0)))
+	 ;; Compare with a cc-float.
+	 (should (not 	(cc>= (,TYPE 1.0) (cc-float 2.0))))
+	 (should 	(cc>= (,TYPE 1.0) (cc-float 1.0)))
+	 (should 	(cc>= (,TYPE 2.0) (cc-float 1.0)))
+	 (should (not 	(cc>= (cc-float 1.0) (,TYPE 2.0))))
+	 (should 	(cc>= (cc-float 1.0) (,TYPE 1.0)))
+	 (should 	(cc>= (cc-float 2.0) (,TYPE 1.0)))
+	 ;; Compare with a cc-long-double.
+	 (should (not 	(cc>= (,TYPE 1.0) (cc-long-double 2.0))))
+	 (should 	(cc>= (,TYPE 1.0) (cc-long-double 1.0)))
+	 (should 	(cc>= (,TYPE 2.0) (cc-long-double 1.0)))
+	 (should (not 	(cc>= (cc-long-double 1.0) (,TYPE 2.0))))
+	 (should 	(cc>= (cc-long-double 1.0) (,TYPE 1.0)))
+	 (should 	(cc>= (cc-long-double 2.0) (,TYPE 1.0)))
+	 ))))
+
+(ert-deftest greater-than-or-equal-to-integer ()
+  "Compare objects of type `integer' for equality."
+  (should (not 	(cc>= 1 2)))
+  (should 	(cc>= 1 1))
+  (should 	(cc>= 2 1)))
+
+(ert-deftest greater-than-or-equal-to-float ()
+  "Compare objects of type `float' for equality."
+  (should (not 	(cc>= 1.0 2.0)))
+  (should 	(cc>= 1.0 1.0))
+  (should 	(cc>= 2.0 1.0)))
+
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-char)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-uchar)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-schar)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-wchar)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-signed-short-int)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-unsigned-short-int)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-signed-int)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-unsigned-int)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-signed-long-int)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-unsigned-long-int)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-signed-long-long-int)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-unsigned-long-long-int)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-sint8)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-uint8)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-sint16)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-uint16)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-sint32)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-uint32)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-sint64)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-uint64)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-ssize)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-usize)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-sintmax)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-uintmax)
+(mmux-core-test--integers--greater-than-or-equal-to-tests cc-ptrdiff)
+
+(mmux-core-test--floating-point--greater-than-or-equal-to-tests float)
+(mmux-core-test--floating-point--greater-than-or-equal-to-tests cc-float)
+(mmux-core-test--floating-point--greater-than-or-equal-to-tests cc-long-double)
+
+
 ;;;; done
 
 (ert-run-tests-batch-and-exit)

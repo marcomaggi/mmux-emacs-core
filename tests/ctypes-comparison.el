@@ -22,13 +22,189 @@
 (require 'ert)
 (require 'cc-core)
 
-(ert-deftest cc= ()
-  "Compare operands.."
-  (should (cc= 1 1))
-  (should (not (cc= 1 2)))
-  (should (cc= (cc-char 1) (cc-char 1)))
-  (should (not (cc= (cc-char 1) (cc-char 2))))
-  )
+
+;;;; equality tests
+
+(defmacro mmux-core-test--integers--equal-tests (TYPE)
+  (let* ((TYPE.str	(symbol-name TYPE))
+	 (TESTNAME	(intern (concat "equality-" TYPE.str)))
+	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
+    `(progn
+       (ert-deftest ,TESTNAME ()
+	 ,DOCSTRING
+	 ;; Compare integers of same type.
+	 (should	(cc= (,TYPE 1) (,TYPE 1)))
+	 (should (not	(cc= (,TYPE 5) (,TYPE 17))))
+	 ;; Compare with a signed integer.
+	 (should	(cc= (,TYPE 1) (cc-signed-int 1)))
+	 (should (not	(cc= (,TYPE 5) (cc-signed-int 17))))
+	 (should	(cc= (cc-signed-int 1) (,TYPE 1)))
+	 (should (not	(cc= (cc-signed-int 5) (,TYPE 17))))
+	 ;; Compare with an unsigned integer.
+	 (should	(cc= (,TYPE 1) (cc-unsigned-int 1)))
+	 (should (not	(cc= (,TYPE 5) (cc-unsigned-int 17))))
+	 (should	(cc= (cc-unsigned-int 1) (,TYPE 1)))
+	 (should (not	(cc= (cc-unsigned-int 5) (,TYPE 17))))
+	 ))))
+
+(defmacro mmux-core-test--floating-point--equal-tests (TYPE)
+  (let* ((TYPE.str	(symbol-name TYPE))
+	 (TESTNAME	(intern (concat "equality-" TYPE.str)))
+	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
+    `(progn
+       (ert-deftest ,TESTNAME ()
+	 ,DOCSTRING
+	 ;; Compare integers of same type.
+	 (should	(cc= (,TYPE 1.0) (,TYPE 1.0)))
+	 (should (not	(cc= (,TYPE 5.0) (,TYPE 17.0))))
+	 ;; Compare with a float.
+	 (should	(cc= (,TYPE 1.0) 1.0))
+	 (should (not	(cc= (,TYPE 5.0) 17.0)))
+	 (should	(cc= 1.0 (,TYPE 1.0)))
+	 (should (not	(cc= 5.0 (,TYPE 17.0))))
+	 ;; Compare with a cc-float.
+	 (should	(cc= (,TYPE 1.0) (cc-float 1.0)))
+	 (should (not	(cc= (,TYPE 5.0) (cc-float 17.0))))
+	 (should	(cc= (cc-float 1.0) (,TYPE 1.0)))
+	 (should (not	(cc= (cc-float 5.0) (,TYPE 17.0))))
+	 ;; Compare with a cc-long-double.
+	 (should	(cc= (,TYPE 1.0) (cc-long-double 1.0)))
+	 (should (not	(cc= (,TYPE 5.0) (cc-long-double 17.0))))
+	 (should	(cc= (cc-long-double 1.0) (,TYPE 1.0)))
+	 (should (not	(cc= (cc-long-double 5.0) (,TYPE 17.0))))
+	 ))))
+
+(ert-deftest equality-integer ()
+  "Compare objects of type `integer' for equality."
+  (should	(cc= 1 1))
+  (should (not	(cc= 1 2))))
+
+(ert-deftest equality-float ()
+  "Compare objects of type `float' for equality."
+  (should	(cc= 1.0 1.0))
+  (should (not	(cc= 1.0 2.0))))
+
+(mmux-core-test--integers--equal-tests cc-char)
+(mmux-core-test--integers--equal-tests cc-uchar)
+(mmux-core-test--integers--equal-tests cc-schar)
+(mmux-core-test--integers--equal-tests cc-wchar)
+(mmux-core-test--integers--equal-tests cc-signed-short-int)
+(mmux-core-test--integers--equal-tests cc-unsigned-short-int)
+(mmux-core-test--integers--equal-tests cc-signed-int)
+(mmux-core-test--integers--equal-tests cc-unsigned-int)
+(mmux-core-test--integers--equal-tests cc-signed-long-int)
+(mmux-core-test--integers--equal-tests cc-unsigned-long-int)
+(mmux-core-test--integers--equal-tests cc-signed-long-long-int)
+(mmux-core-test--integers--equal-tests cc-unsigned-long-long-int)
+(mmux-core-test--integers--equal-tests cc-sint8)
+(mmux-core-test--integers--equal-tests cc-uint8)
+(mmux-core-test--integers--equal-tests cc-sint16)
+(mmux-core-test--integers--equal-tests cc-uint16)
+(mmux-core-test--integers--equal-tests cc-sint32)
+(mmux-core-test--integers--equal-tests cc-uint32)
+(mmux-core-test--integers--equal-tests cc-sint64)
+(mmux-core-test--integers--equal-tests cc-uint64)
+(mmux-core-test--integers--equal-tests cc-ssize)
+(mmux-core-test--integers--equal-tests cc-usize)
+(mmux-core-test--integers--equal-tests cc-sintmax)
+(mmux-core-test--integers--equal-tests cc-uintmax)
+(mmux-core-test--integers--equal-tests cc-ptrdiff)
+
+(mmux-core-test--floating-point--equal-tests float)
+(mmux-core-test--floating-point--equal-tests cc-float)
+(mmux-core-test--floating-point--equal-tests cc-long-double)
+
+
+;;;; not-equality tests
+
+(defmacro mmux-core-test--integers--not-equal-tests (TYPE)
+  (let* ((TYPE.str	(symbol-name TYPE))
+	 (TESTNAME	(intern (concat "not-equality-" TYPE.str)))
+	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for not-equality.")))
+    `(progn
+       (ert-deftest ,TESTNAME ()
+	 ,DOCSTRING
+	 ;; Compare integers of same type.
+	 (should (not	(cc/= (,TYPE 1) (,TYPE 1))))
+	 (should 	(cc/= (,TYPE 5) (,TYPE 17)))
+	 ;; Compare with a signed integer.
+	 (should (not	(cc/= (,TYPE 1) (cc-signed-int 1))))
+	 (should 	(cc/= (,TYPE 5) (cc-signed-int 17)))
+	 (should (not	(cc/= (cc-signed-int 1) (,TYPE 1))))
+	 (should 	(cc/= (cc-signed-int 5) (,TYPE 17)))
+	 ;; Compare with an unsigned integer.
+	 (should (not	(cc/= (,TYPE 1) (cc-unsigned-int 1))))
+	 (should 	(cc/= (,TYPE 5) (cc-unsigned-int 17)))
+	 (should (not	(cc/= (cc-unsigned-int 1) (,TYPE 1))))
+	 (should 	(cc/= (cc-unsigned-int 5) (,TYPE 17)))
+	 ))))
+
+(defmacro mmux-core-test--floating-point--not-equal-tests (TYPE)
+  (let* ((TYPE.str	(symbol-name TYPE))
+	 (TESTNAME	(intern (concat "equality-" TYPE.str)))
+	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for not-equality.")))
+    `(progn
+       (ert-deftest ,TESTNAME ()
+	 ,DOCSTRING
+	 ;; Compare integers of same type.
+	 (should (not	(cc/= (,TYPE 1.0) (,TYPE 1.0))))
+	 (should 	(cc/= (,TYPE 5.0) (,TYPE 17.0)))
+	 ;; Compare with a float.
+	 (should (not	(cc/= (,TYPE 1.0) 1.0)))
+	 (should 	(cc/= (,TYPE 5.0) 17.0))
+	 (should (not	(cc/= 1.0 (,TYPE 1.0))))
+	 (should 	(cc/= 5.0 (,TYPE 17.0)))
+	 ;; Compare with a cc-float.
+	 (should (not	(cc/= (,TYPE 1.0) (cc-float 1.0))))
+	 (should 	(cc/= (,TYPE 5.0) (cc-float 17.0)))
+	 (should (not	(cc/= (cc-float 1.0) (,TYPE 1.0))))
+	 (should 	(cc/= (cc-float 5.0) (,TYPE 17.0)))
+	 ;; Compare with a cc-long-double.
+	 (should (not	(cc/= (,TYPE 1.0) (cc-long-double 1.0))))
+	 (should 	(cc/= (,TYPE 5.0) (cc-long-double 17.0)))
+	 (should (not	(cc/= (cc-long-double 1.0) (,TYPE 1.0))))
+	 (should 	(cc/= (cc-long-double 5.0) (,TYPE 17.0)))
+	 ))))
+
+(ert-deftest not-equality-integer ()
+  "Compare objects of type `integer' for not-equality."
+  (should (not	(cc/= 1 1)))
+  (should 	(cc/= 1 2)))
+
+(ert-deftest not-equality-float ()
+  "Compare objects of type `float' for not-equality."
+  (should (not	(cc/= 1.0 1.0)))
+  (should 	(cc/= 1.0 2.0)))
+
+(mmux-core-test--integers--not-equal-tests cc-char)
+(mmux-core-test--integers--not-equal-tests cc-uchar)
+(mmux-core-test--integers--not-equal-tests cc-schar)
+(mmux-core-test--integers--not-equal-tests cc-wchar)
+(mmux-core-test--integers--not-equal-tests cc-signed-short-int)
+(mmux-core-test--integers--not-equal-tests cc-unsigned-short-int)
+(mmux-core-test--integers--not-equal-tests cc-signed-int)
+(mmux-core-test--integers--not-equal-tests cc-unsigned-int)
+(mmux-core-test--integers--not-equal-tests cc-signed-long-int)
+(mmux-core-test--integers--not-equal-tests cc-unsigned-long-int)
+(mmux-core-test--integers--not-equal-tests cc-signed-long-long-int)
+(mmux-core-test--integers--not-equal-tests cc-unsigned-long-long-int)
+(mmux-core-test--integers--not-equal-tests cc-sint8)
+(mmux-core-test--integers--not-equal-tests cc-uint8)
+(mmux-core-test--integers--not-equal-tests cc-sint16)
+(mmux-core-test--integers--not-equal-tests cc-uint16)
+(mmux-core-test--integers--not-equal-tests cc-sint32)
+(mmux-core-test--integers--not-equal-tests cc-uint32)
+(mmux-core-test--integers--not-equal-tests cc-sint64)
+(mmux-core-test--integers--not-equal-tests cc-uint64)
+(mmux-core-test--integers--not-equal-tests cc-ssize)
+(mmux-core-test--integers--not-equal-tests cc-usize)
+(mmux-core-test--integers--not-equal-tests cc-sintmax)
+(mmux-core-test--integers--not-equal-tests cc-uintmax)
+(mmux-core-test--integers--not-equal-tests cc-ptrdiff)
+
+(mmux-core-test--floating-point--not-equal-tests float)
+(mmux-core-test--floating-point--not-equal-tests cc-float)
+(mmux-core-test--floating-point--not-equal-tests cc-long-double)
 
 
 ;;;; done

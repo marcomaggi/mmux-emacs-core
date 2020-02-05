@@ -46,21 +46,31 @@
   }									\
 									\
   emacs_value								\
-  mmux_emacs_core_make_ ## STEM (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED) \
+  mmux_emacs_core_make_ ## STEM (emacs_env *env, CTYPE val)		\
   {									\
-    assert(nargs == 1);							\
-    ETYPE val = mmux_emacs_core_get_ ## ARG_GETTER_STEM(env, args[0]);	\
     mmux_emacs_core_ ## STEM ##_t *obj;					\
 									\
     errno = 0;								\
     obj   = (mmux_emacs_core_ ## STEM ##_t *)malloc(sizeof(mmux_emacs_core_ ## STEM ##_t)); \
     if (obj) {								\
-      obj->val	= (CTYPE) val;						\
+      obj->val	= val;							\
 									\
       return mmux_emacs_core_make_user_ptr(env, mmux_emacs_core_ ## STEM ##_finalizer, obj); \
     } else {								\
       return mmux_emacs_core_error_memory_allocation(env);		\
     }									\
+  }									\
+									\
+  emacs_value								\
+  Fmmux_emacs_core_make_ ## STEM (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED) \
+  {									\
+    if (0) {								\
+      fprintf(stderr, "%s: enter\n", __func__);				\
+    }									\
+    assert(nargs == 1);							\
+    ETYPE val = mmux_emacs_core_get_ ## ARG_GETTER_STEM(env, args[0]);	\
+									\
+    return mmux_emacs_core_make_ ## STEM(env, (CTYPE)val);		\
   }
 
 MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(uint,	unsigned int,		intmax_t,     integer)
@@ -79,8 +89,8 @@ MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(usize,	 size_t,		intmax_t,     intege
 MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(ssize,	ssize_t,		intmax_t,     integer)
 MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(ptrdiff,	ptrdiff_t,		intmax_t,     integer)
 MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(wchar,	wchar_t,		intmax_t,     integer)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(float,	float,			double,	      float)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(long_double,	long double,		double,	      float)
+MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(float,	float,			double,	      double)
+MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(long_double,	long double,		double,	      double)
 
 
 /** --------------------------------------------------------------------
@@ -140,126 +150,126 @@ static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODUL
 
   {
     .name		= "mmux-core-c-make-uint",
-    .implementation	= mmux_emacs_core_make_uint,
+    .implementation	= Fmmux_emacs_core_make_uint,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "build and return a user-pointer object of type `cc-uint'.",
   },
   {
     .name		= "mmux-core-c-make-sint",
-    .implementation	= mmux_emacs_core_make_sint,
+    .implementation	= Fmmux_emacs_core_make_sint,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "build and return a user-pointer object of type `cc-sint'.",
   },
   {
     .name		= "mmux-core-c-make-ulong",
-    .implementation	= mmux_emacs_core_make_ulong,
+    .implementation	= Fmmux_emacs_core_make_ulong,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "build and return a user-pointer object of type `cc-ulong'.",
   },
   {
     .name		= "mmux-core-c-make-slong",
-    .implementation	= mmux_emacs_core_make_slong,
+    .implementation	= Fmmux_emacs_core_make_slong,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "build and return a user-pointer object of type `cc-slong'.",
   },
   {
     .name		= "mmux-core-c-make-ullong",
-    .implementation	= mmux_emacs_core_make_ullong,
+    .implementation	= Fmmux_emacs_core_make_ullong,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "build and return a user-pointer object of type `cc-ullong'.",
   },
   {
     .name		= "mmux-core-c-make-sllong",
-    .implementation	= mmux_emacs_core_make_sllong,
+    .implementation	= Fmmux_emacs_core_make_sllong,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "build and return a user-pointer object of type `cc-sllong'.",
   },
   {
     .name		= "mmux-core-c-make-uint32",
-    .implementation	= mmux_emacs_core_make_uint32,
+    .implementation	= Fmmux_emacs_core_make_uint32,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "build and return a user-pointer object of type `cc-uint32'.",
   },
   {
     .name		= "mmux-core-c-make-sint32",
-    .implementation	= mmux_emacs_core_make_sint32,
+    .implementation	= Fmmux_emacs_core_make_sint32,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "build and return a user-pointer object of type `cc-sint32'.",
   },
   {
     .name		= "mmux-core-c-make-uint64",
-    .implementation	= mmux_emacs_core_make_uint64,
+    .implementation	= Fmmux_emacs_core_make_uint64,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "build and return a user-pointer object of type `cc-uint64'.",
   },
   {
     .name		= "mmux-core-c-make-sint64",
-    .implementation	= mmux_emacs_core_make_sint64,
+    .implementation	= Fmmux_emacs_core_make_sint64,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "build and return a user-pointer object of type `cc-sint64'.",
   },
   {
     .name		= "mmux-core-c-make-uintmax",
-    .implementation	= mmux_emacs_core_make_uintmax,
+    .implementation	= Fmmux_emacs_core_make_uintmax,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "build and return a user-pointer object of type `cc-uintmax'.",
   },
   {
     .name		= "mmux-core-c-make-sintmax",
-    .implementation	= mmux_emacs_core_make_sintmax,
+    .implementation	= Fmmux_emacs_core_make_sintmax,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "build and return a user-pointer object of type `cc-sintmax'.",
   },
   {
     .name		= "mmux-core-c-make-usize",
-    .implementation	= mmux_emacs_core_make_usize,
+    .implementation	= Fmmux_emacs_core_make_usize,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "build and return a user-pointer object of type `cc-usize'.",
   },
   {
     .name		= "mmux-core-c-make-ssize",
-    .implementation	= mmux_emacs_core_make_ssize,
+    .implementation	= Fmmux_emacs_core_make_ssize,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "build and return a user-pointer object of type `cc-ssize'.",
   },
   {
     .name		= "mmux-core-c-make-ptrdiff",
-    .implementation	= mmux_emacs_core_make_ptrdiff,
+    .implementation	= Fmmux_emacs_core_make_ptrdiff,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "build and return a user-pointer object of type `cc-ptrdiff'.",
   },
   {
     .name		= "mmux-core-c-make-wchar",
-    .implementation	= mmux_emacs_core_make_wchar,
+    .implementation	= Fmmux_emacs_core_make_wchar,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "build and return a user-pointer object of type `cc-wchar'.",
   },
   {
     .name		= "mmux-core-c-make-float",
-    .implementation	= mmux_emacs_core_make_float,
+    .implementation	= Fmmux_emacs_core_make_float,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "build and return a user-pointer object of type `cc-float'.",
   },
   {
     .name		= "mmux-core-c-make-long-double",
-    .implementation	= mmux_emacs_core_make_long_double,
+    .implementation	= Fmmux_emacs_core_make_long_double,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "build and return a user-pointer object of type `cc-long-double'.",

@@ -192,7 +192,7 @@ Fmmux_emacs_core_bytevector_s8_set (emacs_env *env, ptrdiff_t nargs, emacs_value
   assert(3 == nargs);
   mmux_emacs_core_bytevector_t	*bv	= mmux_emacs_core_get_bytevector(env, args[0]);
   size_t			idx	= (size_t)mmux_emacs_core_get_integer(env, args[1]);
-  int8_t			val	= mmux_emacs_core_get_int8(env, args[2]);
+  int8_t			val	= mmux_emacs_core_get_sint8(env, args[2]);
 
   if (idx <= bv->number_of_slots) {
     int8_t	*slots	= ((int8_t*)(bv->ptr));
@@ -230,7 +230,7 @@ Fmmux_emacs_core_bytevector_s16_set (emacs_env *env, ptrdiff_t nargs, emacs_valu
   assert(3 == nargs);
   mmux_emacs_core_bytevector_t	*bv	= mmux_emacs_core_get_bytevector(env, args[0]);
   size_t			idx	= (size_t)mmux_emacs_core_get_integer(env, args[1]);
-  int16_t			val	= mmux_emacs_core_get_int16(env, args[2]);
+  int16_t			val	= mmux_emacs_core_get_sint16(env, args[2]);
 
   if (idx <= bv->number_of_slots) {
     int16_t	*slots	= ((int16_t*)(bv->ptr));

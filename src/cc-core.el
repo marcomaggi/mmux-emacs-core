@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-05 07:38:07 marco>
+;; Time-stamp: <2020-02-05 10:39:00 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -685,17 +685,17 @@
   ;;     (cc= op1 (cc-sint64 op2)))
   ;;
   (let* ((OPERATION.str	(symbol-name OPERATION))
-	 (CC-FUNC	(intern (concat "cc" (symbol-name OPERATION))))
+	 (CC-FUNC2	(intern (concat "cc-2" (symbol-name OPERATION))))
 	 (DOCSTRING	(concat "Return true if OP1 " OPERATION.str " OP2; otherwise return false.")))
     `(progn
-       (cl-defmethod ,CC-FUNC ((op1 ,TYPE) (op2 t))
+       (cl-defmethod ,CC-FUNC2 ((op1 ,TYPE) (op2 t))
 	 ,DOCSTRING
-	 ;;(cc-debug-print (list ',CC-FUNC op1 ',TYPE op2 't))
-	 (,CC-FUNC (,CONVERTER op1) op2))
-       (cl-defmethod ,CC-FUNC ((op1 t) (op2 ,TYPE))
+	 ;;(cc-debug-print (list ',CC-FUNC2 op1 ',TYPE op2 't))
+	 (,CC-FUNC2 (,CONVERTER op1) op2))
+       (cl-defmethod ,CC-FUNC2 ((op1 t) (op2 ,TYPE))
 	 ,DOCSTRING
-	 ;;(cc-debug-print (list ',CC-FUNC op1 't op2 ',TYPE))
-	 (,CC-FUNC op1 (,CONVERTER op2)))
+	 ;;(cc-debug-print (list ',CC-FUNC2 op1 't op2 ',TYPE))
+	 (,CC-FUNC2 op1 (,CONVERTER op2)))
        )))
 
 (defmacro cc--define-integer-comparison (OPERATION)
@@ -703,20 +703,36 @@
   ;;
   (let* ((OPERATION.str			(symbol-name OPERATION))
 	 (CC-FUNC			(intern (concat "cc" OPERATION.str)))
+	 (CC-FUNC2			(intern (concat "cc-2" OPERATION.str)))
 	 (DOCSTRING			(concat "Return true if OP1 " OPERATION.str " OP2; otherwise return false."))
 	 (OPERATION-SINT64		(intern (concat "mmux-core-c-sint64" OPERATION.str)))
 	 (OPERATION-UINT64		(intern (concat "mmux-core-c-uint64" OPERATION.str)))
 	 (OPERATION-SINT64-UINT64	(intern (concat "mmux-core-c-sint64-uint64" OPERATION.str)))
 	 (OPERATION-UINT64-SINT64	(intern (concat "mmux-core-c-uint64-sint64" OPERATION.str))))
     `(progn
-       (cl-defgeneric ,CC-FUNC (op1 op2)
+       (defun ,CC-FUNC (op &rest ops)
+    	 ,DOCSTRING
+	 ;;FIXME Should I rewrite this to use `cl-loop'?  (Marco Maggi; Feb 5, 2020)
+	 (let ((rv t))
+	   (while ops
+	     (let ((item (car ops)))
+	       (if (,CC-FUNC2 op item)
+		   (progn
+		     (setq op item)
+		     (setq ops (cdr ops)))
+		 (progn
+		   (setq rv  nil)
+		   (setq ops nil)))))
+	   rv))
+
+       (cl-defgeneric ,CC-FUNC2 (op1 op2)
     	 ,DOCSTRING)
 
-       (cl-defmethod  ,CC-FUNC ((op1 integer)   (op2 integer))   ,DOCSTRING (,OPERATION op1 op2))
-       (cl-defmethod  ,CC-FUNC ((op1 cc-sint64) (op2 cc-sint64)) ,DOCSTRING (,OPERATION-SINT64 (cc-sint64-obj op1) (cc-sint64-obj op2)))
-       (cl-defmethod  ,CC-FUNC ((op1 cc-uint64) (op2 cc-uint64)) ,DOCSTRING (,OPERATION-UINT64 (cc-uint64-obj op1) (cc-uint64-obj op2)))
-       (cl-defmethod  ,CC-FUNC ((op1 cc-sint64) (op2 cc-uint64)) ,DOCSTRING (,OPERATION-SINT64-UINT64 (cc-sint64-obj op1) (cc-uint64-obj op2)))
-       (cl-defmethod  ,CC-FUNC ((op1 cc-uint64) (op2 cc-sint64)) ,DOCSTRING (,OPERATION-UINT64-SINT64 (cc-uint64-obj op1) (cc-sint64-obj op2)))
+       (cl-defmethod ,CC-FUNC2 ((op1 integer)   (op2 integer))   ,DOCSTRING (,OPERATION op1 op2))
+       (cl-defmethod ,CC-FUNC2 ((op1 cc-sint64) (op2 cc-sint64)) ,DOCSTRING (,OPERATION-SINT64 (cc-sint64-obj op1) (cc-sint64-obj op2)))
+       (cl-defmethod ,CC-FUNC2 ((op1 cc-uint64) (op2 cc-uint64)) ,DOCSTRING (,OPERATION-UINT64 (cc-uint64-obj op1) (cc-uint64-obj op2)))
+       (cl-defmethod ,CC-FUNC2 ((op1 cc-sint64) (op2 cc-uint64)) ,DOCSTRING (,OPERATION-SINT64-UINT64 (cc-sint64-obj op1) (cc-uint64-obj op2)))
+       (cl-defmethod ,CC-FUNC2 ((op1 cc-uint64) (op2 cc-sint64)) ,DOCSTRING (,OPERATION-UINT64-SINT64 (cc-uint64-obj op1) (cc-sint64-obj op2)))
 
        (cc--define-integer-comparison-method ,OPERATION cc-char				cc-sint64)
        (cc--define-integer-comparison-method ,OPERATION cc-schar			cc-sint64)
@@ -770,45 +786,42 @@
   ;;     (cc= op1 (cc-long-double op2)))
   ;;
   (let* ((OPERATION.str	(symbol-name OPERATION))
-	 (CC-FUNC	(intern (concat "cc" (symbol-name OPERATION))))
+	 (CC-FUNC2	(intern (concat "cc-2" (symbol-name OPERATION))))
 	 (DOCSTRING	(concat "Return true if OP1 " OPERATION.str " OP2; otherwise return false.")))
     `(progn
-       (cl-defmethod ,CC-FUNC ((op1 ,TYPE) (op2 t))
+       (cl-defmethod ,CC-FUNC2 ((op1 ,TYPE) (op2 t))
 	 ,DOCSTRING
-	 ;;(cc-debug-print (list ',CC-FUNC op1 ',TYPE op2 't))
-	 (,CC-FUNC (,CONVERTER op1) op2))
-       (cl-defmethod ,CC-FUNC ((op1 t) (op2 ,TYPE))
+	 ;;(cc-debug-print (list ',CC-FUNC2 op1 ',TYPE op2 't))
+	 (,CC-FUNC2 (,CONVERTER op1) op2))
+       (cl-defmethod ,CC-FUNC2 ((op1 t) (op2 ,TYPE))
 	 ,DOCSTRING
-	 ;;(cc-debug-print (list ',CC-FUNC op1 't op2 ',TYPE))
-	 (,CC-FUNC op1 (,CONVERTER op2)))
+	 ;;(cc-debug-print (list ',CC-FUNC2 op1 't op2 ',TYPE))
+	 (,CC-FUNC2 op1 (,CONVERTER op2)))
        )))
 
 (defmacro cc--define-floating-point-comparison (OPERATION)
   ;;Define everything needed to perform a comparison operation among floating-point numbers.
   ;;
   (let* ((OPERATION.str		(symbol-name OPERATION))
-	 (CC-FUNC		(intern (concat "cc" OPERATION.str)))
+	 (CC-FUNC2		(intern (concat "cc-2" OPERATION.str)))
 	 (DOCSTRING		(concat "Return true if OP1 " OPERATION.str " OP2; otherwise return false."))
 	 (OPERATION-LONG-DOUBLE	(intern (concat "mmux-core-c-long-double" OPERATION.str))))
     `(progn
-       (cl-defgeneric ,CC-FUNC (op1 op2)
-    	 ,DOCSTRING)
-
-       (cl-defmethod  ,CC-FUNC ((op1 float) (op2 float))
+       (cl-defmethod  ,CC-FUNC2 ((op1 float) (op2 float))
     	 ,DOCSTRING
     	 (,OPERATION op1 op2))
 
-       (cl-defmethod  ,CC-FUNC ((op1 cc-long-double) (op2 cc-long-double))
+       (cl-defmethod  ,CC-FUNC2 ((op1 cc-long-double) (op2 cc-long-double))
     	 ,DOCSTRING
     	 (,OPERATION-LONG-DOUBLE (cc-long-double-obj op1) (cc-long-double-obj op2)))
 
-       (cl-defmethod  ,CC-FUNC ((op1 float) (op2 t))
+       (cl-defmethod  ,CC-FUNC2 ((op1 float) (op2 t))
     	 ,DOCSTRING
-    	 (,CC-FUNC (cc-long-double op1) op2))
+    	 (,CC-FUNC2 (cc-long-double op1) op2))
 
-       (cl-defmethod  ,CC-FUNC ((op1 t) (op2 float))
+       (cl-defmethod  ,CC-FUNC2 ((op1 t) (op2 float))
     	 ,DOCSTRING
-    	 (,CC-FUNC op1 (cc-long-double op2)))
+    	 (,CC-FUNC2 op1 (cc-long-double op2)))
 
        (cc--define-floating-point-comparison-method ,OPERATION cc-float cc-long-double)
        )))

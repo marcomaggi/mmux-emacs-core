@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-06 07:02:43 marco>
+;; Time-stamp: <2020-02-06 15:15:34 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -34,12 +34,10 @@
 (eval-when-compile
   (require 'cc-constants)
   (require 'cc-basics)
-  (require 'cc-numeric-type-definitions)
-  (require 'cc-numeric-comparison-operations))
+  (require 'cc-number-objects))
 (require 'cc-constants)
 (require 'cc-basics)
-(require 'cc-numeric-type-definitions)
-(require 'cc-numeric-comparison-operations)
+(require 'cc-number-objects)
 
 
 ;;;; bytevector objects: object definitions

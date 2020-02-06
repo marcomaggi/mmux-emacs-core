@@ -83,8 +83,7 @@ AM_ELCFLAGS	= --quick --directory $(builddir)/src --directory $(PWD)/.libs $(MMU
 dist_lisp_LISP	= \
 	src/cc-constants.el				\
 	src/cc-basics.el				\
-	src/cc-numeric-type-definitions.el		\
-	src/cc-numeric-comparison-operations.el		\
+	src/cc-number-objects.el			\
 	src/cc-bytevector-objects.el			\
 	src/cc-core.el
 
@@ -92,28 +91,20 @@ src/cc-basics.elc: \
 	src/cc-constants.elc				\
 	libmmux-emacs-core.la
 
-src/cc-numeric-type-definitions.el: \
-	src/cc-basics.elc				\
-	src/cc-constants.elc				\
-	libmmux-emacs-core.la
-
-src/cc-numeric-comparison-operations.elc: \
-	src/cc-numeric-type-definitions.elc		\
+src/cc-number-objects.el: \
 	src/cc-basics.elc				\
 	src/cc-constants.elc				\
 	libmmux-emacs-core.la
 
 src/cc-bytevector-objects.elc: \
-	src/cc-numeric-comparison-operations.elc	\
-	src/cc-numeric-type-definitions.elc		\
+	src/cc-number-objects.elc			\
 	src/cc-basics.elc				\
 	src/cc-constants.elc				\
 	libmmux-emacs-core.la
 
 src/cc-core.elc: \
 	src/cc-bytevector-objects.elc			\
-	src/cc-numeric-comparison-operations.elc	\
-	src/cc-numeric-type-definitions.elc		\
+	src/cc-number-objects.elc			\
 	src/cc-basics.elc				\
 	src/cc-constants.elc				\
 	libmmux-emacs-core.la

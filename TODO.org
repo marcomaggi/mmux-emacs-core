@@ -1,7 +1,9 @@
 ﻿-*- coding: utf-8-with-signature-unix; fill-column: 200 -*-
 
-* Documentation
-** Add documentation for all the numeric types constructors.
+* Change the package prefix to "mecc-"???
+* Implement numeric type range predicates as C functions.
+* Reimplement numeric limit constants as structures rather than raw numbers.
+* Add documentation for all the numeric types constructors.
 * Local Variables
 
 # Local Variables:

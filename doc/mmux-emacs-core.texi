@@ -870,39 +870,49 @@ range of such type is available.
 @end quotation
 
 @menu
-* ctypes base::                 Base type definitions.
-* ctypes char::                 Wrapper for @code{char}.
-* ctypes schar::                Wrapper for @code{signed char}.
-* ctypes uchar::                Wrapper for @code{unsigned char}.
-* ctypes wchar::                Wrapper for @code{wchar_t}.
-* ctypes sshrt::                Wrapper for @code{signed short int}.
-* ctypes ushrt::                Wrapper for @code{unsigned short int}.
-* ctypes sint::                 Wrapper for @code{signed int}.
-* ctypes uint::                 Wrapper for @code{unsigned int}.
-* ctypes slong::                Wrapper for @code{signed long int}.
-* ctypes ulong::                Wrapper for @code{unsigned long int}.
-* ctypes sllong::               Wrapper for @code{signed long long int}.
-* ctypes ullong::               Wrapper for @code{unsigned long long int}.
-* ctypes ssize::                Wrapper for @code{ssize_t}.
-* ctypes usize::                Wrapper for @code{size_t}.
-* ctypes sintmax::              Wrapper for @code{intmax_t}.
-* ctypes uintmax::              Wrapper for @code{uintmax_t}.
-* ctypes ptrdiff::              Wrapper for @code{ptrdiff_t}.
-* ctypes sint8::                Wrapper for @code{int8_t}.
-* ctypes uint8::                Wrapper for @code{uint8_t}.
-* ctypes sint16::               Wrapper for @code{int16_t}.
-* ctypes uint16::               Wrapper for @code{uint16_t}.
-* ctypes sint32::               Wrapper for @code{int32_t}.
-* ctypes uint32::               Wrapper for @code{uint32_t}.
-* ctypes sint64::               Wrapper for @code{int64_t}.
-* ctypes uint64::               Wrapper for @code{uint64_t}.
-* ctypes float::                Wrapper for @code{float}.
-* ctypes long double::          Wrapper for @code{long double}.
+* ctypes typedefs::             Object type definitions.
+* ctypes comparison::           Comparison operations.
 @end menu
 
 @c page
-@node ctypes base
-@section Base type definitions
+@node ctypes typedefs
+@section Object type definitions
+
+
+@menu
+* ctypes typedefs base::        Base type definitions.
+* ctypes typedefs char::        Wrapper for @code{char}.
+* ctypes typedefs schar::       Wrapper for @code{signed char}.
+* ctypes typedefs uchar::       Wrapper for @code{unsigned char}.
+* ctypes typedefs wchar::       Wrapper for @code{wchar_t}.
+* ctypes typedefs sshrt::       Wrapper for @code{signed short int}.
+* ctypes typedefs ushrt::       Wrapper for @code{unsigned short int}.
+* ctypes typedefs sint::        Wrapper for @code{signed int}.
+* ctypes typedefs uint::        Wrapper for @code{unsigned int}.
+* ctypes typedefs slong::       Wrapper for @code{signed long int}.
+* ctypes typedefs ulong::       Wrapper for @code{unsigned long int}.
+* ctypes typedefs sllong::      Wrapper for @code{signed long long int}.
+* ctypes typedefs ullong::      Wrapper for @code{unsigned long long int}.
+* ctypes typedefs ssize::       Wrapper for @code{ssize_t}.
+* ctypes typedefs usize::       Wrapper for @code{size_t}.
+* ctypes typedefs sintmax::     Wrapper for @code{intmax_t}.
+* ctypes typedefs uintmax::     Wrapper for @code{uintmax_t}.
+* ctypes typedefs ptrdiff::     Wrapper for @code{ptrdiff_t}.
+* ctypes typedefs sint8::       Wrapper for @code{int8_t}.
+* ctypes typedefs uint8::       Wrapper for @code{uint8_t}.
+* ctypes typedefs sint16::      Wrapper for @code{int16_t}.
+* ctypes typedefs uint16::      Wrapper for @code{uint16_t}.
+* ctypes typedefs sint32::      Wrapper for @code{int32_t}.
+* ctypes typedefs uint32::      Wrapper for @code{uint32_t}.
+* ctypes typedefs sint64::      Wrapper for @code{int64_t}.
+* ctypes typedefs uint64::      Wrapper for @code{uint64_t}.
+* ctypes typedefs float::       Wrapper for @code{float}.
+* ctypes typedefs long double:: Wrapper for @code{long double}.
+@end menu
+
+@c page
+@node ctypes typedefs base
+@subsection Base type definitions
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.  All the
@@ -947,8 +957,8 @@ Return true if @var{OBJ} is an instance of the specified type; otherwise return 
 @end defun
 
 @c page
-@node ctypes char
-@section Wrapper for @code{char}
+@node ctypes typedefs char
+@subsection Wrapper for @code{char}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -983,8 +993,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes schar
-@section Wrapper for @code{signed char}
+@node ctypes typedefs schar
+@subsection Wrapper for @code{signed char}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1019,8 +1029,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes uchar
-@section Wrapper for @code{unsigned char}
+@node ctypes typedefs uchar
+@subsection Wrapper for @code{unsigned char}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1055,8 +1065,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes wchar
-@section Wrapper for @code{wchar_t}
+@node ctypes typedefs wchar
+@subsection Wrapper for @code{wchar_t}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1091,8 +1101,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes sshrt
-@section Wrapper for @code{signed short int}
+@node ctypes typedefs sshrt
+@subsection Wrapper for @code{signed short int}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1128,8 +1138,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes ushrt
-@section Wrapper for @code{unsigned short int}
+@node ctypes typedefs ushrt
+@subsection Wrapper for @code{unsigned short int}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1165,8 +1175,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes sint
-@section Wrapper for @code{signed int}
+@node ctypes typedefs sint
+@subsection Wrapper for @code{signed int}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1202,8 +1212,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes uint
-@section Wrapper for @code{unsigned int}
+@node ctypes typedefs uint
+@subsection Wrapper for @code{unsigned int}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1239,8 +1249,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes slong
-@section Wrapper for @code{signed long int}
+@node ctypes typedefs slong
+@subsection Wrapper for @code{signed long int}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1276,8 +1286,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes ulong
-@section Wrapper for @code{unsigned long int}
+@node ctypes typedefs ulong
+@subsection Wrapper for @code{unsigned long int}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1313,8 +1323,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes sllong
-@section Wrapper for @code{signed long long int}
+@node ctypes typedefs sllong
+@subsection Wrapper for @code{signed long long int}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1352,8 +1362,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes ullong
-@section Wrapper for @code{unsigned long long int}
+@node ctypes typedefs ullong
+@subsection Wrapper for @code{unsigned long long int}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1391,8 +1401,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes ssize
-@section Wrapper for @code{ssize_t}
+@node ctypes typedefs ssize
+@subsection Wrapper for @code{ssize_t}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1428,8 +1438,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes usize
-@section Wrapper for @code{size_t}
+@node ctypes typedefs usize
+@subsection Wrapper for @code{size_t}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1465,8 +1475,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes sintmax
-@section Wrapper for @code{intmax_t}
+@node ctypes typedefs sintmax
+@subsection Wrapper for @code{intmax_t}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1502,8 +1512,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes uintmax
-@section Wrapper for @code{uintmax_t}
+@node ctypes typedefs uintmax
+@subsection Wrapper for @code{uintmax_t}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1539,8 +1549,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes ptrdiff
-@section Wrapper for @code{ptrdiff_t}
+@node ctypes typedefs ptrdiff
+@subsection Wrapper for @code{ptrdiff_t}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1576,8 +1586,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes sint8
-@section Wrapper for @code{int8_t}
+@node ctypes typedefs sint8
+@subsection Wrapper for @code{int8_t}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1613,8 +1623,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes uint8
-@section Wrapper for @code{uint8_t}
+@node ctypes typedefs uint8
+@subsection Wrapper for @code{uint8_t}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1650,8 +1660,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes sint16
-@section Wrapper for @code{int16_t}
+@node ctypes typedefs sint16
+@subsection Wrapper for @code{int16_t}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1687,8 +1697,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes uint16
-@section Wrapper for @code{uint16_t}
+@node ctypes typedefs uint16
+@subsection Wrapper for @code{uint16_t}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1724,8 +1734,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes sint32
-@section Wrapper for @code{int32_t}
+@node ctypes typedefs sint32
+@subsection Wrapper for @code{int32_t}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1761,8 +1771,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes uint32
-@section Wrapper for @code{uint32_t}
+@node ctypes typedefs uint32
+@subsection Wrapper for @code{uint32_t}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1798,8 +1808,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes sint64
-@section Wrapper for @code{int64_t}
+@node ctypes typedefs sint64
+@subsection Wrapper for @code{int64_t}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1835,8 +1845,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes uint64
-@section Wrapper for @code{uint64_t}
+@node ctypes typedefs uint64
+@subsection Wrapper for @code{uint64_t}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1872,8 +1882,8 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 @end defun
 
 @c page
-@node ctypes float
-@section Wrapper for @code{float}
+@node ctypes typedefs float
+@subsection Wrapper for @code{float}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1909,8 +1919,8 @@ Return true if @var{OBJ} is a floating--point object and it is in the range repr
 @end defun
 
 @c page
-@node ctypes long double
-@section Wrapper for @code{long double}
+@node ctypes typedefs long double
+@subsection Wrapper for @code{long double}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
@@ -1944,6 +1954,163 @@ user--pointer object.
 Return true if @var{OBJ} is a floating--point object and it is in the range representable by
 @code{long double}.
 @end defun
+
+@c page
+@node ctypes comparison
+@section Comparison operations
+
+
+To perform a comparison operation among operands of different types, we normalise the operands as
+follows:
+
+@itemize
+@item
+We convert all the signed integers to @objtype{cc-sint64}.
+
+@item
+We convert all the unsigned integers to @objtype{cc-uint64}.
+
+@item
+We convert all the floating--point numbers to @objtype{cc-long-double}.
+
+@item
+When comparing integers and floating--point numbers we convert all the integer types to
+@objtype{cc-long-double}.
+@end itemize
+
+@c ------------------------------------------------------------------------
+
+
+@macro mmuxDefunNumericComparisonMethod{OPERATOR, TYPE1, TYPE2}
+@deffn {Method} cc-2\OPERATOR\ ((@vari{op} \TYPE1\) (@varii{op} \TYPE2\))
+Return true if @vari{OP} \OPERATOR\ @varii{OP}; otherwise return false.
+@end deffn
+
+@end macro
+
+
+@macro mmuxDefunNumericComparisonFunction{OPERATOR, OPERATIONDESCRIPTION}
+@defun cc\OPERATOR\ @var{OP} &rest @var{ops}
+Return true if all the operands are \OPERATIONDESCRIPTION\, left to right; otherwise return false.
+The comparison is performed with the generic function @func{cc-2\OPERATOR\}.
+@end defun
+
+
+@deffn {Generic Function} {cc-2\OPERATOR\} (@vari{OP} @varii{OP})
+Return true if @vari{OP} \OPERATOR\ @varii{OP}; otherwise return false.
+@end deffn
+
+@c These are the methods that actually do the operation on built-in numeric objects.
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, integer, integer}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, integer, float}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, float,   integer}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, float,   float}
+
+@c These are the methods that actually do the operation on custom user-pointer objects.
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-sint64, cc-sint64}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-uint64, cc-uint64}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-sint64, cc-uint64}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-uint64, cc-sint64}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-long-double, cc-long-double}
+
+@c These are the methods that normalise operands among operational types.
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-sint64, cc-long-double}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-uint64, cc-long-double}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-long-double, cc-sint64}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-long-double, cc-uint64}
+
+@c These are the methods that normalise among integer types.
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-signed-integer,   cc-signed-integer}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-unsigned-integer, cc-unsigned-integer}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-signed-integer,   cc-unsigned-integer}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-unsigned-integer, cc-signed-integer}
+
+@c These are the methods that normalise among floating point types.
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-floating-point, cc-floating-point}
+
+@c These are the methods that normalise mixed numeric types: `cc-floating-point', `cc-signed-integer', `cc-unsigned-intger'.
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-floating-point,   cc-signed-integer}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-signed-integer,   cc-floating-point}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-floating-point,   cc-unsigned-integer}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-unsigned-integer, cc-floating-point}
+
+@c These are the methods that normalise mixed numeric types: `integer' and `cc-floating-point'.
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, integer, cc-floating-point}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-floating-point, integer}
+
+@c These are the methods that normalise mixed numeric types: `integer' and `cc-signed-integer'.
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, integer, cc-signed-integer}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-signed-integer, integer}
+
+@c These are the methods that normalise mixed numeric types: `integer' and `cc-unsigned-integer'.
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, integer, cc-unsigned-integer}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-unsigned-integer, integer}
+
+@c These are the methods that normalise mixed numeric types: `float' and `cc-floating-point'.
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, float, cc-floating-point}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-floating-point, float}
+
+@c These are the methods that normalise mixed numeric types: `float' and `cc-signed-integer'.
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, float, cc-signed-integer}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-signed-integer, float}
+
+@c These are the methods that normalise mixed numeric types: `float' and `cc-unsigned-integer'.
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, float, cc-unsigned-integer}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-unsigned-integer, float}
+@end macro
+
+@c ------------------------------------------------------------------------
+
+@menu
+* ctypes comparison eq::        Equality functions.
+* ctypes comparison neq::       Non-equality functions.
+* ctypes comparison less::      Less than functions.
+* ctypes comparison greater::   Greater than functions.
+* ctypes comparison leq::       Less than or equal to functions.
+* ctypes comparison geq::       Greater than or equal to functions.
+@end menu
+
+@c page
+@node ctypes comparison eq
+@subsection Equality functions
+
+
+@mmuxDefunNumericComparisonFunction{=, one equal to the other}
+
+@c page
+@node ctypes comparison neq
+@subsection Non--equality functions
+
+
+@mmuxDefunNumericComparisonFunction{/=, one not equal to the other}
+
+@c page
+@node ctypes comparison less
+@subsection Less than functions
+
+
+@mmuxDefunNumericComparisonFunction{<, one less than the other}
+
+@c page
+@node ctypes comparison greater
+@subsection Greater than functions
+
+
+@mmuxDefunNumericComparisonFunction{>, one greater than the other}
+
+@c page
+@node ctypes comparison leq
+@subsection Less than or equal to functions
+
+
+@mmuxDefunNumericComparisonFunction{<=, one less than or equal to the other}
+
+@c page
+@node ctypes comparison geq
+@subsection Greater than or equal to functions
+
+
+@mmuxDefunNumericComparisonFunction{>=, one greater than or equal to the other}
 
 @c page
 @node bytevectors

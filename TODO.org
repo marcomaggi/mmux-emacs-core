@@ -1,0 +1,10 @@
+﻿-*- coding: utf-8-with-signature-unix; fill-column: 200 -*-
+
+* Documentation
+** Add documentation for all the numeric types constructors.
+* Local Variables
+
+# Local Variables:
+# ispell-local-dictionary: "en_GB-ise-w_accents"
+# fill-column: 200
+# End:

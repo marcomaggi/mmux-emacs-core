@@ -95,6 +95,20 @@ Fmmux_emacs_core_double_to_long_double (emacs_env *env, ptrdiff_t nargs, emacs_v
   return mmux_emacs_core_make_long_double(env, mmux_emacs_core_get_double(env, args[0]));
 }
 
+static emacs_value
+Fmmux_emacs_core_sint64_to_long_double (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+{
+  assert(1 == nargs);
+  return mmux_emacs_core_make_long_double(env, (long double)mmux_emacs_core_get_sint64(env, args[0]));
+}
+
+static emacs_value
+Fmmux_emacs_core_uint64_to_long_double (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+{
+  assert(1 == nargs);
+  return mmux_emacs_core_make_long_double(env, (long double)mmux_emacs_core_get_uint64(env, args[0]));
+}
+
 
 /** --------------------------------------------------------------------
  ** Comparison functions.
@@ -164,7 +178,7 @@ MMUX_EMACS_CORE_COMPARISON_OPERATIONS2(uint64, uint64_t, sint64,  int64_t)
  ** Elisp functions table.
  ** ----------------------------------------------------------------- */
 
-#define NUMBER_OF_MODULE_FUNCTIONS	55
+#define NUMBER_OF_MODULE_FUNCTIONS	57
 static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNCTIONS] = {
   /* Conversion functions to "sint64". */
   {
@@ -345,6 +359,20 @@ static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODUL
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Convert a built-int of type `float' to a user-pointer object of type `long-double'.",
+  },
+  {
+    .name		= "mmux-core-c-uint64-to-long-double",
+    .implementation	= Fmmux_emacs_core_uint64_to_long_double,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Convert a custom user-pointer object of type `uint64' to a user-pointer object of type `long-double'.",
+  },
+  {
+    .name		= "mmux-core-c-sint64-to-long-double",
+    .implementation	= Fmmux_emacs_core_sint64_to_long_double,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Convert a custom user-pointer object of type `sint64' to a user-pointer object of type `long-double'.",
   },
 
   /* Comparison functions. */

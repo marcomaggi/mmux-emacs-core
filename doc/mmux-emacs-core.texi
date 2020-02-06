@@ -870,6 +870,7 @@ range of such type is available.
 @end quotation
 
 @menu
+* ctypes base::                 Base type definitions.
 * ctypes char::                 Wrapper for @code{char}.
 * ctypes schar::                Wrapper for @code{signed char}.
 * ctypes uchar::                Wrapper for @code{unsigned char}.
@@ -900,6 +901,52 @@ range of such type is available.
 @end menu
 
 @c page
+@node ctypes base
+@section Base type definitions
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.  All the
+following types are to be considered ``abstract'', so we must not instantiate them.
+
+
+@deftp {Abstract Object Type} cc-number
+Base type of all the custom number types defined by this module.
+@end deftp
+
+
+@deftp {Abstract Object Type} cc-integer
+@deftpx {Parent Type} cc-number
+Base type of all the custom exact integer number types defined by this module.
+@end deftp
+
+
+@deftp {Abstract Object Type} cc-signed-integer
+@deftpx {Parent Type} cc-integer
+Base type of all the custom exact signed integer number types defined by this module.
+@end deftp
+
+
+@deftp {Abstract Object Type} cc-unsigned-integer
+@deftpx {Parent Type} cc-integer
+Base type of all the custom exact unsigned integer number types defined by this module.
+@end deftp
+
+
+@deftp {Abstract Object Type} cc-floating-point
+@deftpx {Parent Type} cc-number
+Base type of all the custom floating--point number types defined by this module.
+@end deftp
+
+
+@defun cc-number-p @var{OBJ}
+@defunx cc-integer-p @var{OBJ}
+@defunx cc-signed-integer-p @var{OBJ}
+@defunx cc-unsigned-integer-p @var{OBJ}
+@defunx cc-floating-point-p @var{OBJ}
+Return true if @var{OBJ} is an instance of the specified type; otherwise return false.
+@end defun
+
+@c page
 @node ctypes char
 @section Wrapper for @code{char}
 
@@ -908,6 +955,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-char
+@deftpx {Parent Type} cc-signed-integer
 Object wrapper for the C language type @code{char}.
 @end deftp
 
@@ -943,6 +991,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-schar
+@deftpx {Parent Type} cc-signed-integer
 Object wrapper for the C language type @code{signed char}.
 @end deftp
 
@@ -978,6 +1027,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-uchar
+@deftpx {Parent Type} cc-unsigned-integer
 Object wrapper for the C language type @code{unsigned char}.
 @end deftp
 
@@ -1013,6 +1063,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-wchar
+@deftpx {Parent Type} cc-unsigned-integer
 Object wrapper for the C language type @code{wchar_t}.
 @end deftp
 
@@ -1048,6 +1099,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-signed-short-int
+@deftpx {Parent Type} cc-signed-integer
 Object wrapper for the C language type @code{signed short int}.
 @end deftp
 
@@ -1084,6 +1136,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-unsigned-short-int
+@deftpx {Parent Type} cc-unsigned-integer
 Object wrapper for the C language type @code{unsigned short int}.
 @end deftp
 
@@ -1120,6 +1173,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-signed-int
+@deftpx {Parent Type} cc-signed-integer
 Object wrapper for the C language type @code{signed int}.
 @end deftp
 
@@ -1156,6 +1210,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-unsigned-int
+@deftpx {Parent Type} cc-unsigned-integer
 Object wrapper for the C language type @code{unsigned int}.
 @end deftp
 
@@ -1192,6 +1247,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-signed-long-int
+@deftpx {Parent Type} cc-signed-integer
 Object wrapper for the C language type @code{signed long int}.
 @end deftp
 
@@ -1228,6 +1284,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-unsigned-long-int
+@deftpx {Parent Type} cc-unsigned-integer
 Object wrapper for the C language type @code{unsigned long int}.
 @end deftp
 
@@ -1264,6 +1321,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-signed-long-long-int
+@deftpx {Parent Type} cc-signed-integer
 Object wrapper for the C language type @code{signed long long int}.
 @end deftp
 
@@ -1302,6 +1360,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-unsigned-long-long-int
+@deftpx {Parent Type} cc-unsigned-integer
 Object wrapper for the C language type @code{unsigned long long int}.
 @end deftp
 
@@ -1340,6 +1399,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-ssize
+@deftpx {Parent Type} cc-signed-integer
 Object wrapper for the C language type @code{ssize_t}.
 @end deftp
 
@@ -1376,6 +1436,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-usize
+@deftpx {Parent Type} cc-unsigned-integer
 Object wrapper for the C language type @code{size_t}.
 @end deftp
 
@@ -1412,6 +1473,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-sintmax
+@deftpx {Parent Type} cc-signed-integer
 Object wrapper for the C language type @code{intmax_t}.
 @end deftp
 
@@ -1448,6 +1510,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-uintmax
+@deftpx {Parent Type} cc-unsigned-integer
 Object wrapper for the C language type @code{uintmax_t}.
 @end deftp
 
@@ -1484,6 +1547,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-ptrdiff
+@deftpx {Parent Type} cc-signed-integer
 Object wrapper for the C language type @code{ptrdiff_t}.
 @end deftp
 
@@ -1520,6 +1584,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-sint8
+@deftpx {Parent Type} cc-signed-integer
 Object wrapper for the C language type @code{int8_t}.
 @end deftp
 
@@ -1556,6 +1621,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-uint8
+@deftpx {Parent Type} cc-unsigned-integer
 Object wrapper for the C language type @code{uint8_t}.
 @end deftp
 
@@ -1592,6 +1658,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-sint16
+@deftpx {Parent Type} cc-signed-integer
 Object wrapper for the C language type @code{int16_t}.
 @end deftp
 
@@ -1628,6 +1695,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-uint16
+@deftpx {Parent Type} cc-unsigned-integer
 Object wrapper for the C language type @code{uint16_t}.
 @end deftp
 
@@ -1664,6 +1732,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-sint32
+@deftpx {Parent Type} cc-signed-integer
 Object wrapper for the C language type @code{int32_t}.
 @end deftp
 
@@ -1700,6 +1769,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-uint32
+@deftpx {Parent Type} cc-unsigned-integer
 Object wrapper for the C language type @code{uint32_t}.
 @end deftp
 
@@ -1736,6 +1806,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-sint64
+@deftpx {Parent Type} cc-signed-integer
 Object wrapper for the C language type @code{int64_t}.
 @end deftp
 
@@ -1772,6 +1843,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-uint64
+@deftpx {Parent Type} cc-unsigned-integer
 Object wrapper for the C language type @code{uint64_t}.
 @end deftp
 
@@ -1808,6 +1880,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-float
+@deftpx {Parent Type} cc-floating-point
 Object wrapper for the C language type @code{float}.
 @end deftp
 
@@ -1844,6 +1917,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 
 
 @deftp {Object Type} cc-long-double
+@deftpx {Parent Type} cc-floating-point
 Object wrapper for the C language type @code{long double}.
 @end deftp
 

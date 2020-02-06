@@ -631,9 +631,50 @@
 (mmux-core-test--floating-point--greater-than-or-equal-to-tests cc-long-double)
 
 
+;;;; mixed integer floating-point equality
+
+(defmacro mmux-core-test--mixed-integer--equal-tests (FTYPE)
+  (let* ((FTYPE.str	(symbol-name FTYPE))
+	 (TESTNAME	(intern (concat "mixed-equality-integer-" FTYPE.str))))
+    `(progn
+       (ert-deftest ,TESTNAME ()
+	 (should	(cc= 1   (,FTYPE 1.0)))
+	 (should	(cc= (,FTYPE 1.0) 1))
+	 (should (not	(cc= 5   (,FTYPE 17.0))))
+	 (should (not	(cc= (,FTYPE 5.0) 17)))
+	 ))))
+
+(mmux-core-test--mixed-integer--equal-tests		cc-float)
+(mmux-core-test--mixed-integer--equal-tests		float)
+(mmux-core-test--mixed-integer--equal-tests		cc-long-double)
+
+;;; --------------------------------------------------------------------
+
+(defmacro mmux-core-test--mixed--equal-tests (ITYPE FTYPE)
+  (let* ((ITYPE.str	(symbol-name ITYPE))
+	 (FTYPE.str	(symbol-name FTYPE))
+	 (TESTNAME	(intern (concat "mixed-equality-" ITYPE.str "-" FTYPE.str))))
+    `(progn
+       (ert-deftest ,TESTNAME ()
+	 (should	(cc= (,ITYPE 1)   (,FTYPE 1.0)))
+	 (should	(cc= (,FTYPE 1.0) (,ITYPE 1)))
+	 (should (not	(cc= (,ITYPE 5)   (,FTYPE 17.0))))
+	 (should (not	(cc= (,FTYPE 5.0) (,ITYPE 17))))
+	 ))))
+
+(mmux-core-test--mixed--equal-tests cc-signed-int	cc-float)
+(mmux-core-test--mixed--equal-tests cc-unsigned-int	cc-float)
+
+(mmux-core-test--mixed--equal-tests cc-signed-int	float)
+(mmux-core-test--mixed--equal-tests cc-unsigned-int	float)
+
+(mmux-core-test--mixed--equal-tests cc-signed-int	cc-long-double)
+(mmux-core-test--mixed--equal-tests cc-unsigned-int	cc-long-double)
+
+
 ;;;; done
 
 (ert-run-tests-batch-and-exit)
 (garbage-collect)
 
-;;; test.el ends here
+;; ;;; test.el ends here

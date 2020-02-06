@@ -2461,6 +2461,11 @@ range.
 Attempt to access the internal represenation of a bytevector object with an index out of range.
 @end defvr
 
+
+@defvr {Error Symbol} mmux-core-instantiating-abstract-type
+@defvrx {Parent Error Symbol} mmux-core-error
+An attempt was performed to instantiate an abstract data type.
+@end defvr
 @c page
 @c ------------------------------------------------------------
 @c Appendices.

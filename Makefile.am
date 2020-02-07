@@ -6,7 +6,7 @@ EXTRA_DIST		= INSTALL			\
 			  meta/slackware/slack-desc.in
 dist_doc_DATA		= README COPYING
 AM_CFLAGS		= $(MMUX_CFLAGS)
-AM_CPPFLAGS		= -I$(srcdir)/src
+AM_CPPFLAGS		= -I$(srcdir)/src -I$(builddir)/src
 CLEANFILES		=
 
 AM_DISTCHECK_CONFIGURE_FLAGS = ELCFLAGS="$(MMUX_EMACS_ELCFLAGS)"
@@ -58,7 +58,9 @@ mmux_emacs_core_REVISION	= @mmux_emacs_core_VERSION_INTERFACE_REVISION@
 mmux_emacs_core_AGE		= @mmux_emacs_core_VERSION_INTERFACE_AGE@
 mmux_emacs_core_LINKER_VERSION	= -version-info $(mmux_emacs_core_CURRENT):$(mmux_emacs_core_REVISION):$(mmux_emacs_core_AGE)
 
-include_HEADERS			= src/mmux-emacs-core.h
+include_HEADERS			= \
+	src/mmux-emacs-core.h		\
+	src/mmux-emacs-core-constants.h
 
 lib_LTLIBRARIES			= libmmux-emacs-core.la
 libmmux_emacs_core_la_CPPFLAGS	= $(AM_CPPFLAGS)
@@ -66,6 +68,7 @@ libmmux_emacs_core_la_CFLAGS	= $(AM_CFLAGS)
 libmmux_emacs_core_la_LDFLAGS	= $(mmux_emacs_core_LINKER_VERSION) $(AM_LDFLAGS)
 libmmux_emacs_core_la_SOURCES	= \
 	src/mmux-emacs-core.h				\
+	src/mmux-emacs-core-constants.h			\
 	src/mmux-emacs-core-internals.h			\
 	src/mmux-emacs-core-library.c			\
 	src/mmux-emacs-core-user-pointer-objects.c	\

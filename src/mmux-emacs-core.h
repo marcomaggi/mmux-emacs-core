@@ -87,6 +87,7 @@ extern "C" {
 #include <stddef.h>
 #include <stdint.h>
 #include <unistd.h>
+#include <mmux-emacs-core-constants.h>
 
 
 /** --------------------------------------------------------------------
@@ -136,10 +137,34 @@ struct mmux_emacs_module_function_t {
 
 /* ------------------------------------------------------------------ */
 
-typedef signed   int		mmux_sint_t;
-typedef unsigned int		mmux_uint_t;
-typedef signed   long int	mmux_slint_t;
-typedef unsigned long int	mmux_ulint_t;
+/* These definitions are useful when composing the output of C language macros. */
+typedef char			mmux_emacs_core_type_char_t;
+typedef signed char		mmux_emacs_core_type_schar_t;
+typedef unsigned char		mmux_emacs_core_type_uchar_t;
+typedef signed   short int	mmux_emacs_core_type_sshrt_t;
+typedef unsigned short int	mmux_emacs_core_type_ushrt_t;
+typedef signed   int		mmux_emacs_core_type_sint_t;
+typedef unsigned int		mmux_emacs_core_type_uint_t;
+typedef signed   long int	mmux_emacs_core_type_slong_t;
+typedef unsigned long int	mmux_emacs_core_type_ulong_t;
+typedef signed   long long int	mmux_emacs_core_type_sllong_t;
+typedef unsigned long long int	mmux_emacs_core_type_ullong_t;
+typedef ssize_t			mmux_emacs_core_type_ssize_t;
+typedef size_t			mmux_emacs_core_type_usize_t;
+typedef intmax_t		mmux_emacs_core_type_sintmax_t;
+typedef uintmax_t		mmux_emacs_core_type_uintmax_t;
+typedef ptrdiff_t		mmux_emacs_core_type_ptrdiff_t;
+typedef int8_t			mmux_emacs_core_type_sint8_t;
+typedef uint8_t			mmux_emacs_core_type_uint8_t;
+typedef int16_t			mmux_emacs_core_type_sint16_t;
+typedef uint16_t		mmux_emacs_core_type_uint16_t;
+typedef int32_t			mmux_emacs_core_type_sint32_t;
+typedef uint32_t		mmux_emacs_core_type_uint32_t;
+typedef int64_t			mmux_emacs_core_type_sint64_t;
+typedef uint64_t		mmux_emacs_core_type_uint64_t;
+typedef float			mmux_emacs_core_type_float_t;
+typedef double			mmux_emacs_core_type_double_t;
+typedef long double		mmux_emacs_core_type_long_double_t;
 
 /* ------------------------------------------------------------------ */
 

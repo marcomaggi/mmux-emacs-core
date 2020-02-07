@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-06 06:51:34 marco>
+;; Time-stamp: <2020-02-07 17:30:22 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -57,6 +57,10 @@
 
 (define-error 'mmux-core-instantiating-abstract-type
   "An attempt was performed to instantiate an abstract data type."
+  'mmux-core-error)
+
+(define-error 'mmux-core-signed/unsigned-integer-comparison
+  "Cannot compare a signed integer with an unsigned integer."
   'mmux-core-error)
 
 

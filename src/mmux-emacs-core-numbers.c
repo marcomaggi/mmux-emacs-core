@@ -29,7 +29,68 @@
 #include "mmux-emacs-core-internals.h"
 #include <string.h>
 #include <stdlib.h>
-#include <errno.h>
+#include <limits.h>
+
+
+/** --------------------------------------------------------------------
+ ** Range checker.
+ ** ----------------------------------------------------------------- */
+
+#undef  MMUX_EMACS_CORE_FITS_SIGNED_P
+#define MMUX_EMACS_CORE_FITS_SIGNED_P(CTYPESTEM, FUNCSTEM, LIMSTEM)	\
+  static emacs_value							\
+  Fmmux_emacs_core_fits_ ## FUNCSTEM ## _p (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED) \
+  {									\
+    assert(1 == nargs);							\
+    mmux_emacs_core_type_ ## CTYPESTEM ## _t	val = mmux_emacs_core_get_ ## CTYPESTEM(env, args[0]); \
+    mmux_emacs_core_type_ ## CTYPESTEM ## _t	min = MMUX_EMACS_CORE_ ## LIMSTEM ## _MIN; \
+    mmux_emacs_core_type_ ## CTYPESTEM ## _t	max = MMUX_EMACS_CORE_ ## LIMSTEM ## _MAX; \
+    return mmux_emacs_core_make_boolean(env, (((min <= val) && (val <= max))? 1 : 0)); \
+  }
+
+#undef  MMUX_EMACS_CORE_FITS_UNSIGNED_P
+#define MMUX_EMACS_CORE_FITS_UNSIGNED_P(CTYPESTEM, FUNCSTEM, LIMSTEM)	\
+  static emacs_value							\
+  Fmmux_emacs_core_fits_ ## FUNCSTEM ## _p (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED) \
+  {									\
+    assert(1 == nargs);							\
+    mmux_emacs_core_type_ ## CTYPESTEM ## _t	val = mmux_emacs_core_get_ ## CTYPESTEM(env, args[0]); \
+    mmux_emacs_core_type_ ## CTYPESTEM ## _t	max = MMUX_EMACS_CORE_ ## LIMSTEM ## _MAX; \
+    return mmux_emacs_core_make_boolean(env, ((val <= max)? 1 : 0));	\
+  }
+
+MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		char,		CHAR)
+MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		schar,		SCHAR)
+MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		uchar,		UCHAR)
+MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		wchar,		WCHAR)
+
+MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sshrt,		SSHRT)
+MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		ushrt,		USHRT)
+MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sint,		SINT)
+MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		uint,		UINT)
+MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		slong,		SLONG)
+MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		ulong,		ULONG)
+/* MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sllong,		SLLONG) */
+MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		ullong,		ULLONG)
+
+/* MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		ssize,		SSIZE) */
+MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		usize,		USIZE)
+/* MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sintmax,	SINTMAX) */
+MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		uintmax,	UINTMAX)
+/* MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		ptrdiff,	PTRDIFF) */
+
+MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sint8,		SINT8)
+MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		uint8,		UINT8)
+MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sint16,		SINT16)
+MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		uint16,		UINT16)
+MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sint32,		SINT32)
+MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		uint32,		UINT32)
+/* MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sint64,		SINT64) */
+MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		uint64,		UINT64)
+
+MMUX_EMACS_CORE_FITS_SIGNED_P(long_double,	float,		FLOAT)
+MMUX_EMACS_CORE_FITS_SIGNED_P(long_double,	double,		DOUBLE)
+MMUX_EMACS_CORE_FITS_SIGNED_P(long_double,	long_double,	LONG_DOUBLE)
 
 
 /** --------------------------------------------------------------------
@@ -145,10 +206,20 @@ MMUX_EMACS_CORE_COMPARISON_OPERATIONS(long_double,	long double)
 
 /* ------------------------------------------------------------------ */
 
+/* FIXME I do not know how to compare a signed integer and an unsigne integer without
+   loosing bits; maybe, in future, GNU Emacs will support big integers with GMP.  For
+   now it is an error.  (Marco Maggi; Feb 7, 2020)*/
 #undef  MMUX_EMACS_CORE_COMPARISON_OPERATION2
 #define MMUX_EMACS_CORE_COMPARISON_OPERATION2(OPNAME, OPERATOR, STEM1, CTYPE1, STEM2, CTYPE2) \
   static emacs_value							\
-  Fmmux_emacs_core_compare_ ## STEM1 ## _ ## STEM2 ## _ ## OPNAME(emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED) \
+  Fmmux_emacs_core_compare_ ## STEM1 ## _ ## STEM2 ## _ ## OPNAME(emacs_env *env, ptrdiff_t nargs, \
+								  emacs_value args[] MMUX_EMACS_CORE_UNUSED, \
+								  void * data MMUX_EMACS_CORE_UNUSED) \
+  {									\
+    assert(2 == nargs);							\
+    return mmux_emacs_core_error_signed_unsigned_integer_comparison(env); \
+  }
+#if 0
   {									\
     assert(2 == nargs);							\
     CTYPE1	op1	= mmux_emacs_core_get_ ## STEM1(env, args[0]);	\
@@ -161,6 +232,7 @@ MMUX_EMACS_CORE_COMPARISON_OPERATIONS(long_double,	long double)
     }									\
     return mmux_emacs_core_make_boolean(env, rv);			\
   }
+#endif
 
 #define MMUX_EMACS_CORE_COMPARISON_OPERATIONS2(STEM1, CTYPE1, STEM2, CTYPE2)	\
   MMUX_EMACS_CORE_COMPARISON_OPERATION2(equal,		==,	STEM1,	CTYPE1,	STEM2,	CTYPE2) \
@@ -178,7 +250,7 @@ MMUX_EMACS_CORE_COMPARISON_OPERATIONS2(uint64, uint64_t, sint64,  int64_t)
  ** Elisp functions table.
  ** ----------------------------------------------------------------- */
 
-#define NUMBER_OF_MODULE_FUNCTIONS	57
+#define NUMBER_OF_MODULE_FUNCTIONS	85
 static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNCTIONS] = {
   /* Conversion functions to "sint64". */
   {
@@ -589,6 +661,208 @@ static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODUL
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is greater than or equal to OP2.",
+  },
+
+  /* Number range fit predicates. */
+  {
+    .name		= "mmux-core-c-fits-char-p",
+    .implementation	= Fmmux_emacs_core_fits_char_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `char'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-schar-p",
+    .implementation	= Fmmux_emacs_core_fits_schar_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `schar'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-uchar-p",
+    .implementation	= Fmmux_emacs_core_fits_uchar_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `uchar'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-wchar-p",
+    .implementation	= Fmmux_emacs_core_fits_wchar_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `wchar'.",
+  },
+
+  {
+    .name		= "mmux-core-c-fits-sshrt-p",
+    .implementation	= Fmmux_emacs_core_fits_sshrt_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `sshrt'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-ushrt-p",
+    .implementation	= Fmmux_emacs_core_fits_ushrt_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `ushrt'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-sint-p",
+    .implementation	= Fmmux_emacs_core_fits_sint_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `sint'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-uint-p",
+    .implementation	= Fmmux_emacs_core_fits_uint_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `uint'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-slong-p",
+    .implementation	= Fmmux_emacs_core_fits_slong_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `slong'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-ulong-p",
+    .implementation	= Fmmux_emacs_core_fits_ulong_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `ulong'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-sllong-p",
+    .implementation	= Fmmux_emacs_core_fits_sllong_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `sllong'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-ullong-p",
+    .implementation	= Fmmux_emacs_core_fits_ullong_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `ullong'.",
+  },
+
+  {
+    .name		= "mmux-core-c-fits-ssize-p",
+    .implementation	= Fmmux_emacs_core_fits_ssize_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `ssize'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-usize-p",
+    .implementation	= Fmmux_emacs_core_fits_usize_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `usize'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-sintmax-p",
+    .implementation	= Fmmux_emacs_core_fits_sintmax_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `sintmax'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-uintmax-p",
+    .implementation	= Fmmux_emacs_core_fits_uintmax_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `uintmax'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-ptrdiff-p",
+    .implementation	= Fmmux_emacs_core_fits_ptrdiff_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `ptrdiff'.",
+  },
+
+  {
+    .name		= "mmux-core-c-fits-sint8-p",
+    .implementation	= Fmmux_emacs_core_fits_sint8_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `sint8'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-uint8-p",
+    .implementation	= Fmmux_emacs_core_fits_uint8_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `uint8'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-sint16-p",
+    .implementation	= Fmmux_emacs_core_fits_sint16_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `sint16'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-uint16-p",
+    .implementation	= Fmmux_emacs_core_fits_uint16_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `uint16'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-sint32-p",
+    .implementation	= Fmmux_emacs_core_fits_sint32_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `sint32'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-uint32-p",
+    .implementation	= Fmmux_emacs_core_fits_uint32_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `uint32'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-sint64-p",
+    .implementation	= Fmmux_emacs_core_fits_sint64_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `sint64'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-uint64-p",
+    .implementation	= Fmmux_emacs_core_fits_uint64_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `uint64'.",
+  },
+
+  {
+    .name		= "mmux-core-c-fits-float-p",
+    .implementation	= Fmmux_emacs_core_fits_float_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `float'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-double-p",
+    .implementation	= Fmmux_emacs_core_fits_double_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `double'.",
+  },
+  {
+    .name		= "mmux-core-c-fits-long_double-p",
+    .implementation	= Fmmux_emacs_core_fits_long_double_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the arguments fits an object of type `long_double'.",
   },
 };
 

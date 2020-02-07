@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-04 07:32:38 marco>
+;; Time-stamp: <2020-02-07 07:03:48 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -85,16 +85,6 @@
 
 ;;; --------------------------------------------------------------------
 
-(defconst cc-SIZEOF_UNSIGNED_INT
-  @VALUEOF_MMUX_SIZEOF_SIGNED_INT@
-  "Size of `unsigned int' measured in bytes.")
-
-(defconst cc-SIZEOF_UNUNSIGNED_INT
-  @VALUEOF_MMUX_SIZEOF_UNSIGNED_INT@
-  "Size of `unsigned int' measured in bytes.")
-
-;;; --------------------------------------------------------------------
-
 (defconst cc-SIZEOF_SIGNED_LONG_INT
   @VALUEOF_MMUX_SIZEOF_SIGNED_LONG_INT@
   "Size of `signed long int' measured in bytes.")
@@ -105,16 +95,6 @@
 
 ;;; --------------------------------------------------------------------
 
-(defconst cc-SIZEOF_UNSIGNED_LONG_INT
-  @VALUEOF_MMUX_SIZEOF_SIGNED_LONG_INT@
-  "Size of `unsigned long int' measured in bytes.")
-
-(defconst cc-SIZEOF_UNUNSIGNED_LONG_INT
-  @VALUEOF_MMUX_SIZEOF_UNSIGNED_LONG_INT@
-  "Size of `unsigned long int' measured in bytes.")
-
-;;; --------------------------------------------------------------------
-
 (defconst cc-SIZEOF_SIGNED_LONG_LONG_INT
   @VALUEOF_MMUX_SIZEOF_SIGNED_LONG_LONG_INT@
   "Size of `signed long long int' measured in bytes.")
@@ -122,16 +102,6 @@
 (defconst cc-SIZEOF_UNSIGNED_LONG_LONG_INT
   @VALUEOF_MMUX_SIZEOF_UNSIGNED_LONG_LONG_INT@
   "Size of `signed long long int' measured in bytes.")
-
-;;; --------------------------------------------------------------------
-
-(defconst cc-SIZEOF_UNSIGNED_LONG_LONG_INT
-  @VALUEOF_MMUX_SIZEOF_SIGNED_LONG_LONG_INT@
-  "Size of `unsigned long long int' measured in bytes.")
-
-(defconst cc-SIZEOF_UNUNSIGNED_LONG_LONG_INT
-  @VALUEOF_MMUX_SIZEOF_UNSIGNED_LONG_LONG_INT@
-  "Size of `unsigned long long int' measured in bytes.")
 
 ;;; --------------------------------------------------------------------
 

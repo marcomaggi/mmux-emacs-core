@@ -65,4 +65,14 @@ mmux_emacs_core_error_bytevector_index_out_of_range (emacs_env * env)
   return env->intern(env, "nil");
 }
 
+emacs_value
+mmux_emacs_core_error_signed_unsigned_integer_comparison (emacs_env * env)
+{
+  static char const	* errmsg	= "cannot compare a signed integer with an unsigned integer";
+  emacs_value		Serrmsg		= mmux_emacs_core_make_string(env, errmsg, strlen(errmsg));
+
+  env->non_local_exit_signal(env, env->intern(env, "mmux-core-signed/unsigned-integer-comparison"), Serrmsg);
+  return env->intern(env, "nil");
+}
+
 /* end of file */

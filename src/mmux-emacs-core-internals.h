@@ -73,6 +73,9 @@ mmux_emacs_core_private_decl emacs_value mmux_emacs_core_error_memory_allocation
 mmux_emacs_core_private_decl emacs_value mmux_emacs_core_error_bytevector_index_out_of_range (emacs_env * env)
   __attribute__((__nonnull__(1)));
 
+mmux_emacs_core_private_decl emacs_value mmux_emacs_core_error_signed_unsigned_integer_comparison (emacs_env * env)
+  __attribute__((__nonnull__(1)));
+
 
 /** --------------------------------------------------------------------
  ** Done.

@@ -2467,6 +2467,12 @@ Attempt to access the internal represenation of a bytevector object with an inde
 An attempt was performed to instantiate an abstract data type.
 @end defvr
 
+
+@defvr {Error Symbol} mmux-core-signed/unsigned-integer-comparison
+@defvrx {Parent Error Symbol} mmux-core-error
+Cannot compare a signed integer with an unsigned integer.
+@end defvr
+
 @c page
 @c ------------------------------------------------------------
 @c Appendices.

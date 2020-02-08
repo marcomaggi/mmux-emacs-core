@@ -94,7 +94,7 @@ src/cc-basics.elc: \
 	src/cc-constants.elc				\
 	libmmux-emacs-core.la
 
-src/cc-number-objects.el: \
+src/cc-number-objects.elc: \
 	src/cc-basics.elc				\
 	src/cc-constants.elc				\
 	libmmux-emacs-core.la

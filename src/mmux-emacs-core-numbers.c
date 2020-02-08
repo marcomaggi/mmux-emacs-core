@@ -29,7 +29,6 @@
 #include "mmux-emacs-core-internals.h"
 #include <string.h>
 #include <stdlib.h>
-#include <limits.h>
 
 
 /** --------------------------------------------------------------------
@@ -70,14 +69,14 @@ MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sint,		SINT)
 MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		uint,		UINT)
 MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		slong,		SLONG)
 MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		ulong,		ULONG)
-/* MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sllong,		SLLONG) */
+MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sllong,		SLLONG)
 MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		ullong,		ULLONG)
 
-/* MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		ssize,		SSIZE) */
+MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		ssize,		SSIZE)
 MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		usize,		USIZE)
-/* MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sintmax,	SINTMAX) */
+MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sintmax,	SINTMAX)
 MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		uintmax,	UINTMAX)
-/* MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		ptrdiff,	PTRDIFF) */
+MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		ptrdiff,	PTRDIFF)
 
 MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sint8,		SINT8)
 MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		uint8,		UINT8)
@@ -85,7 +84,7 @@ MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sint16,		SINT16)
 MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		uint16,		UINT16)
 MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sint32,		SINT32)
 MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		uint32,		UINT32)
-/* MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sint64,		SINT64) */
+MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sint64,		SINT64)
 MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		uint64,		UINT64)
 
 MMUX_EMACS_CORE_FITS_SIGNED_P(long_double,	float,		FLOAT)

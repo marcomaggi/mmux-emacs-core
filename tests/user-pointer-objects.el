@@ -219,6 +219,7 @@
   (should (not	(cc-bytevector-float-p		(cc-bytevector-long-double 123))))
   (should (not	(cc-bytevector-double-p		(cc-bytevector-long-double 123))))
   (should 	(cc-bytevector-long-double-p	(cc-bytevector-long-double 123))))
+
 
 ;;;; done
 

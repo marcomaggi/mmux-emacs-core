@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-06 15:15:34 marco>
+;; Time-stamp: <2020-02-08 08:24:42 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -275,7 +275,7 @@
 	 (C-FUNC		(intern (concat "mmux-core-c-bytevector-" TYPESTEM.str "-ref"))))
     `(cl-defmethod cc-bytevector-ref ((bv ,BYTEVECTOR-TYPE) (idx integer))
        ,DOCSTRING
-       (cl-assert (cc-usize-range-p idx))
+       (cl-assert (cc-fits-usize-p idx))
        (,MAKE-LTYPE (,C-FUNC (cc-bytevector-obj bv) idx)))))
 
 (defmacro cc--define-bytevector-setter (TYPESTEM LTYPE CTYPE)
@@ -287,7 +287,7 @@
 	 (C-FUNC		(intern (concat "mmux-core-c-bytevector-" TYPESTEM.str "-set!"))))
     `(cl-defmethod cc-bytevector-set! ((bv ,BYTEVECTOR-TYPE) (idx integer) (val ,LTYPE))
        ,DOCSTRING
-       (cl-assert (cc-usize-range-p idx))
+       (cl-assert (cc-fits-usize-p idx))
        (,C-FUNC (cc-bytevector-obj bv) idx (,LTYPE-OBJ val)))))
 
 (defmacro cc--define-bytevector-getter-and-setter (TYPESTEM LTYPE CTYPE)

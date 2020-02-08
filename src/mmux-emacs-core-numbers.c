@@ -32,7 +32,7 @@
 
 
 /** --------------------------------------------------------------------
- ** Range checker.
+ ** Range checker: is a number fitting into a C language type?
  ** ----------------------------------------------------------------- */
 
 #undef  MMUX_EMACS_CORE_FITS_SIGNED_P
@@ -668,28 +668,28 @@ static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODUL
     .implementation	= Fmmux_emacs_core_fits_char_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `char'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `char'.",
   },
   {
     .name		= "mmux-core-c-fits-schar-p",
     .implementation	= Fmmux_emacs_core_fits_schar_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `schar'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `schar'.",
   },
   {
     .name		= "mmux-core-c-fits-uchar-p",
     .implementation	= Fmmux_emacs_core_fits_uchar_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `uchar'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `uchar'.",
   },
   {
     .name		= "mmux-core-c-fits-wchar-p",
     .implementation	= Fmmux_emacs_core_fits_wchar_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `wchar'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `wchar'.",
   },
 
   {
@@ -697,56 +697,56 @@ static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODUL
     .implementation	= Fmmux_emacs_core_fits_sshrt_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `sshrt'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `sshrt'.",
   },
   {
     .name		= "mmux-core-c-fits-ushrt-p",
     .implementation	= Fmmux_emacs_core_fits_ushrt_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `ushrt'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `ushrt'.",
   },
   {
     .name		= "mmux-core-c-fits-sint-p",
     .implementation	= Fmmux_emacs_core_fits_sint_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `sint'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `sint'.",
   },
   {
     .name		= "mmux-core-c-fits-uint-p",
     .implementation	= Fmmux_emacs_core_fits_uint_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `uint'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `uint'.",
   },
   {
     .name		= "mmux-core-c-fits-slong-p",
     .implementation	= Fmmux_emacs_core_fits_slong_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `slong'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `slong'.",
   },
   {
     .name		= "mmux-core-c-fits-ulong-p",
     .implementation	= Fmmux_emacs_core_fits_ulong_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `ulong'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `ulong'.",
   },
   {
     .name		= "mmux-core-c-fits-sllong-p",
     .implementation	= Fmmux_emacs_core_fits_sllong_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `sllong'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `sllong'.",
   },
   {
     .name		= "mmux-core-c-fits-ullong-p",
     .implementation	= Fmmux_emacs_core_fits_ullong_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `ullong'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `ullong'.",
   },
 
   {
@@ -754,35 +754,35 @@ static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODUL
     .implementation	= Fmmux_emacs_core_fits_ssize_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `ssize'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `ssize'.",
   },
   {
     .name		= "mmux-core-c-fits-usize-p",
     .implementation	= Fmmux_emacs_core_fits_usize_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `usize'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `usize'.",
   },
   {
     .name		= "mmux-core-c-fits-sintmax-p",
     .implementation	= Fmmux_emacs_core_fits_sintmax_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `sintmax'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `sintmax'.",
   },
   {
     .name		= "mmux-core-c-fits-uintmax-p",
     .implementation	= Fmmux_emacs_core_fits_uintmax_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `uintmax'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `uintmax'.",
   },
   {
     .name		= "mmux-core-c-fits-ptrdiff-p",
     .implementation	= Fmmux_emacs_core_fits_ptrdiff_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `ptrdiff'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `ptrdiff'.",
   },
 
   {
@@ -790,56 +790,56 @@ static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODUL
     .implementation	= Fmmux_emacs_core_fits_sint8_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `sint8'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `sint8'.",
   },
   {
     .name		= "mmux-core-c-fits-uint8-p",
     .implementation	= Fmmux_emacs_core_fits_uint8_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `uint8'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `uint8'.",
   },
   {
     .name		= "mmux-core-c-fits-sint16-p",
     .implementation	= Fmmux_emacs_core_fits_sint16_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `sint16'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `sint16'.",
   },
   {
     .name		= "mmux-core-c-fits-uint16-p",
     .implementation	= Fmmux_emacs_core_fits_uint16_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `uint16'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `uint16'.",
   },
   {
     .name		= "mmux-core-c-fits-sint32-p",
     .implementation	= Fmmux_emacs_core_fits_sint32_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `sint32'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `sint32'.",
   },
   {
     .name		= "mmux-core-c-fits-uint32-p",
     .implementation	= Fmmux_emacs_core_fits_uint32_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `uint32'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `uint32'.",
   },
   {
     .name		= "mmux-core-c-fits-sint64-p",
     .implementation	= Fmmux_emacs_core_fits_sint64_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `sint64'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `sint64'.",
   },
   {
     .name		= "mmux-core-c-fits-uint64-p",
     .implementation	= Fmmux_emacs_core_fits_uint64_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `uint64'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `uint64'.",
   },
 
   {
@@ -847,21 +847,21 @@ static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODUL
     .implementation	= Fmmux_emacs_core_fits_float_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `float'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `float'.",
   },
   {
     .name		= "mmux-core-c-fits-double-p",
     .implementation	= Fmmux_emacs_core_fits_double_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `double'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `double'.",
   },
   {
-    .name		= "mmux-core-c-fits-long_double-p",
+    .name		= "mmux-core-c-fits-long-double-p",
     .implementation	= Fmmux_emacs_core_fits_long_double_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the arguments fits an object of type `long_double'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `long-double'.",
   },
 };
 

@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-06 15:15:11 marco>
+;; Time-stamp: <2020-02-08 08:35:50 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -79,524 +79,100 @@
 
 ;;;; C language type wrappers: char
 
-(cl-defstruct (cc-char
-	       (:include	cc-signed-integer)
-	       (:constructor	cc-char--make))
-  obj)
+(defmacro cc--define-custom-number-object (TYPE PARENT-TYPE)
+  ;;We want the macro use:
+  ;;
+  ;;   (cc--define-custom-number-object cc-char cc-signed-integer)
+  ;;
+  ;;to expand into:
+  ;;
+  ;;   (cl-defstruct (cc-char
+  ;;                   (:include     cc-signed-integer)
+  ;;                   (:constructor cc-char--make))
+  ;;     obj)
+  ;;
+  ;;   (cl-defgeneric cc-char (init)
+  ;;     "Build and return a new instance of `cc-char'.")
+  ;;
+  ;;   (cl-defmethod cc-char ((init cc-char))
+  ;;     "Build and return a new instance of `cc-char'."
+  ;;     (cc-char--make :obj (cc-char-obj init)))
+  ;;
+  ;;   (cl-defmethod  cc-char ((init cc-signed-integer))
+  ;;     "Build and return a new instance of `cc-char'."
+  ;;     (let ((obj (cc-sint64 init)))
+  ;;       (cl-assert (cc-fits-char-p obj))
+  ;;       (cc-char--make :obj (cc-sint64-obj obj))))
+  ;;
+  (let* ((TYPE.str		(symbol-name TYPE))
+	 ;;Strip the leading "cc-" prefix.
+	 (TYPESTEM.str		(substring TYPE.str 3))
+	 (CONSTRUCTOR		(intern (concat TYPE.str "--make")))
+	 (DOCSTRING		(concat "Build and return a new instance of `" TYPE.str "'."))
+	 (FITS-FUNC		(intern (concat "cc-fits-" TYPESTEM.str "-p")))
+	 (TYPE-OBJ		(intern (concat TYPE.str "-obj"))))
+    (cl-multiple-value-bind (BUILTIN-INIT-TYPE NORMALISER)
+	(cond ((eq PARENT-TYPE 'cc-signed-integer)	(cl-values 'integer	'cc-sint64))
+	      ((eq PARENT-TYPE 'cc-unsigned-integer)	(cl-values 'integer	'cc-uint64))
+	      ((eq PARENT-TYPE 'cc-floating-point)	(cl-values 'float	'cc-long-double))
+	      (t
+	       (signal 'mmux-emacs-core-unsupported-init-type PARENT-TYPE)))
+      (let* ((NORMALISER-OBJ	(intern (concat (symbol-name NORMALISER) "-obj"))))
+	`(progn
+	   (cl-defstruct (,TYPE
+			  (:include	,PARENT-TYPE)
+			  (:constructor	,CONSTRUCTOR))
+	     obj)
 
-(cl-defgeneric cc-char (init)
-  "Build and return a new instance of `cc-char'.")
-(cl-defmethod  cc-char ((init integer))
-  "Build and return a new instance of `cc-char'."
-  (cl-assert (cc-char-range-p init))
-  (cc-char--make :obj init))
+	   (cl-defgeneric ,TYPE (init)
+	     ,DOCSTRING)
 
-(cc--define-self-object-maker-method cc-char)
+	   (cl-defmethod ,TYPE ((init ,TYPE))
+	     ,DOCSTRING
+	     (,CONSTRUCTOR :obj (,TYPE-OBJ init)))
 
-(defun cc-char-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `char'."
-  (and (integerp op)
-       (<= cc-CHAR_MIN op cc-CHAR_MAX)))
+	   (cl-defmethod ,TYPE ((init ,BUILTIN-INIT-TYPE))
+	     ,DOCSTRING
+	     (,CONSTRUCTOR :obj (,TYPE-OBJ init)))
 
-
-;;;; C language type wrappers: signed char
+	   (cl-defmethod ,TYPE ((init cc-signed-integer))
+	     ,DOCSTRING
+	     (let ((obj (,NORMALISER init)))
+	       (cl-assert (,FITS-FUNC obj))
+	       (,CONSTRUCTOR :obj (,NORMALISER-OBJ obj))))
 
-(cl-defstruct (cc-schar
-	       (:include	cc-signed-integer)
-	       (:constructor	cc-schar--make))
-  obj)
+	   )))))
 
-(cl-defgeneric cc-schar (init)
-  "Build and return a new instance of `cc-schar'.")
-(cl-defmethod  cc-schar ((init integer))
-  "Build and return a new instance of `cc-schar'."
-  (cl-assert (cc-schar-range-p init))
-  (cc-schar--make :obj init))
-
-(cc--define-self-object-maker-method cc-schar)
-
-(defun cc-schar-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `signed char'."
-  (and (integerp op)
-       (<= cc-SCHAR_MIN op cc-SCHAR_MAX)))
-
-
-;;;; C language type wrappers: unsigned char
-
-(cl-defstruct (cc-uchar
-	       (:include	cc-unsigned-integer)
-	       (:constructor	cc-uchar--make))
-  obj)
-
-(cl-defgeneric cc-uchar (init)
-  "Build and return a new instance of `cc-uchar'.")
-(cl-defmethod  cc-uchar ((init integer))
-  "Build and return a new instance of `cc-uchar'."
-  (cl-assert (cc-uchar-range-p init))
-  (cc-uchar--make :obj init))
-
-(cc--define-self-object-maker-method cc-uchar)
-
-(defun cc-uchar-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `unsigned char'."
-  (and (integerp op)
-       (<= cc-UCHAR_MIN op cc-UCHAR_MAX)))
-
-
-;;;; C language type wrappers: wchar
-
-(cl-defstruct (cc-wchar
-	       (:include	cc-unsigned-integer)
-	       (:constructor	cc-wchar--make))
-  obj)
-
-(cl-defgeneric cc-wchar (init)
-  "Build and return a new instance of `cc-wchar'.")
-(cl-defmethod  cc-wchar ((init integer))
-  "Build and return a new instance of `cc-wchar'."
-  (cl-assert (cc-wchar-range-p init))
-  (cc-wchar--make :obj (mmux-core-c-make-wchar init)))
-
-(cc--define-self-object-maker-method cc-wchar)
-
-(defun cc-wchar-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `wchar_t'."
-  (and (integerp op)
-       (<= cc-WCHAR_MIN op cc-WCHAR_MAX)))
-
-
-;;;; C language type wrappers: signed short int
-
-(cl-defstruct (cc-signed-short-int
-	       (:include	cc-signed-integer)
-	       (:constructor	cc-signed-short-int--make))
-  obj)
-
-(cl-defgeneric cc-signed-short-int (init)
-  "Build and return a new instance of `cc-signed-short-int'.")
-(cl-defmethod  cc-signed-short-int ((init integer))
-  "Build and return a new instance of `cc-signed-short-int'."
-  (cl-assert (cc-signed-short-int-range-p init))
-  (cc-signed-short-int--make :obj init))
-
-(cc--define-self-object-maker-method cc-signed-short-int)
-
-(defun cc-signed-short-int-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `signed short int'."
-  (and (integerp op)
-       (<= cc-SHRT_MIN op cc-SHRT_MAX)))
+(cc--define-custom-number-object cc-char			cc-signed-integer)
+(cc--define-custom-number-object cc-schar			cc-signed-integer)
+(cc--define-custom-number-object cc-uchar			cc-unsigned-integer)
+(cc--define-custom-number-object cc-wchar			cc-unsigned-integer)
+(cc--define-custom-number-object cc-signed-short-int		cc-signed-integer)
+(cc--define-custom-number-object cc-unsigned-short-int		cc-unsigned-integer)
+(cc--define-custom-number-object cc-signed-int			cc-signed-integer)
+(cc--define-custom-number-object cc-unsigned-int		cc-unsigned-integer)
+(cc--define-custom-number-object cc-signed-long-int		cc-signed-integer)
+(cc--define-custom-number-object cc-unsigned-long-int		cc-unsigned-integer)
+(cc--define-custom-number-object cc-signed-long-long-int	cc-signed-integer)
+(cc--define-custom-number-object cc-unsigned-long-long-int	cc-unsigned-integer)
+(cc--define-custom-number-object cc-usize			cc-unsigned-integer)
+(cc--define-custom-number-object cc-ssize			cc-signed-integer)
+(cc--define-custom-number-object cc-sintmax			cc-signed-integer)
+(cc--define-custom-number-object cc-uintmax			cc-unsigned-integer)
+(cc--define-custom-number-object cc-ptrdiff			cc-signed-integer)
+(cc--define-custom-number-object cc-sint8			cc-signed-integer)
+(cc--define-custom-number-object cc-uint8			cc-unsigned-integer)
+(cc--define-custom-number-object cc-sint16			cc-signed-integer)
+(cc--define-custom-number-object cc-uint16			cc-unsigned-integer)
+(cc--define-custom-number-object cc-sint32			cc-signed-integer)
+(cc--define-custom-number-object cc-uint32			cc-unsigned-integer)
+(cc--define-custom-number-object cc-sint64			cc-signed-integer)
+(cc--define-custom-number-object cc-uint64			cc-unsigned-integer)
+(cc--define-custom-number-object cc-float			cc-floating-point)
+(cc--define-custom-number-object cc-long-double			cc-floating-point)
 
 
-;;;; C language type wrappers: unsigned short int
-
-(cl-defstruct (cc-unsigned-short-int
-	       (:include	cc-unsigned-integer)
-	       (:constructor	cc-unsigned-short-int--make))
-  obj)
-
-(cl-defgeneric cc-unsigned-short-int (init)
-  "Build and return a new instance of `cc-unsigned-short-int'.")
-(cl-defmethod  cc-unsigned-short-int ((init integer))
-  "Build and return a new instance of `cc-unsigned-short-int'."
-  (cl-assert (cc-unsigned-short-int-range-p init))
-  (cc-unsigned-short-int--make :obj init))
-
-(cc--define-self-object-maker-method cc-unsigned-short-int)
-
-(defun cc-unsigned-short-int-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `unsigned short int'."
-  (and (integerp op)
-       (<= cc-USHRT_MIN op cc-USHRT_MAX)))
-
-
-;;;; C language type wrappers: signed int
-
-(cl-defstruct (cc-signed-int
-	       (:include	cc-signed-integer)
-	       (:constructor	cc-signed-int--make))
-  obj)
-
-(cl-defgeneric cc-signed-int (init)
-  "Build and return a new instance of `cc-signed-int'.")
-(cl-defmethod  cc-signed-int ((init integer))
-  "Build and return a new instance of `cc-signed-int'."
-  (cl-assert (cc-signed-int-range-p init))
-  (cc-signed-int--make :obj (mmux-core-c-make-sint init)))
-
-(cc--define-self-object-maker-method cc-signed-int)
-
-(defun cc-signed-int-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `signed int'."
-  (and (integerp op)
-       (<= cc-INT_MIN op cc-INT_MAX)))
-
-
-;;;; C language type wrappers: unsigned int
-
-(cl-defstruct (cc-unsigned-int
-	       (:include	cc-unsigned-integer)
-	       (:constructor	cc-unsigned-int--make))
-  obj)
-
-(cl-defgeneric cc-unsigned-int (init)
-  "Build and return a new instance of `cc-unsigned-int'.")
-(cl-defmethod  cc-unsigned-int ((init integer))
-  "Build and return a new instance of `cc-unsigned-int'."
-  (cl-assert (cc-unsigned-int-range-p init))
-  (cc-unsigned-int--make :obj (mmux-core-c-make-uint init)))
-
-(cc--define-self-object-maker-method cc-unsigned-int)
-
-(defun cc-unsigned-int-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `unsigned int'."
-  (and (integerp op)
-       (<= cc-UINT_MIN op cc-UINT_MAX)))
-
-
-;;;; C language type wrappers: signed long int
-
-(cl-defstruct (cc-signed-long-int
-	       (:include	cc-signed-integer)
-	       (:constructor	cc-signed-long-int--make))
-  obj)
-
-(cl-defgeneric cc-signed-long-int (init)
-  "Build and return a new instance of `cc-signed-long-int'.")
-(cl-defmethod  cc-signed-long-int ((init integer))
-  "Build and return a new instance of `cc-signed-long-int'."
-  (cl-assert (cc-signed-long-int-range-p init))
-  (cc-signed-long-int--make :obj (mmux-core-c-make-slong init)))
-
-(cc--define-self-object-maker-method cc-signed-long-int)
-
-(defun cc-signed-long-int-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `signed long int'."
-  (and (integerp op)
-       (<= cc-LONG_MIN op cc-LONG_MAX)))
-
-
-;;;; C language type wrappers: unsigned long int
-
-(cl-defstruct (cc-unsigned-long-int
-	       (:include	cc-unsigned-integer)
-	       (:constructor	cc-unsigned-long-int--make))
-  obj)
-
-(cl-defgeneric cc-unsigned-long-int (init)
-  "Build and return a new instance of `cc-unsigned-long-int'.")
-(cl-defmethod  cc-unsigned-long-int ((init integer))
-  "Build and return a new instance of `cc-unsigned-long-int'."
-  (cl-assert (cc-unsigned-long-int-range-p init))
-  (cc-unsigned-long-int--make :obj (mmux-core-c-make-ulong init)))
-
-(cc--define-self-object-maker-method cc-unsigned-long-int)
-
-(defun cc-unsigned-long-int-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `unsigned long int'."
-  (and (integerp op)
-       (<= cc-ULONG_MIN op cc-ULONG_MAX)))
-
-
-;;;; C language type wrappers: signed long long int
-
-(cl-defstruct (cc-signed-long-long-int
-	       (:include	cc-signed-integer)
-	       (:constructor	cc-signed-long-long-int--make))
-  obj)
-
-(cl-defgeneric cc-signed-long-long-int (init)
-  "Build and return a new instance of `cc-signed-long-long-int'.")
-(cl-defmethod  cc-signed-long-long-int ((init integer))
-  "Build and return a new instance of `cc-signed-long-long-int'."
-  (cl-assert (cc-signed-long-long-int-range-p init))
-  (cc-signed-long-long-int--make :obj (mmux-core-c-make-sllong init)))
-
-(cc--define-self-object-maker-method cc-signed-long-long-int)
-
-(defun cc-signed-long-long-int-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `signed long long int'."
-  (and (integerp op)
-       (<= cc-LLONG_MIN op cc-LLONG_MAX)))
-
-
-;;;; C language type wrappers: unsigned long long int
-
-(cl-defstruct (cc-unsigned-long-long-int
-	       (:include	cc-unsigned-integer)
-	       (:constructor	cc-unsigned-long-long-int--make))
-  obj)
-
-(cl-defgeneric cc-unsigned-long-long-int (init)
-  "Build and return a new instance of `cc-unsigned-long-long-int'.")
-(cl-defmethod  cc-unsigned-long-long-int ((init integer))
-  "Build and return a new instance of `cc-unsigned-long-long-int'."
-  (cl-assert (cc-unsigned-long-long-int-range-p init))
-  (cc-unsigned-long-long-int--make :obj (mmux-core-c-make-ullong init)))
-
-(cc--define-self-object-maker-method cc-unsigned-long-long-int)
-
-(defun cc-unsigned-long-long-int-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `unsigned long long int'."
-  (and (integerp op)
-       (<= cc-ULLONG_MIN op cc-ULLONG_MAX)))
-
-
-;;;; C language type wrappers: size_t
-
-(cl-defstruct (cc-usize
-	       (:include	cc-unsigned-integer)
-	       (:constructor	cc-usize--make))
-  obj)
-
-(cl-defgeneric cc-usize (init)
-  "Build and return a new instance of `cc-usize'.")
-(cl-defmethod  cc-usize ((init integer))
-  "Build and return a new instance of `cc-usize'."
-  (cl-assert (cc-usize-range-p init))
-  (cc-usize--make :obj (mmux-core-c-make-usize init)))
-
-(cc--define-self-object-maker-method cc-usize)
-
-(defun cc-usize-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `size_t'."
-  (and (integerp op)
-       (<= cc-SIZE_T_MIN op cc-SIZE_T_MAX)))
-
-
-;;;; C language type wrappers: ssize_t
-
-(cl-defstruct (cc-ssize
-	       (:include	cc-signed-integer)
-	       (:constructor	cc-ssize--make))
-  obj)
-
-(cl-defgeneric cc-ssize (init)
-  "Build and return a new instance of `cc-ssize'.")
-(cl-defmethod  cc-ssize ((init integer))
-  "Build and return a new instance of `cc-ssize'."
-  (cl-assert (cc-ssize-range-p init))
-  (cc-ssize--make :obj (mmux-core-c-make-ssize init)))
-
-(cc--define-self-object-maker-method cc-ssize)
-
-(defun cc-ssize-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `ssize_t'."
-  (and (integerp op)
-       (<= cc-SSIZE_T_MIN op cc-SSIZE_T_MAX)))
-
-
-;;;; C language type wrappers: signed intmax
-
-(cl-defstruct (cc-sintmax
-	       (:include	cc-signed-integer)
-	       (:constructor	cc-sintmax--make))
-  obj)
-
-(cl-defgeneric cc-sintmax (init)
-  "Build and return a new instance of `cc-sintmax'.")
-(cl-defmethod  cc-sintmax ((init integer))
-  "Build and return a new instance of `cc-sintmax'."
-  (cl-assert (cc-sintmax-range-p init))
-  (cc-sintmax--make :obj (mmux-core-c-make-sintmax init)))
-
-(cc--define-self-object-maker-method cc-sintmax)
-
-(defun cc-sintmax-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `intmax_t'."
-  (and (integerp op)
-       (<= cc-INTMAX_MIN op cc-INTMAX_MAX)))
-
-
-;;;; C language type wrappers: uintmax
-
-(cl-defstruct (cc-uintmax
-	       (:include	cc-unsigned-integer)
-	       (:constructor	cc-uintmax--make))
-  obj)
-
-(cl-defgeneric cc-uintmax (init)
-  "Build and return a new instance of `cc-uintmax'.")
-(cl-defmethod  cc-uintmax ((init integer))
-  "Build and return a new instance of `cc-uintmax'."
-  (cl-assert (cc-uintmax-range-p init))
-  (cc-uintmax--make :obj (mmux-core-c-make-uintmax init)))
-
-(cc--define-self-object-maker-method cc-uintmax)
-
-(defun cc-uintmax-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `uintmax_t'."
-  (and (integerp op)
-       (<= cc-UINTMAX_MIN op cc-UINTMAX_MAX)))
-
-
-;;;; C language type wrappers: signed intmax
-
-(cl-defstruct (cc-ptrdiff
-	       (:include	cc-signed-integer)
-	       (:constructor	cc-ptrdiff--make))
-  obj)
-
-(cl-defgeneric cc-ptrdiff (init)
-  "Build and return a new instance of `cc-ptrdiff'.")
-(cl-defmethod  cc-ptrdiff ((init integer))
-  "Build and return a new instance of `cc-ptrdiff'."
-  (cl-assert (cc-ptrdiff-range-p init))
-  (cc-ptrdiff--make :obj (mmux-core-c-make-ptrdiff init)))
-
-(cc--define-self-object-maker-method cc-ptrdiff)
-
-(defun cc-ptrdiff-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `intmax_t'."
-  (and (integerp op)
-       (<= cc-PTRDIFF_MIN op cc-PTRDIFF_MAX)))
-
-
-;;;; C language type wrappers: int8_t
-
-(cl-defstruct (cc-sint8
-	       (:include	cc-signed-integer)
-	       (:constructor	cc-sint8--make))
-  obj)
-
-(cl-defgeneric cc-sint8 (init)
-  "Build and return a new instance of `cc-sint8'.")
-(cl-defmethod  cc-sint8 ((init integer))
-  "Build and return a new instance of `cc-sint8'."
-  (cl-assert (cc-sint8-range-p init))
-  (cc-sint8--make :obj init))
-
-(cc--define-self-object-maker-method cc-sint8)
-
-(defun cc-sint8-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `int8_t'."
-  (and (integerp op)
-       (<= cc-INT8_MIN op cc-INT8_MAX)))
-
-
-;;;; C language type wrappers: uint8_t
-
-(cl-defstruct (cc-uint8
-	       (:include	cc-unsigned-integer)
-	       (:constructor	cc-uint8--make))
-  obj)
-
-(cl-defgeneric cc-uint8 (init)
-  "Build and return a new instance of `cc-uint8'.")
-(cl-defmethod  cc-uint8 ((init integer))
-  "Build and return a new instance of `cc-uint8'."
-  (cl-assert (cc-uint8-range-p init))
-  (cc-uint8--make :obj init))
-
-(cc--define-self-object-maker-method cc-uint8)
-
-(defun cc-uint8-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `uint8_t'."
-  (and (integerp op)
-       (<= cc-UINT8_MIN op cc-UINT8_MAX)))
-
-
-;;;; C language type wrappers: int16_t
-
-(cl-defstruct (cc-sint16
-	       (:include	cc-signed-integer)
-	       (:constructor	cc-sint16--make))
-  obj)
-
-(cl-defgeneric cc-sint16 (init)
-  "Build and return a new instance of `cc-sint16'.")
-(cl-defmethod  cc-sint16 ((init integer))
-  "Build and return a new instance of `cc-sint16'."
-  (cl-assert (cc-sint16-range-p init))
-  (cc-sint16--make :obj init))
-
-(cc--define-self-object-maker-method cc-sint16)
-
-(defun cc-sint16-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `int16_t'."
-  (and (integerp op)
-       (<= cc-INT16_MIN op cc-INT16_MAX)))
-
-
-;;;; C language type wrappers: uint16_t
-
-(cl-defstruct (cc-uint16
-	       (:include	cc-unsigned-integer)
-	       (:constructor	cc-uint16--make))
-  obj)
-
-(cl-defgeneric cc-uint16 (init)
-  "Build and return a new instance of `cc-uint16'.")
-(cl-defmethod  cc-uint16 ((init integer))
-  "Build and return a new instance of `cc-uint16'."
-  (cl-assert (cc-uint16-range-p init))
-  (cc-uint16--make :obj init))
-
-(cc--define-self-object-maker-method cc-uint16)
-
-(defun cc-uint16-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `uint16_t'."
-  (and (integerp op)
-       (<= cc-UINT16_MIN op cc-UINT16_MAX)))
-
-
-;;;; C language type wrappers: int32_t
-
-(cl-defstruct (cc-sint32
-	       (:include	cc-signed-integer)
-	       (:constructor	cc-sint32--make))
-  obj)
-
-(cl-defgeneric cc-sint32 (init)
-  "Build and return a new instance of `cc-sint32'.")
-(cl-defmethod  cc-sint32 ((init integer))
-  "Build and return a new instance of `cc-sint32'."
-  (cl-assert (cc-sint32-range-p init))
-  (cc-sint32--make :obj (mmux-core-c-make-sint32 init)))
-
-(cc--define-self-object-maker-method cc-sint32)
-
-(defun cc-sint32-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `int32_t'."
-  (and (integerp op)
-       (<= cc-INT32_MIN op cc-INT32_MAX)))
-
-
-;;;; C language type wrappers: uint32_t
-
-(cl-defstruct (cc-uint32
-	       (:include	cc-unsigned-integer)
-	       (:constructor	cc-uint32--make))
-  obj)
-
-(cl-defgeneric cc-uint32 (init)
-  "Build and return a new instance of `cc-uint32'.")
-(cl-defmethod  cc-uint32 ((init integer))
-  "Build and return a new instance of `cc-uint32'."
-  (cl-assert (cc-uint32-range-p init))
-  (cc-uint32--make :obj (mmux-core-c-make-uint32 init)))
-
-(cc--define-self-object-maker-method cc-uint32)
-
-(defun cc-uint32-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `uint32_t'."
-  (and (integerp op)
-       (<= cc-UINT32_MIN op cc-UINT32_MAX)))
-
-
-;;;; C language type wrappers: int64_t
-
-(cl-defstruct (cc-sint64
-	       (:include	cc-signed-integer)
-	       (:constructor	cc-sint64--make))
-  obj)
-
-(cl-defgeneric cc-sint64 (init)
-  "Build and return a new instance of `cc-sint64'.")
-
-(cl-defmethod cc-sint64 ((init integer))
-  "Build and return a new instance of `cc-sint64'."
-  (cl-assert (cc-sint64-range-p init))
-  (cc-sint64--make :obj (mmux-core-c-make-sint64 init)))
+;;;; special initialisation methods
 
 (defmacro cc--define-sint64-maker-method (TYPE CSTEM)
   (let* ((TYPE.str	(symbol-name TYPE))
@@ -620,27 +196,7 @@
 (cc--define-sint64-maker-method cc-ssize		"ssize")
 (cc--define-sint64-maker-method cc-ptrdiff		"ptrdiff")
 
-(cc--define-self-object-maker-method cc-sint64)
-
-(defun cc-sint64-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `int64_t'."
-  (and (integerp op)
-       (<= cc-INT64_MIN op cc-INT64_MAX)))
-
-
-;;;; C language type wrappers: uint64_t
-
-(cl-defstruct (cc-uint64
-	       (:include	cc-unsigned-integer)
-	       (:constructor	cc-uint64--make))
-  obj)
-
-(cl-defgeneric cc-uint64 (init)
-  "Build and return a new instance of `cc-uint64'.")
-(cl-defmethod cc-uint64 ((init integer))
-  "Build and return a new instance of `cc-uint64'."
-  (cl-assert (cc-uint64-range-p init))
-  (cc-uint64--make :obj (mmux-core-c-make-uint64 init)))
+;;; --------------------------------------------------------------------
 
 (defmacro cc--define-uint64-maker-method (TYPE CSTEM)
   (let* ((TYPE.str	(symbol-name TYPE))
@@ -663,56 +219,11 @@
 (cc--define-uint64-maker-method cc-usize			"usize")
 (cc--define-uint64-maker-method cc-wchar			"wchar")
 
-(cc--define-self-object-maker-method cc-uint64)
-
-(defun cc-uint64-range-p (op)
-  "Return true if OP is an exact integer object and it is in the range representable by `uint64_t'."
-  (and (integerp op)
-       (<= cc-UINT64_MIN op cc-UINT64_MAX)))
-
-
-;;;; C language type wrappers: float
-
-(cl-defstruct (cc-float
-	       (:include	cc-floating-point)
-	       (:constructor	cc-float--make))
-  obj)
-
-(cl-defgeneric cc-float (init)
-  "Build and return a new instance of `cc-float'.")
-(cl-defmethod  cc-float ((init float))
-  "Build and return a new instance of `cc-float'."
-  (cl-assert (cc-float-range-p init))
-  (cc-float--make :obj (mmux-core-c-make-float init)))
-
-(cc--define-self-object-maker-method cc-float)
-
-(defun cc-float-range-p (op)
-  "Return true if OP is a floating-point object and it is in the range representable `float'."
-  (and (floatp op)
-       (<= cc-FLT_MIN op cc-FLT_MAX)))
-
-
-;;;; C language type wrappers: long double
-
-(cl-defstruct (cc-long-double
-	       (:include	cc-floating-point)
-	       (:constructor	cc-long-double--make))
-  obj)
-
-(cl-defgeneric cc-long-double (init)
-  "Build and return a new instance of `cc-long-double'.")
-
-(cl-defmethod  cc-long-double ((init float))
-  "Build and return a new instance of `cc-long-double'."
-  (cl-assert (cc-long-double-range-p init))
-  (cc-long-double--make :obj (mmux-core-c-make-long-double init)))
+;;; --------------------------------------------------------------------
 
 (cl-defmethod  cc-long-double ((init integer))
   "Build and return a new instance of `cc-long-double'."
   (cc-long-double (float init)))
-
-(cc--define-self-object-maker-method cc-long-double)
 
 (defmacro cc--define-long-double-maker-method (TYPE CSTEM)
   (let* ((TYPE.str	(symbol-name TYPE))
@@ -735,10 +246,176 @@
   "Convert an object of type `cc-signed-integer' to an object of type `cc-long-double'."
   (cc-long-double (cc-sint64 init)))
 
-(defun cc-long-double-range-p (op)
-  "Return true if OP is a floating-point object and it is in the range representable `long double'."
-  (and (floatp op)
-       (<= cc-LDBL_MIN op cc-LDBL_MAX)))
+
+;;;; range inclusion
+
+(cl-defgeneric cc-fits-char-p (op)
+  "Return true if the argument fits an object of type `cc-char'.")
+(cl-defmethod  cc-fits-char-p ((op cc-signed-integer))
+  "Return true if the argument fits an object of type `cc-char'."
+  (mmux-core-c-fits-char-p (cc-sint64-obl (cc-sint64 op))))
+
+(cl-defgeneric cc-fits-schar-p (op)
+  "Return true if the argument fits an object of type `cc-schar'.")
+(cl-defmethod  cc-fits-schar-p ((op cc-signed-integer))
+  "Return true if the argument fits an object of type `cc-schar'."
+  (mmux-core-c-fits-schar-p (cc-sint64-obj (cc-sint64 op))))
+
+(cl-defgeneric cc-fits-uchar-p (op)
+  "Return true if the argument fits an object of type `cc-uchar'.")
+(cl-defmethod  cc-fits-uchar-p ((op cc-unsigned-integer))
+  "Return true if the argument fits an object of type `cc-uchar'."
+  (mmux-core-c-fits-uchar-p (cc-uint64-obj (cc-uint64 op))))
+
+(cl-defgeneric cc-fits-wchar-p (op)
+  "Return true if the argument fits an object of type `cc-wchar'.")
+(cl-defmethod  cc-fits-wchar-p ((op cc-unsigned-integer))
+  "Return true if the argument fits an object of type `cc-wchar'."
+  (mmux-core-c-fits-wchar-p (cc-uint64-obj (cc-uint64 op))))
+
+(cl-defgeneric cc-fits-sshrt-p (op)
+  "Return true if the argument fits an object of type `cc-sshrt'.")
+(cl-defmethod  cc-fits-sshrt-p ((op cc-signed-integer))
+  "Return true if the argument fits an object of type `cc-sshrt'."
+  (mmux-core-c-fits-sshrt-p (cc-sint64-obj (cc-sint64 op))))
+
+(cl-defgeneric cc-fits-ushrt-p (op)
+  "Return true if the argument fits an object of type `cc-ushrt'.")
+(cl-defmethod  cc-fits-ushrt-p ((op cc-unsigned-integer))
+  "Return true if the argument fits an object of type `cc-ushrt'."
+  (mmux-core-c-fits-ushrt-p (cc-uint64-obj (cc-uint64 op))))
+
+(cl-defgeneric cc-fits-sint-p (op)
+  "Return true if the argument fits an object of type `cc-sint'.")
+(cl-defmethod  cc-fits-sint-p ((op cc-signed-integer))
+  "Return true if the argument fits an object of type `cc-sint'."
+  (mmux-core-c-fits-sint-p (cc-sint64-obj (cc-sint64 op))))
+
+(cl-defgeneric cc-fits-uint-p (op)
+  "Return true if the argument fits an object of type `cc-uint'.")
+(cl-defmethod  cc-fits-uint-p ((op cc-unsigned-integer))
+  "Return true if the argument fits an object of type `cc-uint'."
+  (mmux-core-c-fits-uint-p (cc-uint64-obj (cc-uint64 op))))
+
+(cl-defgeneric cc-fits-slong-p (op)
+  "Return true if the argument fits an object of type `cc-slong'.")
+(cl-defmethod  cc-fits-slong-p ((op cc-signed-integer))
+  "Return true if the argument fits an object of type `cc-slong'."
+  (mmux-core-c-fits-slong-p (cc-sint64-obj (cc-sint64 op))))
+
+(cl-defgeneric cc-fits-ulong-p (op)
+  "Return true if the argument fits an object of type `cc-ulong'.")
+(cl-defmethod  cc-fits-ulong-p ((op cc-unsigned-integer))
+  "Return true if the argument fits an object of type `cc-ulong'."
+  (mmux-core-c-fits-ulong-p (cc-uint64-obj (cc-uint64 op))))
+
+(cl-defgeneric cc-fits-sllong-p (op)
+  "Return true if the argument fits an object of type `cc-sllong'.")
+(cl-defmethod  cc-fits-sllong-p ((op cc-signed-integer))
+  "Return true if the argument fits an object of type `cc-sllong'."
+  (mmux-core-c-fits-sllong-p (cc-sint64-obj (cc-sint64 op))))
+
+(cl-defgeneric cc-fits-ullong-p (op)
+  "Return true if the argument fits an object of type `cc-ullong'.")
+(cl-defmethod  cc-fits-ullong-p ((op cc-unsigned-integer))
+  "Return true if the argument fits an object of type `cc-ullong'."
+  (mmux-core-c-fits-ullong-p (cc-uint64-obj (cc-uint64 op))))
+
+(cl-defgeneric cc-fits-ssize-p (op)
+  "Return true if the argument fits an object of type `cc-ssize'.")
+(cl-defmethod  cc-fits-ssize-p ((op cc-signed-integer))
+  "Return true if the argument fits an object of type `cc-ssize'."
+  (mmux-core-c-fits-ssize-p (cc-sint64-obj (cc-sint64 op))))
+
+(cl-defgeneric cc-fits-usize-p (op)
+  "Return true if the argument fits an object of type `cc-usize'.")
+(cl-defmethod  cc-fits-usize-p ((op cc-unsigned-integer))
+  "Return true if the argument fits an object of type `cc-usize'."
+  (mmux-core-c-fits-usize-p (cc-uint64-obj (cc-uint64 op))))
+
+(cl-defgeneric cc-fits-sintmax-p (op)
+  "Return true if the argument fits an object of type `cc-sintmax'.")
+(cl-defmethod  cc-fits-sintmax-p ((op cc-signed-integer))
+  "Return true if the argument fits an object of type `cc-sintmax'."
+  (mmux-core-c-fits-sintmax-p (cc-sint64-obj (cc-sint64 op))))
+
+(cl-defgeneric cc-fits-uintmax-p (op)
+  "Return true if the argument fits an object of type `cc-uintmax'.")
+(cl-defmethod  cc-fits-uintmax-p ((op cc-unsigned-integer))
+  "Return true if the argument fits an object of type `cc-uintmax'."
+  (mmux-core-c-fits-uintmax-p (cc-uint64-obj (cc-uint64 op))))
+
+(cl-defgeneric cc-fits-ptrdiff-p (op)
+  "Return true if the argument fits an object of type `cc-ptrdiff'.")
+(cl-defmethod  cc-fits-ptrdiff-p ((op cc-signed-integer))
+  "Return true if the argument fits an object of type `cc-ptrdiff'."
+  (mmux-core-c-fits-ptrdiff-p (cc-sint64-obj (cc-sint64 op))))
+
+(cl-defgeneric cc-fits-sint8-p (op)
+  "Return true if the argument fits an object of type `cc-sint8'.")
+(cl-defmethod  cc-fits-sint8-p ((op cc-signed-integer))
+  "Return true if the argument fits an object of type `cc-sint8'."
+  (mmux-core-c-fits-sint8-p (cc-sint64-obj (cc-sint64 op))))
+
+(cl-defgeneric cc-fits-uint8-p (op)
+  "Return true if the argument fits an object of type `cc-uint8'.")
+(cl-defmethod  cc-fits-uint8-p ((op cc-unsigned-integer))
+  "Return true if the argument fits an object of type `cc-uint8'."
+  (mmux-core-c-fits-uint8-p (cc-uint64-obj (cc-uint64 op))))
+
+(cl-defgeneric cc-fits-sint16-p (op)
+  "Return true if the argument fits an object of type `cc-sint16'.")
+(cl-defmethod  cc-fits-sint16-p ((op cc-signed-integer))
+  "Return true if the argument fits an object of type `cc-sint16'."
+  (mmux-core-c-fits-sint16-p (cc-sint64-obj (cc-sint64 op))))
+
+(cl-defgeneric cc-fits-uint16-p (op)
+  "Return true if the argument fits an object of type `cc-uint16'.")
+(cl-defmethod  cc-fits-uint16-p ((op cc-unsigned-integer))
+  "Return true if the argument fits an object of type `cc-uint16'."
+  (mmux-core-c-fits-uint16-p (cc-uint64-obj (cc-uint64 op))))
+
+(cl-defgeneric cc-fits-sint32-p (op)
+  "Return true if the argument fits an object of type `cc-sint32'.")
+(cl-defmethod  cc-fits-sint32-p ((op cc-signed-integer))
+  "Return true if the argument fits an object of type `cc-sint32'."
+  (mmux-core-c-fits-sint32-p (cc-sint64-obj (cc-sint64 op))))
+
+(cl-defgeneric cc-fits-uint32-p (op)
+  "Return true if the argument fits an object of type `cc-uint32'.")
+(cl-defmethod  cc-fits-uint32-p ((op cc-unsigned-integer))
+  "Return true if the argument fits an object of type `cc-uint32'."
+  (mmux-core-c-fits-uint32-p (cc-uint64-obj (cc-uint64 op))))
+
+(cl-defgeneric cc-fits-sint64-p (op)
+  "Return true if the argument fits an object of type `cc-sint64'.")
+(cl-defmethod  cc-fits-sint64-p ((op cc-signed-integer))
+  "Return true if the argument fits an object of type `cc-sint64'."
+  (mmux-core-c-fits-sint64-p (cc-sint64-obj (cc-sint64 op))))
+
+(cl-defgeneric cc-fits-uint64-p (op)
+  "Return true if the argument fits an object of type `cc-uint64'.")
+(cl-defmethod  cc-fits-uint64-p ((op cc-unsigned-integer))
+  "Return true if the argument fits an object of type `cc-uint64'."
+  (mmux-core-c-fits-uint64-p (cc-uint64-obj (cc-uint64 op))))
+
+(cl-defgeneric cc-fits-float-p (op)
+  "Return true if the argument fits an object of type `cc-float'.")
+(cl-defmethod  cc-fits-float-p ((op cc-floating-point))
+  "Return true if the argument fits an object of type `cc-float'."
+  (mmux-core-c-fits-float-p (cc-long-double-obj (cc-long-double op))))
+
+(cl-defgeneric cc-fits-double-p (op)
+  "Return true if the argument fits an object of type `cc-double'.")
+(cl-defmethod  cc-fits-double-p ((op cc-floating-point))
+  "Return true if the argument fits an object of type `cc-double'."
+  (mmux-core-c-fits-double-p (cc-long-double-obj (cc-long-double op))))
+
+(cl-defgeneric cc-fits-long-double-p (op)
+  "Return true if the argument fits an object of type `cc-long-double'.")
+(cl-defmethod  cc-fits-long-double-p ((op cc-floating-point))
+  "Return true if the argument fits an object of type `cc-long-double'."
+  (mmux-core-c-fits-long-double-p (cc-long-double-obj (cc-long-double op))))
 
 
 ;;;; numeric comparison operations

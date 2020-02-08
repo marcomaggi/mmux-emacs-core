@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-07 17:30:22 marco>
+;; Time-stamp: <2020-02-08 07:01:38 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -65,15 +65,6 @@
 
 
 ;;;; helpers
-
-(defmacro cc--define-self-object-maker-method (TYPE)
-  (let* ((TYPE.str	(symbol-name TYPE))
-	 (CC-MAKER	(intern (concat TYPE.str "--make")))
-	 (OBJ-GETTER	(intern (concat TYPE.str "-obj")))
-	 (DOCSTRING	(concat "Build and return a new instance of `" TYPE.str "'.")))
-    `(cl-defmethod ,TYPE ((init ,TYPE))
-       ,DOCSTRING
-       (,CC-MAKER :obj (,OBJ-GETTER init)))))
 
 (defun cc-debug-print (&rest args)
   (pp args 'external-debugging-output))

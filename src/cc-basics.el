@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-08 07:01:38 marco>
+;; Time-stamp: <2020-02-09 06:37:26 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -39,29 +39,50 @@
 
 ;;;; error symbols
 
-(define-error 'mmux-core-error
+(define-error 'mmec-error
   "Error while executing a MMUX Emacs Core operation."
   'error)
 
-(define-error 'mmux-core-no-memory-error
+;;; --------------------------------------------------------------------
+;;; constructor errors
+
+(define-error 'mmec-error-constructor
+  "An error occurred while constructing an object."
+  'mmec-error)
+
+(define-error 'mmec-error-no-memory
   "Error allocating memory."
-  'mmux-core-error)
+  'mmec-error-constructor)
 
-(define-error 'mmux-core-index-out-of-range
-  "Attempt to access the internal represenation of an object with an index out of range."
-  'mmux-core-error)
-
-(define-error 'mmux-core-bytevector-index-out-of-range
-  "Attempt to access the internal represenation of a bytevector object with an index out of range."
-  'mmux-core-index-out-of-range)
-
-(define-error 'mmux-core-instantiating-abstract-type
+(define-error 'mmec-error-instantiating-abstract-type
   "An attempt was performed to instantiate an abstract data type."
-  'mmux-core-error)
+  'mmec-error-constructor)
 
-(define-error 'mmux-core-signed/unsigned-integer-comparison
+(define-error 'mmec-error-unsupported-init-type
+  "An argument given to an object constructor has an unsupported type."
+  'mmec-error-constructor)
+
+;;; --------------------------------------------------------------------
+;;; range errors
+
+(define-error 'mmec-error-value-out-of-range
+  "A numeric object is out of range."
+  'mmec-error)
+
+(define-error 'mmec-error-index-out-of-range
+  "Attempt to access the internal represenation of an object with an index out of range."
+  'mmec-error-value-out-of-range)
+
+(define-error 'mmec-error-bytevector-index-out-of-range
+  "Attempt to access the internal represenation of a bytevector object with an index out of range."
+  'mmec-error-index-out-of-range)
+
+;;; --------------------------------------------------------------------
+;;; operations errors
+
+(define-error 'mmec-error-signed/unsigned-integer-comparison
   "Cannot compare a signed integer with an unsigned integer."
-  'mmux-core-error)
+  'mmec-error)
 
 
 ;;;; helpers

@@ -37,42 +37,55 @@
 
 
 /** --------------------------------------------------------------------
- ** System errors.
+ ** Base errors.
  ** ----------------------------------------------------------------- */
 
-emacs_value
-mmux_emacs_core_error_memory_allocation (emacs_env * env)
-{
-  char const		* errmsg = strerror(errno);
-  emacs_value		Serrmsg = mmux_emacs_core_make_string(env, errmsg, strlen(errmsg));
+MMUX_EMACS_CORE_DEFINE_ERROR_SIGNALER(base, "mmec-error", "Error while executing a MMUX Emacs Core operation.")
 
-  env->non_local_exit_signal(env, env->intern(env, "mmux-core-no-memory-error"), Serrmsg);
-  return env->intern(env, "nil");
-}
+
+/** --------------------------------------------------------------------
+ ** Constructor errors.
+ ** ----------------------------------------------------------------- */
+
+MMUX_EMACS_CORE_DEFINE_ERROR_SIGNALER(constructor,
+				      "mmec-error-constructor",
+				      "An error occurred while constructing an object.")
+
+MMUX_EMACS_CORE_DEFINE_ERROR_SIGNALER(memory_alloction,
+				      "mmec-error-no-memory",
+				      strerror(errno))
+
+MMUX_EMACS_CORE_DEFINE_ERROR_SIGNALER(instantiating_abstract_type,
+				      "mmec-error-instantiating-abstract-type",
+				      "An attempt was performed to instantiate an abstract data type.")
+MMUX_EMACS_CORE_DEFINE_ERROR_SIGNALER(unsupported_init_type,
+				      "mmec-error-unsupported-init-type",
+				      "An argument given to an object constructor has an unsupported type.")
 
 
 /** --------------------------------------------------------------------
  ** Range errors.
  ** ----------------------------------------------------------------- */
 
-emacs_value
-mmux_emacs_core_error_bytevector_index_out_of_range (emacs_env * env)
-{
-  static char const	* errmsg	= "attempt to access a bytevector obect with an index out of range";
-  emacs_value		Serrmsg		= mmux_emacs_core_make_string(env, errmsg, strlen(errmsg));
+MMUX_EMACS_CORE_DEFINE_ERROR_SIGNALER(value_out_of_range,
+				      "mmec-error-value-out-of-range",
+				      "A numeric object is out of range.")
 
-  env->non_local_exit_signal(env, env->intern(env, "mmux-core-bytevector-index-out-of-range"), Serrmsg);
-  return env->intern(env, "nil");
-}
+MMUX_EMACS_CORE_DEFINE_ERROR_SIGNALER(index_out_of_range,
+				      "mmec-error-index-out-of-range",
+				      "Attempt to access the internal represenation of an object with an index out of range.")
 
-emacs_value
-mmux_emacs_core_error_signed_unsigned_integer_comparison (emacs_env * env)
-{
-  static char const	* errmsg	= "cannot compare a signed integer with an unsigned integer";
-  emacs_value		Serrmsg		= mmux_emacs_core_make_string(env, errmsg, strlen(errmsg));
+MMUX_EMACS_CORE_DEFINE_ERROR_SIGNALER(bytevector_index_out_of_range,
+				      "mmec-error-bytevector-index-out-of-range",
+				      "Attempt to access a bytevector obect with an index out of range.")
 
-  env->non_local_exit_signal(env, env->intern(env, "mmux-core-signed/unsigned-integer-comparison"), Serrmsg);
-  return env->intern(env, "nil");
-}
+
+/** --------------------------------------------------------------------
+ ** Operations errors.
+ ** ----------------------------------------------------------------- */
+
+MMUX_EMACS_CORE_DEFINE_ERROR_SIGNALER(signed_unsigned_integer_comparison,
+				      "mmec-error-signed/unsigned-integer-comparison",
+				      "Cannot compare a signed integer with an unsigned integer.")
 
 /* end of file */

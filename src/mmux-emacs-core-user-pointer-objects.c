@@ -33,11 +33,11 @@
 
 
 /** --------------------------------------------------------------------
- ** User-pointer objects: sint32 exact integers.
+ ** User-pointer objects: exact integers not represantable by an intmax_t.
  ** ----------------------------------------------------------------- */
 
 #undef  MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER
-#define MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(STEM, CTYPE, ETYPE, ARG_GETTER_STEM)	\
+#define MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(STEM, CAPSTEM, CTYPE, ARGTYPE, ARG_GETTER_STEM) \
   static void								\
   mmux_emacs_core_ ## STEM ## _finalizer (void * _obj)			\
   {									\
@@ -64,33 +64,35 @@
   emacs_value								\
   Fmmux_emacs_core_make_ ## STEM (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED) \
   {									\
-    if (0) {								\
-      fprintf(stderr, "%s: enter\n", __func__);				\
-    }									\
     assert(nargs == 1);							\
-    ETYPE val = mmux_emacs_core_get_ ## ARG_GETTER_STEM(env, args[0]);	\
+    ARGTYPE val = mmux_emacs_core_get_ ## ARG_GETTER_STEM(env, args[0]); \
 									\
-    return mmux_emacs_core_make_ ## STEM(env, (CTYPE)val);		\
+    if ((MMUX_EMACS_CORE_ ## CAPSTEM ## _MIN <= val) &&			\
+	(val <= MMUX_EMACS_CORE_ ## CAPSTEM ## _MAX)) {			\
+      return mmux_emacs_core_make_ ## STEM(env, (CTYPE)val);		\
+    } else {								\
+      return mmux_emacs_core_error_value_out_of_range(env);		\
+    }									\
   }
 
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(uint,	unsigned int,		intmax_t,     integer)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(sint,        signed int,		intmax_t,     integer)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(ulong,	unsigned long int,	intmax_t,     integer)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(slong,         signed long int,	intmax_t,     integer)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(ullong,	unsigned long long int,	intmax_t,     integer)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(sllong,        signed long long int,	intmax_t,     integer)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(uint32,	uint32_t,		intmax_t,     integer)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(sint32,       int32_t,		intmax_t,     integer)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(uint64,	uint64_t,		intmax_t,     integer)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(sint64,	 int64_t,		intmax_t,     integer)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(uintmax,	uintmax_t,		intmax_t,     integer)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(sintmax,	 intmax_t,		intmax_t,     integer)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(usize,	 size_t,		intmax_t,     integer)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(ssize,	ssize_t,		intmax_t,     integer)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(ptrdiff,	ptrdiff_t,		intmax_t,     integer)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(wchar,	wchar_t,		intmax_t,     integer)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(float,	float,			double,	      double)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(long_double,	long double,		double,	      double)
+MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(wchar,	WCHAR,		wchar_t,		int64_t,	sint64)
+MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(uint,	UINT,		unsigned int,		uint64_t,	uint64)
+MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(sint,	SINT,             signed int,		int64_t,	sint64)
+MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(ulong,	ULONG,		unsigned long int,	uint64_t,	uint64)
+MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(slong,	SLONG,            signed long int,	int64_t,	sint64)
+MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(ullong,	ULLONG,		unsigned long long int,	uint64_t,	uint64)
+MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(sllong,	SLLONG,           signed long long int,	int64_t,	sint64)
+MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(uint32,	UINT32,		uint32_t,		uint64_t,	uint64)
+MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(sint32,	SINT32,          int32_t,		int64_t,	sint64)
+MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(uint64,	UINT64,		uint64_t,		uint64_t,	uint64)
+MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(sint64,	SINT64,		 int64_t,		int64_t,	sint64)
+MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(uintmax,	UINTMAX,	uintmax_t,		uint64_t,	uint64)
+MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(sintmax,	SINTMAX,	 intmax_t,		int64_t,	sint64)
+MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(usize,	USIZE,		 size_t,		uint64_t,	uint64)
+MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(ssize,	SSIZE,		ssize_t,		int64_t,	sint64)
+MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(ptrdiff,	PTRDIFF,	ptrdiff_t,		int64_t,	sint64)
+MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(float,	FLOAT,		float,			long double,    long_double)
+MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(long_double,	LONG_DOUBLE,	long double,		long double,	long_double)
 
 
 /** --------------------------------------------------------------------
@@ -110,9 +112,9 @@ static emacs_value
 Fmmux_emacs_core_make_bytevector (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
 {
   assert(nargs == 3);
-  size_t	number_of_slots		= (size_t)mmux_emacs_core_get_integer(env, args[0]);
-  size_t	slot_size		= (size_t)mmux_emacs_core_get_integer(env, args[1]);
-  int		hold_signed_values	= (int)   mmux_emacs_core_get_integer(env, args[2]);
+  size_t	number_of_slots		= (size_t)mmux_emacs_core_extract_integer(env, args[0]);
+  size_t	slot_size		= (size_t)mmux_emacs_core_extract_integer(env, args[1]);
+  int		hold_signed_values	= (int)   mmux_emacs_core_extract_integer(env, args[2]);
   mmux_emacs_core_bytevector_t	* obj;
 
   errno = 0;

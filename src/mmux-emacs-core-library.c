@@ -103,28 +103,28 @@ Fmmux_emacs_core_version_interface_age (MMUX_EMACS_IFACE_FUNCTION_UNUSED_ARGS)
 #define NUMBER_OF_MODULE_FUNCTIONS	4
 static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNCTIONS] = {
   {
-    .name		= "mmux-core-version-string",
+    .name		= "mmec-version-string",
     .implementation	= Fmmux_emacs_core_version_string,
     .min_arity		= 0,
     .max_arity		= 0,
     .documentation	= "Return the version string."
   },
   {
-    .name		= "mmux-core-version-interface-current",
+    .name		= "mmec-version-interface-current",
     .implementation	= Fmmux_emacs_core_version_interface_current,
     .min_arity		= 0,
     .max_arity		= 0,
     .documentation	= "Return the interface version current number."
   },
   {
-    .name		= "mmux-core-version-interface-revision",
+    .name		= "mmec-version-interface-revision",
     .implementation	= Fmmux_emacs_core_version_interface_revision,
     .min_arity		= 0,
     .max_arity		= 0,
     .documentation	= "Return the interface version revision number."
   },
   {
-    .name		= "mmux-core-version-interface-age",
+    .name		= "mmec-version-interface-age",
     .implementation	= Fmmux_emacs_core_version_interface_age,
     .min_arity		= 0,
     .max_arity		= 0,

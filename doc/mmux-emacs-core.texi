@@ -153,6 +153,7 @@ included in the section entitled ``@gnu{} Free Documentation License''.
 * ctypes::                      Object wrappers for C language types.
 * bytevectors::                 Bytevector objects.
 * errors::                      How errors are signalled.
+* capi::                        C language programming interface.
 
 Appendices
 
@@ -234,22 +235,22 @@ explanation of interface numbers as managed by @gnu{} Libtool @xref{Libtool vers
 Libtool's versioning system, libtool, Shared library support for @gnu{}}.
 
 
-@defun mmux-core-version-string
+@defun mmec-version-string
 Return a string representing the interface version number.
 @end defun
 
 
-@defun mmux-core-version-interface-current
+@defun mmec-version-interface-current
 Return an integer representing the library interface current number.
 @end defun
 
 
-@defun mmux-core-version-interface-revision
+@defun mmec-version-interface-revision
 Return an integer representing the library interface current revision number.
 @end defun
 
 
-@defun mmux-core-version-interface-age
+@defun mmec-version-interface-age
 Return an integer representing the library interface current age.
 @end defun
 
@@ -986,12 +987,6 @@ Return true if @var{obj} is an instance of @objtype{cc-char}, otherwise return f
 Given an instance of @objtype{cc-char}: return the exact integer representing its @ascii{} code.
 @end defun
 
-
-@defun cc-char-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{char}.
-@end defun
-
 @c page
 @node ctypes typedefs schar
 @subsection Wrapper for @code{signed char}
@@ -1020,12 +1015,6 @@ Return true if @var{obj} is an instance of @objtype{cc-schar}, otherwise return 
 
 @defun cc-schar-obj @var{CH}
 Given an instance of @objtype{cc-schar}: return the exact integer representing its @ascii{} code.
-@end defun
-
-
-@defun cc-schar-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{signed char}.
 @end defun
 
 @c page
@@ -1058,12 +1047,6 @@ Return true if @var{obj} is an instance of @objtype{cc-uchar}, otherwise return 
 Given an instance of @objtype{cc-uchar}: return the exact integer representing its @ascii{} code.
 @end defun
 
-
-@defun cc-uchar-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{unsigned char}.
-@end defun
-
 @c page
 @node ctypes typedefs wchar
 @subsection Wrapper for @code{wchar_t}
@@ -1094,12 +1077,6 @@ Return true if @var{obj} is an instance of @objtype{cc-wchar}, otherwise return 
 Given an instance of @objtype{cc-wchar}: return the exact integer representing its @ascii{} code.
 @end defun
 
-
-@defun cc-wchar-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{wchar_t}.
-@end defun
-
 @c page
 @node ctypes typedefs sshrt
 @subsection Wrapper for @code{signed short int}
@@ -1108,33 +1085,27 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-signed-short-int
+@deftp {Object Type} cc-sshrt
 @deftpx {Parent Type} cc-signed-integer
 Object wrapper for the C language type @code{signed short int}.
 @end deftp
 
 
-@deffn {Generic Function} cc-signed-short-int (@var{INIT})
-@deffnx {Method} cc-signed-short-int ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-signed-short-int} initialised with @var{INIT}, which
+@deffn {Generic Function} cc-sshrt (@var{INIT})
+@deffnx {Method} cc-sshrt ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-sshrt} initialised with @var{INIT}, which
 must be an exact integer object in the range of the C language type @code{signed short int}.
 @end deffn
 
 
-@defun cc-signed-short-int-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-signed-short-int}, otherwise return false.
+@defun cc-sshrt-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-sshrt}, otherwise return false.
 @end defun
 
 
-@defun cc-signed-short-int-obj @var{CH}
-Given an instance of @objtype{cc-signed-short-int}: return the exact integer representing its
+@defun cc-sshrt-obj @var{CH}
+Given an instance of @objtype{cc-sshrt}: return the exact integer representing its
 @ascii{} code.
-@end defun
-
-
-@defun cc-signed-short-int-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{signed short int}.
 @end defun
 
 @c page
@@ -1145,33 +1116,27 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-unsigned-short-int
+@deftp {Object Type} cc-ushrt
 @deftpx {Parent Type} cc-unsigned-integer
 Object wrapper for the C language type @code{unsigned short int}.
 @end deftp
 
 
-@deffn {Generic Function} cc-unsigned-short-int (@var{INIT})
-@deffnx {Method} cc-unsigned-short-int ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-unsigned-short-int} initialised with @var{INIT},
+@deffn {Generic Function} cc-ushrt (@var{INIT})
+@deffnx {Method} cc-ushrt ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-ushrt} initialised with @var{INIT},
 which must be an exact integer object in the range of the C language type @code{unsigned short int}.
 @end deffn
 
 
-@defun cc-unsigned-short-int-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-unsigned-short-int}, otherwise return false.
+@defun cc-ushrt-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-ushrt}, otherwise return false.
 @end defun
 
 
-@defun cc-unsigned-short-int-obj @var{CH}
-Given an instance of @objtype{cc-unsigned-short-int}: return the exact integer representing its
+@defun cc-ushrt-obj @var{CH}
+Given an instance of @objtype{cc-ushrt}: return the exact integer representing its
 @ascii{} code.
-@end defun
-
-
-@defun cc-unsigned-short-int-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{unsigned short int}.
 @end defun
 
 @c page
@@ -1182,33 +1147,27 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-signed-int
+@deftp {Object Type} cc-sint
 @deftpx {Parent Type} cc-signed-integer
 Object wrapper for the C language type @code{signed int}.
 @end deftp
 
 
-@deffn {Generic Function} cc-signed-int (@var{INIT})
-@deffnx {Method} cc-signed-int ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-signed-int} initialised with @var{INIT}, which
+@deffn {Generic Function} cc-sint (@var{INIT})
+@deffnx {Method} cc-sint ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-sint} initialised with @var{INIT}, which
 must be an exact integer object in the range of the C language type @code{signed int}.
 @end deffn
 
 
-@defun cc-signed-int-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-signed-int}, otherwise return false.
+@defun cc-sint-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-sint}, otherwise return false.
 @end defun
 
 
-@defun cc-signed-int-obj @var{CH}
-Given an instance of @objtype{cc-signed-int}: return the its internal representation as
+@defun cc-sint-obj @var{CH}
+Given an instance of @objtype{cc-sint}: return the its internal representation as
 user--pointer object.
-@end defun
-
-
-@defun cc-signed-int-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{signed int}.
 @end defun
 
 @c page
@@ -1219,33 +1178,27 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-unsigned-int
+@deftp {Object Type} cc-uint
 @deftpx {Parent Type} cc-unsigned-integer
 Object wrapper for the C language type @code{unsigned int}.
 @end deftp
 
 
-@deffn {Generic Function} cc-unsigned-int (@var{INIT})
-@deffnx {Method} cc-unsigned-int ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-unsigned-int} initialised with @var{INIT}, which must
+@deffn {Generic Function} cc-uint (@var{INIT})
+@deffnx {Method} cc-uint ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-uint} initialised with @var{INIT}, which must
 be an exact integer object in the range of the C language type @code{unsigned int}.
 @end deffn
 
 
-@defun cc-unsigned-int-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-unsigned-int}, otherwise return false.
+@defun cc-uint-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-uint}, otherwise return false.
 @end defun
 
 
-@defun cc-unsigned-int-obj @var{CH}
-Given an instance of @objtype{cc-unsigned-int}: return the its internal representation as
+@defun cc-uint-obj @var{CH}
+Given an instance of @objtype{cc-uint}: return the its internal representation as
 user--pointer object.
-@end defun
-
-
-@defun cc-unsigned-int-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{unsigned int}.
 @end defun
 
 @c page
@@ -1256,33 +1209,27 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-signed-long-int
+@deftp {Object Type} cc-sllong
 @deftpx {Parent Type} cc-signed-integer
 Object wrapper for the C language type @code{signed long int}.
 @end deftp
 
 
-@deffn {Generic Function} cc-signed-long-int (@var{INIT})
-@deffnx {Method} cc-signed-long-int ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-signed-long-int} initialised with @var{INIT}, which
+@deffn {Generic Function} cc-sllong (@var{INIT})
+@deffnx {Method} cc-sllong ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-sllong} initialised with @var{INIT}, which
 must be an exact integer object in the range of the C language type @code{signed long int}.
 @end deffn
 
 
-@defun cc-signed-long-int-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-signed-long-int}, otherwise return false.
+@defun cc-sllong-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-sllong}, otherwise return false.
 @end defun
 
 
-@defun cc-signed-long-int-obj @var{CH}
-Given an instance of @objtype{cc-signed-long-int}: return the its internal representation as
+@defun cc-sllong-obj @var{CH}
+Given an instance of @objtype{cc-sllong}: return the its internal representation as
 user--pointer object.
-@end defun
-
-
-@defun cc-signed-long-int-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{signed long int}.
 @end defun
 
 @c page
@@ -1293,33 +1240,27 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-unsigned-long-int
+@deftp {Object Type} cc-ulong
 @deftpx {Parent Type} cc-unsigned-integer
 Object wrapper for the C language type @code{unsigned long int}.
 @end deftp
 
 
-@deffn {Generic Function} cc-unsigned-long-int (@var{INIT})
-@deffnx {Method} cc-unsigned-long-int ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-unsigned-long-int} initialised with @var{INIT}, which
+@deffn {Generic Function} cc-ulong (@var{INIT})
+@deffnx {Method} cc-ulong ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-ulong} initialised with @var{INIT}, which
 must be an exact integer object in the range of the C language type @code{unsigned long int}.
 @end deffn
 
 
-@defun cc-unsigned-long-int-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-unsigned-long-int}, otherwise return false.
+@defun cc-ulong-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-ulong}, otherwise return false.
 @end defun
 
 
-@defun cc-unsigned-long-int-obj @var{CH}
-Given an instance of @objtype{cc-unsigned-long-int}: return the its internal representation as
+@defun cc-ulong-obj @var{CH}
+Given an instance of @objtype{cc-ulong}: return the its internal representation as
 user--pointer object.
-@end defun
-
-
-@defun cc-unsigned-long-int-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{unsigned long int}.
 @end defun
 
 @c page
@@ -1330,35 +1271,29 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-signed-long-long-int
+@deftp {Object Type} cc-sllong
 @deftpx {Parent Type} cc-signed-integer
 Object wrapper for the C language type @code{signed long long int}.
 @end deftp
 
 
-@deffn {Generic Function} cc-signed-long-long-int (@var{INIT})
-@deffnx {Method} cc-signed-long-long-int ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-signed-long-long-int} initialised with @var{INIT},
+@deffn {Generic Function} cc-sllong (@var{INIT})
+@deffnx {Method} cc-sllong ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-sllong} initialised with @var{INIT},
 which must be an exact integer object in the range of the C language type @code{signed long long
 int}.
 @end deffn
 
 
-@defun cc-signed-long-long-int-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-signed-long-long-int}, otherwise return
+@defun cc-sllong-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-sllong}, otherwise return
 false.
 @end defun
 
 
-@defun cc-signed-long-long-int-obj @var{CH}
-Given an instance of @objtype{cc-signed-long-long-int}: return the its internal representation as
+@defun cc-sllong-obj @var{CH}
+Given an instance of @objtype{cc-sllong}: return the its internal representation as
 user--pointer object.
-@end defun
-
-
-@defun cc-signed-long-long-int-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{signed long long int}.
 @end defun
 
 @c page
@@ -1369,35 +1304,29 @@ Return true if @var{OBJ} is an exact integer object and it is in the range repre
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-unsigned-long-long-int
+@deftp {Object Type} cc-ullong
 @deftpx {Parent Type} cc-unsigned-integer
 Object wrapper for the C language type @code{unsigned long long int}.
 @end deftp
 
 
-@deffn {Generic Function} cc-unsigned-long-long-int (@var{INIT})
-@deffnx {Method} cc-unsigned-long-long-int ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-unsigned-long-long-int} initialised with @var{INIT},
+@deffn {Generic Function} cc-ullong (@var{INIT})
+@deffnx {Method} cc-ullong ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-ullong} initialised with @var{INIT},
 which must be an exact integer object in the range of the C language type @code{unsigned long long
 int}.
 @end deffn
 
 
-@defun cc-unsigned-long-long-int-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-unsigned-long-long-int}, otherwise return
+@defun cc-ullong-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-ullong}, otherwise return
 false.
 @end defun
 
 
-@defun cc-unsigned-long-long-int-obj @var{CH}
-Given an instance of @objtype{cc-unsigned-long-long-int}: return the its internal representation as
+@defun cc-ullong-obj @var{CH}
+Given an instance of @objtype{cc-ullong}: return the its internal representation as
 user--pointer object.
-@end defun
-
-
-@defun cc-unsigned-long-long-int-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{unsigned long long int}.
 @end defun
 
 @c page
@@ -1431,12 +1360,6 @@ Given an instance of @objtype{cc-ssize}: return the its internal representation 
 object.
 @end defun
 
-
-@defun cc-ssize-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{ssize_t}.
-@end defun
-
 @c page
 @node ctypes typedefs usize
 @subsection Wrapper for @code{size_t}
@@ -1466,12 +1389,6 @@ Return true if @var{obj} is an instance of @objtype{cc-usize}, otherwise return 
 @defun cc-usize-obj @var{CH}
 Given an instance of @objtype{cc-usize}: return the its internal representation as user--pointer
 object.
-@end defun
-
-
-@defun cc-usize-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{size_t}.
 @end defun
 
 @c page
@@ -1505,12 +1422,6 @@ Given an instance of @objtype{cc-sintmax}: return the its internal representatio
 object.
 @end defun
 
-
-@defun cc-sintmax-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{intmax_t}.
-@end defun
-
 @c page
 @node ctypes typedefs uintmax
 @subsection Wrapper for @code{uintmax_t}
@@ -1540,12 +1451,6 @@ Return true if @var{obj} is an instance of @objtype{cc-uintmax}, otherwise retur
 @defun cc-uintmax-obj @var{CH}
 Given an instance of @objtype{cc-uintmax}: return the its internal representation as user--pointer
 object.
-@end defun
-
-
-@defun cc-uintmax-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{uintmax}.
 @end defun
 
 @c page
@@ -1579,12 +1484,6 @@ Given an instance of @objtype{cc-ptrdiff}: return the its internal representatio
 object.
 @end defun
 
-
-@defun cc-ptrdiff-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{ptrdiff}.
-@end defun
-
 @c page
 @node ctypes typedefs sint8
 @subsection Wrapper for @code{int8_t}
@@ -1614,12 +1513,6 @@ Return true if @var{obj} is an instance of @objtype{cc-sint8}, otherwise return 
 @defun cc-sint8-obj @var{CH}
 Given an instance of @objtype{cc-sint8}: return the its internal representation as user--pointer
 object.
-@end defun
-
-
-@defun cc-sint8-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{int8_t}.
 @end defun
 
 @c page
@@ -1653,12 +1546,6 @@ Given an instance of @objtype{cc-uint8}: return the its internal representation 
 object.
 @end defun
 
-
-@defun cc-uint8-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{uint8_t}.
-@end defun
-
 @c page
 @node ctypes typedefs sint16
 @subsection Wrapper for @code{int16_t}
@@ -1688,12 +1575,6 @@ Return true if @var{obj} is an instance of @objtype{cc-sint16}, otherwise return
 @defun cc-sint16-obj @var{CH}
 Given an instance of @objtype{cc-sint16}: return the its internal representation as user--pointer
 object.
-@end defun
-
-
-@defun cc-sint16-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{int16_t}.
 @end defun
 
 @c page
@@ -1727,12 +1608,6 @@ Given an instance of @objtype{cc-uint16}: return the its internal representation
 object.
 @end defun
 
-
-@defun cc-uint16-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{uint16_t}.
-@end defun
-
 @c page
 @node ctypes typedefs sint32
 @subsection Wrapper for @code{int32_t}
@@ -1762,12 +1637,6 @@ Return true if @var{obj} is an instance of @objtype{cc-sint32}, otherwise return
 @defun cc-sint32-obj @var{CH}
 Given an instance of @objtype{cc-sint32}: return the its internal representation as user--pointer
 object.
-@end defun
-
-
-@defun cc-sint32-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{int32_t}.
 @end defun
 
 @c page
@@ -1801,12 +1670,6 @@ Given an instance of @objtype{cc-uint32}: return the its internal representation
 object.
 @end defun
 
-
-@defun cc-uint32-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{uint32_t}.
-@end defun
-
 @c page
 @node ctypes typedefs sint64
 @subsection Wrapper for @code{int64_t}
@@ -1836,12 +1699,6 @@ Return true if @var{obj} is an instance of @objtype{cc-sint64}, otherwise return
 @defun cc-sint64-obj @var{CH}
 Given an instance of @objtype{cc-sint64}: return the its internal representation as user--pointer
 object.
-@end defun
-
-
-@defun cc-sint64-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{int64_t}.
 @end defun
 
 @c page
@@ -1875,12 +1732,6 @@ Given an instance of @objtype{cc-uint64}: return the its internal representation
 object.
 @end defun
 
-
-@defun cc-uint64-range-p @var{OBJ}
-Return true if @var{OBJ} is an exact integer object and it is in the range representable by
-@code{uint64_t}.
-@end defun
-
 @c page
 @node ctypes typedefs float
 @subsection Wrapper for @code{float}
@@ -1912,12 +1763,6 @@ Given an instance of @objtype{cc-float}: return the its internal representation 
 object.
 @end defun
 
-
-@defun cc-float-range-p @var{OBJ}
-Return true if @var{OBJ} is a floating--point object and it is in the range representable by
-@code{float}.
-@end defun
-
 @c page
 @node ctypes typedefs long double
 @subsection Wrapper for @code{long double}
@@ -1947,12 +1792,6 @@ Return true if @var{obj} is an instance of @objtype{cc-long-double}, otherwise r
 @defun cc-long-double-obj @var{CH}
 Given an instance of @objtype{cc-long-double}: return the its internal representation as
 user--pointer object.
-@end defun
-
-
-@defun cc-long-double-range-p @var{OBJ}
-Return true if @var{OBJ} is a floating--point object and it is in the range representable by
-@code{long double}.
 @end defun
 
 @c page
@@ -2438,40 +2277,159 @@ Occasionally the functions in @value{PACKAGE} signal an error; the following err
 defined.
 
 
-@defvr {Error Symbol} mmux-core-error
+@defvr {Error Symbol} mmec-error
 The base type of all the error symbols.
 @end defvr
 
 
-@defvr {Error Symbol} mmux-core-no-memory-error
-@defvrx {Parent Error Symbol} mmux-core-error
+@menu
+* errors constructor::          Constructor errors.
+* errors range::                Range errors.
+* errors operations::           Operation errors.
+@end menu
+
+@c page
+@node errors constructor
+@section Constructor errors
+
+
+@defvr {Error Symbol} mmec-error-constructor
+@defvrx {Parent Error Symbol} mmec-error
+An error occurred while constructing an object.
+@end defvr
+
+
+@defvr {Error Symbol} mmec-error-no-memory
+@defvrx {Parent Error Symbol} mmec-error-constructor
 Used to signal that there was not enough memory to allocate an object.
 @end defvr
 
 
-@defvr {Error Symbol} mmux-core-index-out-of-range
-@defvrx {Parent Error Symbol} mmux-core-error
+@defvr {Error Symbol} mmec-error-instantiating-abstract-type
+@defvrx {Parent Error Symbol} mmec-error-constructor
+An attempt was performed to instantiate an abstract data type.
+@end defvr
+
+
+@defvr {Error Symbol} mmec-error-unsupported-init-type
+@defvrx {Parent Error Symbol} mmec-error-constructor
+An argument given to an object constructor has an unsupported type.
+@end defvr
+
+@c page
+@node errors range
+@section Range errors
+
+
+@defvr {Error Symbol} mmec-error-value-out-of-range
+@defvrx {Parent Error Symbol} mmec-error
+A numeric object is out of range.
+@end defvr
+
+
+@defvr {Error Symbol} mmec-error-index-out-of-range
+@defvrx {Parent Error Symbol} mmec-error-value-out-of-range
 Used to signal an attempt to access the internal represenation of an object with an index out of
 range.
 @end defvr
 
 
-@defvr {Error Symbol} mmux-core-bytevector-index-out-of-range
-@defvrx {Parent Error Symbol} mmux-core-index-out-of-range
+@defvr {Error Symbol} mmec-error-bytevector-index-out-of-range
+@defvrx {Parent Error Symbol} mmec-error-index-out-of-range
 Attempt to access the internal represenation of a bytevector object with an index out of range.
 @end defvr
 
-
-@defvr {Error Symbol} mmux-core-instantiating-abstract-type
-@defvrx {Parent Error Symbol} mmux-core-error
-An attempt was performed to instantiate an abstract data type.
-@end defvr
+@c page
+@node errors operations
+@section Operation errors
 
 
-@defvr {Error Symbol} mmux-core-signed/unsigned-integer-comparison
-@defvrx {Parent Error Symbol} mmux-core-error
+@defvr {Error Symbol} mmec-error-signed/unsigned-integer-comparison
+@defvrx {Parent Error Symbol} mmec-error
 Cannot compare a signed integer with an unsigned integer.
 @end defvr
+
+@c page
+@node capi
+@chapter C language programming interface
+
+
+@menu
+* capi errors::                 Signalling errors.
+@end menu
+
+@c page
+@node capi errors
+@section Signalling errors
+
+
+@menu
+* capi errors base::            Signalling base errors.
+* capi errors constructor::     Signalling constructor errors.
+* capi errors range::           Signalling range errors.
+* capi errors operations::      Signalling operation errors.
+@end menu
+
+@c page
+@node capi errors base
+@subsection Signalling base errors
+
+
+@deftypefun emacs_value mmux_emacs_core_base (emacs_env * @var{env})
+Signal an error with error symbol @code{mmec-error} then return @nil{}.
+@end deftypefun
+
+@c page
+@node capi errors constructor
+@subsection Signalling constructor errors
+
+
+@deftypefun emacs_value mmux_emacs_core_error_constructor (emacs_env * @var{env})
+Signal an error with symbol @code{mmec-error-constructor} then return @nil{}.
+@end deftypefun
+
+
+@deftypefun emacs_value mmux_emacs_core_error_memory_allocation (emacs_env * @var{env})
+Signal an error with symbol @code{mmec-error-no-memory} then return @nil{}.
+@end deftypefun
+
+
+@deftypefun emacs_value mmux_emacs_core_error_instantiating_abstract_type (emacs_env * @var{env})
+Signal an error with symbol @code{mmec-error-instantiating-abstract-type} then return @nil{}.
+@end deftypefun
+
+
+@deftypefun emacs_value mmux_emacs_core_error_unsupported_init_type (emacs_env * @var{env})
+Signal an error with symbol @code{mmec-error-unsupported-init-type} then return @nil{}.
+@end deftypefun
+
+@c page
+@node capi errors range
+@subsection Signalling range errors
+
+
+@deftypefun emacs_value mmux_emacs_core_error_value_out_of_range (emacs_env * @var{env})
+Signal an error with symbol @code{mmec-error-value-out-of-range} then return @nil{}.
+@end deftypefun
+
+
+@deftypefun emacs_value mmux_emacs_core_error_index_out_of_range (emacs_env * @var{env})
+Signal an error with symbol @code{mmec-error-index-out-of-range} then return @nil{}.
+@end deftypefun
+
+
+@deftypefun emacs_value mmux_emacs_core_error_bytevector_index_out_of_range (emacs_env * @var{env})
+Signal an error with symbol @code{mmec-error-bytevector-index-out-of-range} then return @nil{}.
+@end deftypefun
+
+@c page
+@node capi errors operations
+@subsection Signalling operation errors
+
+
+@deftypefun emacs_value mmux_emacs_core_error_signed_unsigned_integer_comparison (emacs_env * @var{env})
+Signal an error with symbol @code{mmec-error-signed/unsigned-integer-comparison} then return @nil{}.
+@end deftypefun
 
 @c page
 @c ------------------------------------------------------------

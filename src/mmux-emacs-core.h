@@ -91,11 +91,8 @@ extern "C" {
 
 
 /** --------------------------------------------------------------------
- ** Constants and preprocessor macros.
+ ** Constants.
  ** ----------------------------------------------------------------- */
-
-#define MMUX_EMACS_CORE_PC(POINTER_TYPE, POINTER_NAME, EXPRESSION)	\
-  POINTER_TYPE * POINTER_NAME = (POINTER_TYPE *) (EXPRESSION)
 
 
 /** --------------------------------------------------------------------
@@ -115,6 +112,71 @@ mmux_emacs_core_decl int		mmux_emacs_core_version_interface_age		(void);
 #undef  MMUX_EMACS_IFACE_FUNCTION_UNUSED_ARGS
 #define MMUX_EMACS_IFACE_FUNCTION_UNUSED_ARGS \
   emacs_env *env, ptrdiff_t nargs MMUX_EMACS_CORE_UNUSED, emacs_value args[] MMUX_EMACS_CORE_UNUSED, void *data MMUX_EMACS_CORE_UNUSED
+
+#define MMUX_EMACS_CORE_PC(POINTER_TYPE, POINTER_NAME, EXPRESSION)	\
+  POINTER_TYPE * POINTER_NAME = (POINTER_TYPE *) (EXPRESSION)
+
+/* Usage examples:
+ *
+ * MMUX_EMACS_CORE_DEFINE_ERROR_SIGNALER(memory_alloction,
+ *                                       "mmec-error-no-memory-error",
+ *                                       strerror(errno))
+ *
+ * MMUX_EMACS_CORE_DEFINE_ERROR_SIGNALER(instantiating_abstract_type,
+ *                                       "mmec-error-instantiating-abstract-type",
+ *                                       "An attempt was performed to instantiate an abstract data type.")
+ *
+ * Expand into a function definition.  The function signals an error and returns nil.
+ */
+#undef  MMUX_EMACS_CORE_DEFINE_ERROR_SIGNALER
+#define MMUX_EMACS_CORE_DEFINE_ERROR_SIGNALER(NAME, SYMBOL, MESSAGE)	\
+  emacs_value								\
+  mmux_emacs_core_error_ ## NAME (emacs_env * env)			\
+  {									\
+    char const		* errmsg = MESSAGE;				\
+    emacs_value		Serrmsg = mmux_emacs_core_make_string(env, errmsg, strlen(errmsg)); \
+									\
+    env->non_local_exit_signal(env, env->intern(env, SYMBOL), Serrmsg); \
+    return env->intern(env, "nil");					\
+  }
+
+
+/** --------------------------------------------------------------------
+ ** Error signaling functions.
+ ** ----------------------------------------------------------------- */
+
+mmux_emacs_core_decl emacs_value mmux_emacs_core_base (emacs_env * env)
+  __attribute__((__nonnull__(1)));
+
+/* ------------------------------------------------------------------ */
+
+mmux_emacs_core_decl emacs_value mmux_emacs_core_error_constructor (emacs_env * env)
+  __attribute__((__nonnull__(1)));
+
+mmux_emacs_core_decl emacs_value mmux_emacs_core_error_memory_allocation (emacs_env * env)
+  __attribute__((__nonnull__(1)));
+
+mmux_emacs_core_decl emacs_value mmux_emacs_core_error_instantiating_abstract_type (emacs_env * env)
+  __attribute__((__nonnull__(1)));
+
+mmux_emacs_core_decl emacs_value mmux_emacs_core_error_unsupported_init_type (emacs_env * env)
+  __attribute__((__nonnull__(1)));
+
+/* ------------------------------------------------------------------ */
+
+mmux_emacs_core_decl emacs_value mmux_emacs_core_error_value_out_of_range (emacs_env * env)
+  __attribute__((__nonnull__(1)));
+
+mmux_emacs_core_decl emacs_value mmux_emacs_core_error_index_out_of_range (emacs_env * env)
+  __attribute__((__nonnull__(1)));
+
+mmux_emacs_core_decl emacs_value mmux_emacs_core_error_bytevector_index_out_of_range (emacs_env * env)
+  __attribute__((__nonnull__(1)));
+
+/* ------------------------------------------------------------------ */
+
+mmux_emacs_core_decl emacs_value mmux_emacs_core_error_signed_unsigned_integer_comparison (emacs_env * env)
+  __attribute__((__nonnull__(1)));
 
 
 /** --------------------------------------------------------------------
@@ -193,13 +255,13 @@ mmux_emacs_core_get_user_ptr (emacs_env * env, emacs_value arg)
 }
 
 static inline intmax_t
-mmux_emacs_core_get_integer (emacs_env * env, emacs_value arg)
+mmux_emacs_core_extract_integer (emacs_env * env, emacs_value arg)
 {
   return env->extract_integer(env, arg);
 }
 
 static inline double
-mmux_emacs_core_get_double (emacs_env * env, emacs_value arg)
+mmux_emacs_core_extract_double (emacs_env * env, emacs_value arg)
 {
   return env->extract_float(env, arg);
 }
@@ -212,19 +274,19 @@ mmux_emacs_core_get_double (emacs_env * env, emacs_value arg)
 static inline char
 mmux_emacs_core_get_char (emacs_env * env, emacs_value arg)
 {
-  return ((char)(mmux_emacs_core_get_integer(env, arg)));
+  return ((char)(mmux_emacs_core_extract_integer(env, arg)));
 }
 
 static inline signed char
 mmux_emacs_core_get_schar (emacs_env * env, emacs_value arg)
 {
-  return ((signed char)(mmux_emacs_core_get_integer(env, arg)));
+  return ((signed char)(mmux_emacs_core_extract_integer(env, arg)));
 }
 
 static inline unsigned char
 mmux_emacs_core_get_uchar (emacs_env * env, emacs_value arg)
 {
-  return ((unsigned char)(mmux_emacs_core_get_integer(env, arg)));
+  return ((unsigned char)(mmux_emacs_core_extract_integer(env, arg)));
 }
 
 /* ------------------------------------------------------------------ */
@@ -232,13 +294,13 @@ mmux_emacs_core_get_uchar (emacs_env * env, emacs_value arg)
 static inline unsigned short int
 mmux_emacs_core_get_ushrt (emacs_env * env, emacs_value arg)
 {
-  return ((unsigned short int)(mmux_emacs_core_get_integer(env, arg)));
+  return ((unsigned short int)(mmux_emacs_core_extract_integer(env, arg)));
 }
 
 static inline signed short int
 mmux_emacs_core_get_sshrt (emacs_env * env, emacs_value arg)
 {
-  return ((signed short int)(mmux_emacs_core_get_integer(env, arg)));
+  return ((signed short int)(mmux_emacs_core_extract_integer(env, arg)));
 }
 
 /* ------------------------------------------------------------------ */
@@ -246,13 +308,13 @@ mmux_emacs_core_get_sshrt (emacs_env * env, emacs_value arg)
 static inline uint8_t
 mmux_emacs_core_get_uint8 (emacs_env * env, emacs_value arg)
 {
-  return ((uint8_t)(mmux_emacs_core_get_integer(env, arg)));
+  return ((uint8_t)(mmux_emacs_core_extract_integer(env, arg)));
 }
 
 static inline int8_t
 mmux_emacs_core_get_sint8 (emacs_env * env, emacs_value arg)
 {
-  return ((int8_t)(mmux_emacs_core_get_integer(env, arg)));
+  return ((int8_t)(mmux_emacs_core_extract_integer(env, arg)));
 }
 
 /* ------------------------------------------------------------------ */
@@ -260,13 +322,13 @@ mmux_emacs_core_get_sint8 (emacs_env * env, emacs_value arg)
 static inline uint16_t
 mmux_emacs_core_get_uint16 (emacs_env * env, emacs_value arg)
 {
-  return ((uint16_t)(mmux_emacs_core_get_integer(env, arg)));
+  return ((uint16_t)(mmux_emacs_core_extract_integer(env, arg)));
 }
 
 static inline int16_t
 mmux_emacs_core_get_sint16 (emacs_env * env, emacs_value arg)
 {
-  return ((int16_t)(mmux_emacs_core_get_integer(env, arg)));
+  return ((int16_t)(mmux_emacs_core_extract_integer(env, arg)));
 }
 
 
@@ -400,6 +462,8 @@ mmux_emacs_core_make_sint16 (emacs_env * env, int16_t arg)
    (Marco Maggi; Feb  4, 2020)
 */
 
+typedef struct mmux_emacs_core_wchar_t		mmux_emacs_core_wchar_t;
+
 typedef struct mmux_emacs_core_uint32_t		mmux_emacs_core_uint32_t;
 typedef struct mmux_emacs_core_sint32_t		mmux_emacs_core_sint32_t;
 
@@ -422,12 +486,14 @@ typedef struct mmux_emacs_core_sintmax_t	mmux_emacs_core_sintmax_t;
 typedef struct mmux_emacs_core_uintmax_t	mmux_emacs_core_uintmax_t;
 
 typedef struct mmux_emacs_core_ptrdiff_t	mmux_emacs_core_ptrdiff_t;
-typedef struct mmux_emacs_core_wchar_t		mmux_emacs_core_wchar_t;
 
 typedef struct mmux_emacs_core_float_t		mmux_emacs_core_float_t;
+typedef struct mmux_emacs_core_double_t		mmux_emacs_core_double_t;
 typedef struct mmux_emacs_core_long_double_t	mmux_emacs_core_long_double_t;
 
 /* ------------------------------------------------------------------ */
+
+struct mmux_emacs_core_wchar_t		{ wchar_t			val; };
 
 struct mmux_emacs_core_sint32_t		{ int32_t			val; };
 struct mmux_emacs_core_uint32_t		{ uint32_t			val; };
@@ -451,9 +517,9 @@ struct mmux_emacs_core_sintmax_t	{ intmax_t			val; };
 struct mmux_emacs_core_uintmax_t	{ uintmax_t			val; };
 
 struct mmux_emacs_core_ptrdiff_t	{ ptrdiff_t			val; };
-struct mmux_emacs_core_wchar_t		{ wchar_t			val; };
 
 struct mmux_emacs_core_float_t		{ float				val; };
+struct mmux_emacs_core_double_t		{ double			val; };
 struct mmux_emacs_core_long_double_t	{ long double			val; };
 
 /* ------------------------------------------------------------------ */
@@ -629,6 +695,18 @@ static inline float
 mmux_emacs_core_get_float (emacs_env * env, emacs_value arg)
 {
   MMUX_EMACS_CORE_PC(mmux_emacs_core_float_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
+
+  return obj->val;
+}
+
+/* ------------------------------------------------------------------ */
+
+mmux_emacs_core_decl emacs_value mmux_emacs_core_make_double (emacs_env * env, double val);
+
+static inline double
+mmux_emacs_core_get_double (emacs_env * env, emacs_value arg)
+{
+  MMUX_EMACS_CORE_PC(mmux_emacs_core_double_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
 
   return obj->val;
 }

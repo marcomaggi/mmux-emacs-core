@@ -23,6 +23,55 @@
 (require 'cc-core)
 
 
+;;;; helpers
+
+(defmacro my--unsupported-type-error (TYPE UNSUPPORTED-TYPE INIT)
+  `(should (condition-case nil
+	       (,TYPE (,UNSUPPORTED-TYPE ,INIT))
+	     ((mmec-error-unsupported-init-type)
+	      t)
+	     (t nil))))
+
+(defmacro my--init-argument-does-not-fit (TYPE INIT)
+  `(should (condition-case nil
+	       (,TYPE ,INIT)
+	     ((mmec-error-value-out-of-range)
+	      t)
+	     (t nil))))
+
+
+;;;; number objects makers
+
+(ert-deftest cc-number-char ()
+  "Build a `cc-char' object."
+  (should	(cc-fits-char-p	123))
+  (should (not	(cc-fits-char-p	123000)))
+  ;;
+  (should	(cc-char-p	(cc-char 123)))
+  (should	(cc-char-p	(cc-char 123.0)))
+  (should	(cc-char-p	(cc-char (cc-char	123))))
+  (should	(cc-char-p	(cc-char (cc-schar	123))))
+  (should	(cc-char-p	(cc-char (cc-sshrt	123))))
+  (should	(cc-char-p	(cc-char (cc-sint	123))))
+  (should	(cc-char-p	(cc-char (cc-slong	123))))
+  (should	(cc-char-p	(cc-char (cc-sllong	123))))
+  (should	(cc-char-p	(cc-char (cc-sintmax	123))))
+  (should	(cc-char-p	(cc-char (cc-ssize	123))))
+  (should	(cc-char-p	(cc-char (cc-ptrdiff	123))))
+  ;;
+  (my--unsupported-type-error cc-char cc-uchar		123)
+  (my--unsupported-type-error cc-char cc-wchar		123)
+  (my--unsupported-type-error cc-char cc-ushrt		123)
+  (my--unsupported-type-error cc-char cc-uint		123)
+  (my--unsupported-type-error cc-char cc-ulong		123)
+  (my--unsupported-type-error cc-char cc-ullong		123)
+  (my--unsupported-type-error cc-char cc-uintmax	123)
+  (my--unsupported-type-error cc-char cc-usize		123)
+  ;;
+  (my--init-argument-does-not-fit cc-char 1230)
+  )
+
+
 ;;;; bytevector makers
 
 (ert-deftest cc-bytevector-u8 ()
@@ -40,7 +89,7 @@
   (should (not	(cc-bytevector-s64-p		(cc-bytevector-u8 123))))
   (should (not	(cc-bytevector-float-p		(cc-bytevector-u8 123))))
   (should (not	(cc-bytevector-double-p		(cc-bytevector-u8 123))))
-  (should (not	(cc-bytevector-long-double-p	(cc-bytevector-u8 123)))))
+  (should (not	(cc-bytevector-ldouble-p	(cc-bytevector-u8 123)))))
 
 (ert-deftest cc-bytevector-s8 ()
   "Build a `cc-bytevector-s8' object."
@@ -57,7 +106,7 @@
   (should (not	(cc-bytevector-s64-p		(cc-bytevector-s8 123))))
   (should (not	(cc-bytevector-float-p		(cc-bytevector-s8 123))))
   (should (not	(cc-bytevector-double-p		(cc-bytevector-s8 123))))
-  (should (not	(cc-bytevector-long-double-p	(cc-bytevector-s8 123)))))
+  (should (not	(cc-bytevector-ldouble-p	(cc-bytevector-s8 123)))))
 
 ;;; --------------------------------------------------------------------
 
@@ -76,7 +125,7 @@
   (should (not	(cc-bytevector-s64-p		(cc-bytevector-u16 123))))
   (should (not	(cc-bytevector-float-p		(cc-bytevector-u16 123))))
   (should (not	(cc-bytevector-double-p		(cc-bytevector-u16 123))))
-  (should (not	(cc-bytevector-long-double-p	(cc-bytevector-u16 123)))))
+  (should (not	(cc-bytevector-ldouble-p	(cc-bytevector-u16 123)))))
 
 (ert-deftest cc-bytevector-s16 ()
   "Build a `cc-bytevector-s16' object."
@@ -93,7 +142,7 @@
   (should (not	(cc-bytevector-s64-p		(cc-bytevector-s16 123))))
   (should (not	(cc-bytevector-float-p		(cc-bytevector-s16 123))))
   (should (not	(cc-bytevector-double-p		(cc-bytevector-s16 123))))
-  (should (not	(cc-bytevector-long-double-p	(cc-bytevector-s16 123)))))
+  (should (not	(cc-bytevector-ldouble-p	(cc-bytevector-s16 123)))))
 
 ;;; --------------------------------------------------------------------
 
@@ -112,7 +161,7 @@
   (should (not	(cc-bytevector-s64-p		(cc-bytevector-u32 123))))
   (should (not	(cc-bytevector-float-p		(cc-bytevector-u32 123))))
   (should (not	(cc-bytevector-double-p		(cc-bytevector-u32 123))))
-  (should (not	(cc-bytevector-long-double-p	(cc-bytevector-u32 123)))))
+  (should (not	(cc-bytevector-ldouble-p	(cc-bytevector-u32 123)))))
 
 (ert-deftest cc-bytevector-s32 ()
   "Build a `cc-bytevector-s32' object."
@@ -129,7 +178,7 @@
   (should (not	(cc-bytevector-s64-p		(cc-bytevector-s32 123))))
   (should (not	(cc-bytevector-float-p		(cc-bytevector-s32 123))))
   (should (not	(cc-bytevector-double-p		(cc-bytevector-s32 123))))
-  (should (not	(cc-bytevector-long-double-p	(cc-bytevector-s32 123)))))
+  (should (not	(cc-bytevector-ldouble-p	(cc-bytevector-s32 123)))))
 
 ;;; --------------------------------------------------------------------
 
@@ -148,7 +197,7 @@
   (should (not	(cc-bytevector-s64-p		(cc-bytevector-u64 123))))
   (should (not	(cc-bytevector-float-p		(cc-bytevector-u64 123))))
   (should (not	(cc-bytevector-double-p		(cc-bytevector-u64 123))))
-  (should (not	(cc-bytevector-long-double-p	(cc-bytevector-u64 123)))))
+  (should (not	(cc-bytevector-ldouble-p	(cc-bytevector-u64 123)))))
 
 (ert-deftest cc-bytevector-s64 ()
   "Build a `cc-bytevector-642' object."
@@ -165,7 +214,7 @@
   (should 	(cc-bytevector-s64-p		(cc-bytevector-s64 123))))
   (should (not	(cc-bytevector-float-p		(cc-bytevector-s64 123))))
   (should (not	(cc-bytevector-double-p		(cc-bytevector-s64 123))))
-  (should (not	(cc-bytevector-long-double-p	(cc-bytevector-s64 123))))
+  (should (not	(cc-bytevector-ldouble-p	(cc-bytevector-s64 123))))
 
 ;;; --------------------------------------------------------------------
 
@@ -184,7 +233,7 @@
   (should (not	(cc-bytevector-s64-p		(cc-bytevector-float 123))))
   (should 	(cc-bytevector-float-p		(cc-bytevector-float 123)))
   (should (not	(cc-bytevector-double-p		(cc-bytevector-float 123))))
-  (should (not	(cc-bytevector-long-double-p	(cc-bytevector-float 123)))))
+  (should (not	(cc-bytevector-ldouble-p	(cc-bytevector-float 123)))))
 
 (ert-deftest cc-bytevector-double ()
   "Build a `cc-bytevector-double' object."
@@ -201,24 +250,24 @@
   (should (not	(cc-bytevector-s64-p		(cc-bytevector-double 123))))
   (should (not	(cc-bytevector-float-p		(cc-bytevector-double 123))))
   (should 	(cc-bytevector-double-p		(cc-bytevector-double 123)))
-  (should (not	(cc-bytevector-long-double-p	(cc-bytevector-double 123)))))
+  (should (not	(cc-bytevector-ldouble-p	(cc-bytevector-double 123)))))
 
-(ert-deftest cc-bytevector-long-double ()
-  "Build a `cc-bytevector-long-double' object."
-  (should	(cc-bytevector-p		(cc-bytevector-long-double 123)))
-  (should (not	(cc-integer-bytevector-p	(cc-bytevector-long-double 123))))
-  (should 	(cc-float-bytevector-p		(cc-bytevector-long-double 123)))
-  (should (not	(cc-bytevector-u8-p		(cc-bytevector-long-double 123))))
-  (should (not	(cc-bytevector-u16-p		(cc-bytevector-long-double 123))))
-  (should (not	(cc-bytevector-u32-p		(cc-bytevector-long-double 123))))
-  (should (not	(cc-bytevector-u64-p		(cc-bytevector-long-double 123))))
-  (should (not	(cc-bytevector-s8-p		(cc-bytevector-long-double 123))))
-  (should (not	(cc-bytevector-s16-p		(cc-bytevector-long-double 123))))
-  (should (not	(cc-bytevector-s32-p		(cc-bytevector-long-double 123))))
-  (should (not	(cc-bytevector-s64-p		(cc-bytevector-long-double 123))))
-  (should (not	(cc-bytevector-float-p		(cc-bytevector-long-double 123))))
-  (should (not	(cc-bytevector-double-p		(cc-bytevector-long-double 123))))
-  (should 	(cc-bytevector-long-double-p	(cc-bytevector-long-double 123))))
+(ert-deftest cc-bytevector-ldouble ()
+  "Build a `cc-bytevector-ldouble' object."
+  (should	(cc-bytevector-p		(cc-bytevector-ldouble 123)))
+  (should (not	(cc-integer-bytevector-p	(cc-bytevector-ldouble 123))))
+  (should 	(cc-float-bytevector-p		(cc-bytevector-ldouble 123)))
+  (should (not	(cc-bytevector-u8-p		(cc-bytevector-ldouble 123))))
+  (should (not	(cc-bytevector-u16-p		(cc-bytevector-ldouble 123))))
+  (should (not	(cc-bytevector-u32-p		(cc-bytevector-ldouble 123))))
+  (should (not	(cc-bytevector-u64-p		(cc-bytevector-ldouble 123))))
+  (should (not	(cc-bytevector-s8-p		(cc-bytevector-ldouble 123))))
+  (should (not	(cc-bytevector-s16-p		(cc-bytevector-ldouble 123))))
+  (should (not	(cc-bytevector-s32-p		(cc-bytevector-ldouble 123))))
+  (should (not	(cc-bytevector-s64-p		(cc-bytevector-ldouble 123))))
+  (should (not	(cc-bytevector-float-p		(cc-bytevector-ldouble 123))))
+  (should (not	(cc-bytevector-double-p		(cc-bytevector-ldouble 123))))
+  (should 	(cc-bytevector-ldouble-p	(cc-bytevector-ldouble 123))))
 
 
 ;;;; done

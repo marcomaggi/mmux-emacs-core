@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-08 08:24:42 marco>
+;; Time-stamp: <2020-02-10 07:39:15 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -31,18 +31,15 @@
 
 ;;; Code:
 
-(eval-when-compile
+(eval-and-compile
   (require 'cc-constants)
   (require 'cc-basics)
   (require 'cc-number-objects))
-(require 'cc-constants)
-(require 'cc-basics)
-(require 'cc-number-objects)
 
 
 ;;;; bytevector objects: object definitions
 ;;
-;; mmux-core-c-bytevector-make NUMBER-OF-SLOTS SLOT-SIZE SIGNED
+;; mmux-core-c-make-bytevector NUMBER-OF-SLOTS SLOT-SIZE SIGNED
 ;;
 ;;Defined a the C language level.  Build and return a new custom pointer object.
 ;;
@@ -85,7 +82,7 @@
    :number-of-slots		number-of-slots
    :slot-size			1
    :signed			nil
-   :obj				(mmux-core-c-bytevector-make number-of-slots 1 0)
+   :obj				(mmux-core-c-make-bytevector number-of-slots 1 0)
    :number-of-allocated-bytes	(* number-of-slots 1)))
 
 (cl-defstruct (cc-bytevector-s8
@@ -101,7 +98,7 @@
    :number-of-slots		number-of-slots
    :slot-size			1
    :signed			t
-   :obj				(mmux-core-c-bytevector-make number-of-slots 1 1)
+   :obj				(mmux-core-c-make-bytevector number-of-slots 1 1)
    :number-of-allocated-bytes	(* number-of-slots 1)))
 
 ;;; --------------------------------------------------------------------
@@ -119,7 +116,7 @@
    :number-of-slots		number-of-slots
    :slot-size			2
    :signed			nil
-   :obj				(mmux-core-c-bytevector-make number-of-slots 2 0)
+   :obj				(mmux-core-c-make-bytevector number-of-slots 2 0)
    :number-of-allocated-bytes	(* number-of-slots 2)))
 
 (cl-defstruct (cc-bytevector-s16
@@ -135,7 +132,7 @@
    :number-of-slots		number-of-slots
    :slot-size			2
    :signed			t
-   :obj				(mmux-core-c-bytevector-make number-of-slots 2 1)
+   :obj				(mmux-core-c-make-bytevector number-of-slots 2 1)
    :number-of-allocated-bytes	(* number-of-slots 2)))
 
 ;;; --------------------------------------------------------------------
@@ -153,7 +150,7 @@
    :number-of-slots		number-of-slots
    :slot-size			4
    :signed			nil
-   :obj				(mmux-core-c-bytevector-make number-of-slots 4 0)
+   :obj				(mmux-core-c-make-bytevector number-of-slots 4 0)
    :number-of-allocated-bytes	(* number-of-slots 4)))
 
 (cl-defstruct (cc-bytevector-s32
@@ -169,7 +166,7 @@
    :number-of-slots		number-of-slots
    :slot-size			4
    :signed			t
-   :obj				(mmux-core-c-bytevector-make number-of-slots 4 1)
+   :obj				(mmux-core-c-make-bytevector number-of-slots 4 1)
    :number-of-allocated-bytes	(* number-of-slots 4)))
 
 ;;; --------------------------------------------------------------------
@@ -187,7 +184,7 @@
    :number-of-slots		number-of-slots
    :slot-size			8
    :signed			nil
-   :obj				(mmux-core-c-bytevector-make number-of-slots 8 0)
+   :obj				(mmux-core-c-make-bytevector number-of-slots 8 0)
    :number-of-allocated-bytes	(* number-of-slots 8)))
 
 (cl-defstruct (cc-bytevector-s64
@@ -203,7 +200,7 @@
    :number-of-slots		number-of-slots
    :slot-size			8
    :signed			t
-   :obj				(mmux-core-c-bytevector-make number-of-slots 8 1)
+   :obj				(mmux-core-c-make-bytevector number-of-slots 8 1)
    :number-of-allocated-bytes	(* number-of-slots 8)))
 
 ;;; --------------------------------------------------------------------
@@ -220,7 +217,7 @@
   (cc-bytevector-float--make
    :number-of-slots		number-of-slots
    :slot-size			cc-SIZEOF_FLOAT
-   :obj				(mmux-core-c-bytevector-make number-of-slots cc-SIZEOF_FLOAT 1)
+   :obj				(mmux-core-c-make-bytevector number-of-slots cc-SIZEOF_FLOAT 1)
    :number-of-allocated-bytes	(* number-of-slots cc-SIZEOF_FLOAT)))
 
 ;;; --------------------------------------------------------------------
@@ -237,25 +234,25 @@
   (cc-bytevector-double--make
    :number-of-slots		number-of-slots
    :slot-size			cc-SIZEOF_DOUBLE
-   :obj				(mmux-core-c-bytevector-make number-of-slots cc-SIZEOF_DOUBLE 1)
+   :obj				(mmux-core-c-make-bytevector number-of-slots cc-SIZEOF_DOUBLE 1)
    :number-of-allocated-bytes	(* number-of-slots cc-SIZEOF_DOUBLE)))
 
 ;;; --------------------------------------------------------------------
 
-(cl-defstruct (cc-bytevector-long-double
-	       (:constructor	cc-bytevector-long-double--make)
+(cl-defstruct (cc-bytevector-ldouble
+	       (:constructor	cc-bytevector-ldouble--make)
 	       (:include	cc-float-bytevector)))
 
-(cl-defgeneric cc-bytevector-long-double (number-of-slots)
-  "Build and return a new instance of `cc-bytevector-long-double'.")
-(cl-defmethod  cc-bytevector-long-double ((number-of-slots integer))
-  "Build and return a new instance of `cc-bytevector-long-double'."
+(cl-defgeneric cc-bytevector-ldouble (number-of-slots)
+  "Build and return a new instance of `cc-bytevector-ldouble'.")
+(cl-defmethod  cc-bytevector-ldouble ((number-of-slots integer))
+  "Build and return a new instance of `cc-bytevector-ldouble'."
   (cl-assert (<= 0 number-of-slots))
-  (cc-bytevector-long-double--make
+  (cc-bytevector-ldouble--make
    :number-of-slots		number-of-slots
-   :slot-size			cc-SIZEOF_LONG_DOUBLE
-   :obj				(mmux-core-c-bytevector-make number-of-slots cc-SIZEOF_LONG_DOUBLE 1)
-   :number-of-allocated-bytes	(* number-of-slots cc-SIZEOF_LONG_DOUBLE)))
+   :slot-size			cc-SIZEOF_LDOUBLE
+   :obj				(mmux-core-c-make-bytevector number-of-slots cc-SIZEOF_LDOUBLE 1)
+   :number-of-allocated-bytes	(* number-of-slots cc-SIZEOF_LDOUBLE)))
 
 
 ;;;; bytevector objects: getters and setters

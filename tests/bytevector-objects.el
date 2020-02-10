@@ -188,12 +188,12 @@
     (should (= cc-SIZEOF_DOUBLE (cc-bytevector-slot-size bv)))
     (should (= (* 10 cc-SIZEOF_DOUBLE) (cc-bytevector-number-of-allocated-bytes bv)))))
 
-(ert-deftest cc-bytevector-long-double-slots ()
-  "Inspect the slots of a `cc-bytevector-long-double' object."
-  (let ((bv	(cc-bytevector-long-double 10)))
+(ert-deftest cc-bytevector-ldouble-slots ()
+  "Inspect the slots of a `cc-bytevector-ldouble' object."
+  (let ((bv	(cc-bytevector-ldouble 10)))
     (should (= 10 (cc-bytevector-number-of-slots bv)))
-    (should (= cc-SIZEOF_LONG_DOUBLE (cc-bytevector-slot-size bv)))
-    (should (= (* 10 cc-SIZEOF_LONG_DOUBLE) (cc-bytevector-number-of-allocated-bytes bv)))))
+    (should (= cc-SIZEOF_LDOUBLE (cc-bytevector-slot-size bv)))
+    (should (= (* 10 cc-SIZEOF_LDOUBLE) (cc-bytevector-number-of-allocated-bytes bv)))))
 
 
 ;;;; done

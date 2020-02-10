@@ -33,11 +33,71 @@
 
 
 /** --------------------------------------------------------------------
+ ** Constructors for number objects whose internal representation is a built-in "integer".
+ ** ----------------------------------------------------------------- */
+
+/* This is for signed numbers. */
+#undef  MMUX_EMACS_CORE_DEFINE_MAKER_1
+#define MMUX_EMACS_CORE_DEFINE_MAKER_1(STEM, CAPSTEM, ARGSTEM)		\
+  emacs_value								\
+  Fmmux_emacs_core_make_ ## STEM (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED) \
+  {									\
+    assert(nargs == 1);							\
+    mmux_emacs_core_type_ ## ARGSTEM ## _t val =			\
+      mmux_emacs_core_get_ ## ARGSTEM(env, args[0]);			\
+									\
+    if ((MMUX_EMACS_CORE_ ## CAPSTEM ## _MIN <= val) &&			\
+	(val <= MMUX_EMACS_CORE_ ## CAPSTEM ## _MAX)) {			\
+      return mmux_emacs_core_make_integer(env, (mmux_emacs_core_type_ ## STEM ## _t)val); \
+    } else {								\
+      return mmux_emacs_core_error_value_out_of_range(env);		\
+    }									\
+  }
+
+/* This is for unsigned integers. */
+#undef  MMUX_EMACS_CORE_DEFINE_MAKER_2
+#define MMUX_EMACS_CORE_DEFINE_MAKER_2(STEM, CAPSTEM, ARGSTEM)		\
+  emacs_value								\
+  Fmmux_emacs_core_make_ ## STEM (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED) \
+  {									\
+    assert(nargs == 1);							\
+    mmux_emacs_core_type_ ## ARGSTEM ## _t val =			\
+      mmux_emacs_core_get_ ## ARGSTEM(env, args[0]);			\
+									\
+    if (val <= MMUX_EMACS_CORE_ ## CAPSTEM ## _MAX) {			\
+      return mmux_emacs_core_make_integer(env, (mmux_emacs_core_type_ ## STEM ## _t)val); \
+    } else {								\
+      return mmux_emacs_core_error_value_out_of_range(env);		\
+    }									\
+  }
+
+/* This is for signed integer numbers. */
+#undef  MMUX_EMACS_CORE_DEFINE_MAKER_11
+#define MMUX_EMACS_CORE_DEFINE_MAKER_11(STEM, CAPSTEM)		\
+  MMUX_EMACS_CORE_DEFINE_MAKER_1(STEM, CAPSTEM, sint64)
+
+/* This is for unsigned integer numbers. */
+#undef  MMUX_EMACS_CORE_DEFINE_MAKER_21
+#define MMUX_EMACS_CORE_DEFINE_MAKER_21(STEM, CAPSTEM)		\
+  MMUX_EMACS_CORE_DEFINE_MAKER_2(STEM, CAPSTEM, uint64)
+
+MMUX_EMACS_CORE_DEFINE_MAKER_11(char,	CHAR)
+MMUX_EMACS_CORE_DEFINE_MAKER_11(schar,	SCHAR)
+MMUX_EMACS_CORE_DEFINE_MAKER_21(uchar,	UCHAR)
+MMUX_EMACS_CORE_DEFINE_MAKER_11(sshrt,	SSHRT)
+MMUX_EMACS_CORE_DEFINE_MAKER_21(ushrt,	USHRT)
+MMUX_EMACS_CORE_DEFINE_MAKER_11(sint8,	SINT8)
+MMUX_EMACS_CORE_DEFINE_MAKER_21(uint8,	UINT8)
+MMUX_EMACS_CORE_DEFINE_MAKER_11(sint16,	SINT16)
+MMUX_EMACS_CORE_DEFINE_MAKER_21(uint16,	UINT16)
+
+
+/** --------------------------------------------------------------------
  ** User-pointer objects: exact integers not represantable by an intmax_t.
  ** ----------------------------------------------------------------- */
 
-#undef  MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER
-#define MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(STEM, CAPSTEM, CTYPE, ARGTYPE, ARG_GETTER_STEM) \
+#undef  MMUX_EMACS_CORE_DEFINE_ALLOCATOR_AND_FINALIZER
+#define  MMUX_EMACS_CORE_DEFINE_ALLOCATOR_AND_FINALIZER(STEM)		\
   static void								\
   mmux_emacs_core_ ## STEM ## _finalizer (void * _obj)			\
   {									\
@@ -46,7 +106,7 @@
   }									\
 									\
   emacs_value								\
-  mmux_emacs_core_make_ ## STEM (emacs_env *env, CTYPE val)		\
+  mmux_emacs_core_make_ ## STEM (emacs_env *env, mmux_emacs_core_type_ ## STEM ## _t val) \
   {									\
     mmux_emacs_core_ ## STEM ##_t *obj;					\
 									\
@@ -60,39 +120,78 @@
       return mmux_emacs_core_error_memory_allocation(env);		\
     }									\
   }									\
-									\
-  emacs_value								\
-  Fmmux_emacs_core_make_ ## STEM (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED) \
+
+/* This is for signed numbers. */
+#undef  MMUX_EMACS_CORE_DEFINE_MAKER_3
+#define MMUX_EMACS_CORE_DEFINE_MAKER_3(STEM, CAPSTEM, ARGSTEM)		\
+  MMUX_EMACS_CORE_DEFINE_ALLOCATOR_AND_FINALIZER(STEM)			\
+    emacs_value								\
+    Fmmux_emacs_core_make_ ## STEM (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED) \
   {									\
     assert(nargs == 1);							\
-    ARGTYPE val = mmux_emacs_core_get_ ## ARG_GETTER_STEM(env, args[0]); \
+    mmux_emacs_core_type_ ## ARGSTEM ## _t val =			\
+      mmux_emacs_core_get_ ## ARGSTEM(env, args[0]);			\
 									\
     if ((MMUX_EMACS_CORE_ ## CAPSTEM ## _MIN <= val) &&			\
 	(val <= MMUX_EMACS_CORE_ ## CAPSTEM ## _MAX)) {			\
-      return mmux_emacs_core_make_ ## STEM(env, (CTYPE)val);		\
+      return mmux_emacs_core_make_ ## STEM(env, (mmux_emacs_core_type_ ## STEM ## _t)val); \
     } else {								\
       return mmux_emacs_core_error_value_out_of_range(env);		\
     }									\
   }
 
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(wchar,	WCHAR,		wchar_t,		int64_t,	sint64)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(uint,	UINT,		unsigned int,		uint64_t,	uint64)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(sint,	SINT,             signed int,		int64_t,	sint64)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(ulong,	ULONG,		unsigned long int,	uint64_t,	uint64)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(slong,	SLONG,            signed long int,	int64_t,	sint64)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(ullong,	ULLONG,		unsigned long long int,	uint64_t,	uint64)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(sllong,	SLLONG,           signed long long int,	int64_t,	sint64)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(uint32,	UINT32,		uint32_t,		uint64_t,	uint64)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(sint32,	SINT32,          int32_t,		int64_t,	sint64)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(uint64,	UINT64,		uint64_t,		uint64_t,	uint64)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(sint64,	SINT64,		 int64_t,		int64_t,	sint64)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(uintmax,	UINTMAX,	uintmax_t,		uint64_t,	uint64)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(sintmax,	SINTMAX,	 intmax_t,		int64_t,	sint64)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(usize,	USIZE,		 size_t,		uint64_t,	uint64)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(ssize,	SSIZE,		ssize_t,		int64_t,	sint64)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(ptrdiff,	PTRDIFF,	ptrdiff_t,		int64_t,	sint64)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(float,	FLOAT,		float,			long double,    long_double)
-MMUX_EMACS_CORE_DEFINE_MAKER_AND_FINALIZER(long_double,	LONG_DOUBLE,	long double,		long double,	long_double)
+/* This is for unsigned numbers. */
+#undef  MMUX_EMACS_CORE_DEFINE_MAKER_4
+#define MMUX_EMACS_CORE_DEFINE_MAKER_4(STEM, CAPSTEM, ARGSTEM)		\
+  MMUX_EMACS_CORE_DEFINE_ALLOCATOR_AND_FINALIZER(STEM)			\
+    emacs_value								\
+    Fmmux_emacs_core_make_ ## STEM (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED) \
+  {									\
+    assert(nargs == 1);							\
+    mmux_emacs_core_type_ ## ARGSTEM ## _t val =			\
+      mmux_emacs_core_get_ ## ARGSTEM(env, args[0]);			\
+									\
+    if (val <= MMUX_EMACS_CORE_ ## CAPSTEM ## _MAX) {			\
+      return mmux_emacs_core_make_ ## STEM(env, (mmux_emacs_core_type_ ## STEM ## _t)val); \
+    } else {								\
+      return mmux_emacs_core_error_value_out_of_range(env);		\
+    }									\
+  }
+
+/* This is for signed integer numbers. */
+#undef  MMUX_EMACS_CORE_DEFINE_MAKER_31
+#define MMUX_EMACS_CORE_DEFINE_MAKER_31(STEM, CAPSTEM)		\
+  MMUX_EMACS_CORE_DEFINE_MAKER_3(STEM, CAPSTEM, sint64)
+
+/* This is for unsigned integer numbers. */
+#undef  MMUX_EMACS_CORE_DEFINE_MAKER_41
+#define MMUX_EMACS_CORE_DEFINE_MAKER_41(STEM, CAPSTEM)		\
+  MMUX_EMACS_CORE_DEFINE_MAKER_4(STEM, CAPSTEM, uint64)
+
+/* This is for floating-point numbers. */
+#undef  MMUX_EMACS_CORE_DEFINE_MAKER_32
+#define MMUX_EMACS_CORE_DEFINE_MAKER_32(STEM, CAPSTEM)		\
+  MMUX_EMACS_CORE_DEFINE_MAKER_3(STEM, CAPSTEM, ldouble)
+
+MMUX_EMACS_CORE_DEFINE_MAKER_41(wchar,		WCHAR)
+MMUX_EMACS_CORE_DEFINE_MAKER_41(uint,		UINT)
+MMUX_EMACS_CORE_DEFINE_MAKER_31(sint,		SINT)
+MMUX_EMACS_CORE_DEFINE_MAKER_41(ulong,		ULONG)
+MMUX_EMACS_CORE_DEFINE_MAKER_31(slong,		SLONG)
+MMUX_EMACS_CORE_DEFINE_MAKER_41(ullong,		ULLONG)
+MMUX_EMACS_CORE_DEFINE_MAKER_31(sllong,		SLLONG)
+MMUX_EMACS_CORE_DEFINE_MAKER_41(uint32,		UINT32)
+MMUX_EMACS_CORE_DEFINE_MAKER_31(sint32,		SINT32)
+MMUX_EMACS_CORE_DEFINE_MAKER_41(uint64,		UINT64)
+MMUX_EMACS_CORE_DEFINE_MAKER_31(sint64,		SINT64)
+MMUX_EMACS_CORE_DEFINE_MAKER_41(uintmax,	UINTMAX)
+MMUX_EMACS_CORE_DEFINE_MAKER_31(sintmax,	SINTMAX)
+MMUX_EMACS_CORE_DEFINE_MAKER_41(usize,		USIZE)
+MMUX_EMACS_CORE_DEFINE_MAKER_31(ssize,		SSIZE)
+MMUX_EMACS_CORE_DEFINE_MAKER_31(ptrdiff,	PTRDIFF)
+
+MMUX_EMACS_CORE_DEFINE_MAKER_32(float,		FLOAT)
+MMUX_EMACS_CORE_DEFINE_MAKER_32(ldouble,	LDOUBLE)
 
 
 /** --------------------------------------------------------------------
@@ -140,16 +239,84 @@ Fmmux_emacs_core_make_bytevector (emacs_env *env, ptrdiff_t nargs, emacs_value a
  ** Elisp functions table.
  ** ----------------------------------------------------------------- */
 
-#define NUMBER_OF_MODULE_FUNCTIONS	19
+#define NUMBER_OF_MODULE_FUNCTIONS	28
 static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNCTIONS] = {
   {
-    .name		= "mmux-core-c-bytevector-make",
+    .name		= "mmux-core-c-make-bytevector",
     .implementation	= Fmmux_emacs_core_make_bytevector,
     .min_arity		= 3,
     .max_arity		= 3,
     .documentation	= "Build and return a new bytevector user pointer object."
   },
 
+  /* Constructors  for  custom number  objects  whose  internal representation  is  a
+     built-in "integer" object. */
+  {
+    .name		= "mmux-core-c-make-char",
+    .implementation	= Fmmux_emacs_core_make_char,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "build and return a user-pointer object of type `cc-char'.",
+  },
+  {
+    .name		= "mmux-core-c-make-schar",
+    .implementation	= Fmmux_emacs_core_make_schar,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "build and return a user-pointer object of type `cc-schar'.",
+  },
+  {
+    .name		= "mmux-core-c-make-uchar",
+    .implementation	= Fmmux_emacs_core_make_uchar,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "build and return a user-pointer object of type `cc-uchar'.",
+  },
+  {
+    .name		= "mmux-core-c-make-sshrt",
+    .implementation	= Fmmux_emacs_core_make_sshrt,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "build and return a user-pointer object of type `cc-sshrt'.",
+  },
+  {
+    .name		= "mmux-core-c-make-ushrt",
+    .implementation	= Fmmux_emacs_core_make_ushrt,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "build and return a user-pointer object of type `cc-ushrt'.",
+  },
+  {
+    .name		= "mmux-core-c-make-sint8",
+    .implementation	= Fmmux_emacs_core_make_sint8,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "build and return a user-pointer object of type `cc-sint8'.",
+  },
+  {
+    .name		= "mmux-core-c-make-uint8",
+    .implementation	= Fmmux_emacs_core_make_uint8,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "build and return a user-pointer object of type `cc-uint8'.",
+  },
+  {
+    .name		= "mmux-core-c-make-sint16",
+    .implementation	= Fmmux_emacs_core_make_sint16,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "build and return a user-pointer object of type `cc-sint16'.",
+  },
+  {
+    .name		= "mmux-core-c-make-uint16",
+    .implementation	= Fmmux_emacs_core_make_uint16,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "build and return a user-pointer object of type `cc-uint16'.",
+  },
+
+  /* Constructors  for  custom number  objects  whose  internal representation  is  a
+     user-pointer object. */
   {
     .name		= "mmux-core-c-make-uint",
     .implementation	= Fmmux_emacs_core_make_uint,
@@ -270,11 +437,11 @@ static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODUL
     .documentation	= "build and return a user-pointer object of type `cc-float'.",
   },
   {
-    .name		= "mmux-core-c-make-long-double",
-    .implementation	= Fmmux_emacs_core_make_long_double,
+    .name		= "mmux-core-c-make-ldouble",
+    .implementation	= Fmmux_emacs_core_make_ldouble,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "build and return a user-pointer object of type `cc-long-double'.",
+    .documentation	= "build and return a user-pointer object of type `cc-ldouble'.",
   },
 };
 

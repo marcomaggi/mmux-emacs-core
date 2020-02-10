@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-06 15:15:50 marco>
+;; Time-stamp: <2020-02-09 07:06:22 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -31,15 +31,11 @@
 
 ;;; Code:
 
-(eval-when-compile
+(eval-and-compile
   (require 'cc-constants)
   (require 'cc-basics)
   (require 'cc-number-objects)
   (require 'cc-bytevector-objects))
-(require 'cc-constants)
-(require 'cc-basics)
-(require 'cc-number-objects)
-(require 'cc-bytevector-objects)
 
 (provide 'cc-core)
 

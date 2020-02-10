@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-09 06:37:26 marco>
+;; Time-stamp: <2020-02-10 08:43:56 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -31,9 +31,8 @@
 
 ;;; Code:
 
-(eval-when-compile
+(eval-and-compile
   (load "libmmux-emacs-core"))
-(load "libmmux-emacs-core")
 (require 'cl-lib)
 
 
@@ -89,6 +88,89 @@
 
 (defun cc-debug-print (&rest args)
   (pp args 'external-debugging-output))
+
+(eval-and-compile
+  (defun cc--prefixed-string-p (STRING)
+    ;;Return true if STRING begins with the prefix "cc-".
+    ;;
+    (string= "cc-" (substring STRING 0 3)))
+
+  (defun cc--strip-prefix-from-symbol-name (SYMBOL)
+    ;;If SYMBOL's  name begins  with the  prefix "cc-": strip  it and  return the  resulting string.
+    ;;Otherwise return SYMBOL's name itself.
+    ;;
+    (let ((STRING	(symbol-name SYMBOL)))
+      (if (cc--prefixed-string-p STRING)
+	  ;;Strip the prefix.
+	  (substring STRING 3)
+	STRING)))
+
+  (defun cc--prepend-prefix-to-symbol-name (SYMBOL)
+    ;;If SYMBOL's name begins with the prefix "cc-": return SYMBOL's name itself.  Otherwise prepend
+    ;;the prefix to te name and return the resulting string.
+    ;;
+    ;;
+    (let ((STRING	(symbol-name SYMBOL)))
+      (if (cc--prefixed-string-p STRING)
+	  STRING
+	;;Prepend the prefix
+	(concat (concat "cc-" STRING)))))
+  )
+
+(defmacro cc--make (TYPE-OR-STEM &rest ARGS)
+  ;;Expand into the application of a struct constructor to the given arguments.  Example:
+  ;;
+  ;;  (cl-defstruct (cc-sint64 (:constructor cc-sint64--make))
+  ;;    obj)
+  ;;
+  ;;  (cc--make sint64 :obj 123)
+  ;;  ==> (cc-sint64--make :obj 123)
+  ;;
+  (let* ((TYPE.str	(cc--prepend-prefix-to-symbol-name TYPE-OR-STEM))
+	 (CONSTRUCTOR	(intern (concat TYPE.str "--make"))))
+    (cons CONSTRUCTOR ARGS)))
+
+(defmacro cc--extract-obj (TYPE-OR-STEM VALUE)
+  ;;Expand into the application of a struct slot getter to a struct instance.  Example:
+  ;;
+  ;;  (cl-defstruct cc-mine obj)
+  ;;
+  ;;  (cc--extract-obj mine (cc-mine :obj 123))
+  ;;  ==> (cc-mine-obj (cc-mine :obj 123))
+  ;;  => 123
+  ;;
+  ;;Many struct types  defined by this package use  the name "obj" for the slot  holding an internal
+  ;;representation (often a user-pointer object).
+  ;;
+  (let* ((TYPE.str	(cc--prepend-prefix-to-symbol-name TYPE-OR-STEM))
+	 (EXTRACTOR	(intern (concat TYPE.str "-obj"))))
+    `(,EXTRACTOR ,VALUE)))
+
+(defmacro cc--clang-constructor (TYPE-OR-STEM &rest ARGS)
+  ;;Expand  into the  application of  the  C language  object  constructor to  the given  arguments.
+  ;;Example:
+  ;;
+  ;;  (cc--clang-constructor sint32 123)
+  ;;  ==> (mmux-core-c-make-sint32 123)
+  ;;
+  (let* ((STEM.str		(cc--strip-prefix-from-symbol-name TYPE-OR-STEM))
+	 (CLANG-CONSTRUCTOR	(intern (concat "mmux-core-c-make-" STEM.str))))
+    (cons CLANG-CONSTRUCTOR ARGS)))
+
+(defmacro cc--clang-converter (FROMTYPE-OR-STEM TOTYPE-OR-STEM &rest ARGS)
+  ;;Expand  into  the application  of  the  C language  object  converter  to the  given  arguments.
+  ;;Examples:
+  ;;
+  ;;  (cc--clang-converter sint32 sint64 123)
+  ;;  ==> (mmux-core-c-sint32-to-sint54 (cc-sint32 123))
+  ;;
+  ;;  (cc--clang-converter cc-float cc-ldouble 123)
+  ;;  ==> (mmux-core-c-float-to-ldouble (cc-float 1.2))
+  ;;
+  (let* ((FROMSTEM.str		(cc--strip-prefix-from-symbol-name FROMTYPE-OR-STEM))
+	 (TOSTEM.str		(cc--strip-prefix-from-symbol-name TOTYPE-OR-STEM))
+	 (CLANG-CONVERTER	(intern (concat "mmux-core-c-" FROMSTEM.str "-to-" TOSTEM.str))))
+    (cons CLANG-CONVERTER ARGS)))
 
 
 ;;;; done

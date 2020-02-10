@@ -87,9 +87,9 @@ MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		uint32,		UINT32)
 MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sint64,		SINT64)
 MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		uint64,		UINT64)
 
-MMUX_EMACS_CORE_FITS_SIGNED_P(long_double,	float,		FLOAT)
-MMUX_EMACS_CORE_FITS_SIGNED_P(long_double,	double,		DOUBLE)
-MMUX_EMACS_CORE_FITS_SIGNED_P(long_double,	long_double,	LONG_DOUBLE)
+MMUX_EMACS_CORE_FITS_SIGNED_P(ldouble,	float,		FLOAT)
+MMUX_EMACS_CORE_FITS_SIGNED_P(ldouble,	double,		DOUBLE)
+MMUX_EMACS_CORE_FITS_SIGNED_P(ldouble,	ldouble,	LDOUBLE)
 
 
 /** --------------------------------------------------------------------
@@ -141,32 +141,50 @@ MMUX_EMACS_CORE_CONVERSION_TO_SINT64_AND_UINT64(int32)
 MMUX_EMACS_CORE_CONVERSION_TO_SINT64(ptrdiff)
 MMUX_EMACS_CORE_CONVERSION_TO_UINT64(wchar)
 
+/* ------------------------------------------------------------------ */
+
 static emacs_value
-Fmmux_emacs_core_float_to_long_double (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+Fmmux_emacs_core_integer_to_sint64 (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
 {
   assert(1 == nargs);
-  return mmux_emacs_core_make_long_double(env, mmux_emacs_core_get_float(env, args[0]));
+  return mmux_emacs_core_make_sint64(env, (int64_t)mmux_emacs_core_extract_integer(env, args[0]));
 }
 
 static emacs_value
-Fmmux_emacs_core_double_to_long_double (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+Fmmux_emacs_core_integer_to_uint64 (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
 {
   assert(1 == nargs);
-  return mmux_emacs_core_make_long_double(env, mmux_emacs_core_get_double(env, args[0]));
+  return mmux_emacs_core_make_sint64(env, (int64_t)mmux_emacs_core_extract_integer(env, args[0]));
+}
+
+/* ------------------------------------------------------------------ */
+
+static emacs_value
+Fmmux_emacs_core_float_to_ldouble (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+{
+  assert(1 == nargs);
+  return mmux_emacs_core_make_ldouble(env, mmux_emacs_core_get_float(env, args[0]));
 }
 
 static emacs_value
-Fmmux_emacs_core_sint64_to_long_double (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+Fmmux_emacs_core_double_to_ldouble (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
 {
   assert(1 == nargs);
-  return mmux_emacs_core_make_long_double(env, (long double)mmux_emacs_core_get_sint64(env, args[0]));
+  return mmux_emacs_core_make_ldouble(env, mmux_emacs_core_get_double(env, args[0]));
 }
 
 static emacs_value
-Fmmux_emacs_core_uint64_to_long_double (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+Fmmux_emacs_core_sint64_to_ldouble (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
 {
   assert(1 == nargs);
-  return mmux_emacs_core_make_long_double(env, (long double)mmux_emacs_core_get_uint64(env, args[0]));
+  return mmux_emacs_core_make_ldouble(env, (long double)mmux_emacs_core_get_sint64(env, args[0]));
+}
+
+static emacs_value
+Fmmux_emacs_core_uint64_to_ldouble (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+{
+  assert(1 == nargs);
+  return mmux_emacs_core_make_ldouble(env, (long double)mmux_emacs_core_get_uint64(env, args[0]));
 }
 
 
@@ -201,7 +219,7 @@ Fmmux_emacs_core_uint64_to_long_double (emacs_env *env, ptrdiff_t nargs, emacs_v
 
 MMUX_EMACS_CORE_COMPARISON_OPERATIONS(uint64,		uint64_t)
 MMUX_EMACS_CORE_COMPARISON_OPERATIONS(sint64,		int64_t)
-MMUX_EMACS_CORE_COMPARISON_OPERATIONS(long_double,	long double)
+MMUX_EMACS_CORE_COMPARISON_OPERATIONS(ldouble,	long double)
 
 /* ------------------------------------------------------------------ */
 
@@ -249,7 +267,7 @@ MMUX_EMACS_CORE_COMPARISON_OPERATIONS2(uint64, uint64_t, sint64,  int64_t)
  ** Elisp functions table.
  ** ----------------------------------------------------------------- */
 
-#define NUMBER_OF_MODULE_FUNCTIONS	85
+#define NUMBER_OF_MODULE_FUNCTIONS	87
 static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNCTIONS] = {
   /* Conversion functions to "sint64". */
   {
@@ -336,6 +354,13 @@ static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODUL
     .max_arity		= 1,
     .documentation	= "Convert a user-pointer object of type `ptrdiff' to a user-pointer object of type `sint64'.",
   },
+  {
+    .name		= "mmux-core-c-integer-to-sint64",
+    .implementation	= Fmmux_emacs_core_integer_to_sint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Convert a built-in object of type `integer' to a user-pointer object of type `sint64'.",
+  },
 
   /* Conversion functions to "uint64". */
   {
@@ -415,35 +440,42 @@ static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODUL
     .max_arity		= 1,
     .documentation	= "Convert a user-pointer object of type `wchar' to a user-pointer object of type `uint64'.",
   },
+  {
+    .name		= "mmux-core-c-integer-to-uint64",
+    .implementation	= Fmmux_emacs_core_integer_to_uint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Convert a built-in object of type `integer' to a user-pointer object of type `uint64'.",
+  },
 
   /* Conversion functions to "long double". */
   {
-    .name		= "mmux-core-c-float-to-long-double",
-    .implementation	= Fmmux_emacs_core_float_to_long_double,
+    .name		= "mmux-core-c-float-to-ldouble",
+    .implementation	= Fmmux_emacs_core_float_to_ldouble,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `float' to a user-pointer object of type `long-double'.",
+    .documentation	= "Convert a user-pointer object of type `float' to a user-pointer object of type `ldouble'.",
   },
   {
-    .name		= "mmux-core-c-double-to-long-double",
-    .implementation	= Fmmux_emacs_core_double_to_long_double,
+    .name		= "mmux-core-c-double-to-ldouble",
+    .implementation	= Fmmux_emacs_core_double_to_ldouble,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Convert a built-int of type `float' to a user-pointer object of type `long-double'.",
+    .documentation	= "Convert a built-int of type `float' to a user-pointer object of type `ldouble'.",
   },
   {
-    .name		= "mmux-core-c-uint64-to-long-double",
-    .implementation	= Fmmux_emacs_core_uint64_to_long_double,
+    .name		= "mmux-core-c-uint64-to-ldouble",
+    .implementation	= Fmmux_emacs_core_uint64_to_ldouble,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Convert a custom user-pointer object of type `uint64' to a user-pointer object of type `long-double'.",
+    .documentation	= "Convert a custom user-pointer object of type `uint64' to a user-pointer object of type `ldouble'.",
   },
   {
-    .name		= "mmux-core-c-sint64-to-long-double",
-    .implementation	= Fmmux_emacs_core_sint64_to_long_double,
+    .name		= "mmux-core-c-sint64-to-ldouble",
+    .implementation	= Fmmux_emacs_core_sint64_to_ldouble,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Convert a custom user-pointer object of type `sint64' to a user-pointer object of type `long-double'.",
+    .documentation	= "Convert a custom user-pointer object of type `sint64' to a user-pointer object of type `ldouble'.",
   },
 
   /* Comparison functions. */
@@ -532,43 +564,43 @@ static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODUL
     .documentation	= "Return true if the OP1 is greater than or equal to OP2.",
   },
   {
-    .name		= "mmux-core-c-long-double=",
-    .implementation	= Fmmux_emacs_core_compare_long_double_equal,
+    .name		= "mmux-core-c-ldouble=",
+    .implementation	= Fmmux_emacs_core_compare_ldouble_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is equal to OP2.",
   },
   {
-    .name		= "mmux-core-c-long-double/=",
-    .implementation	= Fmmux_emacs_core_compare_long_double_not_equal,
+    .name		= "mmux-core-c-ldouble/=",
+    .implementation	= Fmmux_emacs_core_compare_ldouble_not_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is not equal to OP2.",
   },
   {
-    .name		= "mmux-core-c-long-double<",
-    .implementation	= Fmmux_emacs_core_compare_long_double_less,
+    .name		= "mmux-core-c-ldouble<",
+    .implementation	= Fmmux_emacs_core_compare_ldouble_less,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is less than OP2.",
   },
   {
-    .name		= "mmux-core-c-long-double>",
-    .implementation	= Fmmux_emacs_core_compare_long_double_greater,
+    .name		= "mmux-core-c-ldouble>",
+    .implementation	= Fmmux_emacs_core_compare_ldouble_greater,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is greater than OP2.",
   },
   {
-    .name		= "mmux-core-c-long-double<=",
-    .implementation	= Fmmux_emacs_core_compare_long_double_less_equal,
+    .name		= "mmux-core-c-ldouble<=",
+    .implementation	= Fmmux_emacs_core_compare_ldouble_less_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is less than or equal to OP2.",
   },
   {
-    .name		= "mmux-core-c-long-double>=",
-    .implementation	= Fmmux_emacs_core_compare_long_double_greater_equal,
+    .name		= "mmux-core-c-ldouble>=",
+    .implementation	= Fmmux_emacs_core_compare_ldouble_greater_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is greater than or equal to OP2.",
@@ -857,11 +889,11 @@ static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODUL
     .documentation	= "Return true if the argument fits a user-pointer object of type `double'.",
   },
   {
-    .name		= "mmux-core-c-fits-long-double-p",
-    .implementation	= Fmmux_emacs_core_fits_long_double_p,
+    .name		= "mmux-core-c-fits-ldouble-p",
+    .implementation	= Fmmux_emacs_core_fits_ldouble_p,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Return true if the argument fits a user-pointer object of type `long-double'.",
+    .documentation	= "Return true if the argument fits a user-pointer object of type `ldouble'.",
   },
 };
 

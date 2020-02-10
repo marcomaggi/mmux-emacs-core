@@ -203,6 +203,7 @@ struct mmux_emacs_module_function_t {
 typedef char			mmux_emacs_core_type_char_t;
 typedef signed char		mmux_emacs_core_type_schar_t;
 typedef unsigned char		mmux_emacs_core_type_uchar_t;
+typedef wchar_t			mmux_emacs_core_type_wchar_t;
 typedef signed   short int	mmux_emacs_core_type_sshrt_t;
 typedef unsigned short int	mmux_emacs_core_type_ushrt_t;
 typedef signed   int		mmux_emacs_core_type_sint_t;
@@ -226,7 +227,7 @@ typedef int64_t			mmux_emacs_core_type_sint64_t;
 typedef uint64_t		mmux_emacs_core_type_uint64_t;
 typedef float			mmux_emacs_core_type_float_t;
 typedef double			mmux_emacs_core_type_double_t;
-typedef long double		mmux_emacs_core_type_long_double_t;
+typedef long double		mmux_emacs_core_type_ldouble_t;
 
 /* ------------------------------------------------------------------ */
 
@@ -489,7 +490,7 @@ typedef struct mmux_emacs_core_ptrdiff_t	mmux_emacs_core_ptrdiff_t;
 
 typedef struct mmux_emacs_core_float_t		mmux_emacs_core_float_t;
 typedef struct mmux_emacs_core_double_t		mmux_emacs_core_double_t;
-typedef struct mmux_emacs_core_long_double_t	mmux_emacs_core_long_double_t;
+typedef struct mmux_emacs_core_ldouble_t	mmux_emacs_core_ldouble_t;
 
 /* ------------------------------------------------------------------ */
 
@@ -520,7 +521,7 @@ struct mmux_emacs_core_ptrdiff_t	{ ptrdiff_t			val; };
 
 struct mmux_emacs_core_float_t		{ float				val; };
 struct mmux_emacs_core_double_t		{ double			val; };
-struct mmux_emacs_core_long_double_t	{ long double			val; };
+struct mmux_emacs_core_ldouble_t	{ long double			val; };
 
 /* ------------------------------------------------------------------ */
 
@@ -713,12 +714,12 @@ mmux_emacs_core_get_double (emacs_env * env, emacs_value arg)
 
 /* ------------------------------------------------------------------ */
 
-mmux_emacs_core_decl emacs_value mmux_emacs_core_make_long_double (emacs_env * env, long double val);
+mmux_emacs_core_decl emacs_value mmux_emacs_core_make_ldouble (emacs_env * env, long double val);
 
 static inline long double
-mmux_emacs_core_get_long_double (emacs_env * env, emacs_value arg)
+mmux_emacs_core_get_ldouble (emacs_env * env, emacs_value arg)
 {
-  MMUX_EMACS_CORE_PC(mmux_emacs_core_long_double_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
+  MMUX_EMACS_CORE_PC(mmux_emacs_core_ldouble_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
 
   return obj->val;
 }

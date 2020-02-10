@@ -24,27 +24,27 @@
 
 (ert-deftest version-string ()
   "Retrieve the version string."
-  (should (stringp (mmux-core-version-string)))
+  (should (stringp (mmec-version-string)))
   (should (string= "Return the version string."
-		   (documentation 'mmux-core-version-string))))
+		   (documentation 'mmec-version-string))))
 
 (ert-deftest version-interface-current ()
   "Retrieve the interface current version."
-  (should (<= 0 (mmux-core-version-interface-current)))
+  (should (<= 0 (mmec-version-interface-current)))
   (should (string= "Return the interface version current number."
-		   (documentation 'mmux-core-version-interface-current))))
+		   (documentation 'mmec-version-interface-current))))
 
 (ert-deftest version-interface-revision ()
   "Retrieve the interface revision version."
-  (should (<= 0 (mmux-core-version-interface-revision)))
+  (should (<= 0 (mmec-version-interface-revision)))
   (should (string= "Return the interface version revision number."
-		   (documentation 'mmux-core-version-interface-revision))))
+		   (documentation 'mmec-version-interface-revision))))
 
 (ert-deftest version-interface-age ()
   "Retrieve the interface age version."
-  (should (<= 0 (mmux-core-version-interface-age)))
+  (should (<= 0 (mmec-version-interface-age)))
   (should (string= "Return the interface version age number."
-		   (documentation 'mmux-core-version-interface-age))))
+		   (documentation 'mmec-version-interface-age))))
 
 (ert-run-tests-batch-and-exit)
 

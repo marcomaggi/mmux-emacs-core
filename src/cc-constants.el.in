@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-07 07:03:48 marco>
+;; Time-stamp: <2020-02-10 07:01:00 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -179,8 +179,8 @@
   @VALUEOF_MMUX_SIZEOF_DOUBLE@
   "Size of `double' measured in bytes.")
 
-(defconst cc-SIZEOF_LONG_DOUBLE
-  @VALUEOF_MMUX_SIZEOF_LONG_DOUBLE@
+(defconst cc-SIZEOF_LDOUBLE
+  @VALUEOF_MMUX_SIZEOF_LDOUBLE@
   "Size of `long double' measured in bytes.")
 
 

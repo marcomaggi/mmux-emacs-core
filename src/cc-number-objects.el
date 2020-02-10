@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-09 06:04:09 marco>
+;; Time-stamp: <2020-02-10 17:26:41 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -31,9 +31,6 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'cc-basics)
-  (require 'cc-constants))
 (require 'cc-basics)
 (require 'cc-constants)
 
@@ -77,73 +74,87 @@
 (cc--define-abstract-type-constructor cc-floating-point)
 
 
-;;;; C language type wrappers: char
+;;;; C language type wrappers: custom number objects
 
-(defmacro cc--define-custom-number-object (TYPE PARENT-TYPE)
-  ;;We want the macro use:
+(defmacro cc--define-custom-number-object (TYPE-OR-STEM ANCESTOR-TYPE)
+  ;;Define everything needed to define a new custom number object.
+  ;;
+  ;;The argument  TYPE-OR-STEM must be  a symbol  representing the new  full type name  (with prefix
+  ;;"cc-") or the stem of the type name (without the prefix "cc-").
+  ;;
+  ;;Usage example:
   ;;
   ;;   (cc--define-custom-number-object cc-char cc-signed-integer)
   ;;
-  ;;to expand into:
-  ;;
-  ;;   (cl-defstruct (cc-char
-  ;;                   (:include     cc-signed-integer)
-  ;;                   (:constructor cc-char--make))
-  ;;     obj)
-  ;;
-  ;;   (cl-defgeneric cc-char (init)
-  ;;     "Build and return a new instance of `cc-char'.")
-  ;;
-  ;;   (cl-defmethod cc-char ((init cc-char))
-  ;;     "Build and return a new instance of `cc-char'."
-  ;;     (cc-char--make :obj (cc-char-obj init)))
-  ;;
-  ;;   (cl-defmethod  cc-char ((init cc-signed-integer))
-  ;;     "Build and return a new instance of `cc-char'."
-  ;;     (let ((obj (cc-sint64 init)))
-  ;;       (cl-assert (cc-fits-char-p obj))
-  ;;       (cc-char--make :obj (cc-sint64-obj obj))))
-  ;;
-  (let* ((TYPE.str		(symbol-name TYPE))
-	 ;;Strip the leading "cc-" prefix.
-	 (TYPESTEM.str		(substring TYPE.str 3))
-	 (CONSTRUCTOR		(intern (concat TYPE.str "--make")))
+  (let* ((TYPE.str		(cc--prepend-prefix-to-symbol-name TYPE-OR-STEM))
+	 (STEM.str		(cc--strip-prefix-from-symbol-name TYPE-OR-STEM))
+	 (TYPE			(intern TYPE.str))
+	 (PARENT-TYPE		ANCESTOR-TYPE)
 	 (DOCSTRING		(concat "Build and return a new instance of `" TYPE.str "'."))
-	 (FITS-FUNC		(intern (concat "cc-fits-" TYPESTEM.str "-p")))
-	 (TYPE-OBJ		(intern (concat TYPE.str "-obj"))))
-    (cl-multiple-value-bind (BUILTIN-INIT-TYPE NORMALISER)
-	(cond ((eq PARENT-TYPE 'cc-signed-integer)	(cl-values 'integer	'cc-sint64))
-	      ((eq PARENT-TYPE 'cc-unsigned-integer)	(cl-values 'integer	'cc-uint64))
-	      ((eq PARENT-TYPE 'cc-floating-point)	(cl-values 'float	'cc-long-double))
+	 (FITS-ASSERTION	(let ((FITS-FUNC (intern (concat "cc-fits-" STEM.str "-p"))))
+				  `(unless (,FITS-FUNC obj)
+				     (signal 'mmec-error-value-out-of-range (list (quote ,TYPE) init)))))
+	 (ELISP-CONSTRUCTOR	(intern (concat TYPE.str "--make"))))
+    (cl-multiple-value-bind (NORMALISED-TYPE)
+	(cond ((eq ANCESTOR-TYPE 'cc-signed-integer)	(list 'cc-sint64))
+	      ((eq ANCESTOR-TYPE 'cc-unsigned-integer)	(list 'cc-uint64))
+	      ((eq ANCESTOR-TYPE 'cc-floating-point)	(list 'cc-ldouble))
 	      (t
-	       (signal 'mmec-error-unsupported-init-type PARENT-TYPE)))
-      (let* ((NORMALISER-OBJ	(intern (concat (symbol-name NORMALISER) "-obj"))))
-	`(progn
-	   (cl-defstruct (,TYPE
-			  (:include	,PARENT-TYPE)
-			  (:constructor	,CONSTRUCTOR))
-	     obj)
+	       (signal 'mmec-error-unsupported-init-type ANCESTOR-TYPE)))
+      `(progn
+	 (cl-defstruct (,TYPE
+			(:include	,PARENT-TYPE)
+			(:constructor	,ELISP-CONSTRUCTOR))
+	   obj)
 
-	   (cl-defgeneric ,TYPE (init)
-	     ,DOCSTRING)
+	 ;;This is the public object constructor implemented as generic function.
+	 ;;
+	 (cl-defgeneric ,TYPE (init)
+	   ,DOCSTRING)
 
-	   (cl-defmethod ,TYPE ((init ,TYPE))
-	     ,DOCSTRING
-	     (,CONSTRUCTOR :obj (,TYPE-OBJ init)))
+	 ;;The copy constructor implemented  as method.  This method creates a  duplicate of the elisp
+	 ;;object, but it reuses the internal representation (which is immutable).
+	 ;;
+	 (cl-defmethod ,TYPE ((init ,TYPE))
+	   ,DOCSTRING
+	   (cc--make ,TYPE :obj (cc--extract-obj ,TYPE init)))
 
-	   (cl-defmethod ,TYPE ((init ,BUILTIN-INIT-TYPE))
-	     ,DOCSTRING
-	     (,CONSTRUCTOR :obj (,TYPE-OBJ init)))
+	 ;;This constructor method accepts as initialisation argument a value whose type is the parent
+	 ;;of TYPE.
+	 ;;
+	 (cl-defmethod ,TYPE ((init ,ANCESTOR-TYPE))
+	   ,DOCSTRING
+	   (let ((obj (,NORMALISED-TYPE init)))
+	     ,FITS-ASSERTION
+	     (cc--make ,TYPE :obj (cc--clang-constructor ,TYPE (cc--extract-obj ,NORMALISED-TYPE obj)))))
 
-	   (cl-defmethod ,TYPE ((init cc-signed-integer))
-	     ,DOCSTRING
-	     (let ((obj (,NORMALISER init)))
-	       (cl-assert (,FITS-FUNC obj))
-	       (,CONSTRUCTOR :obj (,NORMALISER-OBJ obj))))
+	 ;;This constructor method accepts as initialisation  argument a value of the Emacs's built-in
+	 ;;type `integer'.
+	 ;;
+	 (cl-defmethod ,TYPE ((init integer))
+	   ,DOCSTRING
+	   (let ((obj (,NORMALISED-TYPE init)))
+	     ,FITS-ASSERTION
+	     (,ELISP-CONSTRUCTOR :obj (cc--clang-constructor ,TYPE (cc--extract-obj ,NORMALISED-TYPE obj)))))
 
-	   )))))
+	 ;;This constructor method accepts as initialisation  argument a value of the Emacs's built-in
+	 ;;type `integer'.
+	 ;;
+	 (cl-defmethod ,TYPE ((init float))
+	   ,DOCSTRING
+	   (let ((obj (,NORMALISED-TYPE init)))
+	     ,FITS-ASSERTION
+	     (,ELISP-CONSTRUCTOR :obj (cc--clang-constructor ,TYPE (cc--extract-obj ,NORMALISED-TYPE obj)))))
 
-;;These
+	 ;;This constructor method signals that the given initialisation argument is invalid.
+	 ;;
+	 (cl-defmethod ,TYPE ((init cc-number))
+	   ,DOCSTRING
+	   (signal 'mmec-error-unsupported-init-type (list ',TYPE init)))
+
+	 ))))
+
+;;These number objects have a built-in `integer' value as internal representation.
 ;;
 (cc--define-custom-number-object cc-char	cc-signed-integer)
 (cc--define-custom-number-object cc-schar	cc-signed-integer)
@@ -155,6 +166,8 @@
 (cc--define-custom-number-object cc-uint8	cc-unsigned-integer)
 (cc--define-custom-number-object cc-sint16	cc-signed-integer)
 
+;;These number objects have a custom user-pointer object as internal representation.
+;;
 (cc--define-custom-number-object cc-sint	cc-signed-integer)
 (cc--define-custom-number-object cc-uint	cc-unsigned-integer)
 (cc--define-custom-number-object cc-slong	cc-signed-integer)
@@ -172,130 +185,163 @@
 (cc--define-custom-number-object cc-sint64	cc-signed-integer)
 (cc--define-custom-number-object cc-uint64	cc-unsigned-integer)
 (cc--define-custom-number-object cc-float	cc-floating-point)
-(cc--define-custom-number-object cc-long-double	cc-floating-point)
+(cc--define-custom-number-object cc-ldouble	cc-floating-point)
 
 
 ;;;; special initialisation methods
 
-(defmacro cc--define-sint64-maker-method (TYPE CSTEM)
-  (let* ((TYPE.str	(symbol-name TYPE))
-	 (OBJ-GETTER	(intern (concat TYPE.str "-obj")))
-	 (C-CONVERTER	(intern (concat "mmux-core-c-" CSTEM "-to-sint64")))
+(defmacro cc--define-sint64-maker-method (TYPE-OR-STEM)
+  (let* ((TYPE.str	(cc--prepend-prefix-to-symbol-name TYPE-OR-STEM))
+	 (TYPE		(intern TYPE.str))
 	 (DOCSTRING	(concat "Convert an object of type `" TYPE.str "' into an object of type `cc-sint64'.")))
     `(cl-defmethod cc-sint64 ((init ,TYPE))
        ,DOCSTRING
-       (cc-sint64--make :obj (,C-CONVERTER (,OBJ-GETTER init))))))
+       (cc--make sint64 :obj (cc--clang-converter ,TYPE-OR-STEM sint64 (cc--extract-obj ,TYPE-OR-STEM init))))))
 
-(cc--define-sint64-maker-method cc-char		"char")
-(cc--define-sint64-maker-method cc-schar	"schar")
-(cc--define-sint64-maker-method cc-sint8	"sint8")
-(cc--define-sint64-maker-method cc-sint16	"sint16")
-(cc--define-sint64-maker-method cc-sint32	"sint32")
-(cc--define-sint64-maker-method cc-sshrt	"sshrt")
-(cc--define-sint64-maker-method cc-sint		"sint")
-(cc--define-sint64-maker-method cc-slong	"slong")
-(cc--define-sint64-maker-method cc-sllong	"sllong")
-(cc--define-sint64-maker-method cc-sintmax	"sintmax")
-(cc--define-sint64-maker-method cc-ssize	"ssize")
-(cc--define-sint64-maker-method cc-ptrdiff	"ptrdiff")
+(cc--define-sint64-maker-method char)
+(cc--define-sint64-maker-method schar)
+(cc--define-sint64-maker-method sint8)
+(cc--define-sint64-maker-method sint16)
+(cc--define-sint64-maker-method sint32)
+(cc--define-sint64-maker-method sshrt)
+(cc--define-sint64-maker-method sint)
+(cc--define-sint64-maker-method slong)
+(cc--define-sint64-maker-method sllong)
+(cc--define-sint64-maker-method sintmax)
+(cc--define-sint64-maker-method ssize)
+(cc--define-sint64-maker-method ptrdiff)
+
+(cl-defmethod cc-sint64 ((init integer))
+  "Convert an object of type `integer' into an object of type `cc-sint64'."
+  (cc--make sint64 :obj (cc--clang-converter integer sint64 init)))
+
+(cl-defmethod cc-sint64 ((init float))
+  "Convert an object of type `float' into an object of type `cc-sint64'."
+  (cc--make sint64 :obj (cc--clang-converter integer sint64 (round init))))
 
 ;;; --------------------------------------------------------------------
 
-(defmacro cc--define-uint64-maker-method (TYPE CSTEM)
-  (let* ((TYPE.str	(symbol-name TYPE))
-	 (OBJ-GETTER	(intern (concat TYPE.str "-obj")))
-	 (C-CONVERTER	(intern (concat "mmux-core-c-" CSTEM "-to-uint64")))
-	 (DOCSTRING	(concat "Convert an object of type `" TYPE.str "' into an object of type `cc-uint64'.")))
+(defmacro cc--define-uint64-maker-method (TYPE-OR-STEM)
+  (let* ((TYPE.str		(cc--prepend-prefix-to-symbol-name TYPE-OR-STEM))
+	 (TYPE			(intern TYPE.str))
+	 (DOCSTRING		(concat "Convert an object of type `" TYPE.str "' into an object of type `cc-uint64'.")))
     `(cl-defmethod cc-uint64 ((init ,TYPE))
        ,DOCSTRING
-       (cc-uint64--make :obj (,C-CONVERTER (,OBJ-GETTER init))))))
+       (cc--make uint64 :obj (cc--clang-converter ,TYPE-OR-STEM uint64 (cc--extract-obj ,TYPE-OR-STEM init))))))
 
-(cc--define-uint64-maker-method cc-uchar	"uchar")
-(cc--define-uint64-maker-method cc-uint8	"uint8")
-(cc--define-uint64-maker-method cc-uint16	"uint16")
-(cc--define-uint64-maker-method cc-uint32	"uint32")
-(cc--define-uint64-maker-method cc-ushrt	"ushrt")
-(cc--define-uint64-maker-method cc-uint		"uint")
-(cc--define-uint64-maker-method cc-ulong	"ulong")
-(cc--define-uint64-maker-method cc-ullong	"ullong")
-(cc--define-uint64-maker-method cc-uintmax	"uintmax")
-(cc--define-uint64-maker-method cc-usize	"usize")
-(cc--define-uint64-maker-method cc-wchar	"wchar")
+(cc--define-uint64-maker-method uchar)
+(cc--define-uint64-maker-method uint8)
+(cc--define-uint64-maker-method uint16)
+(cc--define-uint64-maker-method uint32)
+(cc--define-uint64-maker-method ushrt)
+(cc--define-uint64-maker-method uint)
+(cc--define-uint64-maker-method ulong)
+(cc--define-uint64-maker-method ullong)
+(cc--define-uint64-maker-method uintmax)
+(cc--define-uint64-maker-method usize)
+(cc--define-uint64-maker-method wchar)
+
+(cl-defmethod cc-uint64 ((init integer))
+  "Convert an object of type `integer' into an object of type `cc-uint64'."
+  (cc--make uint64 :obj (cc--clang-converter integer uint64 init)))
+
+(cl-defmethod cc-uint64 ((init float))
+  "Convert an object of type `float' into an object of type `cc-sint64'."
+  (cc--make uint64 :obj (cc--clang-converter integer uint64 (round init))))
 
 ;;; --------------------------------------------------------------------
 
-(cl-defmethod  cc-long-double ((init integer))
-  "Build and return a new instance of `cc-long-double'."
-  (cc-long-double (float init)))
+(cl-defmethod  cc-ldouble ((init integer))
+  "Build and return a new instance of `cc-ldouble'."
+  (cc-ldouble (float init)))
 
-(defmacro cc--define-long-double-maker-method (TYPE CSTEM)
-  (let* ((TYPE.str	(symbol-name TYPE))
-	 (OBJ-GETTER	(intern (concat TYPE.str "-obj")))
-	 (C-CONVERTER	(intern (concat "mmux-core-c-" CSTEM "-to-long-double")))
-	 (DOCSTRING	(concat "Convert an object of type `" TYPE.str "' into an object of type `cc-long-double'.")))
-    `(cl-defmethod cc-long-double ((init ,TYPE))
+(defmacro cc--define-ldouble-maker-method (TYPE-OR-STEM)
+  (let* ((TYPE.str	(cc--prepend-prefix-to-symbol-name TYPE-OR-STEM))
+	 (TYPE		(intern TYPE.str))
+	 (DOCSTRING	(concat "Convert an object of type `" TYPE.str "' into an object of type `cc-ldouble'.")))
+    `(cl-defmethod cc-ldouble ((init ,TYPE))
        ,DOCSTRING
-       (cc-long-double--make :obj (,C-CONVERTER (,OBJ-GETTER init))))))
+       (cc--make ldouble :obj (cc--clang-converter ,TYPE-OR-STEM ldouble (cc--extract-obj ,TYPE-OR-STEM init))))))
 
-(cc--define-long-double-maker-method cc-float	"float")
-(cc--define-long-double-maker-method cc-uint64	"uint64")
-(cc--define-long-double-maker-method cc-sint64	"sint64")
+(cc--define-ldouble-maker-method float)
+(cc--define-ldouble-maker-method uint64)
+(cc--define-ldouble-maker-method sint64)
 
-(cl-defmethod cc-long-double ((init cc-unsigned-integer))
-  "Convert an object of type `cc-unsigned-integer' to an object of type `cc-long-double'."
-  (cc-long-double (cc-uint64 init)))
+(cl-defmethod cc-ldouble ((init cc-unsigned-integer))
+  "Convert an object of type `cc-unsigned-integer' to an object of type `cc-ldouble'."
+  (cc-ldouble (cc-uint64 init)))
 
-(cl-defmethod cc-long-double ((init cc-signed-integer))
-  "Convert an object of type `cc-signed-integer' to an object of type `cc-long-double'."
-  (cc-long-double (cc-sint64 init)))
+(cl-defmethod cc-ldouble ((init cc-signed-integer))
+  "Convert an object of type `cc-signed-integer' to an object of type `cc-ldouble'."
+  (cc-ldouble (cc-sint64 init)))
+
+(cl-defmethod cc-ldouble ((init integer))
+  "Convert an object of type `integer' into an object of type `cc-ldouble'."
+  (cc--make uint64 :obj (cc--clang-converter float ldouble (float init))))
+
+(cl-defmethod cc-ldouble ((init float))
+  "Convert an object of type `float' into an object of type `cc-ldouble'."
+  (cc--make uint64 :obj (cc--clang-converter float ldouble init)))
 
 
 ;;;; range inclusion
 
-(defmacro cc--define-fits-function (TYPESTEM ARGTYPE NORMALISER-TYPE)
+(defmacro cc--define-fits-function (TYPESTEM USRPTR-ARGTYPE NORMALISED-TYPE)
   (let* ((TYPESTEM.str		(symbol-name TYPESTEM))
 	 (TYPE			(intern (concat "cc-" TYPESTEM.str)))
 	 (FUNCNAME		(intern (concat "cc-fits-" TYPESTEM.str "-p")))
 	 (MMUX-FUNCNAME		(intern (concat "mmux-core-c-fits-" TYPESTEM.str "-p")))
-	 (DOCSTRING		(concat "Return true if the argument fits an object of type `" (symbol-name TYPE) "'."))
-	 (NORMALISER-TYPE.str	(symbol-name NORMALISER-TYPE))
-	 (NORMALISED-OBJ	(intern (concat NORMALISER-TYPE.str "-obj"))))
+	 (DOCSTRING		(concat "Return true if the argument fits an object of type `" (symbol-name TYPE) "'.")))
     `(progn
        (cl-defgeneric ,FUNCNAME (op)
 	 ,DOCSTRING)
-       (cl-defmethod  ,FUNCNAME ((op ,ARGTYPE))
+       (cl-defmethod  ,FUNCNAME ((op ,USRPTR-ARGTYPE))
 	 ,DOCSTRING
-	 (,MMUX-FUNCNAME (,NORMALISED-OBJ (,NORMALISER-TYPE op))))
+	 (,MMUX-FUNCNAME (cc--extract-obj ,NORMALISED-TYPE (,NORMALISED-TYPE op))))
+       (cl-defmethod  ,FUNCNAME ((op integer))
+	 ,DOCSTRING
+	 (,MMUX-FUNCNAME (cc--extract-obj ,NORMALISED-TYPE (,NORMALISED-TYPE op))))
+       (cl-defmethod  ,FUNCNAME ((op float))
+	 ,DOCSTRING
+	 (,MMUX-FUNCNAME (cc--extract-obj ,NORMALISED-TYPE (,NORMALISED-TYPE op))))
        )))
 
-(cc--define-fits-function char			cc-signed-integer	cc-sint64)
-(cc--define-fits-function schar			cc-signed-integer	cc-sint64)
-(cc--define-fits-function uchar			cc-unsigned-integer	cc-uint64)
-(cc--define-fits-function wchar			cc-unsigned-integer	cc-uint64)
-(cc--define-fits-function sshrt			cc-signed-integer	cc-sint64)
-(cc--define-fits-function ushrt			cc-unsigned-integer	cc-uint64)
-(cc--define-fits-function sint			cc-signed-integer	cc-sint64)
-(cc--define-fits-function uint			cc-unsigned-integer	cc-uint64)
-(cc--define-fits-function slong			cc-signed-integer	cc-sint64)
-(cc--define-fits-function ulong			cc-unsigned-integer	cc-uint64)
-(cc--define-fits-function sllong		cc-signed-integer	cc-sint64)
-(cc--define-fits-function ullong		cc-unsigned-integer	cc-uint64)
-(cc--define-fits-function ssize			cc-signed-integer	cc-sint64)
-(cc--define-fits-function usize			cc-unsigned-integer	cc-uint64)
-(cc--define-fits-function sintmax		cc-signed-integer	cc-sint64)
-(cc--define-fits-function uintmax		cc-unsigned-integer	cc-uint64)
-(cc--define-fits-function ptrdiff		cc-signed-integer	cc-sint64)
-(cc--define-fits-function sint8			cc-signed-integer	cc-sint64)
-(cc--define-fits-function uint8			cc-unsigned-integer	cc-uint64)
-(cc--define-fits-function sint16		cc-signed-integer	cc-sint64)
-(cc--define-fits-function uint16		cc-unsigned-integer	cc-uint64)
-(cc--define-fits-function sint32		cc-signed-integer	cc-sint64)
-(cc--define-fits-function uint32		cc-unsigned-integer	cc-uint64)
-(cc--define-fits-function sint64		cc-signed-integer	cc-sint64)
-(cc--define-fits-function uint64		cc-unsigned-integer	cc-uint64)
-(cc--define-fits-function float			cc-floating-point	cc-long-double)
-;;(cc--define-fits-function cc-double		cc-floating-point	cc-long-double)
-(cc--define-fits-function long-double		cc-floating-point	cc-long-double)
+(defmacro cc--define-fits-function/signed-integer (TYPESTEM)
+  `(cc--define-fits-function ,TYPESTEM cc-signed-integer cc-sint64))
+
+(defmacro cc--define-fits-function/unsigned-integer (TYPESTEM)
+  `(cc--define-fits-function ,TYPESTEM cc-unsigned-integer cc-uint64))
+
+(defmacro cc--define-fits-function/floating-point (TYPESTEM)
+  `(cc--define-fits-function ,TYPESTEM cc-floating-point cc-ldouble))
+
+(cc--define-fits-function/signed-integer	char)
+(cc--define-fits-function/signed-integer	schar)
+(cc--define-fits-function/unsigned-integer	uchar)
+(cc--define-fits-function/unsigned-integer	wchar)
+(cc--define-fits-function/signed-integer	sshrt)
+(cc--define-fits-function/unsigned-integer	ushrt)
+(cc--define-fits-function/signed-integer	sint)
+(cc--define-fits-function/unsigned-integer	uint)
+(cc--define-fits-function/signed-integer	slong)
+(cc--define-fits-function/unsigned-integer	ulong)
+(cc--define-fits-function/signed-integer	sllong)
+(cc--define-fits-function/unsigned-integer	ullong)
+(cc--define-fits-function/signed-integer	ssize)
+(cc--define-fits-function/unsigned-integer	usize)
+(cc--define-fits-function/signed-integer	sintmax)
+(cc--define-fits-function/unsigned-integer	uintmax)
+(cc--define-fits-function/signed-integer	ptrdiff)
+(cc--define-fits-function/signed-integer	sint8)
+(cc--define-fits-function/unsigned-integer	uint8)
+(cc--define-fits-function/signed-integer	sint16)
+(cc--define-fits-function/unsigned-integer	uint16)
+(cc--define-fits-function/signed-integer	sint32)
+(cc--define-fits-function/unsigned-integer	uint32)
+(cc--define-fits-function/signed-integer	sint64)
+(cc--define-fits-function/unsigned-integer	uint64)
+(cc--define-fits-function/floating-point	float)
+(cc--define-fits-function/floating-point	ldouble)
 
 
 ;;;; numeric comparison operations
@@ -306,10 +352,10 @@
 ;;
 ;;* We convert all the unsigned integers to `cc-uint64'.
 ;;
-;;* We convert all the floating-point numbers to `cc-long-double'.
+;;* We convert all the floating-point numbers to `cc-ldouble'.
 ;;
 ;;* When  comparing  integers  and floating-point  numbers  we  convert  all  the integer  types  to
-;;  `cc-long-double'.
+;;  `cc-ldouble'.
 ;;
 
 (defmacro cc--define-numeric-comparison-generic-functions (OPERATOR)
@@ -342,10 +388,10 @@
   ;;Define  a  comparison  methods that  converts  the  operands  and  then invokes  an  appropriate
   ;;operation.  Examples:
   ;;
-  ;; (cc--def-numeric-compar-method cc-=2 = cc-=2 integer cc-sint64 cc-float cc-long-double)
+  ;; (cc--def-numeric-compar-method cc-=2 = cc-=2 integer cc-sint64 cc-float cc-ldouble)
   ;; ==> (cl-defmethod cc-=2 ((op1 integer) (op2 cc-float))
   ;;       "..."
-  ;;       (cc-=2 (cc-sint64 op1) (cc-long-double op2)))
+  ;;       (cc-=2 (cc-sint64 op1) (cc-ldouble op2)))
   ;;
   ;; (cc--def-numeric-compar-method cc-=2 = = integer identity integer identity)
   ;; ==> (cl-defmethod cc-=2 ((op1 integer) (op2 integer))
@@ -378,7 +424,7 @@ The argument OP2 must be of type `" TYPE2.str "'.
 	 (OPERATION-UINT64		(intern (concat "mmux-core-c-uint64" OPERATOR.str)))
 	 (OPERATION-SINT64-UINT64	(intern (concat "mmux-core-c-sint64-uint64" OPERATOR.str)))
 	 (OPERATION-UINT64-SINT64	(intern (concat "mmux-core-c-uint64-sint64" OPERATOR.str)))
-	 (OPERATION-LONG-DOUBLE		(intern (concat "mmux-core-c-long-double" OPERATOR.str))))
+	 (OPERATION-LDOUBLE		(intern (concat "mmux-core-c-ldouble" OPERATOR.str))))
     `(progn
        (cc--define-numeric-comparison-generic-functions ,OPERATOR)
 
@@ -393,15 +439,15 @@ The argument OP2 must be of type `" TYPE2.str "'.
        (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,OPERATION-UINT64        cc-uint64 cc-uint64-obj cc-uint64 cc-uint64-obj)
        (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,OPERATION-SINT64-UINT64 cc-sint64 cc-sint64-obj cc-uint64 cc-uint64-obj)
        (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,OPERATION-UINT64-SINT64 cc-uint64 cc-uint64-obj cc-sint64 cc-sint64-obj)
-       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,OPERATION-LONG-DOUBLE
-				      cc-long-double cc-long-double-obj
-				      cc-long-double cc-long-double-obj)
+       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,OPERATION-LDOUBLE
+				      cc-ldouble cc-ldouble-obj
+				      cc-ldouble cc-ldouble-obj)
 
        ;; These are the methods that normalise operands among operational types.
-       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-sint64 cc-long-double cc-long-double identity)
-       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-uint64 cc-long-double cc-long-double identity)
-       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-long-double identity cc-sint64 cc-long-double)
-       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-long-double identity cc-uint64 cc-long-double)
+       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-sint64 cc-ldouble cc-ldouble identity)
+       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-uint64 cc-ldouble cc-ldouble identity)
+       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-ldouble identity cc-sint64 cc-ldouble)
+       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-ldouble identity cc-uint64 cc-ldouble)
 
        ;; These are the methods that normalise among integer types.
        (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-signed-integer   cc-sint64 cc-signed-integer   cc-sint64)
@@ -410,17 +456,17 @@ The argument OP2 must be of type `" TYPE2.str "'.
        (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-unsigned-integer cc-uint64 cc-signed-integer   cc-sint64)
 
        ;; These are the methods that normalise among floating point types.
-       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-floating-point cc-long-double cc-floating-point cc-long-double)
+       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-floating-point cc-ldouble cc-floating-point cc-ldouble)
 
        ;; These are the methods that normalise mixed numeric types: `cc-floating-point', `cc-signed-integer', `cc-unsigned-intger'.
-       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-floating-point   cc-long-double cc-signed-integer   cc-sint64)
-       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-signed-integer   cc-sint64      cc-floating-point   cc-long-double)
-       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-floating-point   cc-long-double cc-unsigned-integer cc-uint64)
-       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-unsigned-integer cc-uint64      cc-floating-point   cc-long-double)
+       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-floating-point   cc-ldouble cc-signed-integer   cc-sint64)
+       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-signed-integer   cc-sint64      cc-floating-point   cc-ldouble)
+       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-floating-point   cc-ldouble cc-unsigned-integer cc-uint64)
+       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-unsigned-integer cc-uint64      cc-floating-point   cc-ldouble)
 
        ;; These are the methods that normalise mixed numeric types: `integer' and `cc-floating-point'.
-       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 integer           cc-long-double cc-floating-point cc-long-double)
-       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-floating-point cc-long-double integer           cc-long-double)
+       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 integer           cc-ldouble cc-floating-point cc-ldouble)
+       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-floating-point cc-ldouble integer           cc-ldouble)
 
        ;; These are the methods that normalise mixed numeric types: `integer' and `cc-signed-integer'.
        (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 integer           cc-sint64 cc-signed-integer cc-sint64)
@@ -431,16 +477,16 @@ The argument OP2 must be of type `" TYPE2.str "'.
        (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-unsigned-integer cc-uint64 integer             cc-sint64)
 
        ;; These are the methods that normalise mixed numeric types: `float' and `cc-floating-point'.
-       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 float             cc-long-double cc-floating-point cc-long-double)
-       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-floating-point cc-long-double float             cc-long-double)
+       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 float             cc-ldouble cc-floating-point cc-ldouble)
+       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-floating-point cc-ldouble float             cc-ldouble)
 
        ;; These are the methods that normalise mixed numeric types: `float' and `cc-signed-integer'.
-       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 float             cc-long-double cc-signed-integer cc-long-double)
-       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-signed-integer cc-long-double float             cc-long-double)
+       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 float             cc-ldouble cc-signed-integer cc-ldouble)
+       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-signed-integer cc-ldouble float             cc-ldouble)
 
        ;; These are the methods that normalise mixed numeric types: `float' and `cc-unsigned-integer'.
-       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 float               cc-long-double cc-unsigned-integer cc-long-double)
-       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-unsigned-integer cc-long-double float               cc-long-double)
+       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 float               cc-ldouble cc-unsigned-integer cc-ldouble)
+       (cc--def-numeric-compar-method ,CC-FUNC2 ,OPERATOR ,CC-FUNC2 cc-unsigned-integer cc-ldouble float               cc-ldouble)
        )))
 
 (cc--define-numeric-comparison =)

@@ -79,11 +79,11 @@
 	 (should (not	(cc= (,TYPE 5.0) (cc-float 17.0))))
 	 (should	(cc= (cc-float 1.0) (,TYPE 1.0)))
 	 (should (not	(cc= (cc-float 5.0) (,TYPE 17.0))))
-	 ;; Compare with a cc-long-double.
-	 (should	(cc= (,TYPE 1.0) (cc-long-double 1.0)))
-	 (should (not	(cc= (,TYPE 5.0) (cc-long-double 17.0))))
-	 (should	(cc= (cc-long-double 1.0) (,TYPE 1.0)))
-	 (should (not	(cc= (cc-long-double 5.0) (,TYPE 17.0))))
+	 ;; Compare with a cc-ldouble.
+	 (should	(cc= (,TYPE 1.0) (cc-ldouble 1.0)))
+	 (should (not	(cc= (,TYPE 5.0) (cc-ldouble 17.0))))
+	 (should	(cc= (cc-ldouble 1.0) (,TYPE 1.0)))
+	 (should (not	(cc= (cc-ldouble 5.0) (,TYPE 17.0))))
 	 ))))
 
 (ert-deftest equality-integer ()
@@ -124,7 +124,7 @@
 
 (mmux-core-test--floating-point--equal-tests	float)
 (mmux-core-test--floating-point--equal-tests	cc-float)
-(mmux-core-test--floating-point--equal-tests	cc-long-double)
+(mmux-core-test--floating-point--equal-tests	cc-ldouble)
 
 
 ;;;; not-equality tests
@@ -201,11 +201,11 @@
 	 (should 	(cc/= (,TYPE 5.0) (cc-float 17.0)))
 	 (should (not	(cc/= (cc-float 1.0) (,TYPE 1.0))))
 	 (should 	(cc/= (cc-float 5.0) (,TYPE 17.0)))
-	 ;; Compare with a cc-long-double.
-	 (should (not	(cc/= (,TYPE 1.0) (cc-long-double 1.0))))
-	 (should 	(cc/= (,TYPE 5.0) (cc-long-double 17.0)))
-	 (should (not	(cc/= (cc-long-double 1.0) (,TYPE 1.0))))
-	 (should 	(cc/= (cc-long-double 5.0) (,TYPE 17.0)))
+	 ;; Compare with a cc-ldouble.
+	 (should (not	(cc/= (,TYPE 1.0) (cc-ldouble 1.0))))
+	 (should 	(cc/= (,TYPE 5.0) (cc-ldouble 17.0)))
+	 (should (not	(cc/= (cc-ldouble 1.0) (,TYPE 1.0))))
+	 (should 	(cc/= (cc-ldouble 5.0) (,TYPE 17.0)))
 	 ))))
 
 (ert-deftest not-equality-integer ()
@@ -246,7 +246,7 @@
 
 (mmux-core-test--floating-point--not-equal-tests float)
 (mmux-core-test--floating-point--not-equal-tests cc-float)
-(mmux-core-test--floating-point--not-equal-tests cc-long-double)
+(mmux-core-test--floating-point--not-equal-tests cc-ldouble)
 
 
 ;;;; less-than tests
@@ -338,13 +338,13 @@
 	 (should 	(cc< (cc-float 1.0) (,TYPE 2.0)))
 	 (should (not	(cc< (cc-float 1.0) (,TYPE 1.0))))
 	 (should (not	(cc< (cc-float 2.0) (,TYPE 1.0))))
-	 ;; Compare with a cc-long-double.
-	 (should 	(cc< (,TYPE 1.0) (cc-long-double 2.0)))
-	 (should (not	(cc< (,TYPE 1.0) (cc-long-double 1.0))))
-	 (should (not	(cc< (,TYPE 2.0) (cc-long-double 1.0))))
-	 (should 	(cc< (cc-long-double 1.0) (,TYPE 2.0)))
-	 (should (not	(cc< (cc-long-double 1.0) (,TYPE 1.0))))
-	 (should (not	(cc< (cc-long-double 2.0) (,TYPE 1.0))))
+	 ;; Compare with a cc-ldouble.
+	 (should 	(cc< (,TYPE 1.0) (cc-ldouble 2.0)))
+	 (should (not	(cc< (,TYPE 1.0) (cc-ldouble 1.0))))
+	 (should (not	(cc< (,TYPE 2.0) (cc-ldouble 1.0))))
+	 (should 	(cc< (cc-ldouble 1.0) (,TYPE 2.0)))
+	 (should (not	(cc< (cc-ldouble 1.0) (,TYPE 1.0))))
+	 (should (not	(cc< (cc-ldouble 2.0) (,TYPE 1.0))))
 	 ))))
 
 (ert-deftest less-than-integer ()
@@ -387,7 +387,7 @@
 
 (mmux-core-test--floating-point--less-than-tests float)
 (mmux-core-test--floating-point--less-than-tests cc-float)
-(mmux-core-test--floating-point--less-than-tests cc-long-double)
+(mmux-core-test--floating-point--less-than-tests cc-ldouble)
 
 
 ;;;; greater-than tests
@@ -477,13 +477,13 @@
 	 (should (not 	(cc> (cc-float 1.0) (,TYPE 2.0))))
 	 (should (not	(cc> (cc-float 1.0) (,TYPE 1.0))))
 	 (should 	(cc> (cc-float 2.0) (,TYPE 1.0)))
-	 ;; Compare with a cc-long-double.
-	 (should (not 	(cc> (,TYPE 1.0) (cc-long-double 2.0))))
-	 (should (not	(cc> (,TYPE 1.0) (cc-long-double 1.0))))
-	 (should 	(cc> (,TYPE 2.0) (cc-long-double 1.0)))
-	 (should (not 	(cc> (cc-long-double 1.0) (,TYPE 2.0))))
-	 (should (not	(cc> (cc-long-double 1.0) (,TYPE 1.0))))
-	 (should 	(cc> (cc-long-double 2.0) (,TYPE 1.0)))
+	 ;; Compare with a cc-ldouble.
+	 (should (not 	(cc> (,TYPE 1.0) (cc-ldouble 2.0))))
+	 (should (not	(cc> (,TYPE 1.0) (cc-ldouble 1.0))))
+	 (should 	(cc> (,TYPE 2.0) (cc-ldouble 1.0)))
+	 (should (not 	(cc> (cc-ldouble 1.0) (,TYPE 2.0))))
+	 (should (not	(cc> (cc-ldouble 1.0) (,TYPE 1.0))))
+	 (should 	(cc> (cc-ldouble 2.0) (,TYPE 1.0)))
 	 ))))
 
 (ert-deftest greater-than-integer ()
@@ -526,7 +526,7 @@
 
 (mmux-core-test--floating-point--greater-than-tests float)
 (mmux-core-test--floating-point--greater-than-tests cc-float)
-(mmux-core-test--floating-point--greater-than-tests cc-long-double)
+(mmux-core-test--floating-point--greater-than-tests cc-ldouble)
 
 
 ;;;; less-than or equal-to tests
@@ -618,13 +618,13 @@
 	 (should 	(cc<= (cc-float 1.0) (,TYPE 2.0)))
 	 (should 	(cc<= (cc-float 1.0) (,TYPE 1.0)))
 	 (should (not	(cc<= (cc-float 2.0) (,TYPE 1.0))))
-	 ;; Compare with a cc-long-double.
-	 (should 	(cc<= (,TYPE 1.0) (cc-long-double 2.0)))
-	 (should 	(cc<= (,TYPE 1.0) (cc-long-double 1.0)))
-	 (should (not	(cc<= (,TYPE 2.0) (cc-long-double 1.0))))
-	 (should 	(cc<= (cc-long-double 1.0) (,TYPE 2.0)))
-	 (should 	(cc<= (cc-long-double 1.0) (,TYPE 1.0)))
-	 (should (not	(cc<= (cc-long-double 2.0) (,TYPE 1.0))))
+	 ;; Compare with a cc-ldouble.
+	 (should 	(cc<= (,TYPE 1.0) (cc-ldouble 2.0)))
+	 (should 	(cc<= (,TYPE 1.0) (cc-ldouble 1.0)))
+	 (should (not	(cc<= (,TYPE 2.0) (cc-ldouble 1.0))))
+	 (should 	(cc<= (cc-ldouble 1.0) (,TYPE 2.0)))
+	 (should 	(cc<= (cc-ldouble 1.0) (,TYPE 1.0)))
+	 (should (not	(cc<= (cc-ldouble 2.0) (,TYPE 1.0))))
 	 ))))
 
 (ert-deftest less-than-or-equal-to-integer ()
@@ -667,7 +667,7 @@
 
 (mmux-core-test--floating-point--less-than-or-equal-to-tests float)
 (mmux-core-test--floating-point--less-than-or-equal-to-tests cc-float)
-(mmux-core-test--floating-point--less-than-or-equal-to-tests cc-long-double)
+(mmux-core-test--floating-point--less-than-or-equal-to-tests cc-ldouble)
 
 
 ;;;; greater-than or equal-to tests
@@ -760,13 +760,13 @@
 	 (should (not 	(cc>= (cc-float 1.0) (,TYPE 2.0))))
 	 (should 	(cc>= (cc-float 1.0) (,TYPE 1.0)))
 	 (should 	(cc>= (cc-float 2.0) (,TYPE 1.0)))
-	 ;; Compare with a cc-long-double.
-	 (should (not 	(cc>= (,TYPE 1.0) (cc-long-double 2.0))))
-	 (should 	(cc>= (,TYPE 1.0) (cc-long-double 1.0)))
-	 (should 	(cc>= (,TYPE 2.0) (cc-long-double 1.0)))
-	 (should (not 	(cc>= (cc-long-double 1.0) (,TYPE 2.0))))
-	 (should 	(cc>= (cc-long-double 1.0) (,TYPE 1.0)))
-	 (should 	(cc>= (cc-long-double 2.0) (,TYPE 1.0)))
+	 ;; Compare with a cc-ldouble.
+	 (should (not 	(cc>= (,TYPE 1.0) (cc-ldouble 2.0))))
+	 (should 	(cc>= (,TYPE 1.0) (cc-ldouble 1.0)))
+	 (should 	(cc>= (,TYPE 2.0) (cc-ldouble 1.0)))
+	 (should (not 	(cc>= (cc-ldouble 1.0) (,TYPE 2.0))))
+	 (should 	(cc>= (cc-ldouble 1.0) (,TYPE 1.0)))
+	 (should 	(cc>= (cc-ldouble 2.0) (,TYPE 1.0)))
 	 ))))
 
 (ert-deftest greater-than-or-equal-to-integer ()
@@ -809,7 +809,7 @@
 
 (mmux-core-test--floating-point--greater-than-or-equal-to-tests float)
 (mmux-core-test--floating-point--greater-than-or-equal-to-tests cc-float)
-(mmux-core-test--floating-point--greater-than-or-equal-to-tests cc-long-double)
+(mmux-core-test--floating-point--greater-than-or-equal-to-tests cc-ldouble)
 
 
 ;;;; mixed integer floating-point equality
@@ -827,7 +827,7 @@
 
 (mmux-core-test--mixed-integer--equal-tests		cc-float)
 (mmux-core-test--mixed-integer--equal-tests		float)
-(mmux-core-test--mixed-integer--equal-tests		cc-long-double)
+(mmux-core-test--mixed-integer--equal-tests		cc-ldouble)
 
 ;;; --------------------------------------------------------------------
 
@@ -849,8 +849,8 @@
 (mmux-core-test--mixed--equal-tests cc-sint	float)
 (mmux-core-test--mixed--equal-tests cc-uint	float)
 
-(mmux-core-test--mixed--equal-tests cc-sint	cc-long-double)
-(mmux-core-test--mixed--equal-tests cc-uint	cc-long-double)
+(mmux-core-test--mixed--equal-tests cc-sint	cc-ldouble)
+(mmux-core-test--mixed--equal-tests cc-uint	cc-ldouble)
 
 
 ;;;; done

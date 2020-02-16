@@ -29,7 +29,7 @@
   "Setters and getters for a `cc-bytevector-u8' object."
   (let ((bv	(cc-bytevector-u8 10)))
     (dotimes (i 10)
-      (cc-bytevector-set! bv i (cc-uint8 (+ 10 i))))
+      (cc-bytevector-set bv i (cc-uint8 (+ 10 i))))
     (dotimes (i 10)
       (should (cc= (cc-uint8 (+ 10 i))
     		   (cc-bytevector-ref bv i))))))
@@ -38,7 +38,7 @@
   "Setters and getters for a `cc-bytevector-s8' object."
   (let ((bv	(cc-bytevector-s8 10)))
     (dotimes (i 10)
-      (cc-bytevector-set! bv i (cc-sint8 (+ -10 i))))
+      (cc-bytevector-set bv i (cc-sint8 (+ -10 i))))
     (dotimes (i 10)
       (should (cc= (cc-sint8 (+ -10 i))
     		   (cc-bytevector-ref bv i))))))
@@ -49,7 +49,7 @@
   "Setters and getters for a `cc-bytevector-u16' object."
   (let ((bv	(cc-bytevector-u16 10)))
     (dotimes (i 10)
-      (cc-bytevector-set! bv i (cc-uint16 (+ 10 i))))
+      (cc-bytevector-set bv i (cc-uint16 (+ 10 i))))
     (dotimes (i 10)
       (should (cc= (cc-uint16 (+ 10 i))
     		   (cc-bytevector-ref bv i))))))
@@ -58,7 +58,7 @@
   "Setters and getters for a `cc-bytevector-s16' object."
   (let ((bv	(cc-bytevector-s16 10)))
     (dotimes (i 10)
-      (cc-bytevector-set! bv i (cc-sint16 (+ -10 i))))
+      (cc-bytevector-set bv i (cc-sint16 (+ -10 i))))
     (dotimes (i 10)
       (should (cc= (cc-sint16 (+ -10 i))
     		   (cc-bytevector-ref bv i))))))
@@ -69,7 +69,7 @@
   "Setters and getters for a `cc-bytevector-u32' object."
   (let ((bv	(cc-bytevector-u32 10)))
     (dotimes (i 10)
-      (cc-bytevector-set! bv i (cc-uint32 (+ 10 i))))
+      (cc-bytevector-set bv i (cc-uint32 (+ 10 i))))
     (dotimes (i 10)
       (should (cc= (cc-uint32 (+ 10 i))
     		   (cc-bytevector-ref bv i))))))
@@ -78,7 +78,7 @@
   "Setters and getters for a `cc-bytevector-s32' object."
   (let ((bv	(cc-bytevector-s32 10)))
     (dotimes (i 10)
-      (cc-bytevector-set! bv i (cc-sint32 (+ -10 i))))
+      (cc-bytevector-set bv i (cc-sint32 (+ -10 i))))
     (dotimes (i 10)
       (should (cc= (cc-sint32 (+ -10 i))
     		   (cc-bytevector-ref bv i))))))
@@ -89,7 +89,7 @@
   "Setters and getters for a `cc-bytevector-u64' object."
   (let ((bv	(cc-bytevector-u64 10)))
     (dotimes (i 10)
-      (cc-bytevector-set! bv i (cc-uint64 (+ 10 i))))
+      (cc-bytevector-set bv i (cc-uint64 (+ 10 i))))
     (dotimes (i 10)
       (should (cc= (cc-uint64 (+ 10 i))
     		   (cc-bytevector-ref bv i))))))
@@ -98,7 +98,7 @@
   "Setters and getters for a `cc-bytevector-s64' object."
   (let ((bv	(cc-bytevector-s64 10)))
     (dotimes (i 10)
-      (cc-bytevector-set! bv i (cc-sint64 (+ -10 i))))
+      (cc-bytevector-set bv i (cc-sint64 (+ -10 i))))
     (dotimes (i 10)
       (should (cc= (cc-sint64 (+ -10 i))
     		   (cc-bytevector-ref bv i))))))

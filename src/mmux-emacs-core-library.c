@@ -44,22 +44,22 @@ int  plugin_is_GPL_compatible;
  ** ----------------------------------------------------------------- */
 
 char const *
-mmux_emacs_core_version_string (void)
+mmec_version_string (void)
 {
   return mmux_emacs_core_VERSION_INTERFACE_STRING;
 }
 int
-mmux_emacs_core_version_interface_current (void)
+mmec_version_interface_current (void)
 {
   return mmux_emacs_core_VERSION_INTERFACE_CURRENT;
 }
 int
-mmux_emacs_core_version_interface_revision (void)
+mmec_version_interface_revision (void)
 {
   return mmux_emacs_core_VERSION_INTERFACE_REVISION;
 }
 int
-mmux_emacs_core_version_interface_age (void)
+mmec_version_interface_age (void)
 {
   return mmux_emacs_core_VERSION_INTERFACE_AGE;
 }
@@ -67,32 +67,32 @@ mmux_emacs_core_version_interface_age (void)
 /* ------------------------------------------------------------------ */
 
 static emacs_value
-Fmmux_emacs_core_version_string (MMUX_EMACS_IFACE_FUNCTION_UNUSED_ARGS)
+Fmmec_version_string (MMEC_ELISP_FUNCTION_UNUSED_ARGS)
 {
-  char const *	str = mmux_emacs_core_version_string();
+  char const *	str = mmec_version_string();
 
-  return mmux_emacs_core_make_string(env, str, strlen(str));
+  return mmec_new_emacs_value_string(env, str, strlen(str));
 }
 static emacs_value
-Fmmux_emacs_core_version_interface_current (MMUX_EMACS_IFACE_FUNCTION_UNUSED_ARGS)
+Fmmec_version_interface_current (MMEC_ELISP_FUNCTION_UNUSED_ARGS)
 {
-  int	N = mmux_emacs_core_version_interface_current();
+  int	N = mmec_version_interface_current();
 
-  return mmux_emacs_core_make_integer(env, (intmax_t)N);
+  return mmec_new_emacs_value_integer(env, (intmax_t)N);
 }
 static emacs_value
-Fmmux_emacs_core_version_interface_revision (MMUX_EMACS_IFACE_FUNCTION_UNUSED_ARGS)
+Fmmec_version_interface_revision (MMEC_ELISP_FUNCTION_UNUSED_ARGS)
 {
-  int	N = mmux_emacs_core_version_interface_revision();
+  int	N = mmec_version_interface_revision();
 
-  return mmux_emacs_core_make_integer(env, (intmax_t)N);
+  return mmec_new_emacs_value_integer(env, (intmax_t)N);
 }
 static emacs_value
-Fmmux_emacs_core_version_interface_age (MMUX_EMACS_IFACE_FUNCTION_UNUSED_ARGS)
+Fmmec_version_interface_age (MMEC_ELISP_FUNCTION_UNUSED_ARGS)
 {
-  int	N = mmux_emacs_core_version_interface_age();
+  int	N = mmec_version_interface_age();
 
-  return mmux_emacs_core_make_integer(env, (intmax_t)N);
+  return mmec_new_emacs_value_integer(env, (intmax_t)N);
 }
 
 
@@ -101,31 +101,31 @@ Fmmux_emacs_core_version_interface_age (MMUX_EMACS_IFACE_FUNCTION_UNUSED_ARGS)
  ** ----------------------------------------------------------------- */
 
 #define NUMBER_OF_MODULE_FUNCTIONS	4
-static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNCTIONS] = {
+static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNCTIONS] = {
   {
     .name		= "mmec-version-string",
-    .implementation	= Fmmux_emacs_core_version_string,
+    .implementation	= Fmmec_version_string,
     .min_arity		= 0,
     .max_arity		= 0,
     .documentation	= "Return the version string."
   },
   {
     .name		= "mmec-version-interface-current",
-    .implementation	= Fmmux_emacs_core_version_interface_current,
+    .implementation	= Fmmec_version_interface_current,
     .min_arity		= 0,
     .max_arity		= 0,
     .documentation	= "Return the interface version current number."
   },
   {
     .name		= "mmec-version-interface-revision",
-    .implementation	= Fmmux_emacs_core_version_interface_revision,
+    .implementation	= Fmmec_version_interface_revision,
     .min_arity		= 0,
     .max_arity		= 0,
     .documentation	= "Return the interface version revision number."
   },
   {
     .name		= "mmec-version-interface-age",
-    .implementation	= Fmmux_emacs_core_version_interface_age,
+    .implementation	= Fmmec_version_interface_age,
     .min_arity		= 0,
     .max_arity		= 0,
     .documentation	= "Return the interface version age number."
@@ -138,7 +138,7 @@ static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODUL
  ** ----------------------------------------------------------------- */
 
 void
-mmux_emacs_define_functions_from_table (emacs_env * env, mmux_emacs_module_function_t const * module_functions,
+mmec_define_elisp_functions_from_table (emacs_env * env, mmec_module_function_t const * module_functions,
 					int number_of_module_functions, int verbose)
 {
   emacs_value	Qdefalias = env->intern(env, "defalias");
@@ -171,10 +171,9 @@ emacs_module_init (struct emacs_runtime *ert)
     if (env->size < (ptrdiff_t)sizeof(*env)) {
       return 2;
     } else {
-      mmux_emacs_define_functions_from_table(env, module_functions_table, NUMBER_OF_MODULE_FUNCTIONS, 0);
-      mmux_emacs_core_user_ptr_objects_init(env);
-      mmux_emacs_core_user_number_objects_init(env);
-      mmux_emacs_core_bytevectors_init(env);
+      mmec_define_elisp_functions_from_table(env, module_functions_table, NUMBER_OF_MODULE_FUNCTIONS, 0);
+      mmec_number_objects_init(env);
+      mmec_bytevector_objects_init(env);
       return 0;
     }
   }

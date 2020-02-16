@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-10 07:39:15 marco>
+;; Time-stamp: <2020-02-14 06:43:58 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -39,7 +39,7 @@
 
 ;;;; bytevector objects: object definitions
 ;;
-;; mmux-core-c-make-bytevector NUMBER-OF-SLOTS SLOT-SIZE SIGNED
+;; mmec-c-make-bytevector NUMBER-OF-SLOTS SLOT-SIZE SIGNED
 ;;
 ;;Defined a the C language level.  Build and return a new custom pointer object.
 ;;
@@ -78,11 +78,11 @@
 (cl-defmethod  cc-bytevector-u8 ((number-of-slots integer))
   "Build and return a new instance of `cc-bytevector-u8'."
   (cl-assert (<= 0 number-of-slots))
-  (cc-bytevector-u8--make
+  (cc--make cc-bytevector-u8
    :number-of-slots		number-of-slots
    :slot-size			1
    :signed			nil
-   :obj				(mmux-core-c-make-bytevector number-of-slots 1 0)
+   :obj				(mmec-c-make-bytevector number-of-slots 1 0)
    :number-of-allocated-bytes	(* number-of-slots 1)))
 
 (cl-defstruct (cc-bytevector-s8
@@ -94,11 +94,11 @@
 (cl-defmethod  cc-bytevector-s8 ((number-of-slots integer))
   "Build and return a new instance of `cc-bytevector-s8'."
   (cl-assert (<= 0 number-of-slots))
-  (cc-bytevector-s8--make
+  (cc--make cc-bytevector-s8
    :number-of-slots		number-of-slots
    :slot-size			1
    :signed			t
-   :obj				(mmux-core-c-make-bytevector number-of-slots 1 1)
+   :obj				(mmec-c-make-bytevector number-of-slots 1 1)
    :number-of-allocated-bytes	(* number-of-slots 1)))
 
 ;;; --------------------------------------------------------------------
@@ -112,11 +112,11 @@
 (cl-defmethod  cc-bytevector-u16 ((number-of-slots integer))
   "Build and return a new instance of `cc-bytevector-u16'."
   (cl-assert (<= 0 number-of-slots))
-  (cc-bytevector-u16--make
+  (cc--make cc-bytevector-u16
    :number-of-slots		number-of-slots
    :slot-size			2
    :signed			nil
-   :obj				(mmux-core-c-make-bytevector number-of-slots 2 0)
+   :obj				(mmec-c-make-bytevector number-of-slots 2 0)
    :number-of-allocated-bytes	(* number-of-slots 2)))
 
 (cl-defstruct (cc-bytevector-s16
@@ -128,11 +128,11 @@
 (cl-defmethod  cc-bytevector-s16 ((number-of-slots integer))
   "Build and return a new instance of `cc-bytevector-s16'."
   (cl-assert (<= 0 number-of-slots))
-  (cc-bytevector-s16--make
+  (cc--make cc-bytevector-s16
    :number-of-slots		number-of-slots
    :slot-size			2
    :signed			t
-   :obj				(mmux-core-c-make-bytevector number-of-slots 2 1)
+   :obj				(mmec-c-make-bytevector number-of-slots 2 1)
    :number-of-allocated-bytes	(* number-of-slots 2)))
 
 ;;; --------------------------------------------------------------------
@@ -146,11 +146,11 @@
 (cl-defmethod  cc-bytevector-u32 ((number-of-slots integer))
   "Build and return a new instance of `cc-bytevector-u32'."
   (cl-assert (<= 0 number-of-slots))
-  (cc-bytevector-u32--make
+  (cc--make cc-bytevector-u32
    :number-of-slots		number-of-slots
    :slot-size			4
    :signed			nil
-   :obj				(mmux-core-c-make-bytevector number-of-slots 4 0)
+   :obj				(mmec-c-make-bytevector number-of-slots 4 0)
    :number-of-allocated-bytes	(* number-of-slots 4)))
 
 (cl-defstruct (cc-bytevector-s32
@@ -162,11 +162,11 @@
 (cl-defmethod  cc-bytevector-s32 ((number-of-slots integer))
   "Build and return a new instance of `cc-bytevector-s32'."
   (cl-assert (<= 0 number-of-slots))
-  (cc-bytevector-s32--make
+  (cc--make cc-bytevector-s32
    :number-of-slots		number-of-slots
    :slot-size			4
    :signed			t
-   :obj				(mmux-core-c-make-bytevector number-of-slots 4 1)
+   :obj				(mmec-c-make-bytevector number-of-slots 4 1)
    :number-of-allocated-bytes	(* number-of-slots 4)))
 
 ;;; --------------------------------------------------------------------
@@ -180,11 +180,11 @@
 (cl-defmethod  cc-bytevector-u64 ((number-of-slots integer))
   "Build and return a new instance of `cc-bytevector-u64'."
   (cl-assert (<= 0 number-of-slots))
-  (cc-bytevector-u64--make
+  (cc--make cc-bytevector-u64
    :number-of-slots		number-of-slots
    :slot-size			8
    :signed			nil
-   :obj				(mmux-core-c-make-bytevector number-of-slots 8 0)
+   :obj				(mmec-c-make-bytevector number-of-slots 8 0)
    :number-of-allocated-bytes	(* number-of-slots 8)))
 
 (cl-defstruct (cc-bytevector-s64
@@ -196,11 +196,11 @@
 (cl-defmethod  cc-bytevector-s64 ((number-of-slots integer))
   "Build and return a new instance of `cc-bytevector-s64'."
   (cl-assert (<= 0 number-of-slots))
-  (cc-bytevector-s64--make
+  (cc--make cc-bytevector-s64
    :number-of-slots		number-of-slots
    :slot-size			8
    :signed			t
-   :obj				(mmux-core-c-make-bytevector number-of-slots 8 1)
+   :obj				(mmec-c-make-bytevector number-of-slots 8 1)
    :number-of-allocated-bytes	(* number-of-slots 8)))
 
 ;;; --------------------------------------------------------------------
@@ -214,10 +214,10 @@
 (cl-defmethod  cc-bytevector-float ((number-of-slots integer))
   "Build and return a new instance of `cc-bytevector-float'."
   (cl-assert (<= 0 number-of-slots))
-  (cc-bytevector-float--make
+  (cc--make cc-bytevector-float
    :number-of-slots		number-of-slots
    :slot-size			cc-SIZEOF_FLOAT
-   :obj				(mmux-core-c-make-bytevector number-of-slots cc-SIZEOF_FLOAT 1)
+   :obj				(mmec-c-make-bytevector number-of-slots cc-SIZEOF_FLOAT 1)
    :number-of-allocated-bytes	(* number-of-slots cc-SIZEOF_FLOAT)))
 
 ;;; --------------------------------------------------------------------
@@ -231,10 +231,10 @@
 (cl-defmethod  cc-bytevector-double ((number-of-slots integer))
   "Build and return a new instance of `cc-bytevector-double'."
   (cl-assert (<= 0 number-of-slots))
-  (cc-bytevector-double--make
+  (cc--make cc-bytevector-double
    :number-of-slots		number-of-slots
    :slot-size			cc-SIZEOF_DOUBLE
-   :obj				(mmux-core-c-make-bytevector number-of-slots cc-SIZEOF_DOUBLE 1)
+   :obj				(mmec-c-make-bytevector number-of-slots cc-SIZEOF_DOUBLE 1)
    :number-of-allocated-bytes	(* number-of-slots cc-SIZEOF_DOUBLE)))
 
 ;;; --------------------------------------------------------------------
@@ -248,10 +248,10 @@
 (cl-defmethod  cc-bytevector-ldouble ((number-of-slots integer))
   "Build and return a new instance of `cc-bytevector-ldouble'."
   (cl-assert (<= 0 number-of-slots))
-  (cc-bytevector-ldouble--make
+  (cc--make cc-bytevector-ldouble
    :number-of-slots		number-of-slots
    :slot-size			cc-SIZEOF_LDOUBLE
-   :obj				(mmux-core-c-make-bytevector number-of-slots cc-SIZEOF_LDOUBLE 1)
+   :obj				(mmec-c-make-bytevector number-of-slots cc-SIZEOF_LDOUBLE 1)
    :number-of-allocated-bytes	(* number-of-slots cc-SIZEOF_LDOUBLE)))
 
 
@@ -260,7 +260,7 @@
 (cl-defgeneric cc-bytevector-ref (bv idx)
   "Extract a value from a bytevector.")
 
-(cl-defgeneric cc-bytevector-set! (bv idx val)
+(cl-defgeneric cc-bytevector-set (bv idx val)
   "Store the value VAL into the bytevector BV at index IDX.")
 
 (defmacro cc--define-bytevector-getter (TYPESTEM LTYPE CTYPE)
@@ -269,7 +269,7 @@
 	 (BYTEVECTOR-TYPE	(intern (concat "cc-bytevector-" TYPESTEM.str)))
 	 (DOCSTRING		(concat "Extract a value of type `" (symbol-name CTYPE) "' from the bytevector BV at index IDX."))
 	 (MAKE-LTYPE		LTYPE)
-	 (C-FUNC		(intern (concat "mmux-core-c-bytevector-" TYPESTEM.str "-ref"))))
+	 (C-FUNC		(intern (concat "mmec-c-bytevector-" TYPESTEM.str "-ref"))))
     `(cl-defmethod cc-bytevector-ref ((bv ,BYTEVECTOR-TYPE) (idx integer))
        ,DOCSTRING
        (cl-assert (cc-fits-usize-p idx))
@@ -281,8 +281,8 @@
 	 (BYTEVECTOR-TYPE	(intern (concat "cc-bytevector-" TYPESTEM.str)))
 	 (DOCSTRING		(concat "Store a value VAL of type `" (symbol-name CTYPE) "' into the bytevector BV at index IDX."))
 	 (LTYPE-OBJ		(intern (concat LTYPE.str "-obj")))
-	 (C-FUNC		(intern (concat "mmux-core-c-bytevector-" TYPESTEM.str "-set!"))))
-    `(cl-defmethod cc-bytevector-set! ((bv ,BYTEVECTOR-TYPE) (idx integer) (val ,LTYPE))
+	 (C-FUNC		(intern (concat "mmec-c-bytevector-" TYPESTEM.str "-set"))))
+    `(cl-defmethod cc-bytevector-set ((bv ,BYTEVECTOR-TYPE) (idx integer) (val ,LTYPE))
        ,DOCSTRING
        (cl-assert (cc-fits-usize-p idx))
        (,C-FUNC (cc-bytevector-obj bv) idx (,LTYPE-OBJ val)))))

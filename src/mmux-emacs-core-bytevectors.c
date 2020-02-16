@@ -27,6 +27,48 @@
  ** ----------------------------------------------------------------- */
 
 #include "mmux-emacs-core-internals.h"
+#include <errno.h>
+
+
+/** --------------------------------------------------------------------
+ ** User-pointer objects: bytevectors.
+ ** ----------------------------------------------------------------- */
+
+static void
+mmec_bytevector_finalizer (void * _obj)
+{
+  MMEC_PC(mmec_intrep_bytevector_t, obj, _obj);
+
+  free(obj->ptr);
+  free(obj);
+}
+
+static emacs_value
+Fmmec_make_bytevector (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
+{
+  assert(nargs == 3);
+  size_t	number_of_slots		= (size_t)mmec_extract_elisp_integer_from_emacs_value(env, args[0]);
+  size_t	slot_size		= (size_t)mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
+  int		hold_signed_values	= (int)   mmec_extract_elisp_integer_from_emacs_value(env, args[2]);
+  mmec_intrep_bytevector_t	* obj;
+
+  errno = 0;
+  obj   = (mmec_intrep_bytevector_t *)malloc(sizeof(mmec_intrep_bytevector_t));
+  if (obj) {
+    errno	= 0;
+    obj->ptr	= (uint8_t *)calloc(number_of_slots, slot_size);
+    if (obj->ptr) {
+      obj->number_of_slots	= number_of_slots;
+      obj->slot_size		= slot_size;
+      obj->hold_signed_values	= hold_signed_values? 1 : 0;
+      return mmec_new_emacs_value_from_usrptr_object(env, mmec_bytevector_finalizer, obj);
+    } else {
+      return mmec_error_memory_allocation(env);
+    }
+  } else {
+    return mmec_error_memory_allocation(env);
+  }
+}
 
 
 /** --------------------------------------------------------------------
@@ -34,134 +76,134 @@
  ** ----------------------------------------------------------------- */
 
 static emacs_value
-Fmmux_emacs_core_bytevector_u8_ref (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+Fmmec_bytevector_u8_ref (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
 {
   assert(2 == nargs);
-  mmux_emacs_core_bytevector_t	*bv	= mmux_emacs_core_get_bytevector(env, args[0]);
-  size_t			idx	= (size_t)mmux_emacs_core_extract_integer(env, args[1]);
+  mmec_intrep_bytevector_t	*bv	= mmec_extract_intrep_bytevector(env, args[0]);
+  size_t			idx	= (size_t)mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
 
   if (idx <= bv->number_of_slots) {
-    return mmux_emacs_core_make_integer(env, bv->ptr[idx]);
+    return mmec_new_emacs_value_from_clang_uint8(env, bv->ptr[idx]);
   } else {
-    return mmux_emacs_core_error_bytevector_index_out_of_range(env);
+    return mmec_error_bytevector_index_out_of_range(env);
   }
 }
 
 static emacs_value
-Fmmux_emacs_core_bytevector_s8_ref (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+Fmmec_bytevector_s8_ref (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
 {
   assert(2 == nargs);
-  mmux_emacs_core_bytevector_t	*bv	= mmux_emacs_core_get_bytevector(env, args[0]);
-  size_t			idx	= (size_t)mmux_emacs_core_extract_integer(env, args[1]);
+  mmec_intrep_bytevector_t	*bv	= mmec_extract_intrep_bytevector(env, args[0]);
+  size_t			idx	= (size_t)mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
 
   if (idx <= bv->number_of_slots) {
     int8_t	*slots	= ((int8_t*)(bv->ptr));
 
-    return mmux_emacs_core_make_integer(env, slots[idx]);
+    return mmec_new_emacs_value_from_clang_sint8(env, slots[idx]);
   } else {
-    return mmux_emacs_core_error_bytevector_index_out_of_range(env);
+    return mmec_error_bytevector_index_out_of_range(env);
   }
 }
 
 /* ------------------------------------------------------------------ */
 
 static emacs_value
-Fmmux_emacs_core_bytevector_u16_ref (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+Fmmec_bytevector_u16_ref (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
 {
   assert(2 == nargs);
-  mmux_emacs_core_bytevector_t	*bv	= mmux_emacs_core_get_bytevector(env, args[0]);
-  size_t			idx	= (size_t)mmux_emacs_core_extract_integer(env, args[1]);
+  mmec_intrep_bytevector_t	*bv	= mmec_extract_intrep_bytevector(env, args[0]);
+  size_t			idx	= (size_t)mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
 
   if (idx <= bv->number_of_slots) {
     uint16_t	*slots	= ((uint16_t*)(bv->ptr));
 
-    return mmux_emacs_core_make_integer(env, slots[idx]);
+    return mmec_new_emacs_value_from_clang_uint16(env, slots[idx]);
   } else {
-    return mmux_emacs_core_error_bytevector_index_out_of_range(env);
+    return mmec_error_bytevector_index_out_of_range(env);
   }
 }
 
 static emacs_value
-Fmmux_emacs_core_bytevector_s16_ref (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+Fmmec_bytevector_s16_ref (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
 {
   assert(2 == nargs);
-  mmux_emacs_core_bytevector_t	*bv	= mmux_emacs_core_get_bytevector(env, args[0]);
-  size_t			idx	= (size_t)mmux_emacs_core_extract_integer(env, args[1]);
+  mmec_intrep_bytevector_t	*bv	= mmec_extract_intrep_bytevector(env, args[0]);
+  size_t			idx	= (size_t)mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
 
   if (idx <= bv->number_of_slots) {
     int16_t	*slots	= ((int16_t*)(bv->ptr));
 
-    return mmux_emacs_core_make_integer(env, slots[idx]);
+    return mmec_new_emacs_value_from_clang_sint16(env, slots[idx]);
   } else {
-    return mmux_emacs_core_error_bytevector_index_out_of_range(env);
+    return mmec_error_bytevector_index_out_of_range(env);
   }
 }
 
 /* ------------------------------------------------------------------ */
 
 static emacs_value
-Fmmux_emacs_core_bytevector_u32_ref (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+Fmmec_bytevector_u32_ref (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
 {
   assert(2 == nargs);
-  mmux_emacs_core_bytevector_t	*bv	= mmux_emacs_core_get_bytevector(env, args[0]);
-  size_t			idx	= (size_t)mmux_emacs_core_extract_integer(env, args[1]);
+  mmec_intrep_bytevector_t	*bv	= mmec_extract_intrep_bytevector(env, args[0]);
+  size_t			idx	= (size_t)mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
 
   if (idx <= bv->number_of_slots) {
     uint32_t	*slots	= ((uint32_t *)(bv->ptr));
 
-    return mmux_emacs_core_make_integer(env, slots[idx]);
+    return mmec_new_emacs_value_from_clang_uint32(env, slots[idx]);
   } else {
-    return mmux_emacs_core_error_bytevector_index_out_of_range(env);
+    return mmec_error_bytevector_index_out_of_range(env);
   }
 }
 
 static emacs_value
-Fmmux_emacs_core_bytevector_s32_ref (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+Fmmec_bytevector_s32_ref (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
 {
   assert(2 == nargs);
-  mmux_emacs_core_bytevector_t	*bv	= mmux_emacs_core_get_bytevector(env, args[0]);
-  size_t			idx	= (size_t)mmux_emacs_core_extract_integer(env, args[1]);
+  mmec_intrep_bytevector_t	*bv	= mmec_extract_intrep_bytevector(env, args[0]);
+  size_t			idx	= (size_t)mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
 
   if (idx <= bv->number_of_slots) {
     int32_t	*slots	= ((int32_t*)(bv->ptr));
 
-    return mmux_emacs_core_make_integer(env, slots[idx]);
+    return mmec_new_emacs_value_from_clang_sint32(env, slots[idx]);
   } else {
-    return mmux_emacs_core_error_bytevector_index_out_of_range(env);
+    return mmec_error_bytevector_index_out_of_range(env);
   }
 }
 
 /* ------------------------------------------------------------------ */
 
 static emacs_value
-Fmmux_emacs_core_bytevector_u64_ref (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+Fmmec_bytevector_u64_ref (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
 {
   assert(2 == nargs);
-  mmux_emacs_core_bytevector_t	*bv	= mmux_emacs_core_get_bytevector(env, args[0]);
-  size_t			idx	= (size_t)mmux_emacs_core_extract_integer(env, args[1]);
+  mmec_intrep_bytevector_t	*bv	= mmec_extract_intrep_bytevector(env, args[0]);
+  size_t			idx	= (size_t)mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
 
   if (idx <= bv->number_of_slots) {
     uint64_t	*slots	= ((uint64_t*)(bv->ptr));
 
-    return mmux_emacs_core_make_integer(env, slots[idx]);
+    return mmec_new_emacs_value_from_clang_uint64(env, slots[idx]);
   } else {
-    return mmux_emacs_core_error_bytevector_index_out_of_range(env);
+    return mmec_error_bytevector_index_out_of_range(env);
   }
 }
 
 static emacs_value
-Fmmux_emacs_core_bytevector_s64_ref (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+Fmmec_bytevector_s64_ref (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
 {
   assert(2 == nargs);
-  mmux_emacs_core_bytevector_t	*bv	= mmux_emacs_core_get_bytevector(env, args[0]);
-  size_t			idx	= (size_t)mmux_emacs_core_extract_integer(env, args[1]);
+  mmec_intrep_bytevector_t	*bv	= mmec_extract_intrep_bytevector(env, args[0]);
+  size_t			idx	= (size_t)mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
 
   if (idx <= bv->number_of_slots) {
     int64_t	*slots	= ((int64_t*)(bv->ptr));
 
-    return mmux_emacs_core_make_integer(env, slots[idx]);
+    return mmec_new_emacs_value_from_clang_sint64(env, slots[idx]);
   } else {
-    return mmux_emacs_core_error_bytevector_index_out_of_range(env);
+    return mmec_error_bytevector_index_out_of_range(env);
   }
 }
 
@@ -171,150 +213,150 @@ Fmmux_emacs_core_bytevector_s64_ref (emacs_env *env, ptrdiff_t nargs, emacs_valu
  ** ----------------------------------------------------------------- */
 
 static emacs_value
-Fmmux_emacs_core_bytevector_u8_set (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+Fmmec_bytevector_u8_set (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
 {
   assert(3 == nargs);
-  mmux_emacs_core_bytevector_t	*bv	= mmux_emacs_core_get_bytevector(env, args[0]);
-  size_t			idx	= (size_t)mmux_emacs_core_extract_integer(env, args[1]);
-  uint8_t			val	= mmux_emacs_core_get_uint8(env, args[2]);
+  mmec_intrep_bytevector_t	*bv	= mmec_extract_intrep_bytevector(env, args[0]);
+  size_t			idx	= (size_t)mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
+  uint8_t			val	= mmec_extract_clang_uint8_from_emacs_value(env, args[2]);
 
   if (idx <= bv->number_of_slots) {
     bv->ptr[idx] = val;
-    return mmux_emacs_core_make_nil(env);
+    return mmec_new_emacs_value_nil(env);
   } else {
-    return mmux_emacs_core_error_bytevector_index_out_of_range(env);
+    return mmec_error_bytevector_index_out_of_range(env);
   }
 }
 
 static emacs_value
-Fmmux_emacs_core_bytevector_s8_set (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+Fmmec_bytevector_s8_set (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
 {
   assert(3 == nargs);
-  mmux_emacs_core_bytevector_t	*bv	= mmux_emacs_core_get_bytevector(env, args[0]);
-  size_t			idx	= (size_t)mmux_emacs_core_extract_integer(env, args[1]);
-  int8_t			val	= mmux_emacs_core_get_sint8(env, args[2]);
+  mmec_intrep_bytevector_t	*bv	= mmec_extract_intrep_bytevector(env, args[0]);
+  size_t			idx	= (size_t)mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
+  int8_t			val	= mmec_extract_clang_sint8_from_emacs_value(env, args[2]);
 
   if (idx <= bv->number_of_slots) {
     int8_t	*slots	= ((int8_t*)(bv->ptr));
 
     slots[idx] = val;
-    return mmux_emacs_core_make_nil(env);
+    return mmec_new_emacs_value_nil(env);
   } else {
-    return mmux_emacs_core_error_bytevector_index_out_of_range(env);
+    return mmec_error_bytevector_index_out_of_range(env);
   }
 }
 
 /* ------------------------------------------------------------------ */
 
 static emacs_value
-Fmmux_emacs_core_bytevector_u16_set (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+Fmmec_bytevector_u16_set (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
 {
   assert(3 == nargs);
-  mmux_emacs_core_bytevector_t	*bv	= mmux_emacs_core_get_bytevector(env, args[0]);
-  size_t			idx	= (size_t)mmux_emacs_core_extract_integer(env, args[1]);
-  uint16_t			val	= mmux_emacs_core_get_uint16(env, args[2]);
+  mmec_intrep_bytevector_t	*bv	= mmec_extract_intrep_bytevector(env, args[0]);
+  size_t			idx	= (size_t)mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
+  uint16_t			val	= mmec_extract_clang_uint16_from_emacs_value(env, args[2]);
 
   if (idx <= bv->number_of_slots) {
     uint16_t	*slots	= ((uint16_t*)(bv->ptr));
 
     slots[idx] = val;
-    return mmux_emacs_core_make_nil(env);
+    return mmec_new_emacs_value_nil(env);
   } else {
-    return mmux_emacs_core_error_bytevector_index_out_of_range(env);
+    return mmec_error_bytevector_index_out_of_range(env);
   }
 }
 
 static emacs_value
-Fmmux_emacs_core_bytevector_s16_set (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+Fmmec_bytevector_s16_set (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
 {
   assert(3 == nargs);
-  mmux_emacs_core_bytevector_t	*bv	= mmux_emacs_core_get_bytevector(env, args[0]);
-  size_t			idx	= (size_t)mmux_emacs_core_extract_integer(env, args[1]);
-  int16_t			val	= mmux_emacs_core_get_sint16(env, args[2]);
+  mmec_intrep_bytevector_t	*bv	= mmec_extract_intrep_bytevector(env, args[0]);
+  size_t			idx	= (size_t)mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
+  int16_t			val	= mmec_extract_clang_sint16_from_emacs_value(env, args[2]);
 
   if (idx <= bv->number_of_slots) {
     int16_t	*slots	= ((int16_t*)(bv->ptr));
 
     slots[idx] = val;
-    return mmux_emacs_core_make_nil(env);
+    return mmec_new_emacs_value_nil(env);
   } else {
-    return mmux_emacs_core_error_bytevector_index_out_of_range(env);
+    return mmec_error_bytevector_index_out_of_range(env);
   }
 }
 
 /* ------------------------------------------------------------------ */
 
 static emacs_value
-Fmmux_emacs_core_bytevector_u32_set (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+Fmmec_bytevector_u32_set (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
 {
   assert(3 == nargs);
-  mmux_emacs_core_bytevector_t	*bv	= mmux_emacs_core_get_bytevector(env, args[0]);
-  size_t			idx	= (size_t)mmux_emacs_core_extract_integer(env, args[1]);
-  uint32_t			val	= mmux_emacs_core_get_uint32(env, args[2]);
+  mmec_intrep_bytevector_t	*bv	= mmec_extract_intrep_bytevector(env, args[0]);
+  size_t			idx	= (size_t)mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
+  uint32_t			val	= mmec_extract_clang_uint32_from_emacs_value(env, args[2]);
 
   if (idx <= bv->number_of_slots) {
     uint32_t	*slots	= ((uint32_t*)(bv->ptr));
 
     slots[idx] = val;
-    return mmux_emacs_core_make_nil(env);
+    return mmec_new_emacs_value_nil(env);
   } else {
-    return mmux_emacs_core_error_bytevector_index_out_of_range(env);
+    return mmec_error_bytevector_index_out_of_range(env);
   }
 }
 
 static emacs_value
-Fmmux_emacs_core_bytevector_s32_set (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+Fmmec_bytevector_s32_set (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
 {
   assert(3 == nargs);
-  mmux_emacs_core_bytevector_t	*bv	= mmux_emacs_core_get_bytevector(env, args[0]);
-  size_t			idx	= (size_t)mmux_emacs_core_extract_integer(env, args[1]);
-  int32_t			val	= mmux_emacs_core_get_sint32(env, args[2]);
+  mmec_intrep_bytevector_t	*bv	= mmec_extract_intrep_bytevector(env, args[0]);
+  size_t			idx	= (size_t)mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
+  int32_t			val	= mmec_extract_clang_sint32_from_emacs_value(env, args[2]);
 
   if (idx <= bv->number_of_slots) {
     int32_t	*slots	= ((int32_t*)(bv->ptr));
 
     slots[idx] = val;
-    return mmux_emacs_core_make_nil(env);
+    return mmec_new_emacs_value_nil(env);
   } else {
-    return mmux_emacs_core_error_bytevector_index_out_of_range(env);
+    return mmec_error_bytevector_index_out_of_range(env);
   }
 }
 
 /* ------------------------------------------------------------------ */
 
 static emacs_value
-Fmmux_emacs_core_bytevector_u64_set (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+Fmmec_bytevector_u64_set (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
 {
   assert(3 == nargs);
-  mmux_emacs_core_bytevector_t	*bv	= mmux_emacs_core_get_bytevector(env, args[0]);
-  size_t			idx	= (size_t)mmux_emacs_core_extract_integer(env, args[1]);
-  uint64_t			val	= mmux_emacs_core_get_uint64(env, args[2]);
+  mmec_intrep_bytevector_t	*bv	= mmec_extract_intrep_bytevector(env, args[0]);
+  size_t			idx	= (size_t)mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
+  uint64_t			val	= mmec_extract_clang_uint64_from_emacs_value(env, args[2]);
 
   if (idx <= bv->number_of_slots) {
     uint64_t	*slots	= ((uint64_t*)(bv->ptr));
 
     slots[idx] = val;
-    return mmux_emacs_core_make_nil(env);
+    return mmec_new_emacs_value_nil(env);
   } else {
-    return mmux_emacs_core_error_bytevector_index_out_of_range(env);
+    return mmec_error_bytevector_index_out_of_range(env);
   }
 }
 
 static emacs_value
-Fmmux_emacs_core_bytevector_s64_set (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+Fmmec_bytevector_s64_set (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
 {
   assert(3 == nargs);
-  mmux_emacs_core_bytevector_t	*bv	= mmux_emacs_core_get_bytevector(env, args[0]);
-  size_t			idx	= (size_t)mmux_emacs_core_extract_integer(env, args[1]);
-  int64_t			val	= mmux_emacs_core_get_sint64(env, args[2]);
+  mmec_intrep_bytevector_t	*bv	= mmec_extract_intrep_bytevector(env, args[0]);
+  size_t			idx	= (size_t)mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
+  int64_t			val	= mmec_extract_clang_sint64_from_emacs_value(env, args[2]);
 
   if (idx <= bv->number_of_slots) {
     int64_t	*slots	= ((int64_t*)(bv->ptr));
 
     slots[idx] = val;
-    return mmux_emacs_core_make_nil(env);
+    return mmec_new_emacs_value_nil(env);
   } else {
-    return mmux_emacs_core_error_bytevector_index_out_of_range(env);
+    return mmec_error_bytevector_index_out_of_range(env);
   }
 }
 
@@ -323,61 +365,70 @@ Fmmux_emacs_core_bytevector_s64_set (emacs_env *env, ptrdiff_t nargs, emacs_valu
  ** Elisp functions table.
  ** ----------------------------------------------------------------- */
 
-#define NUMBER_OF_MODULE_FUNCTIONS	16
-static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNCTIONS] = {
-  /* Bytevector objects: getters.. */
+#define NUMBER_OF_MODULE_FUNCTIONS	17
+static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNCTIONS] = {
+  /* Constructors. */
   {
-    .name		= "mmux-core-c-bytevector-u8-ref",
-    .implementation	= Fmmux_emacs_core_bytevector_u8_ref,
+    .name		= "mmec-c-make-bytevector",
+    .implementation	= Fmmec_make_bytevector,
+    .min_arity		= 3,
+    .max_arity		= 3,
+    .documentation	= "Build and return a new bytevector user pointer object."
+  },
+
+  /* Bytevector objects: getters. */
+  {
+    .name		= "mmec-c-bytevector-u8-ref",
+    .implementation	= Fmmec_bytevector_u8_ref,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Extract an `uint8_t' from a `cc-bytevector' object."
   },
   {
-    .name		= "mmux-core-c-bytevector-s8-ref",
-    .implementation	= Fmmux_emacs_core_bytevector_s8_ref,
+    .name		= "mmec-c-bytevector-s8-ref",
+    .implementation	= Fmmec_bytevector_s8_ref,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Extract an `int8_t' from a `cc-bytevector' object."
   },
   {
-    .name		= "mmux-core-c-bytevector-u16-ref",
-    .implementation	= Fmmux_emacs_core_bytevector_u16_ref,
+    .name		= "mmec-c-bytevector-u16-ref",
+    .implementation	= Fmmec_bytevector_u16_ref,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Extract an `uint16_t' from a `cc-bytevector' object."
   },
   {
-    .name		= "mmux-core-c-bytevector-s16-ref",
-    .implementation	= Fmmux_emacs_core_bytevector_s16_ref,
+    .name		= "mmec-c-bytevector-s16-ref",
+    .implementation	= Fmmec_bytevector_s16_ref,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Extract an `int16_t' from a `cc-bytevector' object."
   },
   {
-    .name		= "mmux-core-c-bytevector-u32-ref",
-    .implementation	= Fmmux_emacs_core_bytevector_u32_ref,
+    .name		= "mmec-c-bytevector-u32-ref",
+    .implementation	= Fmmec_bytevector_u32_ref,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Extract an `uint32_t' from a `cc-bytevector' object."
   },
   {
-    .name		= "mmux-core-c-bytevector-s32-ref",
-    .implementation	= Fmmux_emacs_core_bytevector_s32_ref,
+    .name		= "mmec-c-bytevector-s32-ref",
+    .implementation	= Fmmec_bytevector_s32_ref,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Extract an `int32_t' from a `cc-bytevector' object."
   },
   {
-    .name		= "mmux-core-c-bytevector-u64-ref",
-    .implementation	= Fmmux_emacs_core_bytevector_u64_ref,
+    .name		= "mmec-c-bytevector-u64-ref",
+    .implementation	= Fmmec_bytevector_u64_ref,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Extract an `uint64_t' from a `cc-bytevector' object."
   },
   {
-    .name		= "mmux-core-c-bytevector-s64-ref",
-    .implementation	= Fmmux_emacs_core_bytevector_s64_ref,
+    .name		= "mmec-c-bytevector-s64-ref",
+    .implementation	= Fmmec_bytevector_s64_ref,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Extract an `int64_t' from a `cc-bytevector' object."
@@ -385,57 +436,57 @@ static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODUL
 
   /* Bytevector objects: setters. */
   {
-    .name		= "mmux-core-c-bytevector-u8-set!",
-    .implementation	= Fmmux_emacs_core_bytevector_u8_set,
+    .name		= "mmec-c-bytevector-u8-set",
+    .implementation	= Fmmec_bytevector_u8_set,
     .min_arity		= 3,
     .max_arity		= 3,
     .documentation	= "Set an `uint8_t' into a `cc-bytevector' object."
   },
   {
-    .name		= "mmux-core-c-bytevector-s8-set!",
-    .implementation	= Fmmux_emacs_core_bytevector_s8_set,
+    .name		= "mmec-c-bytevector-s8-set",
+    .implementation	= Fmmec_bytevector_s8_set,
     .min_arity		= 3,
     .max_arity		= 3,
     .documentation	= "Set an `int8_t' into a `cc-bytevector' object."
   },
   {
-    .name		= "mmux-core-c-bytevector-u16-set!",
-    .implementation	= Fmmux_emacs_core_bytevector_u16_set,
+    .name		= "mmec-c-bytevector-u16-set",
+    .implementation	= Fmmec_bytevector_u16_set,
     .min_arity		= 3,
     .max_arity		= 3,
     .documentation	= "Set an `uint16_t' into a `cc-bytevector' object."
   },
   {
-    .name		= "mmux-core-c-bytevector-s16-set!",
-    .implementation	= Fmmux_emacs_core_bytevector_s16_set,
+    .name		= "mmec-c-bytevector-s16-set",
+    .implementation	= Fmmec_bytevector_s16_set,
     .min_arity		= 3,
     .max_arity		= 3,
     .documentation	= "Set an `int16_t' into a `cc-bytevector' object."
   },
   {
-    .name		= "mmux-core-c-bytevector-u32-set!",
-    .implementation	= Fmmux_emacs_core_bytevector_u32_set,
+    .name		= "mmec-c-bytevector-u32-set",
+    .implementation	= Fmmec_bytevector_u32_set,
     .min_arity		= 3,
     .max_arity		= 3,
     .documentation	= "Set an `uint32_t' into a `cc-bytevector' object."
   },
   {
-    .name		= "mmux-core-c-bytevector-s32-set!",
-    .implementation	= Fmmux_emacs_core_bytevector_s32_set,
+    .name		= "mmec-c-bytevector-s32-set",
+    .implementation	= Fmmec_bytevector_s32_set,
     .min_arity		= 3,
     .max_arity		= 3,
     .documentation	= "Set an `int32_t' into a `cc-bytevector' object."
   },
   {
-    .name		= "mmux-core-c-bytevector-u64-set!",
-    .implementation	= Fmmux_emacs_core_bytevector_u64_set,
+    .name		= "mmec-c-bytevector-u64-set",
+    .implementation	= Fmmec_bytevector_u64_set,
     .min_arity		= 3,
     .max_arity		= 3,
     .documentation	= "Set an `uint64_t' into a `cc-bytevector' object."
   },
   {
-    .name		= "mmux-core-c-bytevector-s64-set!",
-    .implementation	= Fmmux_emacs_core_bytevector_s64_set,
+    .name		= "mmec-c-bytevector-s64-set",
+    .implementation	= Fmmec_bytevector_s64_set,
     .min_arity		= 3,
     .max_arity		= 3,
     .documentation	= "Set an `int64_t' into a `cc-bytevector' object."
@@ -448,9 +499,9 @@ static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODUL
  ** ----------------------------------------------------------------- */
 
 void
-mmux_emacs_core_bytevectors_init (emacs_env * env)
+mmec_bytevector_objects_init (emacs_env * env)
 {
-  mmux_emacs_define_functions_from_table(env, module_functions_table, NUMBER_OF_MODULE_FUNCTIONS, 0);
+  mmec_define_elisp_functions_from_table(env, module_functions_table, NUMBER_OF_MODULE_FUNCTIONS, 0);
 }
 
 /* end of file */

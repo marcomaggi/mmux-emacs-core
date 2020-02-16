@@ -40,7 +40,7 @@
 	     (t nil))))
 
 
-;;;; number objects makers
+;;;; number objects makers: cc-char
 
 (ert-deftest cc-number-char ()
   "Build a `cc-char' object."
@@ -69,7 +69,37 @@
   (my--unsupported-type-error cc-char cc-usize		123)
   ;;
   (my--init-argument-does-not-fit cc-char 1230)
-  )
+  nil)
+
+;;; --------------------------------------------------------------------
+
+(ert-deftest cc-number-float ()
+  "Build a `cc-float' object."
+  (should	(cc-fits-float-p	123))
+  (should	(cc-fits-float-p	12.3))
+  ;;
+  (should	(cc-float-p	(cc-float 123)))
+  (should	(cc-float-p	(cc-float 12.3)))
+  ;;
+  (should	(cc-float-p	(cc-float (cc-char	123))))
+  (should	(cc-float-p	(cc-float (cc-schar	123))))
+  (should	(cc-float-p	(cc-float (cc-uchar	123))))
+  (should	(cc-float-p	(cc-float (cc-sshrt	123))))
+  (should	(cc-float-p	(cc-float (cc-ushrt	123))))
+  (should	(cc-float-p	(cc-float (cc-sint	123))))
+  (should	(cc-float-p	(cc-float (cc-uint	123))))
+  (should	(cc-float-p	(cc-float (cc-slong	123))))
+  (should	(cc-float-p	(cc-float (cc-ulong	123))))
+  (should	(cc-float-p	(cc-float (cc-sllong	123))))
+  (should	(cc-float-p	(cc-float (cc-ullong	123))))
+  (should	(cc-float-p	(cc-float (cc-sintmax	123))))
+  (should	(cc-float-p	(cc-float (cc-uintmax	123))))
+  (should	(cc-float-p	(cc-float (cc-ssize	123))))
+  (should	(cc-float-p	(cc-float (cc-usize	123))))
+  (should	(cc-float-p	(cc-float (cc-ptrdiff	123))))
+  ;;
+  (my--init-argument-does-not-fit cc-float 12.30)
+  t)
 
 
 ;;;; bytevector makers

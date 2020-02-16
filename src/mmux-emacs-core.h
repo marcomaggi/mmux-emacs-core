@@ -22,8 +22,8 @@
   program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MMUX_EMACS_CORE_H
-#define MMUX_EMACS_CORE_H 1
+#ifndef MMEC_H
+#define MMEC_H 1
 
 
 /** --------------------------------------------------------------------
@@ -34,17 +34,17 @@
 extern "C" {
 #endif
 
-/* The macro MMUX_EMACS_CORE_UNUSED indicates that a  function, function argument or variable may
+/* The macro MMEC_UNUSED indicates that a  function, function argument or variable may
    potentially be unused. Usage examples:
 
-   static int unused_function (char arg) MMUX_EMACS_CORE_UNUSED;
-   int foo (char unused_argument MMUX_EMACS_CORE_UNUSED);
-   int unused_variable MMUX_EMACS_CORE_UNUSED;
+   static int unused_function (char arg) MMEC_UNUSED;
+   int foo (char unused_argument MMEC_UNUSED);
+   int unused_variable MMEC_UNUSED;
 */
 #ifdef __GNUC__
-#  define MMUX_EMACS_CORE_UNUSED		__attribute__((__unused__))
+#  define MMEC_UNUSED		__attribute__((__unused__))
 #else
-#  define MMUX_EMACS_CORE_UNUSED		/* empty */
+#  define MMEC_UNUSED		/* empty */
 #endif
 
 #ifndef __GNUC__
@@ -55,25 +55,25 @@ extern "C" {
 #if defined _WIN32 || defined __CYGWIN__
 #  ifdef BUILDING_DLL
 #    ifdef __GNUC__
-#      define mmux_emacs_core_decl		__attribute__((__dllexport__)) extern
+#      define mmec_decl		__attribute__((__dllexport__)) extern
 #    else
-#      define mmux_emacs_core_decl		__declspec(dllexport) extern
+#      define mmec_decl		__declspec(dllexport) extern
 #    endif
 #  else
 #    ifdef __GNUC__
-#      define mmux_emacs_core_decl		__attribute__((__dllimport__)) extern
+#      define mmec_decl		__attribute__((__dllimport__)) extern
 #    else
-#      define mmux_emacs_core_decl		__declspec(dllimport) extern
+#      define mmec_decl		__declspec(dllimport) extern
 #    endif
 #  endif
-#  define mmux_emacs_core_private_decl	extern
+#  define mmec_private_decl	extern
 #else
 #  if __GNUC__ >= 4
-#    define mmux_emacs_core_decl		__attribute__((__visibility__("default"))) extern
-#    define mmux_emacs_core_private_decl	__attribute__((__visibility__("hidden")))  extern
+#    define mmec_decl		__attribute__((__visibility__("default"))) extern
+#    define mmec_private_decl	__attribute__((__visibility__("hidden")))  extern
 #  else
-#    define mmux_emacs_core_decl		extern
-#    define mmux_emacs_core_private_decl	extern
+#    define mmec_decl		extern
+#    define mmec_private_decl	extern
 #  endif
 #endif
 
@@ -99,42 +99,45 @@ extern "C" {
  ** Version functions.
  ** ----------------------------------------------------------------- */
 
-mmux_emacs_core_decl char const *	mmux_emacs_core_version_string			(void);
-mmux_emacs_core_decl int		mmux_emacs_core_version_interface_current	(void);
-mmux_emacs_core_decl int		mmux_emacs_core_version_interface_revision	(void);
-mmux_emacs_core_decl int		mmux_emacs_core_version_interface_age		(void);
+mmec_decl char const *	mmec_version_string		(void);
+mmec_decl int		mmec_version_interface_current	(void);
+mmec_decl int		mmec_version_interface_revision	(void);
+mmec_decl int		mmec_version_interface_age	(void);
 
 
 /** --------------------------------------------------------------------
  ** Preprocessor macros.
  ** ----------------------------------------------------------------- */
 
-#undef  MMUX_EMACS_IFACE_FUNCTION_UNUSED_ARGS
-#define MMUX_EMACS_IFACE_FUNCTION_UNUSED_ARGS \
-  emacs_env *env, ptrdiff_t nargs MMUX_EMACS_CORE_UNUSED, emacs_value args[] MMUX_EMACS_CORE_UNUSED, void *data MMUX_EMACS_CORE_UNUSED
+#undef  MMEC_ELISP_FUNCTION_UNUSED_ARGS
+#define MMEC_ELISP_FUNCTION_UNUSED_ARGS \
+  emacs_env *env, ptrdiff_t nargs MMEC_UNUSED, emacs_value args[] MMEC_UNUSED, void *data MMEC_UNUSED
 
-#define MMUX_EMACS_CORE_PC(POINTER_TYPE, POINTER_NAME, EXPRESSION)	\
+#define MMEC_PC(POINTER_TYPE, POINTER_NAME, EXPRESSION)	\
   POINTER_TYPE * POINTER_NAME = (POINTER_TYPE *) (EXPRESSION)
+
+#define MMEC_CAST(TYPE, NAME, EXPRESSION)	\
+  TYPE NAME = (TYPE) (EXPRESSION)
 
 /* Usage examples:
  *
- * MMUX_EMACS_CORE_DEFINE_ERROR_SIGNALER(memory_alloction,
- *                                       "mmec-error-no-memory-error",
- *                                       strerror(errno))
+ * MMEC_DEFINE_ERROR_SIGNALLER(mmec, memory_alloction,
+ *                             "mmec-error-no-memory-error",
+ *                             strerror(errno))
  *
- * MMUX_EMACS_CORE_DEFINE_ERROR_SIGNALER(instantiating_abstract_type,
- *                                       "mmec-error-instantiating-abstract-type",
- *                                       "An attempt was performed to instantiate an abstract data type.")
+ * MMEC_DEFINE_ERROR_SIGNALLER(mmec, instantiating_abstract_type,
+ *                             "mmec-error-instantiating-abstract-type",
+ *                             "An attempt was performed to instantiate an abstract data type.")
  *
  * Expand into a function definition.  The function signals an error and returns nil.
  */
-#undef  MMUX_EMACS_CORE_DEFINE_ERROR_SIGNALER
-#define MMUX_EMACS_CORE_DEFINE_ERROR_SIGNALER(NAME, SYMBOL, MESSAGE)	\
+#undef  MMEC_DEFINE_ERROR_SIGNALLER
+#define MMEC_DEFINE_ERROR_SIGNALLER(PREFIX, NAME, SYMBOL, MESSAGE)	\
   emacs_value								\
-  mmux_emacs_core_error_ ## NAME (emacs_env * env)			\
+  PREFIX ## _error_ ## NAME (emacs_env * env)				\
   {									\
     char const		* errmsg = MESSAGE;				\
-    emacs_value		Serrmsg = mmux_emacs_core_make_string(env, errmsg, strlen(errmsg)); \
+    emacs_value		Serrmsg = mmec_new_emacs_value_string(env, errmsg, strlen(errmsg)); \
 									\
     env->non_local_exit_signal(env, env->intern(env, SYMBOL), Serrmsg); \
     return env->intern(env, "nil");					\
@@ -145,603 +148,328 @@ mmux_emacs_core_decl int		mmux_emacs_core_version_interface_age		(void);
  ** Error signaling functions.
  ** ----------------------------------------------------------------- */
 
-mmux_emacs_core_decl emacs_value mmux_emacs_core_base (emacs_env * env)
-  __attribute__((__nonnull__(1)));
+typedef emacs_value mmec_error_signaller_fun_t (emacs_env * env);
+
+#undef  MMEC_SIGNALLER_PROTOTYPE
+#define MMEC_SIGNALLER_PROTOTYPE(PREFIX, FUNCNAME)	\
+  mmec_decl mmec_error_signaller_fun_t PREFIX ## _error_ ## FUNCNAME __attribute__((__nonnull__(1)))
+
+MMEC_SIGNALLER_PROTOTYPE(mmec, base);
 
 /* ------------------------------------------------------------------ */
 
-mmux_emacs_core_decl emacs_value mmux_emacs_core_error_constructor (emacs_env * env)
-  __attribute__((__nonnull__(1)));
-
-mmux_emacs_core_decl emacs_value mmux_emacs_core_error_memory_allocation (emacs_env * env)
-  __attribute__((__nonnull__(1)));
-
-mmux_emacs_core_decl emacs_value mmux_emacs_core_error_instantiating_abstract_type (emacs_env * env)
-  __attribute__((__nonnull__(1)));
-
-mmux_emacs_core_decl emacs_value mmux_emacs_core_error_unsupported_init_type (emacs_env * env)
-  __attribute__((__nonnull__(1)));
+MMEC_SIGNALLER_PROTOTYPE(mmec, constructor);
+MMEC_SIGNALLER_PROTOTYPE(mmec, memory_allocation);
+MMEC_SIGNALLER_PROTOTYPE(mmec, instantiating_abstract_type);
+MMEC_SIGNALLER_PROTOTYPE(mmec, unsupported_init_type);
 
 /* ------------------------------------------------------------------ */
 
-mmux_emacs_core_decl emacs_value mmux_emacs_core_error_value_out_of_range (emacs_env * env)
-  __attribute__((__nonnull__(1)));
-
-mmux_emacs_core_decl emacs_value mmux_emacs_core_error_index_out_of_range (emacs_env * env)
-  __attribute__((__nonnull__(1)));
-
-mmux_emacs_core_decl emacs_value mmux_emacs_core_error_bytevector_index_out_of_range (emacs_env * env)
-  __attribute__((__nonnull__(1)));
+MMEC_SIGNALLER_PROTOTYPE(mmec, value_out_of_range);
+MMEC_SIGNALLER_PROTOTYPE(mmec, index_out_of_range);
+MMEC_SIGNALLER_PROTOTYPE(mmec, bytevector_index_out_of_range);
 
 /* ------------------------------------------------------------------ */
 
-mmux_emacs_core_decl emacs_value mmux_emacs_core_error_signed_unsigned_integer_comparison (emacs_env * env)
-  __attribute__((__nonnull__(1)));
+MMEC_SIGNALLER_PROTOTYPE(mmec, signed_unsigned_integer_comparison);
 
 
 /** --------------------------------------------------------------------
  ** MMUX Emacs generic type definitions.
  ** ----------------------------------------------------------------- */
 
-typedef emacs_value mmux_emacs_function_implementation_t (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void *data);
-typedef void mmux_emacs_finalizer_func_t (void *);
-typedef mmux_emacs_finalizer_func_t *	mmux_emacs_finalizer_t;
+/* These definitions are useful when composing the output of C language macros. */
+typedef char			mmec_clang_char_t;
+typedef signed char		mmec_clang_schar_t;
+typedef unsigned char		mmec_clang_uchar_t;
+typedef wchar_t			mmec_clang_wchar_t;
+typedef signed   short int	mmec_clang_sshrt_t;
+typedef unsigned short int	mmec_clang_ushrt_t;
+typedef signed   int		mmec_clang_sint_t;
+typedef unsigned int		mmec_clang_uint_t;
+typedef signed   long int	mmec_clang_slong_t;
+typedef unsigned long int	mmec_clang_ulong_t;
+typedef signed   long long int	mmec_clang_sllong_t;
+typedef unsigned long long int	mmec_clang_ullong_t;
+typedef ssize_t			mmec_clang_ssize_t;
+typedef size_t			mmec_clang_usize_t;
+typedef intmax_t		mmec_clang_sintmax_t;
+typedef uintmax_t		mmec_clang_uintmax_t;
+typedef ptrdiff_t		mmec_clang_ptrdiff_t;
+typedef int8_t			mmec_clang_sint8_t;
+typedef uint8_t			mmec_clang_uint8_t;
+typedef int16_t			mmec_clang_sint16_t;
+typedef uint16_t		mmec_clang_uint16_t;
+typedef int32_t			mmec_clang_sint32_t;
+typedef uint32_t		mmec_clang_uint32_t;
+typedef int64_t			mmec_clang_sint64_t;
+typedef uint64_t		mmec_clang_uint64_t;
+typedef float			mmec_clang_float_t;
+typedef double			mmec_clang_double_t;
+typedef long double		mmec_clang_ldouble_t;
 
-typedef struct mmux_emacs_module_function_t	mmux_emacs_module_function_t;
+
+/** --------------------------------------------------------------------
+ ** Elisp functions definition.
+ ** ----------------------------------------------------------------- */
 
-struct mmux_emacs_module_function_t {
+typedef emacs_value mmec_elisp_function_implementation_t (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void *data);
+typedef struct mmec_module_function_t	mmec_module_function_t;
+
+struct mmec_module_function_t {
   char const				* name;
-  mmux_emacs_function_implementation_t	* implementation;
+  mmec_elisp_function_implementation_t	* implementation;
   ptrdiff_t				min_arity;
   ptrdiff_t				max_arity;
   char const				* documentation;
 };
 
-/* ------------------------------------------------------------------ */
-
-/* These definitions are useful when composing the output of C language macros. */
-typedef char			mmux_emacs_core_type_char_t;
-typedef signed char		mmux_emacs_core_type_schar_t;
-typedef unsigned char		mmux_emacs_core_type_uchar_t;
-typedef wchar_t			mmux_emacs_core_type_wchar_t;
-typedef signed   short int	mmux_emacs_core_type_sshrt_t;
-typedef unsigned short int	mmux_emacs_core_type_ushrt_t;
-typedef signed   int		mmux_emacs_core_type_sint_t;
-typedef unsigned int		mmux_emacs_core_type_uint_t;
-typedef signed   long int	mmux_emacs_core_type_slong_t;
-typedef unsigned long int	mmux_emacs_core_type_ulong_t;
-typedef signed   long long int	mmux_emacs_core_type_sllong_t;
-typedef unsigned long long int	mmux_emacs_core_type_ullong_t;
-typedef ssize_t			mmux_emacs_core_type_ssize_t;
-typedef size_t			mmux_emacs_core_type_usize_t;
-typedef intmax_t		mmux_emacs_core_type_sintmax_t;
-typedef uintmax_t		mmux_emacs_core_type_uintmax_t;
-typedef ptrdiff_t		mmux_emacs_core_type_ptrdiff_t;
-typedef int8_t			mmux_emacs_core_type_sint8_t;
-typedef uint8_t			mmux_emacs_core_type_uint8_t;
-typedef int16_t			mmux_emacs_core_type_sint16_t;
-typedef uint16_t		mmux_emacs_core_type_uint16_t;
-typedef int32_t			mmux_emacs_core_type_sint32_t;
-typedef uint32_t		mmux_emacs_core_type_uint32_t;
-typedef int64_t			mmux_emacs_core_type_sint64_t;
-typedef uint64_t		mmux_emacs_core_type_uint64_t;
-typedef float			mmux_emacs_core_type_float_t;
-typedef double			mmux_emacs_core_type_double_t;
-typedef long double		mmux_emacs_core_type_ldouble_t;
-
-/* ------------------------------------------------------------------ */
-
-typedef emacs_value mmux_emacs_core_type_maker_fun_t (emacs_env *env, ptrdiff_t nargs, emacs_value args[],
-						      void * data MMUX_EMACS_CORE_UNUSED);
-
-
-/** --------------------------------------------------------------------
- ** Functions prototypes.
- ** ----------------------------------------------------------------- */
-
-mmux_emacs_core_decl void
-mmux_emacs_define_functions_from_table (emacs_env * env, mmux_emacs_module_function_t const * module_functions,
+mmec_decl void
+mmec_define_elisp_functions_from_table (emacs_env * env, mmec_module_function_t const * module_functions,
 					int number_of_module_functions, int verbose)
   __attribute__((__nonnull__(1,2)));
 
 
 /** --------------------------------------------------------------------
- ** MMUX Emacs generic inline functions: argument getters for Emacs built-int objects.
+ ** User pointer objects definition.
+ ** ----------------------------------------------------------------- */
+
+typedef void mmec_usrptr_object_finalizer_func_t (void *);
+typedef mmec_usrptr_object_finalizer_func_t *	mmec_usrptr_object_finalizer_t;
+
+
+/** --------------------------------------------------------------------
+ ** Handling Emacs built-in values.
  ** ----------------------------------------------------------------- */
 
 static inline void *
-mmux_emacs_core_get_user_ptr (emacs_env * env, emacs_value arg)
+mmec_get_usrptr_object_from_emacs_value (emacs_env * env, emacs_value arg)
 {
   return env->get_user_ptr(env, arg);
 }
 
 static inline intmax_t
-mmux_emacs_core_extract_integer (emacs_env * env, emacs_value arg)
+mmec_extract_elisp_integer_from_emacs_value (emacs_env * env, emacs_value arg)
 {
   return env->extract_integer(env, arg);
 }
 
 static inline double
-mmux_emacs_core_extract_double (emacs_env * env, emacs_value arg)
+mmec_extract_elisp_float_from_emacs_value (emacs_env * env, emacs_value arg)
 {
   return env->extract_float(env, arg);
 }
 
-
-/** --------------------------------------------------------------------
- ** MMUX Emacs generic inline functions: argument getters for custom objects.
- ** ----------------------------------------------------------------- */
-
-static inline char
-mmux_emacs_core_get_char (emacs_env * env, emacs_value arg)
-{
-  return ((char)(mmux_emacs_core_extract_integer(env, arg)));
-}
-
-static inline signed char
-mmux_emacs_core_get_schar (emacs_env * env, emacs_value arg)
-{
-  return ((signed char)(mmux_emacs_core_extract_integer(env, arg)));
-}
-
-static inline unsigned char
-mmux_emacs_core_get_uchar (emacs_env * env, emacs_value arg)
-{
-  return ((unsigned char)(mmux_emacs_core_extract_integer(env, arg)));
-}
-
 /* ------------------------------------------------------------------ */
-
-static inline unsigned short int
-mmux_emacs_core_get_ushrt (emacs_env * env, emacs_value arg)
-{
-  return ((unsigned short int)(mmux_emacs_core_extract_integer(env, arg)));
-}
-
-static inline signed short int
-mmux_emacs_core_get_sshrt (emacs_env * env, emacs_value arg)
-{
-  return ((signed short int)(mmux_emacs_core_extract_integer(env, arg)));
-}
-
-/* ------------------------------------------------------------------ */
-
-static inline uint8_t
-mmux_emacs_core_get_uint8 (emacs_env * env, emacs_value arg)
-{
-  return ((uint8_t)(mmux_emacs_core_extract_integer(env, arg)));
-}
-
-static inline int8_t
-mmux_emacs_core_get_sint8 (emacs_env * env, emacs_value arg)
-{
-  return ((int8_t)(mmux_emacs_core_extract_integer(env, arg)));
-}
-
-/* ------------------------------------------------------------------ */
-
-static inline uint16_t
-mmux_emacs_core_get_uint16 (emacs_env * env, emacs_value arg)
-{
-  return ((uint16_t)(mmux_emacs_core_extract_integer(env, arg)));
-}
-
-static inline int16_t
-mmux_emacs_core_get_sint16 (emacs_env * env, emacs_value arg)
-{
-  return ((int16_t)(mmux_emacs_core_extract_integer(env, arg)));
-}
-
-
-/** --------------------------------------------------------------------
- ** MMUX Emacs generic inline functions: object makers for Emacs built-in objects.
- ** ----------------------------------------------------------------- */
 
 static inline emacs_value
-mmux_emacs_core_make_user_ptr (emacs_env * env, mmux_emacs_finalizer_t finalizer, void * ptr)
+mmec_new_emacs_value_from_usrptr_object (emacs_env * env, mmec_usrptr_object_finalizer_t finalizer, void * ptr)
 {
   return env->make_user_ptr(env, finalizer, ptr);
 }
 
 static inline emacs_value
-mmux_emacs_core_make_nil (emacs_env * env)
+mmec_new_emacs_value_nil (emacs_env * env)
 {
   return env->intern(env, "nil");
 }
 
 static inline emacs_value
-mmux_emacs_core_make_true (emacs_env * env)
+mmec_new_emacs_value_true (emacs_env * env)
 {
   return env->intern(env, "t");
 }
 
 static inline emacs_value
-mmux_emacs_core_make_boolean (emacs_env * env, int val)
+mmec_new_emacs_value_boolean (emacs_env * env, int val)
 {
-  return ((val)? mmux_emacs_core_make_true(env) : mmux_emacs_core_make_nil(env));
+  return ((val)? mmec_new_emacs_value_true(env) : mmec_new_emacs_value_nil(env));
 }
 
 static inline emacs_value
-mmux_emacs_core_make_integer (emacs_env * env, intmax_t arg)
+mmec_new_emacs_value_integer (emacs_env * env, intmax_t val)
 {
-  return env->make_integer(env, arg);
+  return env->make_integer(env, val);
 }
 
 static inline emacs_value
-mmux_emacs_core_make_double (emacs_env * env, double arg)
+mmec_new_emacs_value_float (emacs_env * env, double val)
 {
-  return env->make_float(env, arg);
+  return env->make_float(env, val);
 }
 
 static inline emacs_value
-mmux_emacs_core_make_string (emacs_env * env, char const * strptr, size_t strlen)
+mmec_new_emacs_value_string (emacs_env * env, char const * ptr, size_t len)
 {
-  return env->make_string(env, strptr, strlen);
+  return env->make_string(env, ptr, len);
 }
 
 
 /** --------------------------------------------------------------------
- ** MMUX Emacs generic inline functions: object makers for custom objects.
+ ** Number objects having "integer" as internal representation.
  ** ----------------------------------------------------------------- */
 
-static inline emacs_value
-mmux_emacs_core_make_char (emacs_env * env, char arg)
-{
-  return mmux_emacs_core_make_integer(env, (intmax_t)arg);
-}
+#undef  MMEC_DEFINE_WRAPPER_TYPE_INTEGER_REP
+#define MMEC_DEFINE_WRAPPER_TYPE_INTEGER_REP(STEM)			\
+  typedef intmax_t		mmec_intrep_ ## STEM ## _t;		\
+									\
+  static inline mmec_intrep_ ## STEM ## _t				\
+  mmec_extract_intrep_ ## STEM ## _from_emacs_value (emacs_env * env, emacs_value arg) \
+  {									\
+    return (mmec_intrep_ ## STEM ## _t)mmec_extract_elisp_integer_from_emacs_value(env, arg); \
+  }									\
+									\
+  static inline mmec_clang_ ## STEM ## _t				\
+  mmec_extract_clang_ ## STEM ## _from_intrep_ ## STEM (mmec_intrep_ ## STEM ## _t val) \
+  {									\
+    return (mmec_clang_ ## STEM ## _t)val;				\
+  }									\
+									\
+  static inline mmec_clang_ ## STEM ## _t				\
+  mmec_extract_clang_ ## STEM ## _from_emacs_value (emacs_env * env, emacs_value arg) \
+  {									\
+    return mmec_extract_clang_ ## STEM ## _from_intrep_ ## STEM(mmec_extract_intrep_ ## STEM ## _from_emacs_value(env, arg)); \
+  }									\
+									\
+  static inline mmec_intrep_ ## STEM ## _t				\
+  mmec_new_intrep_ ## STEM ## _from_clang_ ## STEM (mmec_clang_ ## STEM ## _t val) \
+  {									\
+    return (mmec_intrep_ ## STEM ## _t)val;				\
+  }									\
+									\
+  static inline emacs_value						\
+  mmec_new_emacs_value_from_intrep_ ## STEM (emacs_env * env, mmec_intrep_ ## STEM ## _t val) \
+  {									\
+    return mmec_new_emacs_value_integer(env, (intmax_t)val);		\
+  }									\
+									\
+  static inline emacs_value						\
+  mmec_new_emacs_value_from_clang_ ## STEM (emacs_env * env, mmec_clang_ ## STEM ## _t val) \
+  {									\
+    return mmec_new_emacs_value_from_intrep_ ## STEM(env, mmec_new_intrep_ ## STEM ## _from_clang_ ## STEM(val)); \
+  }
 
 /* ------------------------------------------------------------------ */
 
-static inline emacs_value
-mmux_emacs_core_make_schar (emacs_env * env, signed char arg)
-{
-  return mmux_emacs_core_make_integer(env, (intmax_t)arg);
-}
-
-static inline emacs_value
-mmux_emacs_core_make_uchar (emacs_env * env, unsigned char arg)
-{
-  return mmux_emacs_core_make_integer(env, (intmax_t)arg);
-}
-
-/* ------------------------------------------------------------------ */
-
-static inline emacs_value
-mmux_emacs_core_make_ushrt (emacs_env * env, unsigned short int arg)
-{
-  return mmux_emacs_core_make_integer(env, (intmax_t)arg);
-}
-
-static inline emacs_value
-mmux_emacs_core_make_sshrt (emacs_env * env, signed short int arg)
-{
-  return mmux_emacs_core_make_integer(env, (intmax_t)arg);
-}
-
-/* ------------------------------------------------------------------ */
-
-static inline emacs_value
-mmux_emacs_core_make_uint8 (emacs_env * env, uint8_t arg)
-{
-  return mmux_emacs_core_make_integer(env, (intmax_t)arg);
-}
-
-static inline emacs_value
-mmux_emacs_core_make_sint8 (emacs_env * env, int8_t arg)
-{
-  return mmux_emacs_core_make_integer(env, (intmax_t)arg);
-}
-
-/* ------------------------------------------------------------------ */
-
-static inline emacs_value
-mmux_emacs_core_make_uint16 (emacs_env * env, uint16_t arg)
-{
-  return mmux_emacs_core_make_integer(env, (intmax_t)arg);
-}
-
-static inline emacs_value
-mmux_emacs_core_make_sint16 (emacs_env * env, int16_t arg)
-{
-  return mmux_emacs_core_make_integer(env, (intmax_t)arg);
-}
+MMEC_DEFINE_WRAPPER_TYPE_INTEGER_REP(char)
+MMEC_DEFINE_WRAPPER_TYPE_INTEGER_REP(schar)
+MMEC_DEFINE_WRAPPER_TYPE_INTEGER_REP(uchar)
+MMEC_DEFINE_WRAPPER_TYPE_INTEGER_REP(sshrt)
+MMEC_DEFINE_WRAPPER_TYPE_INTEGER_REP(ushrt)
+MMEC_DEFINE_WRAPPER_TYPE_INTEGER_REP(sint8)
+MMEC_DEFINE_WRAPPER_TYPE_INTEGER_REP(uint8)
+MMEC_DEFINE_WRAPPER_TYPE_INTEGER_REP(sint16)
+MMEC_DEFINE_WRAPPER_TYPE_INTEGER_REP(uint16)
 
 
 /** --------------------------------------------------------------------
- ** User-pointer objects: exact integer objects, floating-point objects.
+ ** Number objects having "float" as internal representation.
  ** ----------------------------------------------------------------- */
 
-/* At the  time of this  writing: GNU Emacs version  26+ implements as  exact integer
-   numbers as fixnum objects with "intmax_t" internal representation; but not all the
-   range representable  by an "intmax_t" is  used, because some bits  are occupied by
-   the type flags.
-
-   We trust  such type to  correctly represent the C  language integers up  to 32-bit
-   internal representations; for all the other types we need a user-pointer object to
-   make available the whole type range.
-
-   (Marco Maggi; Feb  4, 2020)
-*/
-
-typedef struct mmux_emacs_core_wchar_t		mmux_emacs_core_wchar_t;
-
-typedef struct mmux_emacs_core_uint32_t		mmux_emacs_core_uint32_t;
-typedef struct mmux_emacs_core_sint32_t		mmux_emacs_core_sint32_t;
-
-typedef struct mmux_emacs_core_uint64_t		mmux_emacs_core_uint64_t;
-typedef struct mmux_emacs_core_sint64_t		mmux_emacs_core_sint64_t;
-
-typedef struct mmux_emacs_core_sint_t		mmux_emacs_core_sint_t;
-typedef struct mmux_emacs_core_uint_t		mmux_emacs_core_uint_t;
-
-typedef struct mmux_emacs_core_slong_t		mmux_emacs_core_slong_t;
-typedef struct mmux_emacs_core_ulong_t		mmux_emacs_core_ulong_t;
-
-typedef struct mmux_emacs_core_sllong_t		mmux_emacs_core_sllong_t;
-typedef struct mmux_emacs_core_ullong_t		mmux_emacs_core_ullong_t;
-
-typedef struct mmux_emacs_core_ssize_t		mmux_emacs_core_ssize_t;
-typedef struct mmux_emacs_core_usize_t		mmux_emacs_core_usize_t;
-
-typedef struct mmux_emacs_core_sintmax_t	mmux_emacs_core_sintmax_t;
-typedef struct mmux_emacs_core_uintmax_t	mmux_emacs_core_uintmax_t;
-
-typedef struct mmux_emacs_core_ptrdiff_t	mmux_emacs_core_ptrdiff_t;
-
-typedef struct mmux_emacs_core_float_t		mmux_emacs_core_float_t;
-typedef struct mmux_emacs_core_double_t		mmux_emacs_core_double_t;
-typedef struct mmux_emacs_core_ldouble_t	mmux_emacs_core_ldouble_t;
-
-/* ------------------------------------------------------------------ */
-
-struct mmux_emacs_core_wchar_t		{ wchar_t			val; };
-
-struct mmux_emacs_core_sint32_t		{ int32_t			val; };
-struct mmux_emacs_core_uint32_t		{ uint32_t			val; };
-
-struct mmux_emacs_core_sint64_t		{ int64_t			val; };
-struct mmux_emacs_core_uint64_t		{ uint64_t			val; };
-
-struct mmux_emacs_core_sint_t		{ int				val; };
-struct mmux_emacs_core_uint_t		{ unsigned int			val; };
-
-struct mmux_emacs_core_slong_t		{ signed long int		val; };
-struct mmux_emacs_core_ulong_t		{ unsigned long int		val; };
-
-struct mmux_emacs_core_sllong_t		{ signed long long int		val; };
-struct mmux_emacs_core_ullong_t		{ unsigned long long int	val; };
-
-struct mmux_emacs_core_ssize_t		{ ssize_t			val; };
-struct mmux_emacs_core_usize_t		{ size_t			val; };
-
-struct mmux_emacs_core_sintmax_t	{ intmax_t			val; };
-struct mmux_emacs_core_uintmax_t	{ uintmax_t			val; };
-
-struct mmux_emacs_core_ptrdiff_t	{ ptrdiff_t			val; };
-
-struct mmux_emacs_core_float_t		{ float				val; };
-struct mmux_emacs_core_double_t		{ double			val; };
-struct mmux_emacs_core_ldouble_t	{ long double			val; };
+#undef  MMEC_DEFINE_WRAPPER_TYPE_FLOAT_REP
+#define MMEC_DEFINE_WRAPPER_TYPE_FLOAT_REP(STEM)			\
+  typedef double		mmec_intrep_ ## STEM ## _t;		\
+									\
+  static inline mmec_intrep_ ## STEM ## _t				\
+  mmec_extract_intrep_ ## STEM ## _from_emacs_value (emacs_env * env, emacs_value arg) \
+  {									\
+    return (mmec_intrep_ ## STEM ## _t)mmec_extract_elisp_float_from_emacs_value(env, arg); \
+  }									\
+									\
+  static inline mmec_clang_ ## STEM ## _t				\
+  mmec_extract_clang_ ## STEM ## _from_intrep_ ## STEM (mmec_intrep_ ## STEM ## _t val) \
+  {									\
+    return (mmec_clang_ ## STEM ## _t)val;				\
+  }									\
+									\
+  static inline mmec_clang_ ## STEM ## _t				\
+  mmec_extract_clang_ ## STEM ## _from_emacs_value (emacs_env * env, emacs_value arg) \
+  {									\
+    return mmec_extract_clang_ ## STEM ## _from_intrep_ ## STEM(mmec_extract_intrep_ ## STEM ## _from_emacs_value(env, arg)); \
+  }									\
+									\
+  static inline mmec_intrep_ ## STEM ## _t				\
+  mmec_new_intrep_ ## STEM ## _from_clang_ ## STEM (mmec_clang_ ## STEM ## _t val) \
+  {									\
+    return (mmec_intrep_ ## STEM ## _t)val;				\
+  }									\
+									\
+  static inline emacs_value						\
+  mmec_new_emacs_value_from_intrep_ ## STEM (emacs_env * env, mmec_intrep_ ## STEM ## _t val) \
+  {									\
+    return mmec_new_emacs_value_integer(env, (intmax_t)val);		\
+  }									\
+									\
+  static inline emacs_value						\
+  mmec_new_emacs_value_from_clang_ ## STEM (emacs_env * env, mmec_clang_ ## STEM ## _t val) \
+  {									\
+    return mmec_new_emacs_value_from_intrep_ ## STEM(env, mmec_new_intrep_ ## STEM ## _from_clang_ ## STEM(val)); \
+  }
 
 /* ------------------------------------------------------------------ */
 
-mmux_emacs_core_decl emacs_value mmux_emacs_core_make_sint32 (emacs_env * env,  int32_t val);
-mmux_emacs_core_decl emacs_value mmux_emacs_core_make_uint32 (emacs_env * env, uint32_t val);
+MMEC_DEFINE_WRAPPER_TYPE_FLOAT_REP(double)
 
-static inline int32_t
-mmux_emacs_core_get_sint32 (emacs_env * env, emacs_value arg)
-{
-  MMUX_EMACS_CORE_PC(mmux_emacs_core_sint32_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
+
+/** --------------------------------------------------------------------
+ ** Number objects having user-pointer objects as internal representation.
+ ** ----------------------------------------------------------------- */
 
-  return obj->val;
-}
-static inline uint32_t
-mmux_emacs_core_get_uint32 (emacs_env * env, emacs_value arg)
-{
-  MMUX_EMACS_CORE_PC(mmux_emacs_core_uint32_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
-
-  return obj->val;
-}
-
-/* ------------------------------------------------------------------ */
-
-mmux_emacs_core_decl emacs_value mmux_emacs_core_make_sint64 (emacs_env * env,  int64_t val);
-mmux_emacs_core_decl emacs_value mmux_emacs_core_make_uint64 (emacs_env * env, uint64_t val);
-
-static inline int64_t
-mmux_emacs_core_get_sint64 (emacs_env * env, emacs_value arg)
-{
-  MMUX_EMACS_CORE_PC(mmux_emacs_core_sint64_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
-
-  if (0) { fprintf(stderr, "%s: %p %ld\n", __func__, (void*)arg, (long)(obj->val)); }
-  return obj->val;
-}
-static inline uint64_t
-mmux_emacs_core_get_uint64 (emacs_env * env, emacs_value arg)
-{
-  MMUX_EMACS_CORE_PC(mmux_emacs_core_uint64_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
-
-  return obj->val;
-}
+#undef  MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP
+#define MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP(BSTEM)			\
+  typedef struct mmec_intrep_ ## BSTEM ## _stru_t	mmec_intrep_ ## BSTEM ## _stru_t; \
+  typedef struct mmec_intrep_ ## BSTEM ## _stru_t *	mmec_intrep_ ## BSTEM ## _t; \
+									\
+  struct mmec_intrep_ ## BSTEM ## _stru_t {				\
+    mmec_clang_ ## BSTEM ## _t val;					\
+  };									\
+									\
+  mmec_decl mmec_intrep_ ## BSTEM ## _t mmec_new_intrep_ ## BSTEM ## _from_clang_ ## BSTEM (mmec_clang_ ## BSTEM ## _t val); \
+  mmec_decl emacs_value mmec_new_emacs_value_from_intrep_ ## BSTEM (emacs_env * env, mmec_intrep_ ## BSTEM ## _t irep); \
+  mmec_decl emacs_value mmec_new_emacs_value_from_clang_ ## BSTEM (emacs_env * env, mmec_clang_ ## BSTEM ## _t val); \
+  mmec_decl mmec_intrep_ ## BSTEM ## _t mmec_get_intrep_ ## BSTEM ## _from_emacs_value (emacs_env * env, emacs_value arg); \
+  mmec_decl mmec_clang_ ## BSTEM ## _t mmec_extract_clang_ ## BSTEM ## _from_intrep_ ## BSTEM (mmec_intrep_ ## BSTEM ## _t irep); \
+  mmec_decl mmec_clang_ ## BSTEM ## _t mmec_extract_clang_ ## BSTEM ## _from_emacs_value (emacs_env * env, emacs_value arg);
 
 /* ------------------------------------------------------------------ */
 
-mmux_emacs_core_decl emacs_value mmux_emacs_core_make_sint (emacs_env * env, signed   int val);
-mmux_emacs_core_decl emacs_value mmux_emacs_core_make_uint (emacs_env * env, unsigned int val);
-
-static inline int
-mmux_emacs_core_get_sint (emacs_env * env, emacs_value arg)
-{
-  MMUX_EMACS_CORE_PC(mmux_emacs_core_sint_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
-
-  return obj->val;
-}
-static inline unsigned int
-mmux_emacs_core_get_uint (emacs_env * env, emacs_value arg)
-{
-  MMUX_EMACS_CORE_PC(mmux_emacs_core_uint_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
-
-  return obj->val;
-}
-
-/* ------------------------------------------------------------------ */
-
-mmux_emacs_core_decl emacs_value mmux_emacs_core_make_slong (emacs_env * env, signed   long int val);
-mmux_emacs_core_decl emacs_value mmux_emacs_core_make_ulong (emacs_env * env, unsigned long int val);
-
-static inline long int
-mmux_emacs_core_get_slong (emacs_env * env, emacs_value arg)
-{
-  MMUX_EMACS_CORE_PC(mmux_emacs_core_slong_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
-
-  return obj->val;
-}
-static inline unsigned long int
-mmux_emacs_core_get_ulong (emacs_env * env, emacs_value arg)
-{
-  MMUX_EMACS_CORE_PC(mmux_emacs_core_ulong_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
-
-  return obj->val;
-}
-
-/* ------------------------------------------------------------------ */
-
-mmux_emacs_core_decl emacs_value mmux_emacs_core_make_sllong (emacs_env * env, signed   long long int val);
-mmux_emacs_core_decl emacs_value mmux_emacs_core_make_ullong (emacs_env * env, unsigned long long int val);
-
-static inline long long int
-mmux_emacs_core_get_sllong (emacs_env * env, emacs_value arg)
-{
-  MMUX_EMACS_CORE_PC(mmux_emacs_core_sllong_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
-
-  return obj->val;
-}
-static inline unsigned long long int
-mmux_emacs_core_get_ullong (emacs_env * env, emacs_value arg)
-{
-  MMUX_EMACS_CORE_PC(mmux_emacs_core_ullong_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
-
-  return obj->val;
-}
-
-/* ------------------------------------------------------------------ */
-
-mmux_emacs_core_decl emacs_value mmux_emacs_core_make_ssize (emacs_env * env, ssize_t val);
-mmux_emacs_core_decl emacs_value mmux_emacs_core_make_usize (emacs_env * env,  size_t val);
-
-static inline ssize_t
-mmux_emacs_core_get_ssize (emacs_env * env, emacs_value arg)
-{
-  MMUX_EMACS_CORE_PC(mmux_emacs_core_ssize_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
-
-  return obj->val;
-}
-static inline size_t
-mmux_emacs_core_get_usize (emacs_env * env, emacs_value arg)
-{
-  MMUX_EMACS_CORE_PC(mmux_emacs_core_usize_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
-
-  return obj->val;
-}
-
-/* ------------------------------------------------------------------ */
-
-mmux_emacs_core_decl emacs_value mmux_emacs_core_make_sintmax (emacs_env * env,  intmax_t val);
-mmux_emacs_core_decl emacs_value mmux_emacs_core_make_uintmax (emacs_env * env, uintmax_t val);
-
-static inline intmax_t
-mmux_emacs_core_get_sintmax (emacs_env * env, emacs_value arg)
-{
-  MMUX_EMACS_CORE_PC(mmux_emacs_core_sintmax_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
-
-  return obj->val;
-}
-static inline uintmax_t
-mmux_emacs_core_get_uintmax (emacs_env * env, emacs_value arg)
-{
-  MMUX_EMACS_CORE_PC(mmux_emacs_core_uintmax_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
-
-  return obj->val;
-}
-
-/* ------------------------------------------------------------------ */
-
-mmux_emacs_core_decl emacs_value mmux_emacs_core_make_ptrdiff (emacs_env * env, ptrdiff_t val);
-
-static inline ptrdiff_t
-mmux_emacs_core_get_ptrdiff (emacs_env * env, emacs_value arg)
-{
-  MMUX_EMACS_CORE_PC(mmux_emacs_core_ptrdiff_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
-
-  return obj->val;
-}
-
-/* ------------------------------------------------------------------ */
-
-mmux_emacs_core_decl emacs_value mmux_emacs_core_make_wchar (emacs_env * env, wchar_t val);
-
-static inline wchar_t
-mmux_emacs_core_get_wchar (emacs_env * env, emacs_value arg)
-{
-  MMUX_EMACS_CORE_PC(mmux_emacs_core_wchar_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
-
-  return obj->val;
-}
-
-/* ------------------------------------------------------------------ */
-
-mmux_emacs_core_decl emacs_value mmux_emacs_core_make_float (emacs_env * env, float val);
-
-static inline float
-mmux_emacs_core_get_float (emacs_env * env, emacs_value arg)
-{
-  MMUX_EMACS_CORE_PC(mmux_emacs_core_float_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
-
-  return obj->val;
-}
-
-/* ------------------------------------------------------------------ */
-
-mmux_emacs_core_decl emacs_value mmux_emacs_core_make_double (emacs_env * env, double val);
-
-static inline double
-mmux_emacs_core_get_double (emacs_env * env, emacs_value arg)
-{
-  MMUX_EMACS_CORE_PC(mmux_emacs_core_double_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
-
-  return obj->val;
-}
-
-/* ------------------------------------------------------------------ */
-
-mmux_emacs_core_decl emacs_value mmux_emacs_core_make_ldouble (emacs_env * env, long double val);
-
-static inline long double
-mmux_emacs_core_get_ldouble (emacs_env * env, emacs_value arg)
-{
-  MMUX_EMACS_CORE_PC(mmux_emacs_core_ldouble_t, obj, mmux_emacs_core_get_user_ptr(env, arg));
-
-  return obj->val;
-}
+MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP(wchar)
+MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP(sint)
+MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP(uint)
+MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP(slong)
+MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP(ulong)
+MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP(sllong)
+MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP(ullong)
+MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP(sintmax)
+MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP(uintmax)
+MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP(ssize)
+MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP(usize)
+MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP(ptrdiff)
+MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP(sint32)
+MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP(uint32)
+MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP(sint64)
+MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP(uint64)
+MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP(float)
+MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP(ldouble)
 
 
 /** --------------------------------------------------------------------
  ** User-pointer objects: bytevectors.
  ** ----------------------------------------------------------------- */
 
-typedef struct mmux_emacs_core_bytevector_t	mmux_emacs_core_bytevector_t;
+typedef struct mmec_intrep_bytevector_t	mmec_intrep_bytevector_t;
 
-struct mmux_emacs_core_bytevector_t {
+struct mmec_intrep_bytevector_t {
   size_t	number_of_slots;
   size_t	slot_size;
   int		hold_signed_values;
   uint8_t	* ptr;
 };
 
-static inline mmux_emacs_core_bytevector_t *
-mmux_emacs_core_get_bytevector (emacs_env * env, emacs_value arg)
+static inline mmec_intrep_bytevector_t *
+mmec_extract_intrep_bytevector (emacs_env * env, emacs_value arg)
 {
-  return ((mmux_emacs_core_bytevector_t *)mmux_emacs_core_get_user_ptr(env, arg));
+  return ((mmec_intrep_bytevector_t *)mmec_get_usrptr_object_from_emacs_value(env, arg));
 }
 
 
@@ -753,6 +481,6 @@ mmux_emacs_core_get_bytevector (emacs_env * env, emacs_value arg)
 } // extern "C"
 #endif
 
-#endif /* MMUX_EMACS_CORE_H */
+#endif /* MMEC_H */
 
 /* end of file */

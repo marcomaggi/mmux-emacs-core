@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-10 08:43:56 marco>
+;; Time-stamp: <2020-02-14 06:47:59 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -115,6 +115,16 @@
 	  STRING
 	;;Prepend the prefix
 	(concat (concat "cc-" STRING)))))
+
+  (defun cc--select-normalised-type-stem-from-ancestor-type (ANCESTOR-TYPE)
+    (cond ((eq ANCESTOR-TYPE 'cc-signed-integer)	'sint64)
+	  ((eq ANCESTOR-TYPE 'cc-unsigned-integer)	'uint64)
+	  ((eq ANCESTOR-TYPE 'cc-floating-point)	'ldouble)
+	  (t
+	   (signal 'mmec-error-unsupported-init-type ANCESTOR-TYPE))))
+
+  (defun cc--type-elisp-constructor-name (TYPE-OR-STEM)
+    (intern (concat (cc--prepend-prefix-to-symbol-name TYPE-OR-STEM) "--make")))
   )
 
 (defmacro cc--make (TYPE-OR-STEM &rest ARGS)
@@ -126,9 +136,7 @@
   ;;  (cc--make sint64 :obj 123)
   ;;  ==> (cc-sint64--make :obj 123)
   ;;
-  (let* ((TYPE.str	(cc--prepend-prefix-to-symbol-name TYPE-OR-STEM))
-	 (CONSTRUCTOR	(intern (concat TYPE.str "--make"))))
-    (cons CONSTRUCTOR ARGS)))
+  (cons (cc--type-elisp-constructor-name TYPE-OR-STEM) ARGS))
 
 (defmacro cc--extract-obj (TYPE-OR-STEM VALUE)
   ;;Expand into the application of a struct slot getter to a struct instance.  Example:
@@ -151,25 +159,31 @@
   ;;Example:
   ;;
   ;;  (cc--clang-constructor sint32 123)
-  ;;  ==> (mmux-core-c-make-sint32 123)
+  ;;  ==> (mmec-c-make-sint32 123)
   ;;
   (let* ((STEM.str		(cc--strip-prefix-from-symbol-name TYPE-OR-STEM))
-	 (CLANG-CONSTRUCTOR	(intern (concat "mmux-core-c-make-" STEM.str))))
+	 (CLANG-CONSTRUCTOR	(intern (concat "mmec-c-make-" STEM.str))))
     (cons CLANG-CONSTRUCTOR ARGS)))
+
+(defmacro cc--number-clang-constructor (TYPE-OR-STEM NORMALISED-TYPE-OR-STEM &rest ARGS)
+  (let ((STEM (intern (concat (cc--strip-prefix-from-symbol-name TYPE-OR-STEM)
+			      "-from-"
+			      (cc--strip-prefix-from-symbol-name NORMALISED-TYPE-OR-STEM)))))
+    `(cc--clang-constructor ,STEM . ,ARGS)))
 
 (defmacro cc--clang-converter (FROMTYPE-OR-STEM TOTYPE-OR-STEM &rest ARGS)
   ;;Expand  into  the application  of  the  C language  object  converter  to the  given  arguments.
   ;;Examples:
   ;;
   ;;  (cc--clang-converter sint32 sint64 123)
-  ;;  ==> (mmux-core-c-sint32-to-sint54 (cc-sint32 123))
+  ;;  ==> (mmec-c-sint32-to-sint54 (cc-sint32 123))
   ;;
   ;;  (cc--clang-converter cc-float cc-ldouble 123)
-  ;;  ==> (mmux-core-c-float-to-ldouble (cc-float 1.2))
+  ;;  ==> (mmec-c-float-to-ldouble (cc-float 1.2))
   ;;
   (let* ((FROMSTEM.str		(cc--strip-prefix-from-symbol-name FROMTYPE-OR-STEM))
 	 (TOSTEM.str		(cc--strip-prefix-from-symbol-name TOTYPE-OR-STEM))
-	 (CLANG-CONVERTER	(intern (concat "mmux-core-c-" FROMSTEM.str "-to-" TOSTEM.str))))
+	 (CLANG-CONVERTER	(intern (concat "mmec-c-" FROMSTEM.str "-to-" TOSTEM.str))))
     (cons CLANG-CONVERTER ARGS)))
 
 

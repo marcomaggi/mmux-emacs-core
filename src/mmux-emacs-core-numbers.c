@@ -5,7 +5,7 @@
 
   Abstract
 
-	This module implements facilitie for number objects.
+	This module implements facilities for number objects.
 
   Copyright (C) 2020 Marco Maggi <mrc.mgg@gmail.com>
 
@@ -29,162 +29,434 @@
 #include "mmux-emacs-core-internals.h"
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <math.h>
 
 
 /** --------------------------------------------------------------------
- ** Range checker: is a number fitting into a C language type?
+ ** Fitting functions for C normalised language types.
  ** ----------------------------------------------------------------- */
 
-#undef  MMUX_EMACS_CORE_FITS_SIGNED_P
-#define MMUX_EMACS_CORE_FITS_SIGNED_P(CTYPESTEM, FUNCSTEM, LIMSTEM)	\
+#undef  MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_ELISP_FUNC
+#define MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_ELISP_FUNC(NSTEM, BSTEM) \
   static emacs_value							\
-  Fmmux_emacs_core_fits_ ## FUNCSTEM ## _p (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED) \
+  Fmmec_ ## NSTEM ## _fits_ ## BSTEM ## _range_p (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED) \
   {									\
     assert(1 == nargs);							\
-    mmux_emacs_core_type_ ## CTYPESTEM ## _t	val = mmux_emacs_core_get_ ## CTYPESTEM(env, args[0]); \
-    mmux_emacs_core_type_ ## CTYPESTEM ## _t	min = MMUX_EMACS_CORE_ ## LIMSTEM ## _MIN; \
-    mmux_emacs_core_type_ ## CTYPESTEM ## _t	max = MMUX_EMACS_CORE_ ## LIMSTEM ## _MAX; \
-    return mmux_emacs_core_make_boolean(env, (((min <= val) && (val <= max))? 1 : 0)); \
+    mmec_clang_ ## NSTEM ## _t nval;					\
+    bool fits;								\
+    nval = mmec_extract_clang_ ## NSTEM ## _from_emacs_value(env, args[0]); \
+    fits = mmec_clang_ ## NSTEM ## _fits_ ## BSTEM ## _range_p(nval);	\
+    return mmec_new_emacs_value_boolean(env, fits);			\
   }
 
-#undef  MMUX_EMACS_CORE_FITS_UNSIGNED_P
-#define MMUX_EMACS_CORE_FITS_UNSIGNED_P(CTYPESTEM, FUNCSTEM, LIMSTEM)	\
-  static emacs_value							\
-  Fmmux_emacs_core_fits_ ## FUNCSTEM ## _p (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED) \
+/* We  normalise:   every  exact   signed  integer   number  to   a  value   of  type
+ * "mmec_clang_sint64_t";  every exact  unsigned integer  number to  a value  of type
+ * "mmec_clang_uint64_t";   every  floating-point   number   to  a   value  of   type
+ * "mmec_clang_ldouble_t".
+ *
+ * In  reverse: we  need functions  to  check if  a  normalised type  fits the  range
+ * representable by a basic type.
+ */
+
+/* Define a  range Fit checker function  for normalised signed values.   The argument
+   NSTEM is the stem of the normalised type  name.  The argument BSTEM is the stem of
+   the base  type name.  The  argument BCAPSTEM is the  capitalised stem of  the base
+   type name. */
+#undef  MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC
+#define MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(NSTEM, BSTEM, BCAPSTEM) \
+  bool									\
+  mmec_clang_ ## NSTEM ## _fits_ ## BSTEM ## _range_p (mmec_clang_ ## NSTEM ## _t nval)	\
   {									\
-    assert(1 == nargs);							\
-    mmux_emacs_core_type_ ## CTYPESTEM ## _t	val = mmux_emacs_core_get_ ## CTYPESTEM(env, args[0]); \
-    mmux_emacs_core_type_ ## CTYPESTEM ## _t	max = MMUX_EMACS_CORE_ ## LIMSTEM ## _MAX; \
-    return mmux_emacs_core_make_boolean(env, ((val <= max)? 1 : 0));	\
-  }
+    return (((MMEC_ ## BCAPSTEM ## _MIN <= nval) && (nval <= MMEC_ ## BCAPSTEM ## _MAX))? true : false); \
+  }									\
+  MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_ELISP_FUNC(NSTEM, BSTEM)
 
-MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		char,		CHAR)
-MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		schar,		SCHAR)
-MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		uchar,		UCHAR)
-MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		wchar,		WCHAR)
+/* Define a range fit checker function  for normalised unsigned values.  The argument
+   NSTEM is the stem of the normalised type  name.  The argument BSTEM is the stem of
+   the base  type name.  The  argument BCAPSTEM is the  capitalised stem of  the base
+   type name. */
+#undef  MMEC_DEFINE_UNSIGNED_NORMALISED_TYPE_FITS_FUNC
+#define MMEC_DEFINE_UNSIGNED_NORMALISED_TYPE_FITS_FUNC(NSTEM, BSTEM, BCAPSTEM) \
+  bool									\
+  mmec_clang_ ## NSTEM ## _fits_ ## BSTEM ## _range_p (mmec_clang_ ## NSTEM ## _t nval)	\
+  {									\
+    return ((nval <= MMEC_ ## BCAPSTEM ## _MAX)? true : false);		\
+  }									\
+  MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_ELISP_FUNC(NSTEM, BSTEM)
 
-MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sshrt,		SSHRT)
-MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		ushrt,		USHRT)
-MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sint,		SINT)
-MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		uint,		UINT)
-MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		slong,		SLONG)
-MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		ulong,		ULONG)
-MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sllong,		SLLONG)
-MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		ullong,		ULLONG)
-
-MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		ssize,		SSIZE)
-MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		usize,		USIZE)
-MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sintmax,	SINTMAX)
-MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		uintmax,	UINTMAX)
-MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		ptrdiff,	PTRDIFF)
-
-MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sint8,		SINT8)
-MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		uint8,		UINT8)
-MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sint16,		SINT16)
-MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		uint16,		UINT16)
-MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sint32,		SINT32)
-MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		uint32,		UINT32)
-MMUX_EMACS_CORE_FITS_SIGNED_P(sint64,		sint64,		SINT64)
-MMUX_EMACS_CORE_FITS_UNSIGNED_P(uint64,		uint64,		UINT64)
-
-MMUX_EMACS_CORE_FITS_SIGNED_P(ldouble,	float,		FLOAT)
-MMUX_EMACS_CORE_FITS_SIGNED_P(ldouble,	double,		DOUBLE)
-MMUX_EMACS_CORE_FITS_SIGNED_P(ldouble,	ldouble,	LDOUBLE)
+MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(sint64,	char,		CHAR)
+MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(sint64,	schar,		SCHAR)
+MMEC_DEFINE_UNSIGNED_NORMALISED_TYPE_FITS_FUNC(uint64,	uchar,		UCHAR)
+MMEC_DEFINE_UNSIGNED_NORMALISED_TYPE_FITS_FUNC(uint64,	wchar,		WCHAR)
+MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(sint64,	sshrt,		SSHRT)
+MMEC_DEFINE_UNSIGNED_NORMALISED_TYPE_FITS_FUNC(uint64,	ushrt,		USHRT)
+MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(sint64,	sint,		SINT)
+MMEC_DEFINE_UNSIGNED_NORMALISED_TYPE_FITS_FUNC(uint64,	uint,		UINT)
+MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(sint64,	slong,		SLONG)
+MMEC_DEFINE_UNSIGNED_NORMALISED_TYPE_FITS_FUNC(uint64,	ulong,		ULONG)
+MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(sint64,	sllong,		SLLONG)
+MMEC_DEFINE_UNSIGNED_NORMALISED_TYPE_FITS_FUNC(uint64,	ullong,		ULLONG)
+MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(sint64,	sintmax,	SINTMAX)
+MMEC_DEFINE_UNSIGNED_NORMALISED_TYPE_FITS_FUNC(uint64,	uintmax,	UINTMAX)
+MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(sint64,	ssize,		SSIZE)
+MMEC_DEFINE_UNSIGNED_NORMALISED_TYPE_FITS_FUNC(uint64,	usize,		USIZE)
+MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(sint64,	ptrdiff,	PTRDIFF)
+MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(sint64,	sint8,		SINT8)
+MMEC_DEFINE_UNSIGNED_NORMALISED_TYPE_FITS_FUNC(uint64,	uint8,		UINT8)
+MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(sint64,	sint16,		SINT16)
+MMEC_DEFINE_UNSIGNED_NORMALISED_TYPE_FITS_FUNC(uint64,	uint16,		UINT16)
+MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(sint64,	sint32,		SINT32)
+MMEC_DEFINE_UNSIGNED_NORMALISED_TYPE_FITS_FUNC(uint64,	uint32,		UINT32)
+MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(sint64,	sint64,		SINT64)
+MMEC_DEFINE_UNSIGNED_NORMALISED_TYPE_FITS_FUNC(uint64,	uint64,		UINT64)
+MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(ldouble,	float,		FLOAT)
+MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(ldouble,	double,		FLOAT)
+MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(ldouble,	ldouble,	LDOUBLE)
 
 
 /** --------------------------------------------------------------------
- ** Conversion functions.
+ ** Custom numbers with built-in "integer" internal representation.
  ** ----------------------------------------------------------------- */
 
-#undef  MMUX_EMACS_CORE_CONVERSION_TO_SINT64
-#define MMUX_EMACS_CORE_CONVERSION_TO_SINT64(STEM)			\
-  static emacs_value							\
-  Fmmux_emacs_core_ ## STEM ## _to_sint64 (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED) \
+/* Define  the  C language  implementation  function  of  an Emacs  Lisp  constructor
+ * function for a base C language type; the  C language type has an Emacs Lisp object
+ * of  type  "integer"  as  internal   representation.   The  constructor  accepts  a
+ * normalised Emacs Lisp value as argument.
+ *
+ * The argument NSTEM is the stem of the normalised type name.
+ *
+ * The argument BSTEM is the stem of the base type name.
+ */
+#undef  MMEC_DEFINE_INTEGER_NUMBER_CONSTRUCTOR
+#define MMEC_DEFINE_INTEGER_NUMBER_CONSTRUCTOR(BSTEM, NSTEM)		\
+  emacs_value								\
+  Fmmec_make_integer_ ## BSTEM ## _from_usrptr_ ## NSTEM (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED) \
   {									\
-    assert(1 == nargs);							\
-    int64_t	rv = mmux_emacs_core_get_ ## STEM(env, args[0]);	\
-    if (0) {								\
-      fprintf(stderr, "%s: %ld\n", __func__, (long)rv);			\
+    assert(nargs == 1);							\
+    mmec_clang_ ## NSTEM ## _t nval =					\
+      mmec_extract_clang_ ## NSTEM ## _from_emacs_value(env, args[0]);	\
+									\
+    if (mmec_clang_ ## NSTEM ## _fits_ ## BSTEM ## _range_p(nval)) {	\
+      MMEC_CAST(mmec_clang_ ## BSTEM ## _t, val, nval);			\
+      return mmec_new_emacs_value_from_clang_ ## BSTEM(env, val);	\
+    } else {								\
+      return mmec_error_value_out_of_range(env);			\
     }									\
-    return mmux_emacs_core_make_sint64(env, rv);			\
   }
 
-#undef  MMUX_EMACS_CORE_CONVERSION_TO_UINT64
-#define MMUX_EMACS_CORE_CONVERSION_TO_UINT64(STEM)			\
-  static emacs_value							\
-  Fmmux_emacs_core_ ## STEM ## _to_uint64 (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED) \
+MMEC_DEFINE_INTEGER_NUMBER_CONSTRUCTOR(char,	sint64)
+MMEC_DEFINE_INTEGER_NUMBER_CONSTRUCTOR(schar,	sint64)
+MMEC_DEFINE_INTEGER_NUMBER_CONSTRUCTOR(uchar,	uint64)
+MMEC_DEFINE_INTEGER_NUMBER_CONSTRUCTOR(sshrt,	sint64)
+MMEC_DEFINE_INTEGER_NUMBER_CONSTRUCTOR(ushrt,	uint64)
+MMEC_DEFINE_INTEGER_NUMBER_CONSTRUCTOR(sint8,	sint64)
+MMEC_DEFINE_INTEGER_NUMBER_CONSTRUCTOR(uint8,	uint64)
+MMEC_DEFINE_INTEGER_NUMBER_CONSTRUCTOR(sint16,	sint64)
+MMEC_DEFINE_INTEGER_NUMBER_CONSTRUCTOR(uint16,	uint64)
+
+
+/** --------------------------------------------------------------------
+ ** Custom numbers with built-in "float" internal representation.
+ ** ----------------------------------------------------------------- */
+
+/* Define  the  C language  implementation  function  of  an Emacs  Lisp  constructor
+ * function for a base C language type; the  C language type has an Emacs Lisp object
+ * of type "float" as internal  representation.  The constructor accepts a normalised
+ * Emacs Lisp value as argument.
+ *
+ * The argument NSTEM is the stem of the normalised type name.
+ *
+ * The argument BSTEM is the stem of the base type name.
+ */
+#undef  MMEC_DEFINE_FLOAT_NUMBER_CONSTRUCTOR
+#define MMEC_DEFINE_FLOAT_NUMBER_CONSTRUCTOR(BSTEM, NSTEM)		\
+  emacs_value								\
+  Fmmec_make_elisp_float_from_usrptr_ ## NSTEM (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED) \
   {									\
-    assert(1 == nargs);							\
-    uint64_t	rv = mmux_emacs_core_get_ ## STEM(env, args[0]);	\
-    if (0) {								\
-      fprintf(stderr, "%s: %ld\n", __func__, (long)rv);			\
+    assert(nargs == 1);							\
+    mmec_clang_ ## NSTEM ## _t nval =					\
+      mmec_extract_clang_ ## NSTEM ## _from_emacs_value(env, args[0]);	\
+									\
+    if (mmec_clang_ ## NSTEM ## _fits_ ## BSTEM ## _range_p(nval)) {	\
+      MMEC_CAST(mmec_clang_ ## BSTEM ## _t, val, nval);			\
+      return mmec_new_emacs_value_from_clang_ ## BSTEM(env, val);	\
+    } else {								\
+      return mmec_error_value_out_of_range(env);			\
     }									\
-    return mmux_emacs_core_make_uint64(env, rv);			\
   }
 
-#undef  MMUX_EMACS_CORE_CONVERSION_TO_SINT64_AND_UINT64
-#define MMUX_EMACS_CORE_CONVERSION_TO_SINT64_AND_UINT64(STEM)	\
-  MMUX_EMACS_CORE_CONVERSION_TO_SINT64(s ## STEM)		\
-  MMUX_EMACS_CORE_CONVERSION_TO_UINT64(u ## STEM)
+MMEC_DEFINE_FLOAT_NUMBER_CONSTRUCTOR(double,	ldouble)
 
-MMUX_EMACS_CORE_CONVERSION_TO_SINT64(char)
-MMUX_EMACS_CORE_CONVERSION_TO_SINT64_AND_UINT64(char)
-MMUX_EMACS_CORE_CONVERSION_TO_SINT64_AND_UINT64(shrt)
-MMUX_EMACS_CORE_CONVERSION_TO_SINT64_AND_UINT64(int)
-MMUX_EMACS_CORE_CONVERSION_TO_SINT64_AND_UINT64(long)
-MMUX_EMACS_CORE_CONVERSION_TO_SINT64_AND_UINT64(llong)
-MMUX_EMACS_CORE_CONVERSION_TO_SINT64_AND_UINT64(intmax)
-MMUX_EMACS_CORE_CONVERSION_TO_SINT64_AND_UINT64(size)
-MMUX_EMACS_CORE_CONVERSION_TO_SINT64_AND_UINT64(int8)
-MMUX_EMACS_CORE_CONVERSION_TO_SINT64_AND_UINT64(int16)
-MMUX_EMACS_CORE_CONVERSION_TO_SINT64_AND_UINT64(int32)
-MMUX_EMACS_CORE_CONVERSION_TO_SINT64(ptrdiff)
-MMUX_EMACS_CORE_CONVERSION_TO_UINT64(wchar)
+
+/** --------------------------------------------------------------------
+ ** Custom numbers with user-pointer object internal representation.
+ ** ----------------------------------------------------------------- */
+
+/* At the  Emacs Lisp  level, these  types are constructed  from a  normalised number
+ * representation:
+ *
+ * - The initialisation  value of signed  integers is  a user-pointer object  of type
+ *   "sint64".
+ *
+ * - The initialisation value  of unsigned integers is a user-pointer  object of type
+ *   "uint64".
+ *
+ * - The initialisation value  of floating-point numbers is a  user-pointer object of
+ *   type "ldouble".
+ */
+
+#undef  MMEC_DEFINE_USRPTR_BASE_TYPE_FUNCTIONS
+#define MMEC_DEFINE_USRPTR_BASE_TYPE_FUNCTIONS(BSTEM)			\
+  mmec_intrep_ ## BSTEM ## _t						\
+  mmec_new_intrep_ ## BSTEM ## _from_clang_ ## BSTEM (mmec_clang_ ## BSTEM ## _t val) \
+  {									\
+    mmec_intrep_ ## BSTEM ##_t irep;					\
+									\
+    errno = 0;								\
+    irep   = (mmec_intrep_ ## BSTEM ##_t)malloc(sizeof(mmec_intrep_ ## BSTEM ## _stru_t)); \
+    if (irep) {								\
+      irep->val	= val;							\
+      return irep;							\
+    } else {								\
+      return NULL;							\
+    }									\
+  }									\
+									\
+  emacs_value								\
+  mmec_new_emacs_value_from_intrep_ ## BSTEM (emacs_env * env, mmec_intrep_ ## BSTEM ## _t irep) \
+  {									\
+    return mmec_new_emacs_value_from_usrptr_object(env, mmec_intrep_ ## BSTEM ## _finalizer, irep); \
+  }									\
+									\
+  emacs_value								\
+  mmec_new_emacs_value_from_clang_ ## BSTEM (emacs_env * env, mmec_clang_ ## BSTEM ## _t val) \
+  {									\
+    mmec_intrep_ ## BSTEM ## _t	irep =					\
+      mmec_new_intrep_ ## BSTEM ## _from_clang_ ## BSTEM(val);		\
+    if (irep) {								\
+      return mmec_new_emacs_value_from_intrep_ ## BSTEM(env, irep);	\
+    } else {								\
+      return mmec_error_memory_allocation(env);				\
+    }									\
+  }									\
+									\
+  mmec_intrep_ ## BSTEM ## _t						\
+  mmec_get_intrep_ ## BSTEM ## _from_emacs_value (emacs_env * env, emacs_value arg) \
+  {									\
+    return ((mmec_intrep_ ## BSTEM ## _t)mmec_get_usrptr_object_from_emacs_value(env, arg)); \
+  }									\
+									\
+  mmec_clang_ ## BSTEM ## _t						\
+  mmec_extract_clang_ ## BSTEM ## _from_intrep_ ## BSTEM (mmec_intrep_ ## BSTEM ## _t irep) \
+  {									\
+    return irep->val;							\
+  }									\
+									\
+  mmec_clang_ ## BSTEM ## _t						\
+  mmec_extract_clang_ ## BSTEM ## _from_emacs_value (emacs_env * env, emacs_value arg) \
+  {									\
+    mmec_intrep_ ## BSTEM ## _t	irep;					\
+									\
+    irep = mmec_get_intrep_ ## BSTEM ## _from_emacs_value(env, arg);	\
+    return mmec_extract_clang_ ## BSTEM ## _from_intrep_ ## BSTEM(irep); \
+  }
+
+/* Define a C language function acting  as user-pointer object finalizer.  The object
+ * being finalized is the internal representation of a custom number.
+ *
+ * The argument BSTEM is the stem of the base type name.
+ */
+#undef  MMEC_DEFINE_USRPTR_FINALIZER_FUNCTION
+#define MMEC_DEFINE_USRPTR_FINALIZER_FUNCTION(BSTEM)	\
+  static void						\
+  mmec_intrep_ ## BSTEM ## _finalizer (void * _obj)	\
+  {							\
+    MMEC_PC(mmec_intrep_ ## BSTEM ##_t, obj, _obj);	\
+    free(obj);						\
+  }
+
+/* Define  the  C language  implementation  function  of  an Emacs  Lisp  constructor
+ * function  for a  base C  language type;  the  C language  type has  an Emacs  Lisp
+ * user-pointer  object  as  internal  representation.   The  constructor  accepts  a
+ * normalised Emacs Lisp value as argument.
+ *
+ * The argument NSTEM is the stem of the normalised type name.
+ *
+ * The argument BSTEM is the stem of the base type name.
+ */
+#undef  MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR
+#define MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(BSTEM, NSTEM)	\
+  emacs_value								\
+  Fmmec_make_usrptr_ ## BSTEM ## _from_usrptr_ ## NSTEM (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED) \
+  {									\
+    assert(nargs == 1);							\
+    mmec_clang_ ## NSTEM ## _t nval =					\
+      mmec_extract_clang_ ## NSTEM ## _from_emacs_value(env, args[0]);	\
+									\
+    if (mmec_clang_ ## NSTEM ## _fits_ ## BSTEM ## _range_p(nval)) {	\
+      MMEC_CAST(mmec_clang_ ## BSTEM ## _t, val, nval);			\
+      return mmec_new_emacs_value_from_clang_ ## BSTEM(env, val);	\
+    } else {								\
+      return mmec_error_value_out_of_range(env);			\
+    }									\
+  }
+
+#define MMEC_DEFINE_USRPTR_BASE_TYPE(BSTEM, NSTEM)		\
+  MMEC_DEFINE_USRPTR_FINALIZER_FUNCTION(BSTEM)			\
+  MMEC_DEFINE_USRPTR_BASE_TYPE_FUNCTIONS(BSTEM)			\
+  MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(BSTEM, NSTEM)
+
+MMEC_DEFINE_USRPTR_BASE_TYPE(wchar,	uint64)
+MMEC_DEFINE_USRPTR_BASE_TYPE(sint,	sint64)
+MMEC_DEFINE_USRPTR_BASE_TYPE(uint,	uint64)
+MMEC_DEFINE_USRPTR_BASE_TYPE(slong,	sint64)
+MMEC_DEFINE_USRPTR_BASE_TYPE(ulong,	uint64)
+MMEC_DEFINE_USRPTR_BASE_TYPE(sllong,	sint64)
+MMEC_DEFINE_USRPTR_BASE_TYPE(ullong,	uint64)
+MMEC_DEFINE_USRPTR_BASE_TYPE(sintmax,	sint64)
+MMEC_DEFINE_USRPTR_BASE_TYPE(uintmax,	uint64)
+MMEC_DEFINE_USRPTR_BASE_TYPE(ssize,	sint64)
+MMEC_DEFINE_USRPTR_BASE_TYPE(usize,	uint64)
+MMEC_DEFINE_USRPTR_BASE_TYPE(ptrdiff,	sint64)
+MMEC_DEFINE_USRPTR_BASE_TYPE(sint32,	sint64)
+MMEC_DEFINE_USRPTR_BASE_TYPE(uint32,	uint64)
+MMEC_DEFINE_USRPTR_BASE_TYPE(float,	ldouble)
+
+
+/** --------------------------------------------------------------------
+ ** Custom numbers with user-pointer object internal representation.
+ ** ----------------------------------------------------------------- */
+
+/* The following definitions are for normalised types. */
+
+MMEC_DEFINE_USRPTR_FINALIZER_FUNCTION(sint64)
+MMEC_DEFINE_USRPTR_BASE_TYPE_FUNCTIONS(sint64)
+
+MMEC_DEFINE_USRPTR_FINALIZER_FUNCTION(uint64)
+MMEC_DEFINE_USRPTR_BASE_TYPE_FUNCTIONS(uint64)
+
+MMEC_DEFINE_USRPTR_FINALIZER_FUNCTION(ldouble)
+MMEC_DEFINE_USRPTR_BASE_TYPE_FUNCTIONS(ldouble)
+
+/* Define  the  C language  implementation  function  of  an Emacs  Lisp  constructor
+ * function  for a  base C  language type;  the  C language  type has  an Emacs  Lisp
+ * user-pointer  object  as  internal  representation.   The  constructor  accepts  a
+ * normalised Emacs Lisp value as argument.
+ *
+ * The argument NSTEM is the stem of the normalised type name.
+ *
+ * The argument BSTEM is the stem of the base type name.
+ */
+#undef  MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR
+#define MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(BSTEM, ARGSTEM, ARGINTREP) \
+  emacs_value								\
+  Fmmec_make_usrptr_ ## BSTEM ## _from_ ## ARGINTREP ## _ ## ARGSTEM	\
+  (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED) \
+  {									\
+    assert(nargs == 1);							\
+    mmec_clang_ ## ARGSTEM ## _t nval =					\
+      mmec_extract_clang_ ## ARGSTEM ## _from_emacs_value(env, args[0]); \
+    MMEC_CAST(mmec_clang_ ## BSTEM ## _t, val, nval);			\
+    return mmec_new_emacs_value_from_clang_ ## BSTEM(env, val);		\
+  }
+
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(sint64,		char,		integer)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(sint64,		schar,		integer)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(uint64,		uchar,		integer)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(uint64,		wchar,		usrptr)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(sint64,		sshrt,		integer)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(uint64,		ushrt,		integer)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(sint64,		sint,		usrptr)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(uint64,		uint,		usrptr)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(sint64,		slong,		usrptr)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(uint64,		ulong,		usrptr)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(sint64,		sllong,		usrptr)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(uint64,		ullong,		usrptr)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(sint64,		sintmax,	usrptr)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(uint64,		uintmax,	usrptr)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(sint64,		ssize,		usrptr)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(uint64,		usize,		usrptr)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(sint64,		ptrdiff,	usrptr)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(sint64,		sint8,		integer)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(uint64,		uint8,		integer)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(sint64,		sint16,		integer)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(uint64,		uint16,		integer)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(sint64,		sint32,		usrptr)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(uint64,		uint32,		usrptr)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(sint64,		sint64,		usrptr)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(uint64,		uint64,		usrptr)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(ldouble,		float,		usrptr)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(ldouble,		double,		float)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(ldouble,		ldouble,	usrptr)
 
 /* ------------------------------------------------------------------ */
 
-static emacs_value
-Fmmux_emacs_core_integer_to_sint64 (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+emacs_value
+Fmmec_make_usrptr_sint64_from_elisp_integer (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
 {
-  assert(1 == nargs);
-  return mmux_emacs_core_make_sint64(env, (int64_t)mmux_emacs_core_extract_integer(env, args[0]));
+  assert(nargs == 1);
+  mmec_clang_sintmax_t argval = mmec_extract_elisp_integer_from_emacs_value(env, args[0]);
+  MMEC_CAST(mmec_clang_sint64_t, val, argval);
+  return mmec_new_emacs_value_from_clang_sint64(env, val);
 }
 
-static emacs_value
-Fmmux_emacs_core_integer_to_uint64 (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+emacs_value
+Fmmec_make_usrptr_sint64_from_elisp_float (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
 {
-  assert(1 == nargs);
-  return mmux_emacs_core_make_sint64(env, (int64_t)mmux_emacs_core_extract_integer(env, args[0]));
+  assert(nargs == 1);
+  mmec_clang_double_t	argval = mmec_extract_elisp_float_from_emacs_value(env, args[0]);
+  MMEC_CAST(mmec_clang_sint64_t, val, round(argval));
+  return mmec_new_emacs_value_from_clang_sint64(env, val);
 }
 
 /* ------------------------------------------------------------------ */
 
-static emacs_value
-Fmmux_emacs_core_float_to_ldouble (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+emacs_value
+Fmmec_make_usrptr_uint64_from_elisp_integer (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
 {
-  assert(1 == nargs);
-  return mmux_emacs_core_make_ldouble(env, mmux_emacs_core_get_float(env, args[0]));
+  assert(nargs == 1);
+  mmec_clang_sintmax_t argval = mmec_extract_elisp_integer_from_emacs_value(env, args[0]);
+  MMEC_CAST(mmec_clang_uint64_t, val, argval);
+  return mmec_new_emacs_value_from_clang_uint64(env, val);
 }
 
-static emacs_value
-Fmmux_emacs_core_double_to_ldouble (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+emacs_value
+Fmmec_make_usrptr_uint64_from_elisp_float (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
 {
-  assert(1 == nargs);
-  return mmux_emacs_core_make_ldouble(env, mmux_emacs_core_get_double(env, args[0]));
+  assert(nargs == 1);
+  mmec_clang_double_t	argval = mmec_extract_elisp_float_from_emacs_value(env, args[0]);
+  MMEC_CAST(mmec_clang_uint64_t, val, round(argval));
+  return mmec_new_emacs_value_from_clang_uint64(env, val);
 }
 
-static emacs_value
-Fmmux_emacs_core_sint64_to_ldouble (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+/* ------------------------------------------------------------------ */
+
+emacs_value
+Fmmec_make_usrptr_ldouble_from_usrptr_sint64 (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
 {
-  assert(1 == nargs);
-  return mmux_emacs_core_make_ldouble(env, (long double)mmux_emacs_core_get_sint64(env, args[0]));
+  assert(nargs == 1);
+  mmec_clang_sint64_t argval = mmec_extract_clang_sint64_from_emacs_value(env, args[0]);
+  MMEC_CAST(mmec_clang_ldouble_t, val, argval);
+  return mmec_new_emacs_value_from_clang_ldouble(env, val);
 }
 
-static emacs_value
-Fmmux_emacs_core_uint64_to_ldouble (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED)
+emacs_value
+Fmmec_make_usrptr_ldouble_from_usrptr_uint64 (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
 {
-  assert(1 == nargs);
-  return mmux_emacs_core_make_ldouble(env, (long double)mmux_emacs_core_get_uint64(env, args[0]));
+  assert(nargs == 1);
+  mmec_clang_uint64_t argval = mmec_extract_clang_uint64_from_emacs_value(env, args[0]);
+  MMEC_CAST(mmec_clang_ldouble_t, val, argval);
+  return mmec_new_emacs_value_from_clang_ldouble(env, val);
+}
+
+emacs_value
+Fmmec_make_usrptr_ldouble_from_elisp_float (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
+{
+  assert(nargs == 1);
+  mmec_clang_double_t argval = mmec_extract_elisp_float_from_emacs_value(env, args[0]);
+  MMEC_CAST(mmec_clang_ldouble_t, val, argval);
+  return mmec_new_emacs_value_from_clang_ldouble(env, val);
 }
 
 
@@ -192,415 +464,606 @@ Fmmux_emacs_core_uint64_to_ldouble (emacs_env *env, ptrdiff_t nargs, emacs_value
  ** Comparison functions.
  ** ----------------------------------------------------------------- */
 
-#undef  MMUX_EMACS_CORE_COMPARISON_OPERATION
-#define MMUX_EMACS_CORE_COMPARISON_OPERATION(OPNAME, OPERATOR, STEM, CTYPE) \
+#undef  MMEC_COMPARISON_OPERATION
+#define MMEC_COMPARISON_OPERATION(OPNAME, OPERATOR, STEM)		\
   static emacs_value							\
-  Fmmux_emacs_core_compare_ ## STEM ## _ ## OPNAME(emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMUX_EMACS_CORE_UNUSED) \
+  Fmmec_compare_ ## STEM ## _ ## OPNAME(emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED) \
   {									\
     assert(2 == nargs);							\
-    CTYPE	op1	= mmux_emacs_core_get_ ## STEM(env, args[0]);	\
-    CTYPE	op2	= mmux_emacs_core_get_ ## STEM(env, args[1]);	\
+    mmec_clang_ ## STEM ## _t op1 = mmec_extract_clang_ ## STEM ## _from_emacs_value(env, args[0]); \
+    mmec_clang_ ## STEM ## _t op2 = mmec_extract_clang_ ## STEM ## _from_emacs_value(env, args[1]); \
     int		rv	= ((op1 OPERATOR op2)? 1 : 0);			\
 									\
     if (0) {								\
       fprintf(stderr, "%s: op1=%ld op2=%ld rv=%d\n", __func__,		\
 	      (long)op1, (long)op2, rv);				\
     }									\
-    return mmux_emacs_core_make_boolean(env, rv);			\
+    return mmec_new_emacs_value_boolean(env, rv);			\
   }
 
-#define MMUX_EMACS_CORE_COMPARISON_OPERATIONS(STEM, CTYPE)		\
-  MMUX_EMACS_CORE_COMPARISON_OPERATION(equal,		==,	STEM,	CTYPE) \
-  MMUX_EMACS_CORE_COMPARISON_OPERATION(less,		<,	STEM,	CTYPE) \
-  MMUX_EMACS_CORE_COMPARISON_OPERATION(greater,		>,	STEM,	CTYPE) \
-  MMUX_EMACS_CORE_COMPARISON_OPERATION(less_equal,	<=,	STEM,	CTYPE) \
-  MMUX_EMACS_CORE_COMPARISON_OPERATION(greater_equal,	>=,	STEM,	CTYPE) \
-  MMUX_EMACS_CORE_COMPARISON_OPERATION(not_equal,	!=,	STEM,	CTYPE)
+#define MMEC_COMPARISON_OPERATIONS(STEM)		\
+  MMEC_COMPARISON_OPERATION(equal,		==,	STEM) \
+  MMEC_COMPARISON_OPERATION(less,		<,	STEM) \
+  MMEC_COMPARISON_OPERATION(greater,		>,	STEM) \
+  MMEC_COMPARISON_OPERATION(less_equal,		<=,	STEM) \
+  MMEC_COMPARISON_OPERATION(greater_equal,	>=,	STEM) \
+  MMEC_COMPARISON_OPERATION(not_equal,		!=,	STEM)
 
-MMUX_EMACS_CORE_COMPARISON_OPERATIONS(uint64,		uint64_t)
-MMUX_EMACS_CORE_COMPARISON_OPERATIONS(sint64,		int64_t)
-MMUX_EMACS_CORE_COMPARISON_OPERATIONS(ldouble,	long double)
+MMEC_COMPARISON_OPERATIONS(uint64)
+MMEC_COMPARISON_OPERATIONS(sint64)
+MMEC_COMPARISON_OPERATIONS(ldouble)
 
 /* ------------------------------------------------------------------ */
 
 /* FIXME I do not know how to compare a signed integer and an unsigne integer without
    loosing bits; maybe, in future, GNU Emacs will support big integers with GMP.  For
    now it is an error.  (Marco Maggi; Feb 7, 2020)*/
-#undef  MMUX_EMACS_CORE_COMPARISON_OPERATION2
-#define MMUX_EMACS_CORE_COMPARISON_OPERATION2(OPNAME, OPERATOR, STEM1, CTYPE1, STEM2, CTYPE2) \
+#undef  MMEC_COMPARISON_OPERATION2
+#define MMEC_COMPARISON_OPERATION2(OPNAME, OPERATOR, STEM1, STEM2) \
   static emacs_value							\
-  Fmmux_emacs_core_compare_ ## STEM1 ## _ ## STEM2 ## _ ## OPNAME(emacs_env *env, ptrdiff_t nargs, \
-								  emacs_value args[] MMUX_EMACS_CORE_UNUSED, \
-								  void * data MMUX_EMACS_CORE_UNUSED) \
+  Fmmec_compare_ ## STEM1 ## _ ## STEM2 ## _ ## OPNAME(emacs_env *env, ptrdiff_t nargs, \
+						       emacs_value args[] MMEC_UNUSED, \
+						       void * data MMEC_UNUSED) \
   {									\
     assert(2 == nargs);							\
-    return mmux_emacs_core_error_signed_unsigned_integer_comparison(env); \
+    return mmec_error_signed_unsigned_integer_comparison(env);		\
   }
-#if 0
-  {									\
-    assert(2 == nargs);							\
-    CTYPE1	op1	= mmux_emacs_core_get_ ## STEM1(env, args[0]);	\
-    CTYPE2	op2	= mmux_emacs_core_get_ ## STEM2(env, args[1]);	\
-    int		rv	= ((op1 OPERATOR op2)? 1 : 0);			\
-									\
-    if (0) {								\
-      fprintf(stderr, "%s: op1=%ld op2=%ld rv=%d\n", __func__,		\
-	      (long)op1, (long)op2, rv);				\
-    }									\
-    return mmux_emacs_core_make_boolean(env, rv);			\
-  }
-#endif
 
-#define MMUX_EMACS_CORE_COMPARISON_OPERATIONS2(STEM1, CTYPE1, STEM2, CTYPE2)	\
-  MMUX_EMACS_CORE_COMPARISON_OPERATION2(equal,		==,	STEM1,	CTYPE1,	STEM2,	CTYPE2) \
-  MMUX_EMACS_CORE_COMPARISON_OPERATION2(less,		<,	STEM1,	CTYPE1,	STEM2,	CTYPE2) \
-  MMUX_EMACS_CORE_COMPARISON_OPERATION2(greater,	>,	STEM1,	CTYPE1,	STEM2,	CTYPE2) \
-  MMUX_EMACS_CORE_COMPARISON_OPERATION2(less_equal,	<=,	STEM1,	CTYPE1,	STEM2,	CTYPE2) \
-  MMUX_EMACS_CORE_COMPARISON_OPERATION2(greater_equal,	>=,	STEM1,	CTYPE1,	STEM2,	CTYPE2) \
-  MMUX_EMACS_CORE_COMPARISON_OPERATION2(not_equal,	!=,	STEM1,	CTYPE1,	STEM2,	CTYPE2)
+#define MMEC_COMPARISON_OPERATIONS2(STEM1, STEM2)			\
+  MMEC_COMPARISON_OPERATION2(equal,		==,	STEM1,	STEM2)	\
+  MMEC_COMPARISON_OPERATION2(less,		<,	STEM1,	STEM2)	\
+  MMEC_COMPARISON_OPERATION2(greater,		>,	STEM1,	STEM2)	\
+  MMEC_COMPARISON_OPERATION2(less_equal,	<=,	STEM1,	STEM2)	\
+  MMEC_COMPARISON_OPERATION2(greater_equal,	>=,	STEM1,	STEM2)	\
+  MMEC_COMPARISON_OPERATION2(not_equal,		!=,	STEM1,	STEM2)
 
-MMUX_EMACS_CORE_COMPARISON_OPERATIONS2(sint64,  int64_t, uint64, uint64_t)
-MMUX_EMACS_CORE_COMPARISON_OPERATIONS2(uint64, uint64_t, sint64,  int64_t)
+MMEC_COMPARISON_OPERATIONS2(sint64, uint64)
+MMEC_COMPARISON_OPERATIONS2(uint64, sint64)
 
 
 /** --------------------------------------------------------------------
  ** Elisp functions table.
  ** ----------------------------------------------------------------- */
 
-#define NUMBER_OF_MODULE_FUNCTIONS	87
-static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNCTIONS] = {
-  /* Conversion functions to "sint64". */
+#define NUMBER_OF_MODULE_FUNCTIONS	115
+static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNCTIONS] = {
+  /* Constructors  for  custom number  objects  whose  internal representation  is  a
+     built-in "integer" object. */
   {
-    .name		= "mmux-core-c-char-to-sint64",
-    .implementation	= Fmmux_emacs_core_char_to_sint64,
+    .name		= "mmec-c-make-integer-char-from-usrptr-sint64",
+    .implementation	= Fmmec_make_integer_char_from_usrptr_sint64,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `char' to a user-pointer object of type `sint64'.",
+    .documentation	= "Build and return the internal representation of `cc-char' value.",
   },
   {
-    .name		= "mmux-core-c-schar-to-sint64",
-    .implementation	= Fmmux_emacs_core_schar_to_sint64,
+    .name		= "mmec-c-make-integer-schar-from-usrptr-sint64",
+    .implementation	= Fmmec_make_integer_schar_from_usrptr_sint64,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `schar' to a user-pointer object of type `sint64'.",
+    .documentation	= "Build and return the internal representation of `cc-schar' value.",
   },
   {
-    .name		= "mmux-core-c-sshrt-to-sint64",
-    .implementation	= Fmmux_emacs_core_sshrt_to_sint64,
+    .name		= "mmec-c-make-integer-uchar-from-usrptr-uint64",
+    .implementation	= Fmmec_make_integer_uchar_from_usrptr_uint64,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `sshrt' to a user-pointer object of type `sint64'.",
+    .documentation	= "Build and return the internal representation of `cc-uchar' value.",
   },
   {
-    .name		= "mmux-core-c-sint-to-sint64",
-    .implementation	= Fmmux_emacs_core_sint_to_sint64,
+    .name		= "mmec-c-make-integer-sshrt-from-usrptr-sint64",
+    .implementation	= Fmmec_make_integer_sshrt_from_usrptr_sint64,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `sint' to a user-pointer object of type `sint64'.",
+    .documentation	= "Build and return the internal representation of `cc-sshrt' value.",
   },
   {
-    .name		= "mmux-core-c-slong-to-sint64",
-    .implementation	= Fmmux_emacs_core_slong_to_sint64,
+    .name		= "mmec-c-make-integer-ushrt-from-usrptr-uint64",
+    .implementation	= Fmmec_make_integer_ushrt_from_usrptr_uint64,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `slong' to a user-pointer object of type `sint64'.",
+    .documentation	= "Build and return the internal representation of `cc-ushrt' value.",
   },
   {
-    .name		= "mmux-core-c-sllong-to-sint64",
-    .implementation	= Fmmux_emacs_core_sllong_to_sint64,
+    .name		= "mmec-c-make-integer-sint8-from-usrptr-sint64",
+    .implementation	= Fmmec_make_integer_sint8_from_usrptr_sint64,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `sllong' to a user-pointer object of type `sint64'.",
+    .documentation	= "Build and return the internal representation of `cc-sint8' value..",
   },
   {
-    .name		= "mmux-core-c-sint8-to-sint64",
-    .implementation	= Fmmux_emacs_core_sint8_to_sint64,
+    .name		= "mmec-c-make-integer-uint8-from-usrptr-uint64",
+    .implementation	= Fmmec_make_integer_uint8_from_usrptr_uint64,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `sint8' to a user-pointer object of type `sint64'.",
+    .documentation	= "Build and return the internal representation of `cc-uint8' value.",
   },
   {
-    .name		= "mmux-core-c-sint16-to-sint64",
-    .implementation	= Fmmux_emacs_core_sint16_to_sint64,
+    .name		= "mmec-c-make-integer-sint16-from-usrptr-sint64",
+    .implementation	= Fmmec_make_integer_sint16_from_usrptr_sint64,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `sint16' to a user-pointer object of type `sint64'.",
+    .documentation	= "Build and return the internal representation of `cc-sint16' value.",
   },
   {
-    .name		= "mmux-core-c-sint32-to-sint64",
-    .implementation	= Fmmux_emacs_core_sint32_to_sint64,
+    .name		= "mmec-c-make-integer-uint16-from-usrptr-uint64",
+    .implementation	= Fmmec_make_integer_uint16_from_usrptr_uint64,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `sint32' to a user-pointer object of type `sint64'.",
-  },
-  {
-    .name		= "mmux-core-c-ssize-to-sint64",
-    .implementation	= Fmmux_emacs_core_ssize_to_sint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `ssize' to a user-pointer object of type `sint64'.",
-  },
-  {
-    .name		= "mmux-core-c-sintmax-to-sint64",
-    .implementation	= Fmmux_emacs_core_sintmax_to_sint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `sintmax' to a user-pointer object of type `sint64'.",
-  },
-  {
-    .name		= "mmux-core-c-ptrdiff-to-sint64",
-    .implementation	= Fmmux_emacs_core_ptrdiff_to_sint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `ptrdiff' to a user-pointer object of type `sint64'.",
-  },
-  {
-    .name		= "mmux-core-c-integer-to-sint64",
-    .implementation	= Fmmux_emacs_core_integer_to_sint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Convert a built-in object of type `integer' to a user-pointer object of type `sint64'.",
+    .documentation	= "Build and return the internal representation of `cc-uint16' value.",
   },
 
-  /* Conversion functions to "uint64". */
+  /* Constructors  for  custom number  objects  whose  internal representation  is  a
+     built-in "float" object. */
   {
-    .name		= "mmux-core-c-uchar-to-uint64",
-    .implementation	= Fmmux_emacs_core_uchar_to_uint64,
+    .name		= "mmec-c-make-elisp-float-from-usrptr-ldouble",
+    .implementation	= Fmmec_make_elisp_float_from_usrptr_ldouble,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `uchar' to a user-pointer object of type `uint64'.",
-  },
-  {
-    .name		= "mmux-core-c-ushrt-to-uint64",
-    .implementation	= Fmmux_emacs_core_ushrt_to_uint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `ushrt' to a user-pointer object of type `uint64'.",
-  },
-  {
-    .name		= "mmux-core-c-uint-to-uint64",
-    .implementation	= Fmmux_emacs_core_uint_to_uint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `uint' to a user-pointer object of type `uint64'.",
-  },
-  {
-    .name		= "mmux-core-c-ulong-to-uint64",
-    .implementation	= Fmmux_emacs_core_ulong_to_uint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `ulong' to a user-pointer object of type `uint64'.",
-  },
-  {
-    .name		= "mmux-core-c-ullong-to-uint64",
-    .implementation	= Fmmux_emacs_core_ullong_to_uint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `ullong' to a user-pointer object of type `uint64'.",
-  },
-  {
-    .name		= "mmux-core-c-uint8-to-uint64",
-    .implementation	= Fmmux_emacs_core_uint8_to_uint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `uint8' to a user-pointer object of type `uint64'.",
-  },
-  {
-    .name		= "mmux-core-c-uint16-to-uint64",
-    .implementation	= Fmmux_emacs_core_uint16_to_uint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `uint16' to a user-pointer object of type `uint64'.",
-  },
-  {
-    .name		= "mmux-core-c-uint32-to-uint64",
-    .implementation	= Fmmux_emacs_core_uint32_to_uint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `uint32' to a user-pointer object of type `uint64'.",
-  },
-  {
-    .name		= "mmux-core-c-usize-to-uint64",
-    .implementation	= Fmmux_emacs_core_usize_to_uint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `usize' to a user-pointer object of type `uint64'.",
-  },
-  {
-    .name		= "mmux-core-c-uintmax-to-uint64",
-    .implementation	= Fmmux_emacs_core_uintmax_to_uint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `uintmax' to a user-pointer object of type `uint64'.",
-  },
-  {
-    .name		= "mmux-core-c-wchar-to-uint64",
-    .implementation	= Fmmux_emacs_core_wchar_to_uint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `wchar' to a user-pointer object of type `uint64'.",
-  },
-  {
-    .name		= "mmux-core-c-integer-to-uint64",
-    .implementation	= Fmmux_emacs_core_integer_to_uint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Convert a built-in object of type `integer' to a user-pointer object of type `uint64'.",
+    .documentation	= "Build and return the internal representation of `cc-double' value.",
   },
 
-  /* Conversion functions to "long double". */
+  /* Constructors  for  custom number  objects  whose  internal representation  is  a
+     user-pointer object. */
   {
-    .name		= "mmux-core-c-float-to-ldouble",
-    .implementation	= Fmmux_emacs_core_float_to_ldouble,
+    .name		= "mmec-c-make-usrptr-wchar-from-usrptr-uint64",
+    .implementation	= Fmmec_make_usrptr_wchar_from_usrptr_uint64,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Convert a user-pointer object of type `float' to a user-pointer object of type `ldouble'.",
+    .documentation	= "Build and return a user-pointer object of type `wchar'.",
   },
   {
-    .name		= "mmux-core-c-double-to-ldouble",
-    .implementation	= Fmmux_emacs_core_double_to_ldouble,
+    .name		= "mmec-c-make-usrptr-sint-from-usrptr-sint64",
+    .implementation	= Fmmec_make_usrptr_sint_from_usrptr_sint64,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Convert a built-int of type `float' to a user-pointer object of type `ldouble'.",
+    .documentation	= "Build and return a user-pointer object of type `sint'.",
   },
   {
-    .name		= "mmux-core-c-uint64-to-ldouble",
-    .implementation	= Fmmux_emacs_core_uint64_to_ldouble,
+    .name		= "mmec-c-make-usrptr-uint-from-usrptr-uint64",
+    .implementation	= Fmmec_make_usrptr_uint_from_usrptr_uint64,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Convert a custom user-pointer object of type `uint64' to a user-pointer object of type `ldouble'.",
+    .documentation	= "Build and return a user-pointer object of type `uint'.",
   },
   {
-    .name		= "mmux-core-c-sint64-to-ldouble",
-    .implementation	= Fmmux_emacs_core_sint64_to_ldouble,
+    .name		= "mmec-c-make-usrptr-slong-from-usrptr-sint64",
+    .implementation	= Fmmec_make_usrptr_slong_from_usrptr_sint64,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Convert a custom user-pointer object of type `sint64' to a user-pointer object of type `ldouble'.",
+    .documentation	= "Build and return a user-pointer object of type `slong'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-ulong-from-usrptr-uint64",
+    .implementation	= Fmmec_make_usrptr_ulong_from_usrptr_uint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `ulong'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-sllong-from-usrptr-sint64",
+    .implementation	= Fmmec_make_usrptr_sllong_from_usrptr_sint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `sllong'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-ullong-from-usrptr-uint64",
+    .implementation	= Fmmec_make_usrptr_ullong_from_usrptr_uint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `ullong'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-sint32-from-usrptr-sint64",
+    .implementation	= Fmmec_make_usrptr_sint32_from_usrptr_sint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `sint32'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-uint32-from-usrptr-uint64",
+    .implementation	= Fmmec_make_usrptr_uint32_from_usrptr_uint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `uint32'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-sintmax-from-usrptr-sint64",
+    .implementation	= Fmmec_make_usrptr_sintmax_from_usrptr_sint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `sintmax'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-uintmax-from-usrptr-uint64",
+    .implementation	= Fmmec_make_usrptr_uintmax_from_usrptr_uint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `uintmax'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-ssize-from-usrptr-sint64",
+    .implementation	= Fmmec_make_usrptr_ssize_from_usrptr_sint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `ssize'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-usize-from-usrptr-uint64",
+    .implementation	= Fmmec_make_usrptr_usize_from_usrptr_uint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `usize'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-ptrdiff-from-usrptr-sint64",
+    .implementation	= Fmmec_make_usrptr_ptrdiff_from_usrptr_sint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `ptrdiff'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-float-from-usrptr-ldouble",
+    .implementation	= Fmmec_make_usrptr_float_from_usrptr_ldouble,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `float'.",
+  },
+
+  /* Constructors for user-pointer objects of type "sint64". */
+  {
+    .name		= "mmec-c-make-usrptr-sint64-from-integer-char",
+    .implementation	= Fmmec_make_usrptr_sint64_from_integer_char,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `sint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-sint64-from-integer-schar",
+    .implementation	= Fmmec_make_usrptr_sint64_from_integer_schar,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `sint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-sint64-from-integer-sshrt",
+    .implementation	= Fmmec_make_usrptr_sint64_from_integer_sshrt,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `sint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-sint64-from-usrptr-sint",
+    .implementation	= Fmmec_make_usrptr_sint64_from_usrptr_sint,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `sint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-sint64-from-usrptr-slong",
+    .implementation	= Fmmec_make_usrptr_sint64_from_usrptr_slong,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `sint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-sint64-from-usrptr-sllong",
+    .implementation	= Fmmec_make_usrptr_sint64_from_usrptr_sllong,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `sint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-sint64-from-integer-sint8",
+    .implementation	= Fmmec_make_usrptr_sint64_from_integer_sint8,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `sint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-sint64-from-integer-sint16",
+    .implementation	= Fmmec_make_usrptr_sint64_from_integer_sint16,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `sint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-sint64-from-usrptr-sint32",
+    .implementation	= Fmmec_make_usrptr_sint64_from_usrptr_sint32,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `sint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-sint64-from-usrptr-ssize",
+    .implementation	= Fmmec_make_usrptr_sint64_from_usrptr_ssize,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `sint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-sint64-from-usrptr-sintmax",
+    .implementation	= Fmmec_make_usrptr_sint64_from_usrptr_sintmax,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `sint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-sint64-from-usrptr-ptrdiff",
+    .implementation	= Fmmec_make_usrptr_sint64_from_usrptr_ptrdiff,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `sint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-sint64-from-elisp-integer",
+    .implementation	= Fmmec_make_usrptr_sint64_from_elisp_integer,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `sint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-sint64-from-elisp-float",
+    .implementation	= Fmmec_make_usrptr_sint64_from_elisp_float,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `sint64'.",
+  },
+
+  /* Constructors for user-pointer objects of type "uint64". */
+  {
+    .name		= "mmec-c-make-usrptr-uint64-from-integer-uchar",
+    .implementation	= Fmmec_make_usrptr_uint64_from_integer_uchar,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `uint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-uint64-from-integer-ushrt",
+    .implementation	= Fmmec_make_usrptr_uint64_from_integer_ushrt,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `uint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-uint64-from-usrptr-uint",
+    .implementation	= Fmmec_make_usrptr_uint64_from_usrptr_uint,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `uint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-uint64-from-usrptr-ulong",
+    .implementation	= Fmmec_make_usrptr_uint64_from_usrptr_ulong,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `uint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-uint64-from-usrptr-ullong",
+    .implementation	= Fmmec_make_usrptr_uint64_from_usrptr_ullong,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `uint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-uint64-from-integer-uint8",
+    .implementation	= Fmmec_make_usrptr_uint64_from_integer_uint8,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `uint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-uint64-from-integer-uint16",
+    .implementation	= Fmmec_make_usrptr_uint64_from_integer_uint16,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `uint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-uint64-from-usrptr-uint32",
+    .implementation	= Fmmec_make_usrptr_uint64_from_usrptr_uint32,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `uint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-uint64-from-usrptr-usize",
+    .implementation	= Fmmec_make_usrptr_uint64_from_usrptr_usize,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `uint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-uint64-from-usrptr-uintmax",
+    .implementation	= Fmmec_make_usrptr_uint64_from_usrptr_uintmax,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `uint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-uint64-from-usrptr-wchar",
+    .implementation	= Fmmec_make_usrptr_uint64_from_usrptr_wchar,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `uint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-uint64-from-elisp-integer",
+    .implementation	= Fmmec_make_usrptr_uint64_from_elisp_integer,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `uint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-uint64-from-elisp-float",
+    .implementation	= Fmmec_make_usrptr_uint64_from_elisp_float,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `uint64'.",
+  },
+
+  /* Constructors for user-pointer objects of type "ldouble". */
+  {
+    .name		= "mmec-c-make-usrptr-ldouble-from-usrptr-sint64",
+    .implementation	= Fmmec_make_usrptr_ldouble_from_usrptr_sint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `ldouble'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-ldouble-from-usrptr-uint64",
+    .implementation	= Fmmec_make_usrptr_ldouble_from_usrptr_uint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `ldouble'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-ldouble-from-usrptr-float",
+    .implementation	= Fmmec_make_usrptr_ldouble_from_usrptr_float,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `ldouble'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-ldouble-from-usrptr-ldouble",
+    .implementation	= Fmmec_make_usrptr_ldouble_from_usrptr_ldouble,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `ldouble'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-ldouble-from-elisp-float",
+    .implementation	= Fmmec_make_usrptr_ldouble_from_elisp_float,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `ldouble'.",
   },
 
   /* Comparison functions. */
   {
-    .name		= "mmux-core-c-sint64=",
-    .implementation	= Fmmux_emacs_core_compare_sint64_equal,
+    .name		= "mmec-c-sint64=",
+    .implementation	= Fmmec_compare_sint64_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is equal to OP2.",
   },
   {
-    .name		= "mmux-core-c-sint64/=",
-    .implementation	= Fmmux_emacs_core_compare_sint64_not_equal,
+    .name		= "mmec-c-sint64/=",
+    .implementation	= Fmmec_compare_sint64_not_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is not equal to OP2.",
   },
   {
-    .name		= "mmux-core-c-sint64<",
-    .implementation	= Fmmux_emacs_core_compare_sint64_less,
+    .name		= "mmec-c-sint64<",
+    .implementation	= Fmmec_compare_sint64_less,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is less than OP2.",
   },
   {
-    .name		= "mmux-core-c-sint64>",
-    .implementation	= Fmmux_emacs_core_compare_sint64_greater,
+    .name		= "mmec-c-sint64>",
+    .implementation	= Fmmec_compare_sint64_greater,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is greater than OP2.",
   },
   {
-    .name		= "mmux-core-c-sint64<=",
-    .implementation	= Fmmux_emacs_core_compare_sint64_less_equal,
+    .name		= "mmec-c-sint64<=",
+    .implementation	= Fmmec_compare_sint64_less_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is less than or equal to OP2.",
   },
   {
-    .name		= "mmux-core-c-sint64>=",
-    .implementation	= Fmmux_emacs_core_compare_sint64_greater_equal,
+    .name		= "mmec-c-sint64>=",
+    .implementation	= Fmmec_compare_sint64_greater_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is greater than or equal to OP2.",
   },
   {
-    .name		= "mmux-core-c-uint64=",
-    .implementation	= Fmmux_emacs_core_compare_uint64_equal,
+    .name		= "mmec-c-uint64=",
+    .implementation	= Fmmec_compare_uint64_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is equal to OP2.",
   },
   {
-    .name		= "mmux-core-c-uint64/=",
-    .implementation	= Fmmux_emacs_core_compare_uint64_not_equal,
+    .name		= "mmec-c-uint64/=",
+    .implementation	= Fmmec_compare_uint64_not_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is not equal to OP2.",
   },
   {
-    .name		= "mmux-core-c-uint64<",
-    .implementation	= Fmmux_emacs_core_compare_uint64_less,
+    .name		= "mmec-c-uint64<",
+    .implementation	= Fmmec_compare_uint64_less,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is less than OP2.",
   },
   {
-    .name		= "mmux-core-c-uint64>",
-    .implementation	= Fmmux_emacs_core_compare_uint64_greater,
+    .name		= "mmec-c-uint64>",
+    .implementation	= Fmmec_compare_uint64_greater,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is greater than OP2.",
   },
   {
-    .name		= "mmux-core-c-uint64<=",
-    .implementation	= Fmmux_emacs_core_compare_uint64_less_equal,
+    .name		= "mmec-c-uint64<=",
+    .implementation	= Fmmec_compare_uint64_less_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is less than or equal to OP2.",
   },
   {
-    .name		= "mmux-core-c-uint64>=",
-    .implementation	= Fmmux_emacs_core_compare_uint64_greater_equal,
+    .name		= "mmec-c-uint64>=",
+    .implementation	= Fmmec_compare_uint64_greater_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is greater than or equal to OP2.",
   },
   {
-    .name		= "mmux-core-c-ldouble=",
-    .implementation	= Fmmux_emacs_core_compare_ldouble_equal,
+    .name		= "mmec-c-ldouble=",
+    .implementation	= Fmmec_compare_ldouble_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is equal to OP2.",
   },
   {
-    .name		= "mmux-core-c-ldouble/=",
-    .implementation	= Fmmux_emacs_core_compare_ldouble_not_equal,
+    .name		= "mmec-c-ldouble/=",
+    .implementation	= Fmmec_compare_ldouble_not_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is not equal to OP2.",
   },
   {
-    .name		= "mmux-core-c-ldouble<",
-    .implementation	= Fmmux_emacs_core_compare_ldouble_less,
+    .name		= "mmec-c-ldouble<",
+    .implementation	= Fmmec_compare_ldouble_less,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is less than OP2.",
   },
   {
-    .name		= "mmux-core-c-ldouble>",
-    .implementation	= Fmmux_emacs_core_compare_ldouble_greater,
+    .name		= "mmec-c-ldouble>",
+    .implementation	= Fmmec_compare_ldouble_greater,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is greater than OP2.",
   },
   {
-    .name		= "mmux-core-c-ldouble<=",
-    .implementation	= Fmmux_emacs_core_compare_ldouble_less_equal,
+    .name		= "mmec-c-ldouble<=",
+    .implementation	= Fmmec_compare_ldouble_less_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is less than or equal to OP2.",
   },
   {
-    .name		= "mmux-core-c-ldouble>=",
-    .implementation	= Fmmux_emacs_core_compare_ldouble_greater_equal,
+    .name		= "mmec-c-ldouble>=",
+    .implementation	= Fmmec_compare_ldouble_greater_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is greater than or equal to OP2.",
@@ -608,43 +1071,43 @@ static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODUL
 
   /* Comparison operations between sint64 and uint64. */
   {
-    .name		= "mmux-core-c-sint64-uint64=",
-    .implementation	= Fmmux_emacs_core_compare_sint64_uint64_equal,
+    .name		= "mmec-c-sint64-uint64=",
+    .implementation	= Fmmec_compare_sint64_uint64_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is equal to OP2.",
   },
   {
-    .name		= "mmux-core-c-sint64-uint64/=",
-    .implementation	= Fmmux_emacs_core_compare_sint64_uint64_not_equal,
+    .name		= "mmec-c-sint64-uint64/=",
+    .implementation	= Fmmec_compare_sint64_uint64_not_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is not equal to OP2.",
   },
   {
-    .name		= "mmux-core-c-sint64-uint64<",
-    .implementation	= Fmmux_emacs_core_compare_sint64_uint64_less,
+    .name		= "mmec-c-sint64-uint64<",
+    .implementation	= Fmmec_compare_sint64_uint64_less,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is less than OP2.",
   },
   {
-    .name		= "mmux-core-c-sint64-uint64>",
-    .implementation	= Fmmux_emacs_core_compare_sint64_uint64_greater,
+    .name		= "mmec-c-sint64-uint64>",
+    .implementation	= Fmmec_compare_sint64_uint64_greater,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is greater than OP2.",
   },
   {
-    .name		= "mmux-core-c-sint64-uint64<=",
-    .implementation	= Fmmux_emacs_core_compare_sint64_uint64_less_equal,
+    .name		= "mmec-c-sint64-uint64<=",
+    .implementation	= Fmmec_compare_sint64_uint64_less_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is less than or equal to OP2.",
   },
   {
-    .name		= "mmux-core-c-sint64-uint64>=",
-    .implementation	= Fmmux_emacs_core_compare_sint64_uint64_greater_equal,
+    .name		= "mmec-c-sint64-uint64>=",
+    .implementation	= Fmmec_compare_sint64_uint64_greater_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is greater than or equal to OP2.",
@@ -652,43 +1115,43 @@ static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODUL
 
   /* Comparison operations between uint64 and sint64. */
   {
-    .name		= "mmux-core-c-uint64-sint64=",
-    .implementation	= Fmmux_emacs_core_compare_uint64_sint64_equal,
+    .name		= "mmec-c-uint64-sint64=",
+    .implementation	= Fmmec_compare_uint64_sint64_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is equal to OP2.",
   },
   {
-    .name		= "mmux-core-c-uint64-sint64/=",
-    .implementation	= Fmmux_emacs_core_compare_uint64_sint64_not_equal,
+    .name		= "mmec-c-uint64-sint64/=",
+    .implementation	= Fmmec_compare_uint64_sint64_not_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is not equal to OP2.",
   },
   {
-    .name		= "mmux-core-c-uint64-sint64<",
-    .implementation	= Fmmux_emacs_core_compare_uint64_sint64_less,
+    .name		= "mmec-c-uint64-sint64<",
+    .implementation	= Fmmec_compare_uint64_sint64_less,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is less than OP2.",
   },
   {
-    .name		= "mmux-core-c-uint64-sint64>",
-    .implementation	= Fmmux_emacs_core_compare_uint64_sint64_greater,
+    .name		= "mmec-c-uint64-sint64>",
+    .implementation	= Fmmec_compare_uint64_sint64_greater,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is greater than OP2.",
   },
   {
-    .name		= "mmux-core-c-uint64-sint64<=",
-    .implementation	= Fmmux_emacs_core_compare_uint64_sint64_less_equal,
+    .name		= "mmec-c-uint64-sint64<=",
+    .implementation	= Fmmec_compare_uint64_sint64_less_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is less than or equal to OP2.",
   },
   {
-    .name		= "mmux-core-c-uint64-sint64>=",
-    .implementation	= Fmmux_emacs_core_compare_uint64_sint64_greater_equal,
+    .name		= "mmec-c-uint64-sint64>=",
+    .implementation	= Fmmec_compare_uint64_sint64_greater_equal,
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Return true if the OP1 is greater than or equal to OP2.",
@@ -696,201 +1159,201 @@ static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODUL
 
   /* Number range fit predicates. */
   {
-    .name		= "mmux-core-c-fits-char-p",
-    .implementation	= Fmmux_emacs_core_fits_char_p,
+    .name		= "mmec-c-sint64-fits-char-p",
+    .implementation	= Fmmec_sint64_fits_char_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `char'.",
   },
   {
-    .name		= "mmux-core-c-fits-schar-p",
-    .implementation	= Fmmux_emacs_core_fits_schar_p,
+    .name		= "mmec-c-sint64-fits-schar-p",
+    .implementation	= Fmmec_sint64_fits_schar_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `schar'.",
   },
   {
-    .name		= "mmux-core-c-fits-uchar-p",
-    .implementation	= Fmmux_emacs_core_fits_uchar_p,
+    .name		= "mmec-c-uint64-fits-uchar-p",
+    .implementation	= Fmmec_uint64_fits_uchar_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `uchar'.",
   },
   {
-    .name		= "mmux-core-c-fits-wchar-p",
-    .implementation	= Fmmux_emacs_core_fits_wchar_p,
+    .name		= "mmec-c-uint64-fits-wchar-p",
+    .implementation	= Fmmec_uint64_fits_wchar_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `wchar'.",
   },
 
   {
-    .name		= "mmux-core-c-fits-sshrt-p",
-    .implementation	= Fmmux_emacs_core_fits_sshrt_p,
+    .name		= "mmec-c-sint64-fits-sshrt-p",
+    .implementation	= Fmmec_sint64_fits_sshrt_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `sshrt'.",
   },
   {
-    .name		= "mmux-core-c-fits-ushrt-p",
-    .implementation	= Fmmux_emacs_core_fits_ushrt_p,
+    .name		= "mmec-c-uint64-fits-ushrt-p",
+    .implementation	= Fmmec_uint64_fits_ushrt_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `ushrt'.",
   },
   {
-    .name		= "mmux-core-c-fits-sint-p",
-    .implementation	= Fmmux_emacs_core_fits_sint_p,
+    .name		= "mmec-c-sint64-fits-sint-p",
+    .implementation	= Fmmec_sint64_fits_sint_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `sint'.",
   },
   {
-    .name		= "mmux-core-c-fits-uint-p",
-    .implementation	= Fmmux_emacs_core_fits_uint_p,
+    .name		= "mmec-c-uint64-fits-uint-p",
+    .implementation	= Fmmec_uint64_fits_uint_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `uint'.",
   },
   {
-    .name		= "mmux-core-c-fits-slong-p",
-    .implementation	= Fmmux_emacs_core_fits_slong_p,
+    .name		= "mmec-c-sint64-fits-slong-p",
+    .implementation	= Fmmec_sint64_fits_slong_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `slong'.",
   },
   {
-    .name		= "mmux-core-c-fits-ulong-p",
-    .implementation	= Fmmux_emacs_core_fits_ulong_p,
+    .name		= "mmec-c-uint64-fits-ulong-p",
+    .implementation	= Fmmec_uint64_fits_ulong_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `ulong'.",
   },
   {
-    .name		= "mmux-core-c-fits-sllong-p",
-    .implementation	= Fmmux_emacs_core_fits_sllong_p,
+    .name		= "mmec-c-sint64-fits-sllong-p",
+    .implementation	= Fmmec_sint64_fits_sllong_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `sllong'.",
   },
   {
-    .name		= "mmux-core-c-fits-ullong-p",
-    .implementation	= Fmmux_emacs_core_fits_ullong_p,
+    .name		= "mmec-c-uint64-fits-ullong-p",
+    .implementation	= Fmmec_uint64_fits_ullong_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `ullong'.",
   },
 
   {
-    .name		= "mmux-core-c-fits-ssize-p",
-    .implementation	= Fmmux_emacs_core_fits_ssize_p,
+    .name		= "mmec-c-sint64-fits-ssize-p",
+    .implementation	= Fmmec_sint64_fits_ssize_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `ssize'.",
   },
   {
-    .name		= "mmux-core-c-fits-usize-p",
-    .implementation	= Fmmux_emacs_core_fits_usize_p,
+    .name		= "mmec-c-uint64-fits-usize-p",
+    .implementation	= Fmmec_uint64_fits_usize_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `usize'.",
   },
   {
-    .name		= "mmux-core-c-fits-sintmax-p",
-    .implementation	= Fmmux_emacs_core_fits_sintmax_p,
+    .name		= "mmec-c-sint64-fits-sintmax-p",
+    .implementation	= Fmmec_sint64_fits_sintmax_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `sintmax'.",
   },
   {
-    .name		= "mmux-core-c-fits-uintmax-p",
-    .implementation	= Fmmux_emacs_core_fits_uintmax_p,
+    .name		= "mmec-c-uint64-fits-uintmax-p",
+    .implementation	= Fmmec_uint64_fits_uintmax_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `uintmax'.",
   },
   {
-    .name		= "mmux-core-c-fits-ptrdiff-p",
-    .implementation	= Fmmux_emacs_core_fits_ptrdiff_p,
+    .name		= "mmec-c-sint64-fits-ptrdiff-p",
+    .implementation	= Fmmec_sint64_fits_ptrdiff_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `ptrdiff'.",
   },
 
   {
-    .name		= "mmux-core-c-fits-sint8-p",
-    .implementation	= Fmmux_emacs_core_fits_sint8_p,
+    .name		= "mmec-c-sint64-fits-sint8-p",
+    .implementation	= Fmmec_sint64_fits_sint8_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `sint8'.",
   },
   {
-    .name		= "mmux-core-c-fits-uint8-p",
-    .implementation	= Fmmux_emacs_core_fits_uint8_p,
+    .name		= "mmec-c-uint64-fits-uint8-p",
+    .implementation	= Fmmec_uint64_fits_uint8_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `uint8'.",
   },
   {
-    .name		= "mmux-core-c-fits-sint16-p",
-    .implementation	= Fmmux_emacs_core_fits_sint16_p,
+    .name		= "mmec-c-sint64-fits-sint16-p",
+    .implementation	= Fmmec_sint64_fits_sint16_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `sint16'.",
   },
   {
-    .name		= "mmux-core-c-fits-uint16-p",
-    .implementation	= Fmmux_emacs_core_fits_uint16_p,
+    .name		= "mmec-c-uint64-fits-uint16-p",
+    .implementation	= Fmmec_uint64_fits_uint16_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `uint16'.",
   },
   {
-    .name		= "mmux-core-c-fits-sint32-p",
-    .implementation	= Fmmux_emacs_core_fits_sint32_p,
+    .name		= "mmec-c-sint64-fits-sint32-p",
+    .implementation	= Fmmec_sint64_fits_sint32_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `sint32'.",
   },
   {
-    .name		= "mmux-core-c-fits-uint32-p",
-    .implementation	= Fmmux_emacs_core_fits_uint32_p,
+    .name		= "mmec-c-uint64-fits-uint32-p",
+    .implementation	= Fmmec_uint64_fits_uint32_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `uint32'.",
   },
   {
-    .name		= "mmux-core-c-fits-sint64-p",
-    .implementation	= Fmmux_emacs_core_fits_sint64_p,
+    .name		= "mmec-c-sint64-fits-sint64-p",
+    .implementation	= Fmmec_sint64_fits_sint64_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `sint64'.",
   },
   {
-    .name		= "mmux-core-c-fits-uint64-p",
-    .implementation	= Fmmux_emacs_core_fits_uint64_p,
+    .name		= "mmec-c-uint64-fits-uint64-p",
+    .implementation	= Fmmec_uint64_fits_uint64_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `uint64'.",
   },
 
   {
-    .name		= "mmux-core-c-fits-float-p",
-    .implementation	= Fmmux_emacs_core_fits_float_p,
+    .name		= "mmec-c-ldouble-fits-float-p",
+    .implementation	= Fmmec_ldouble_fits_float_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `float'.",
   },
   {
-    .name		= "mmux-core-c-fits-double-p",
-    .implementation	= Fmmux_emacs_core_fits_double_p,
+    .name		= "mmec-c-ldouble-fits-double-p",
+    .implementation	= Fmmec_ldouble_fits_double_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `double'.",
   },
   {
-    .name		= "mmux-core-c-fits-ldouble-p",
-    .implementation	= Fmmux_emacs_core_fits_ldouble_p,
+    .name		= "mmec-c-ldouble-fits-ldouble-p",
+    .implementation	= Fmmec_ldouble_fits_ldouble_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `ldouble'.",
@@ -903,9 +1366,9 @@ static mmux_emacs_module_function_t const module_functions_table[NUMBER_OF_MODUL
  ** ----------------------------------------------------------------- */
 
 void
-mmux_emacs_core_user_number_objects_init (emacs_env * env)
+mmec_number_objects_init (emacs_env * env)
 {
-  mmux_emacs_define_functions_from_table(env, module_functions_table, NUMBER_OF_MODULE_FUNCTIONS, 0);
+  mmec_define_elisp_functions_from_table(env, module_functions_table, NUMBER_OF_MODULE_FUNCTIONS, 0);
 }
 
 /* end of file */

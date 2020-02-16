@@ -50,9 +50,9 @@
 @set PackageHeader                      mmux-emacs-core.h
 @set PackageHeaderFile                  @file{@value{PackageHeader}}
 
-@set PackageApiCPrefixLower             mmux_emacs_core_
-@set PackageApiCPrefixUpper             MMUX_EMACS_CORE_
-@set PackageApiElispPrefix              cc-
+@set PackageApiCPrefixLower             mmec_
+@set PackageApiCPrefixUpper             MMEC_
+@set PackageApiElispPrefix              mmec-
 
 @set GithubUrl                 @url{https://github.com/marcomaggi/@value{PACKAGE_NICKNAME}}
 @set BitbucketUrl              @url{https://bitbucket.org/marcomaggi/@value{PACKAGE_NICKNAME}}
@@ -255,23 +255,23 @@ Return an integer representing the library interface current age.
 @end defun
 
 
-@deftypefun {char const *} mmux_emacs_core_version_string (void)
+@deftypefun {char const *} mmec_version_string (void)
 Return a pointer to a statically allocated @asciiz{} string representing the interface version
 number.
 @end deftypefun
 
 
-@deftypefun int mmux_emacs_core_version_interface_current (void)
+@deftypefun int mmec_version_interface_current (void)
 Return an integer representing the library interface current number.
 @end deftypefun
 
 
-@deftypefun int mmux_emacs_core_version_interface_revision (void)
+@deftypefun int mmec_version_interface_revision (void)
 Return an integer representing the library interface current revision number.
 @end deftypefun
 
 
-@deftypefun int mmux_emacs_core_version_interface_age (void)
+@deftypefun int mmec_version_interface_age (void)
 Return an integer representing the library interface current age.
 @end deftypefun
 
@@ -908,7 +908,8 @@ range of such type is available.
 * ctypes typedefs sint64::      Wrapper for @code{int64_t}.
 * ctypes typedefs uint64::      Wrapper for @code{uint64_t}.
 * ctypes typedefs float::       Wrapper for @code{float}.
-* ctypes typedefs long double:: Wrapper for @code{long double}.
+* ctypes typedefs double::      Wrapper for @code{double}.
+* ctypes typedefs ldouble::     Wrapper for @code{long double}.
 @end menu
 
 @c page
@@ -984,7 +985,8 @@ Return true if @var{obj} is an instance of @objtype{cc-char}, otherwise return f
 
 
 @defun cc-char-obj @var{CH}
-Given an instance of @objtype{cc-char}: return the exact integer representing its @ascii{} code.
+Given an instance of @objtype{cc-char}: return its internal representation as Emacs built--in
+@code{integer} object representing its @ascii{} code.
 @end defun
 
 @c page
@@ -1014,7 +1016,8 @@ Return true if @var{obj} is an instance of @objtype{cc-schar}, otherwise return 
 
 
 @defun cc-schar-obj @var{CH}
-Given an instance of @objtype{cc-schar}: return the exact integer representing its @ascii{} code.
+Given an instance of @objtype{cc-schar}: return its internal representation as Emacs built--in
+@code{integer} object representing its @ascii{} code.
 @end defun
 
 @c page
@@ -1044,7 +1047,8 @@ Return true if @var{obj} is an instance of @objtype{cc-uchar}, otherwise return 
 
 
 @defun cc-uchar-obj @var{CH}
-Given an instance of @objtype{cc-uchar}: return the exact integer representing its @ascii{} code.
+Given an instance of @objtype{cc-uchar}: return its internal representation as Emacs built--in
+@code{integer} object representing its @ascii{} code.
 @end defun
 
 @c page
@@ -1074,7 +1078,7 @@ Return true if @var{obj} is an instance of @objtype{cc-wchar}, otherwise return 
 
 
 @defun cc-wchar-obj @var{CH}
-Given an instance of @objtype{cc-wchar}: return the exact integer representing its @ascii{} code.
+Given an instance of @objtype{cc-wchar}: return the exact integer representing its code.
 @end defun
 
 @c page
@@ -1093,8 +1097,8 @@ Object wrapper for the C language type @code{signed short int}.
 
 @deffn {Generic Function} cc-sshrt (@var{INIT})
 @deffnx {Method} cc-sshrt ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-sshrt} initialised with @var{INIT}, which
-must be an exact integer object in the range of the C language type @code{signed short int}.
+Build and return a new instance of @objtype{cc-sshrt} initialised with @var{INIT}, which must be an
+exact integer object in the range of the C language type @code{signed short int}.
 @end deffn
 
 
@@ -1104,8 +1108,8 @@ Return true if @var{obj} is an instance of @objtype{cc-sshrt}, otherwise return 
 
 
 @defun cc-sshrt-obj @var{CH}
-Given an instance of @objtype{cc-sshrt}: return the exact integer representing its
-@ascii{} code.
+Given an instance of @objtype{cc-sshrt}: return its internal representation as Emacs built--in
+@code{integer} object.
 @end defun
 
 @c page
@@ -1124,8 +1128,8 @@ Object wrapper for the C language type @code{unsigned short int}.
 
 @deffn {Generic Function} cc-ushrt (@var{INIT})
 @deffnx {Method} cc-ushrt ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-ushrt} initialised with @var{INIT},
-which must be an exact integer object in the range of the C language type @code{unsigned short int}.
+Build and return a new instance of @objtype{cc-ushrt} initialised with @var{INIT}, which must be an
+exact integer object in the range of the C language type @code{unsigned short int}.
 @end deffn
 
 
@@ -1135,8 +1139,8 @@ Return true if @var{obj} is an instance of @objtype{cc-ushrt}, otherwise return 
 
 
 @defun cc-ushrt-obj @var{CH}
-Given an instance of @objtype{cc-ushrt}: return the exact integer representing its
-@ascii{} code.
+Given an instance of @objtype{cc-ushrt}: return its internal representation as Emacs built--in
+@code{integer} object.
 @end defun
 
 @c page
@@ -1209,27 +1213,27 @@ user--pointer object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-sllong
+@deftp {Object Type} cc-slong
 @deftpx {Parent Type} cc-signed-integer
 Object wrapper for the C language type @code{signed long int}.
 @end deftp
 
 
-@deffn {Generic Function} cc-sllong (@var{INIT})
-@deffnx {Method} cc-sllong ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-sllong} initialised with @var{INIT}, which
-must be an exact integer object in the range of the C language type @code{signed long int}.
+@deffn {Generic Function} cc-slong (@var{INIT})
+@deffnx {Method} cc-slong ((@var{INIT} integer))
+Build and return a new instance of @objtype{cc-slong} initialised with @var{INIT}, which must be an
+exact integer object in the range of the C language type @code{signed long int}.
 @end deffn
 
 
-@defun cc-sllong-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-sllong}, otherwise return false.
+@defun cc-slong-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-slong}, otherwise return false.
 @end defun
 
 
-@defun cc-sllong-obj @var{CH}
-Given an instance of @objtype{cc-sllong}: return the its internal representation as
-user--pointer object.
+@defun cc-slong-obj @var{CH}
+Given an instance of @objtype{cc-slong}: return the its internal representation as user--pointer
+object.
 @end defun
 
 @c page
@@ -1511,8 +1515,8 @@ Return true if @var{obj} is an instance of @objtype{cc-sint8}, otherwise return 
 
 
 @defun cc-sint8-obj @var{CH}
-Given an instance of @objtype{cc-sint8}: return the its internal representation as user--pointer
-object.
+Given an instance of @objtype{cc-sint8}: return the its internal representation as Emacs built--in
+@code{integer} object.
 @end defun
 
 @c page
@@ -1542,8 +1546,8 @@ Return true if @var{obj} is an instance of @objtype{cc-uint8}, otherwise return 
 
 
 @defun cc-uint8-obj @var{CH}
-Given an instance of @objtype{cc-uint8}: return the its internal representation as user--pointer
-object.
+Given an instance of @objtype{cc-uint8}: return the its internal representation as Emacs built--in
+@code{integer} object.
 @end defun
 
 @c page
@@ -1573,8 +1577,8 @@ Return true if @var{obj} is an instance of @objtype{cc-sint16}, otherwise return
 
 
 @defun cc-sint16-obj @var{CH}
-Given an instance of @objtype{cc-sint16}: return the its internal representation as user--pointer
-object.
+Given an instance of @objtype{cc-sint16}: return the its internal representation as Emacs built--in
+@code{integer} object.
 @end defun
 
 @c page
@@ -1604,8 +1608,8 @@ Return true if @var{obj} is an instance of @objtype{cc-uint16}, otherwise return
 
 
 @defun cc-uint16-obj @var{CH}
-Given an instance of @objtype{cc-uint16}: return the its internal representation as user--pointer
-object.
+Given an instance of @objtype{cc-uint16}: return the its internal representation as Emacs built--in
+@code{integer} object.
 @end defun
 
 @c page
@@ -1764,33 +1768,64 @@ object.
 @end defun
 
 @c page
-@node ctypes typedefs long double
+@node ctypes typedefs double
+@subsection Wrapper for @code{double}
+
+
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+
+
+@deftp {Object Type} cc-double
+@deftpx {Parent Type} cc-floating-point
+Object wrapper for the C language type @code{double}.
+@end deftp
+
+
+@deffn {Generic Function} cc-double (@var{INIT})
+@deffnx {Method} cc-double ((@var{INIT} float))
+Build and return a new instance of @objtype{cc-double} initialised with @var{INIT}, which must be a
+floating--point object in the range of the C language type @code{double}.
+@end deffn
+
+
+@defun cc-double-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-double}, otherwise return false.
+@end defun
+
+
+@defun cc-double-obj @var{CH}
+Given an instance of @objtype{cc-double}: return the its internal representation as Emacs built--in
+@code{float}.
+@end defun
+
+@c page
+@node ctypes typedefs ldouble
 @subsection Wrapper for @code{long double}
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-long-double
+@deftp {Object Type} cc-ldouble
 @deftpx {Parent Type} cc-floating-point
 Object wrapper for the C language type @code{long double}.
 @end deftp
 
 
-@deffn {Generic Function} cc-long-double (@var{INIT})
-@deffnx {Method} cc-long-double ((@var{INIT} float))
-Build and return a new instance of @objtype{cc-long-double} initialised with @var{INIT}, which must
+@deffn {Generic Function} cc-ldouble (@var{INIT})
+@deffnx {Method} cc-ldouble ((@var{INIT} float))
+Build and return a new instance of @objtype{cc-ldouble} initialised with @var{INIT}, which must
 be a floating--point object in the range of the C language type @code{long double}.
 @end deffn
 
 
-@defun cc-long-double-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-long-double}, otherwise return false.
+@defun cc-ldouble-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{cc-ldouble}, otherwise return false.
 @end defun
 
 
-@defun cc-long-double-obj @var{CH}
-Given an instance of @objtype{cc-long-double}: return the its internal representation as
+@defun cc-ldouble-obj @var{CH}
+Given an instance of @objtype{cc-ldouble}: return the its internal representation as
 user--pointer object.
 @end defun
 
@@ -1810,11 +1845,11 @@ We convert all the signed integers to @objtype{cc-sint64}.
 We convert all the unsigned integers to @objtype{cc-uint64}.
 
 @item
-We convert all the floating--point numbers to @objtype{cc-long-double}.
+We convert all the floating--point numbers to @objtype{cc-ldouble}.
 
 @item
 When comparing integers and floating--point numbers we convert all the integer types to
-@objtype{cc-long-double}.
+@objtype{cc-ldouble}.
 @end itemize
 
 @c ------------------------------------------------------------------------
@@ -1850,13 +1885,13 @@ Return true if @vari{OP} \OPERATOR\ @varii{OP}; otherwise return false.
 @mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-uint64, cc-uint64}
 @mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-sint64, cc-uint64}
 @mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-uint64, cc-sint64}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-long-double, cc-long-double}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-ldouble, cc-ldouble}
 
 @c These are the methods that normalise operands among operational types.
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-sint64, cc-long-double}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-uint64, cc-long-double}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-long-double, cc-sint64}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-long-double, cc-uint64}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-sint64, cc-ldouble}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-uint64, cc-ldouble}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-ldouble, cc-sint64}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-ldouble, cc-uint64}
 
 @c These are the methods that normalise among integer types.
 @mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-signed-integer,   cc-signed-integer}
@@ -2084,7 +2119,7 @@ of this type are correctly garbage collected.
 @end deftp
 
 
-@deftp {Object Type} cc-bytevector-long-double
+@deftp {Object Type} cc-bytevector-ldouble
 @deftpx {Parent Type} cc-float-bytevector
 Type of bytevector objects holding C language values of type @code{long double} in their slots.
 Objects of this type are correctly garbage collected.
@@ -2165,8 +2200,8 @@ Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-double}; other
 @end defun
 
 
-@defun cc-bytevector-long-double-p @var{OBJ}
-Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-long-double}; otherwise return
+@defun cc-bytevector-ldouble-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-ldouble}; otherwise return
 false.
 @end defun
 
@@ -2355,8 +2390,177 @@ Cannot compare a signed integer with an unsigned integer.
 
 
 @menu
+* capi typedefs::               General type definitions.
 * capi errors::                 Signalling errors.
+* capi modules::                Modules related definitions.
+* capi objects::                Handling Emacs Lisp objects.
 @end menu
+
+@c page
+@node capi typedefs
+@section General type definitions
+
+
+@menu
+* capi typedefs clang::         C language type definitions.
+@end menu
+
+@c page
+@node capi typedefs clang
+@subsection C language type definitions
+
+
+The following type definitions are useful when defining macros: every type name has the C language
+specification in a single word, so we can build macro expansions with:
+
+@example
+#undef  THE_TYPE
+#define THE_TYPE(STEM)          mmec_clang_ ## STEM ## _t
+
+THE_TYPE(char)
+THE_TYPE(sshrt)
+THE_TYPE(ullong)
+@end example
+
+
+@deftp {Type definition} mmec_clang_char_t
+An alias for the C language type @code{char}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_schar_t
+An alias for the C language type @code{signed char}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_uchar_t
+An alias for the C language type @code{unsigned char}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_wchar_t
+An alias for the C language type @code{wchar_t}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_sshrt_t
+An alias for the C language type @code{signed   short int}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_ushrt_t
+An alias for the C language type @code{unsigned short int}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_sint_t
+An alias for the C language type @code{signed   int}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_uint_t
+An alias for the C language type @code{unsigned int}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_slong_t
+An alias for the C language type @code{signed   long int}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_ulong_t
+An alias for the C language type @code{unsigned long int}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_sllong_t
+An alias for the C language type @code{signed   long long int}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_ullong_t
+An alias for the C language type @code{unsigned long long int}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_ssize_t
+An alias for the C language type @code{ssize_t}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_usize_t
+An alias for the C language type @code{size_t}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_sintmax_t
+An alias for the C language type @code{intmax_t}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_uintmax_t
+An alias for the C language type @code{uintmax_t}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_ptrdiff_t
+An alias for the C language type @code{ptrdiff_t}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_sint8_t
+An alias for the C language type @code{int8_t}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_uint8_t
+An alias for the C language type @code{uint8_t}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_sint16_t
+An alias for the C language type @code{int16_t}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_uint16_t
+An alias for the C language type @code{uint16_t}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_sint32_t
+An alias for the C language type @code{int32_t}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_uint32_t
+An alias for the C language type @code{uint32_t}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_sint64_t
+An alias for the C language type @code{int64_t}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_uint64_t
+An alias for the C language type @code{uint64_t}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_float_t
+An alias for the C language type @code{float}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_double_t
+An alias for the C language type @code{double}.
+@end deftp
+
+
+@deftp {Type definition} mmec_clang_ldouble_t
+An alias for the C language type @code{long double}.
+@end deftp
 
 @c page
 @node capi errors
@@ -2364,6 +2568,8 @@ Cannot compare a signed integer with an unsigned integer.
 
 
 @menu
+* capi errors typedefs::        Error signalling type definitions.
+* capi errors macros::          Error signalling preprocessor macros.
 * capi errors base::            Signalling base errors.
 * capi errors constructor::     Signalling constructor errors.
 * capi errors range::           Signalling range errors.
@@ -2371,11 +2577,58 @@ Cannot compare a signed integer with an unsigned integer.
 @end menu
 
 @c page
+@node capi errors typedefs
+@subsection Error signalling type definitions
+
+
+@deftypefn {Function Protoype} emacs_value mmec_error_signaller_fun_t (emacs_env * @var{env})
+Prototype of functions signalling an error.
+@end deftypefn
+
+@c page
+@node capi errors macros
+@subsection Error signalling preprocessor macros
+
+
+@defmac MMEC_DEFINE_ERROR_SIGNALLER (@var{PREFIX}, @var{NAME}, @var{SYMBOL}, @var{MESSAGE})
+Expand into the definition of an error signalling function.  The expansion is:
+
+@example
+emacs_value
+PREFIX ## _error_ ## NAME (emacs_env * env)
+@{
+  char const   *errmsg = MESSAGE;
+  emacs_value  Serrmsg = \
+    mmec_new_emacs_string(env, errmsg, strlen(errmsg));
+
+  env->non_local_exit_signal(env,
+    env->intern(env, SYMBOL), Serrmsg);
+  return env->intern(env, "nil");
+@}
+@end example
+
+We could define an error signaller function with prototype:
+
+@example
+mmec_error_signaller_fun_t mmec_error_memory_allocation;
+@end example
+
+@noindent
+as:
+
+@example
+MMEC_DEFINE_ERROR_SIGNALLER(mmec, memory_alloction,
+  "mmec-error-no-memory",
+  "Not enough memory available to allocate an object.")
+@end example
+@end defmac
+
+@c page
 @node capi errors base
 @subsection Signalling base errors
 
 
-@deftypefun emacs_value mmux_emacs_core_base (emacs_env * @var{env})
+@deftypefun emacs_value mmec_error_base (emacs_env * @var{env})
 Signal an error with error symbol @code{mmec-error} then return @nil{}.
 @end deftypefun
 
@@ -2384,22 +2637,22 @@ Signal an error with error symbol @code{mmec-error} then return @nil{}.
 @subsection Signalling constructor errors
 
 
-@deftypefun emacs_value mmux_emacs_core_error_constructor (emacs_env * @var{env})
+@deftypefun emacs_value mmec_error_constructor (emacs_env * @var{env})
 Signal an error with symbol @code{mmec-error-constructor} then return @nil{}.
 @end deftypefun
 
 
-@deftypefun emacs_value mmux_emacs_core_error_memory_allocation (emacs_env * @var{env})
+@deftypefun emacs_value mmec_error_memory_allocation (emacs_env * @var{env})
 Signal an error with symbol @code{mmec-error-no-memory} then return @nil{}.
 @end deftypefun
 
 
-@deftypefun emacs_value mmux_emacs_core_error_instantiating_abstract_type (emacs_env * @var{env})
+@deftypefun emacs_value mmec_error_instantiating_abstract_type (emacs_env * @var{env})
 Signal an error with symbol @code{mmec-error-instantiating-abstract-type} then return @nil{}.
 @end deftypefun
 
 
-@deftypefun emacs_value mmux_emacs_core_error_unsupported_init_type (emacs_env * @var{env})
+@deftypefun emacs_value mmec_error_unsupported_init_type (emacs_env * @var{env})
 Signal an error with symbol @code{mmec-error-unsupported-init-type} then return @nil{}.
 @end deftypefun
 
@@ -2408,17 +2661,17 @@ Signal an error with symbol @code{mmec-error-unsupported-init-type} then return 
 @subsection Signalling range errors
 
 
-@deftypefun emacs_value mmux_emacs_core_error_value_out_of_range (emacs_env * @var{env})
+@deftypefun emacs_value mmec_error_value_out_of_range (emacs_env * @var{env})
 Signal an error with symbol @code{mmec-error-value-out-of-range} then return @nil{}.
 @end deftypefun
 
 
-@deftypefun emacs_value mmux_emacs_core_error_index_out_of_range (emacs_env * @var{env})
+@deftypefun emacs_value mmec_error_index_out_of_range (emacs_env * @var{env})
 Signal an error with symbol @code{mmec-error-index-out-of-range} then return @nil{}.
 @end deftypefun
 
 
-@deftypefun emacs_value mmux_emacs_core_error_bytevector_index_out_of_range (emacs_env * @var{env})
+@deftypefun emacs_value mmec_error_bytevector_index_out_of_range (emacs_env * @var{env})
 Signal an error with symbol @code{mmec-error-bytevector-index-out-of-range} then return @nil{}.
 @end deftypefun
 
@@ -2427,9 +2680,514 @@ Signal an error with symbol @code{mmec-error-bytevector-index-out-of-range} then
 @subsection Signalling operation errors
 
 
-@deftypefun emacs_value mmux_emacs_core_error_signed_unsigned_integer_comparison (emacs_env * @var{env})
+@deftypefun emacs_value mmec_error_signed_unsigned_integer_comparison (emacs_env * @var{env})
 Signal an error with symbol @code{mmec-error-signed/unsigned-integer-comparison} then return @nil{}.
 @end deftypefun
+
+@c page
+@node capi modules
+@section Modules related definitions
+
+
+Here is an example of how we can define Emacs Lisp functions at the C language level using the
+facilities of @value{PACKAGE}:
+
+@example
+static emacs_value
+Fspiffy_function (emacs_env *env, ptrdiff_t nargs,
+                  emacs_value args[], void * data)
+@{
+  assert(0 == nargs);
+  return mmec_new_elisp_nil(env);
+@}
+
+#define NUMBER_OF_MODULE_FUNCTIONS      1
+static mmec_module_function_t const \
+   module_functions_table[NUMBER_OF_MODULE_FUNCTIONS] = @{
+  @{
+    .name               = "spiffy-function",
+    .implementation     = Fspiffy_function,
+    .min_arity          = 0,
+    .max_arity          = 0,
+    .documentation      = "Do something spiffy."
+  @}
+@}
+
+void
+init_spiffy_module (emacs_env * env)
+@{
+  mmec_define_elisp_functions_from_table(env,
+    module_functions_table, NUMBER_OF_MODULE_FUNCTIONS, 0);
+@}
+@end example
+
+
+@deftypefn {Function Prototype} emacs_value mmec_elisp_function_implementation_t (emacs_env * @var{env}, ptrdiff_t @var{nargs}, emacs_value @var{args}[], void * @var{data})
+Prototype of Emacs Lisp functions defined at the C language level.
+@end deftypefn
+
+
+@deftp {Struct Typedef} mmec_module_function_t
+Structure type representing an Emacs Lisp function definition at the C language level.  Instances of
+this type area meant to be defined in a an array and used to initialise a module.
+
+@table @code
+@item char const * name
+Pointer to an @asciiz{} representing the name of the Emacs Lisp function.
+
+@item mmec_elisp_function_implementation_t * implementation
+Pointer to the C language function implementing the Emacs Lisp function.
+
+@item ptrdiff_t min_arity
+Minimum number of arguments accepted by the Emacs Lisp function.  It is the minimum number of items
+in the array @var{args} of the functions with type @objtype{mmec_elisp_function_implementation_t}.
+
+@item ptrdiff_t max_arity
+Maximum number of arguments accepted by the Emacs Lisp function.  It is the maximum number of items
+in the array @var{args} of the functions with type @objtype{mmec_elisp_function_implementation_t}.
+
+@item char const * documentation
+Pointer to an @asciiz{} representing the documentation of the Emacs Lisp function.
+@end table
+@end deftp
+
+
+@deftypefun void mmec_define_elisp_functions_from_table (emacs_env * @var{env}, mmec_module_function_t const * @var{module_functions}, int @var{number_of_module_functions}, int @var{verbose})
+Define a number of Emacs Lisp functions at the C language level.
+
+The argument @var{env} must be the environment in which the functions will be defined.
+
+The argument @var{module_functions} must be a pointer to an array of Emacs Lisp function
+definitions.
+
+The argument @var{number_of_module_functions} must be the number of items in the array referenced by
+@var{module_functions}.
+
+If the argument @var{verbose} is true: for every defined function, a string representing the
+function name is printed to @code{stderr}, terminated by a newline; otherwise nothing is printed.
+@end deftypefun
+
+@c page
+@node capi objects
+@section Handling Emacs Lisp objects
+
+
+@menu
+* capi objects elisp::          Handling Emacs built-in values.
+* capi objects usrptr::         Defining user-pointer objects.
+* capi objects clang::          Wrappers for C language values.
+@end menu
+
+@c page
+@node capi objects elisp
+@subsection Handling Emacs built--in values
+
+
+@menu
+* capi objects elisp getters::  Retrieving values from Emacs built-in values.
+* capi objects elisp makers::   Making new Emacs built-in values.
+@end menu
+
+@c page
+@node capi objects elisp getters
+@subsubsection Retrieving values from Emacs built--in values
+
+
+@deftypefun {void *} mmec_get_usrptr_object_from_emacs_value (emacs_env * @var{env}, emacs_value @var{arg})
+Given an Emacs Lisp value @var{arg} in the context of the environment @var{env}: get from it a
+pointer to a user--pointer object; return the pointer.  The returned value is the internal
+representation of @var{arg}, so if we mutate it we will mutate the value @var{arg} itself.
+
+If @var{arg} is not a user--pointer object: the @code{wrong-type-argument} error condition is
+raised.
+@end deftypefun
+
+
+@deftypefun intmax_t mmec_extract_elisp_integer_from_emacs_value (emacs_env * @var{env}, emacs_value @var{arg})
+Given an Emacs Lisp value @var{arg} in the context of the environment @var{env}: extract from it an
+exact integer number; return the number.  The returned value is independent from the internal
+representation of @var{arg}.
+
+If @var{arg} is not an exact integer value: the @code{wrong-type-argument} error condition is
+raised.
+@end deftypefun
+
+
+@deftypefun double mmec_extract_elisp_float_from_emacs_value (emacs_env * @var{env}, emacs_value @var{arg})
+Given an Emacs Lisp value @var{arg} in the context of the environment @var{env}: extract from it a
+double--precision floating point number; return the number.  The returned value is independent from
+the internal representation of @var{arg}.
+
+If @var{arg} is not an exact integer value: the @code{wrong-type-argument} error condition is
+raised.
+@end deftypefun
+
+@c page
+@node capi objects elisp makers
+@subsubsection Making new Emacs built--in values
+
+
+@deftypefun emacs_value mmec_new_emacs_value_from_usrptr_object (emacs_env * @var{env}, mmec_usrptr_object_finalizer_t @var{finalizer}, void * @var{ptr})
+@anchor{mmec_new_emacs_value_from_usrptr_object}
+Build and return a new Emacs built--in value from the raw pointer of a user--pointer object
+@var{ptr} in the context of the environment @var{env}.  The argument @var{finalizer} must be a
+pointer to the user--pointer object destructor.
+@end deftypefun
+
+
+@deftypefun emacs_value mmec_new_emacs_value_nil (emacs_env * @var{env})
+Build and return an Emacs built--in value representing the interned symbol @code{nil}, in the
+context of the environment @var{env}.
+@end deftypefun
+
+
+@deftypefun emacs_value mmec_new_emacs_value_true (emacs_env * @var{env})
+Build and return an Emacs built--in value representing the interned symbol @code{t}, in the context
+of the environment @var{env}.
+@end deftypefun
+
+
+@deftypefun emacs_value mmec_new_emacs_value_boolean (emacs_env * @var{env}, int @var{val})
+Build and return an Emacs built--in value representing either the interned symbol @code{nil} (if
+@var{val} is zero) or the interned symbol @code{t} (if @var{val} is non--zero), in the context of
+the environment @var{env}.
+@end deftypefun
+
+
+@deftypefun emacs_value mmec_new_emacs_value_integer (emacs_env * @var{env}, intmax_t @var{val})
+Build and return an Emacs built--in value representing the exact integer @var{val}, in the context
+of the environment @var{env}.
+@end deftypefun
+
+
+@deftypefun emacs_value mmec_new_emacs_value_float (emacs_env * @var{env}, double @var{val})
+Build and return an Emacs built--in value representing the double--precision floating point number
+@var{val}, in the context of the environment @var{env}.
+@end deftypefun
+
+
+@deftypefun emacs_value mmec_new_emacs_value_string (emacs_env * @var{env}, char const * @var{ptr}, size_t @var{len})
+Build and return an Emacs built--in value representing the @ascii{} string referenced by @var{ptr},
+of length @var{len}, in the context of the environment @var{env}.  The C language string is
+duplicated in the internal representation of the returned value.
+@end deftypefun
+
+@c page
+@node capi objects usrptr
+@subsection Defining user--pointer objects
+
+
+@deftypefn {Function Prototype} void mmec_usrptr_object_finalizer_func_t (void * @var{ptr})
+Prototype of C language functions usable as user--pointer object destructors.
+@end deftypefn
+
+
+@deftp {Pointer Typedef} mmec_usrptr_object_finalizer_t
+Type of pointers to C language functions usable as user--pointer object destructors.  We can use
+values of this type as arguments in calls to @cfunc{mmec_new_emacs_value_from_usrptr_object},
+@ref{mmec_new_emacs_value_from_usrptr_object}.
+@end deftp
+
+@c page
+@node capi objects clang
+@subsection Wrappers for C language values
+
+
+@value{PACKAGE} defines a custom value type for every standard C language type we might need when
+interfacing with a foreign C language library.  At the Emacs lisp level: these values are
+represented by instances of a structure type defined with @func{cl-defstruct}, every structure holds
+an Emacs Lisp value as internal representation:
+
+@itemize
+@item
+Exact integer values that fit into an Emacs built--in @objtype{integer} value have @objtype{integer}
+values as internal representation.
+
+@item
+Exact integer values that do not fit into an Emacs built--in @objtype{integer} value have a
+user--pointer object value as internal representation.
+
+@item
+Floating--point values of type @code{double} have Emacs built--in @objtype{float} values as internal
+representation.
+
+@item
+Floating--point values of type @code{float} and @code{long double} have a user--pointer object value
+as internal representation.
+
+@end itemize
+
+At the C language level:
+
+@itemize
+@item
+Exact integer values that fit into an Emacs built--in @objtype{integer} value have @code{intmax_t}
+values as internal representation and we can cast such values to the specific C language type.
+
+@item
+Exact integer values that do not fit into an Emacs built--in @objtype{integer} value have a C
+language structure as internal representation, with memory dynamically allocated.
+
+@item
+Floating--point values of type @code{double} have @code{double} values as internal representation.
+
+@item
+Floating--point values of type @code{float} and @code{long double} have a C language structure as
+internal representation, with memory dynamically allocated.
+@end itemize
+
+@c ------------------------------------------------------------------------
+
+@macro DocumentNumberValueWithIntegerRep{STEM, CTYPE}
+@node capi objects clang \STEM\
+@subsubsection Wrapper of @code{\CTYPE\}
+
+
+@deftp {Type Definition} mmec_intrep_\STEM\_t
+Type of internal representation for objects wrapping a C language value of type @code{\CTYPE\}.  It
+is an alias for @code{intmax_t}.
+@end deftp
+
+@subsubheading Extractors
+
+@deftypefun mmec_intrep_\STEM\_t mmec_extract_intrep_\STEM\_from_emacs_value (emacs_env * @var{ENV}, emacs_value @var{ARG})
+Given the Emacs value @var{ARG}, in the context of the environment @var{ENV}: extract its internal
+representation wrapping the C language value; return the representation itself.  The returned value
+is independent from @var{ARG}.
+
+If @var{ARG} is not an Emacs built--in value of type @objtype{integer}: the
+@code{wrong-type-argument} error condition is raised.
+@end deftypefun
+
+
+@deftypefun mmec_clang_\STEM\_t mmec_extract_clang_\STEM\_from_emacs_value (emacs_env * @var{ENV}, emacs_value @var{ARG})
+Given the Emacs value @var{ARG}, in the context of the environment @var{ENV}: extract from its
+representation the raw C language value; return the raw value itself.  The returned value is
+independent from @var{ARG}.
+
+If @var{ARG} is not an Emacs built--in value of type @objtype{integer}: the
+@code{wrong-type-argument} error condition is raised.
+@end deftypefun
+
+
+@deftypefun mmec_clang_\STEM\_t mmec_extract_clang_\STEM\_from_intrep_\STEM\ (mmec_intrep_\STEM\_t @var{IREP})
+Given the internal representation of a wrapper for the C language type @code{\CTYPE\}, extract and
+return its value as raw C language value.  The returned value is independent from @var{IREP}.
+@end deftypefun
+
+@subsubheading Constructors
+
+@deftypefun mmec_intrep_\STEM\_t mmec_new_intrep_\STEM\_from_clang_\STEM\ (mmec_clang_\STEM\_t @var{VAL})
+Given the raw C language value @var{VAL} wrap it into its internal representation and return the
+result.  The returned value is independent from @var{VAL}.
+@end deftypefun
+
+
+@deftypefun emacs_value mmec_new_emacs_value_from_intrep_\STEM\ (emacs_env * @var{ENV}, mmec_intrep_\STEM\_t @var{IREP})
+Given the internal representation @var{IREP} of a C language value: build and return a new Emacs
+value, in the context of the environment @var{ENV}, representing the C language value.  The returned
+object is independent from @var{IREP}.
+@end deftypefun
+
+
+@deftypefun emacs_value mmec_new_emacs_value_from_clang_\STEM\ (emacs_env * @var{ENV}, mmec_clang_\STEM\_t @var{VAL})
+Given a raw C language value @var{VAL}: build and return a new Emacs value, in the context of the
+environment @var{ENV}, representing the value.  The returned object is independent from @var{VAL}.
+@end deftypefun
+@end macro
+
+@c ------------------------------------------------------------------------
+
+@macro DocumentNumberValueWithFloatRep{STEM, CTYPE}
+@node capi objects clang \STEM\
+@subsubsection Wrapper of @code{\CTYPE\}
+
+
+@deftp {Type Definition} mmec_intrep_\STEM\_t
+Type of internal representation for objects wrapping a C language value of type @code{\CTYPE\}.  It
+is an alias for @code{double}.
+@end deftp
+
+@subsubheading Extractors
+
+@deftypefun mmec_intrep_\STEM\_t mmec_extract_intrep_\STEM\_from_emacs_value (emacs_env * @var{ENV}, emacs_value @var{ARG})
+Given the Emacs value @var{ARG}, in the context of the environment @var{ENV}: extract its internal
+representation wrapping the C language value; return the representation itself.  The returned value
+is independent from @var{ARG}.
+
+If @var{ARG} is not an Emacs built--in value of type @objtype{float}: the @code{wrong-type-argument}
+error condition is raised.
+@end deftypefun
+
+
+@deftypefun mmec_clang_\STEM\_t mmec_extract_clang_\STEM\_from_emacs_value (emacs_env * @var{ENV}, emacs_value @var{ARG})
+Given the Emacs value @var{ARG}, in the context of the environment @var{ENV}: extract from its
+internal representation the raw C language value; return the raw value itself.  The returned value
+is independent from the Emacs value @var{ARG}.
+
+If @var{ARG} is not an Emacs built--in value of type @objtype{float}: the @code{wrong-type-argument}
+error condition is raised.
+@end deftypefun
+
+
+@deftypefun mmec_clang_\STEM\_t mmec_extract_clang_\STEM\_from_intrep_\STEM\ (mmec_intrep_\STEM\_t @var{IREP})
+Given the internal representation of a wrapper for the C language type @code{\CTYPE\}, extract and
+return its value as raw C language value.
+@end deftypefun
+
+@subsubheading Constructors
+
+@deftypefun mmec_intrep_\STEM\_t mmec_new_intrep_\STEM\_from_clang_\STEM\ (mmec_clang_\STEM\_t @var{VAL})
+Given the raw C language value @var{VAL} wrap it into its internal representation and return the
+result.  The returned value is independent from @var{VAL}.
+@end deftypefun
+
+
+@deftypefun emacs_value mmec_new_emacs_value_from_intrep_\STEM\ (emacs_env * @var{ENV}, mmec_intrep_\STEM\_t @var{VAL})
+Given the internal representation @var{VAL} of a C language value: build and return a new Emacs
+value, in the context of the environment @var{ENV}, representing the C language value itself.  The
+returned object is independent from @var{VAL}.
+@end deftypefun
+
+
+@deftypefun emacs_value mmec_new_emacs_value_from_clang_\STEM\ (emacs_env * @var{ENV}, mmec_clang_\STEM\_t @var{VAL})
+Given a raw C language value: build and return a new Emacs value, in the context of the environment
+@var{ENV}, representing the raw value itself.  The returned object is independent from @var{VAL}.
+@end deftypefun
+@end macro
+
+@c ------------------------------------------------------------------------
+
+@macro DocumentNumberValueWithUsrptrRep{STEM, CTYPE}
+@node capi objects clang \STEM\
+@subsubsection Wrapper of @code{\CTYPE\}
+
+@deftp {Struct Pointer} mmec_intrep_\STEM\_t
+Type of internal representation for objects wrapping a C language value of type @code{\CTYPE\} and
+using a user--pointer object as internal representation.
+@end deftp
+
+@subsubheading Extractors
+
+@deftypefun mmec_intrep_\STEM\_t mmec_get_intrep_\STEM\_from_emacs_value (emacs_env * @var{ENV}, emacs_value @var{ARG})
+Given the Emacs value @var{ARG}, in the context of the environment @var{ENV}: retrieve its internal
+representation wrapping the C language value; return the representation.  The returned value is
+still dependent from @var{ARG}: if we mutate it, we will mutate the original Emacs value.
+
+If @var{ARG} is not an Emacs user--pointer object: the @code{wrong-type-argument} error condition is
+raised.  At the C language level: there is no way to validate @var{ARG} as having an object of type
+@objtype{mmec_intrep_\STEM\_t} as internal representation, rather than some other user--pointer
+object type.
+@end deftypefun
+
+
+@deftypefun mmec_clang_\STEM\_t mmec_extract_clang_\STEM\_from_emacs_value (emacs_env * @var{ENV}, emacs_value @var{ARG})
+Given the Emacs value @var{ARG}, in the context of the environment @var{ENV}: extract from it its
+representation the raw C language value; return the value.  The returned value is independent from
+the Emacs value @var{ARG}.
+
+If @var{ARG} is not an Emacs user--pointer value: the @code{wrong-type-argument} error condition is
+raised.  At the C language level: there is no way to validate @var{ARG} as having an object of type
+@objtype{mmec_intrep_\STEM\_t} as internal representation, rather than some other user--pointer
+object type.
+@end deftypefun
+
+
+@deftypefun mmec_clang_\STEM\_t mmec_extract_clang_\STEM\_from_intrep_\STEM\ (mmec_intrep_\STEM\_t @var{IREP})
+Given the internal representation of a wrapper for the C language type @code{\CTYPE\}, extract and
+return its value as raw C language value.  The returned value is independent from the internal
+representation @var{IREP}.
+@end deftypefun
+
+@subsubheading Constructors
+
+@deftypefun mmec_intrep_\STEM\_t mmec_new_intrep_\STEM\_from_clang_\STEM\ (mmec_clang_\STEM\_t @var{VAL})
+Given the raw C language value @var{VAL} wrap it into its internal representation and return the
+result.  The returned value is independent from @var{VAL}.
+
+If an error occurs building the internal representation: an error is signalled and the return value
+is @cnull{}.
+@end deftypefun
+
+
+@deftypefun emacs_value mmec_new_emacs_value_from_intrep_\STEM\ (emacs_env * @var{ENV}, mmec_intrep_\STEM\_t @var{IREP})
+Given the internal representation @var{VAL} of a C language value: build and return a new Emacs
+value, in the context of the environment @var{ENV}, representing the C language value.  The returned
+object references @var{IREP} itself.
+@end deftypefun
+
+
+@deftypefun emacs_value mmec_new_emacs_value_from_clang_\STEM\ (emacs_env * @var{ENV}, mmec_clang_\STEM\_t @var{VAL})
+Given a raw C language value: build and return a new Emacs value, in the context of the environment
+@var{ENV}, representing the C language value itself.  The returned object is independent from
+@var{VAL}.
+
+If an error occurs building the internal representation: an error is signalled and the return value
+is @nil{}.
+@end deftypefun
+@end macro
+
+@c ------------------------------------------------------------------------
+
+@menu
+* capi objects clang char::     Wrapper of @code{char}.
+* capi objects clang schar::    Wrapper of @code{signed char}.
+* capi objects clang uchar::    Wrapper of @code{unsigned char}.
+* capi objects clang wchar::    Wrapper of @code{wchar_t}.
+* capi objects clang sshrt::    Wrapper of @code{signed short int}.
+* capi objects clang ushrt::    Wrapper of @code{unsigned short int}.
+* capi objects clang sint::     Wrapper of @code{signed int}.
+* capi objects clang uint::     Wrapper of @code{unsigned int}.
+* capi objects clang slong::    Wrapper of @code{signed long int}.
+* capi objects clang ulong::    Wrapper of @code{unsigned long int}.
+* capi objects clang sllong::   Wrapper of @code{signed long long int}.
+* capi objects clang ullong::   Wrapper of @code{unsigned long long int}.
+* capi objects clang sintmax::  Wrapper of @code{intmax_t}.
+* capi objects clang uintmax::  Wrapper of @code{uintmax_t}.
+* capi objects clang ssize::    Wrapper of @code{ssize_t}.
+* capi objects clang usize::    Wrapper of @code{size_t}.
+* capi objects clang ptrdiff::  Wrapper of @code{ptrdiff_t}.
+* capi objects clang sint8::    Wrapper of @code{int8_t}.
+* capi objects clang uint8::    Wrapper of @code{uint8_t}.
+* capi objects clang sint16::   Wrapper of @code{int16_t}.
+* capi objects clang uint16::   Wrapper of @code{uint16_t}.
+* capi objects clang sint32::   Wrapper of @code{int32_t}.
+* capi objects clang uint32::   Wrapper of @code{uint32_t}.
+* capi objects clang sint64::   Wrapper of @code{int64_t}.
+* capi objects clang uint64::   Wrapper of @code{uint64_t}.
+* capi objects clang float::    Wrapper of @code{float}.
+* capi objects clang double::   Wrapper of @code{double}.
+* capi objects clang ldouble::  Wrapper of @code{long double}.
+@end menu
+
+@DocumentNumberValueWithIntegerRep{char, char}
+@DocumentNumberValueWithIntegerRep{schar, signed char}
+@DocumentNumberValueWithIntegerRep{uchar, unsigned char}
+@DocumentNumberValueWithUsrptrRep{wchar, wchar_t}
+@DocumentNumberValueWithIntegerRep{sshrt, signed short int}
+@DocumentNumberValueWithIntegerRep{ushrt, unsigned short int}
+@DocumentNumberValueWithUsrptrRep{sint, signed int}
+@DocumentNumberValueWithUsrptrRep{uint, unsigned int}
+@DocumentNumberValueWithUsrptrRep{slong, signed long int}
+@DocumentNumberValueWithUsrptrRep{ulong, unsigned long int}
+@DocumentNumberValueWithUsrptrRep{sllong, signed long long int}
+@DocumentNumberValueWithUsrptrRep{ullong, unsigned long long int}
+@DocumentNumberValueWithUsrptrRep{sintmax, intmax_t}
+@DocumentNumberValueWithUsrptrRep{uintmax, uintmax_t}
+@DocumentNumberValueWithUsrptrRep{ssize, ssize_t}
+@DocumentNumberValueWithUsrptrRep{usize, size_t}
+@DocumentNumberValueWithUsrptrRep{ptrdiff, ptrdiff_t}
+@DocumentNumberValueWithIntegerRep{sint8, int8_t}
+@DocumentNumberValueWithIntegerRep{uint8, uint8_t}
+@DocumentNumberValueWithIntegerRep{sint16, int16_t}
+@DocumentNumberValueWithIntegerRep{uint16, uint16_t}
+@DocumentNumberValueWithUsrptrRep{sint32, int32_t}
+@DocumentNumberValueWithUsrptrRep{uint32, uint32_t}
+@DocumentNumberValueWithUsrptrRep{sint64, int64_t}
+@DocumentNumberValueWithUsrptrRep{uint64, uint64_t}
+@DocumentNumberValueWithUsrptrRep{float, float}
+@DocumentNumberValueWithFloatRep{double, double}
+@DocumentNumberValueWithUsrptrRep{ldouble, ldouble}
 
 @c page
 @c ------------------------------------------------------------

@@ -71,10 +71,24 @@ libmmux_emacs_core_la_SOURCES	= \
 	src/mmux-emacs-core-constants.h			\
 	src/mmux-emacs-core-internals.h			\
 	src/mmux-emacs-core-library.c			\
-	src/mmux-emacs-core-user-pointer-objects.c	\
 	src/mmux-emacs-core-numbers.c			\
 	src/mmux-emacs-core-bytevectors.c		\
 	src/mmux-emacs-core-errors.c
+
+MMUX_EMACS_CORE_OBJ_PREREQ	= \
+	src/mmux-emacs-core.h		\
+	src/mmux-emacs-core-constants.h	\
+	src/mmux-emacs-core-internals.h
+
+src/mmux-emacs-core-errors.$(OBJEXT):			$(MMUX_EMACS_CORE_OBJ_PREREQ)
+src/mmux-emacs-core-library.$(OBJEXT):			$(MMUX_EMACS_CORE_OBJ_PREREQ)
+src/mmux-emacs-core-user-pointer-objects.$(OBJEXT):	$(MMUX_EMACS_CORE_OBJ_PREREQ)
+src/mmux-emacs-core-numbers.$(OBJEXT):			$(MMUX_EMACS_CORE_OBJ_PREREQ)
+src/mmux-emacs-core-bytevectors.$(OBJEXT):		$(MMUX_EMACS_CORE_OBJ_PREREQ)
+
+.PHONY: library
+
+library: libmmux-emacs-core.la
 
 
 #### Emacs code

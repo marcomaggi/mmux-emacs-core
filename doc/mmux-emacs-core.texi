@@ -46,7 +46,7 @@
 @set PackageLibstem                     @file{mmux-emacs-core}
 @set PackageSharedLibraryBasename       @file{libmmux-emacs-core}
 
-@set PackageEmacsModule                 @file{mmec-core}
+@set PackageEmacsModule                 @file{mmec}
 @set PackageHeader                      mmux-emacs-core.h
 @set PackageHeaderFile                  @file{@value{PackageHeader}}
 
@@ -189,9 +189,9 @@ This package supports @posix{} platforms.  This package is meant to work with @g
 @value{RequiredEmacsVersion}.  This package depends upon the external packages: @code{cl-lib}.  To
 run the test suite: this package requires the @code{ert} package.
 
-@value{PACKAGE} installs the elisp modules @value{PackageEmacsModule}, @file{mmec-constants} and a C
-language shared library with basename @value{PackageSharedLibraryBasename} (using the @gnu{} Libtool
-infrastructure).  All the elisp definition names are prefixed with
+@value{PACKAGE} installs various elisp modules, the main one being @value{PackageEmacsModule}; it
+also installs a C language shared library with basename @value{PackageSharedLibraryBasename} (using
+the @gnu{} Libtool infrastructure).  All the elisp definition names are prefixed with
 @code{@value{PackageApiElispPrefix}}.  The C language shared library is installed under
 @samp{$libdir}, for example:
 
@@ -209,7 +209,7 @@ something like:
 @lisp
 (add-to-list 'load-path "/usr/local/lib64"
                         "/usr/local/share/emacs/site-lisp")
-(require 'mmec-core)
+(require 'mmec)
 @end lisp
 
 @cindex @value{PackageHeaderFile}, header file
@@ -255,27 +255,6 @@ Return an integer representing the library interface current revision number.
 @defun mmec-version-interface-age
 Return an integer representing the library interface current age.
 @end defun
-
-
-@deftypefun {char const *} mmec_version_string (void)
-Return a pointer to a statically allocated @asciiz{} string representing the interface version
-number.
-@end deftypefun
-
-
-@deftypefun int mmec_version_interface_current (void)
-Return an integer representing the library interface current number.
-@end deftypefun
-
-
-@deftypefun int mmec_version_interface_revision (void)
-Return an integer representing the library interface current revision number.
-@end deftypefun
-
-
-@deftypefun int mmec_version_interface_age (void)
-Return an integer representing the library interface current age.
-@end deftypefun
 
 @c page
 @node constants
@@ -2392,11 +2371,42 @@ Cannot compare a signed integer with an unsigned integer.
 
 
 @menu
+* capi version::                Version informations.
 * capi typedefs::               General type definitions.
 * capi errors::                 Signalling errors.
 * capi modules::                Modules related definitions.
 * capi objects::                Handling Emacs Lisp objects.
 @end menu
+
+@c page
+@node capi version
+@section Version informations
+
+
+The installed libraries follow version numbering as established by the @gnu{} Autotools.  For an
+explanation of interface numbers as managed by @gnu{} Libtool @xref{Libtool versioning, interface,
+Libtool's versioning system, libtool, Shared library support for @gnu{}}.
+
+
+@deftypefun {char const *} mmec_version_string (void)
+Return a pointer to a statically allocated @asciiz{} string representing the interface version
+number.
+@end deftypefun
+
+
+@deftypefun int mmec_version_interface_current (void)
+Return an integer representing the library interface current number.
+@end deftypefun
+
+
+@deftypefun int mmec_version_interface_revision (void)
+Return an integer representing the library interface current revision number.
+@end deftypefun
+
+
+@deftypefun int mmec_version_interface_age (void)
+Return an integer representing the library interface current age.
+@end deftypefun
 
 @c page
 @node capi typedefs

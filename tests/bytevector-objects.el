@@ -72,7 +72,8 @@
       (cc-bytevector-set bv i (cc-uint32 (+ 10 i))))
     (dotimes (i 10)
       (should (cc= (cc-uint32 (+ 10 i))
-    		   (cc-bytevector-ref bv i))))))
+    		   (cc-bytevector-ref bv i))))
+    nil))
 
 (ert-deftest cc-bytevector-s32 ()
   "Setters and getters for a `cc-bytevector-s32' object."
@@ -201,4 +202,4 @@
 (ert-run-tests-batch-and-exit)
 (garbage-collect)
 
-;;; test.el ends here
+;;; bytevector-objects.el ends here

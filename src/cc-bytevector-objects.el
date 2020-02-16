@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-14 06:43:58 marco>
+;; Time-stamp: <2020-02-16 07:02:44 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -258,22 +258,36 @@
 ;;;; bytevector objects: getters and setters
 
 (cl-defgeneric cc-bytevector-ref (bv idx)
-  "Extract a value from a bytevector.")
+  "Extract a value from a bytevector.
+
+The  argument BV  must be  a  value whose  type is  a subtype  of
+`cc-bytevector'.
+
+The argumet  IDX must be  a value of type  `integer' representing
+the index of a slot into the bytevector BV.")
 
 (cl-defgeneric cc-bytevector-set (bv idx val)
-  "Store the value VAL into the bytevector BV at index IDX.")
+  "Store the value VAL into the bytevector BV at index IDX.
+
+The  argument BV  must be  a  value whose  type is  a subtype  of
+`cc-bytevector'.
+
+The argumet  IDX must be  a value of type  `integer' representing
+the index of a slot into the bytevector BV.
+
+The argument VAL must be a numeric value compatible with the type
+of slots in the bytevector BV.")
 
 (defmacro cc--define-bytevector-getter (TYPESTEM LTYPE CTYPE)
   (let* ((TYPESTEM.str		(symbol-name TYPESTEM))
 	 (LTYPE.str		(symbol-name LTYPE))
 	 (BYTEVECTOR-TYPE	(intern (concat "cc-bytevector-" TYPESTEM.str)))
 	 (DOCSTRING		(concat "Extract a value of type `" (symbol-name CTYPE) "' from the bytevector BV at index IDX."))
-	 (MAKE-LTYPE		LTYPE)
 	 (C-FUNC		(intern (concat "mmec-c-bytevector-" TYPESTEM.str "-ref"))))
     `(cl-defmethod cc-bytevector-ref ((bv ,BYTEVECTOR-TYPE) (idx integer))
        ,DOCSTRING
        (cl-assert (cc-fits-usize-p idx))
-       (,MAKE-LTYPE (,C-FUNC (cc-bytevector-obj bv) idx)))))
+       (cc--make ,LTYPE :obj (,C-FUNC (cc-bytevector-obj bv) idx)))))
 
 (defmacro cc--define-bytevector-setter (TYPESTEM LTYPE CTYPE)
   (let* ((TYPESTEM.str		(symbol-name TYPESTEM))

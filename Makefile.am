@@ -98,32 +98,32 @@ library: libmmux-emacs-core.la
 AM_ELCFLAGS	= --quick --directory $(builddir)/src --directory $(PWD)/.libs $(MMUX_EMACS_ELCFLAGS)
 
 dist_lisp_LISP	= \
-	src/cc-constants.el				\
-	src/cc-basics.el				\
-	src/cc-number-objects.el			\
-	src/cc-bytevector-objects.el			\
-	src/cc-core.el
+	src/mmec-constants.el				\
+	src/mmec-basics.el				\
+	src/mmec-number-objects.el			\
+	src/mmec-bytevector-objects.el			\
+	src/mmec.el
 
-src/cc-basics.elc: \
-	src/cc-constants.elc				\
+src/mmec-basics.elc: \
+	src/mmec-constants.elc				\
 	libmmux-emacs-core.la
 
-src/cc-number-objects.elc: \
-	src/cc-basics.elc				\
-	src/cc-constants.elc				\
+src/mmec-number-objects.elc: \
+	src/mmec-basics.elc				\
+	src/mmec-constants.elc				\
 	libmmux-emacs-core.la
 
-src/cc-bytevector-objects.elc: \
-	src/cc-number-objects.elc			\
-	src/cc-basics.elc				\
-	src/cc-constants.elc				\
+src/mmec-bytevector-objects.elc: \
+	src/mmec-number-objects.elc			\
+	src/mmec-basics.elc				\
+	src/mmec-constants.elc				\
 	libmmux-emacs-core.la
 
-src/cc-core.elc: \
-	src/cc-bytevector-objects.elc			\
-	src/cc-number-objects.elc			\
-	src/cc-basics.elc				\
-	src/cc-constants.elc				\
+src/mmec.elc: \
+	src/mmec-bytevector-objects.elc			\
+	src/mmec-number-objects.elc			\
+	src/mmec-basics.elc				\
+	src/mmec-constants.elc				\
 	libmmux-emacs-core.la
 
 

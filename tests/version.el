@@ -20,7 +20,7 @@
 ;;; Code:
 
 (require 'ert)
-(require 'cc-core)
+(require 'mmec)
 
 (ert-deftest version-string ()
   "Retrieve the version string."

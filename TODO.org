@@ -1,6 +1,5 @@
 ﻿-*- coding: utf-8-with-signature-unix; fill-column: 200 -*-
 
-* Change the package prefix to "mmec-"???
 * Reimplement numeric limit constants as structures rather than raw numbers.
 * Add documentation for all the numeric types constructors.
 * Add bytevector types for all the integer numbers.

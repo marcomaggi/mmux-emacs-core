@@ -1,10 +1,10 @@
-;;; cc-core.el --- core definitions for C language intefaces
+;;; mmec.el --- core definitions for C language intefaces
 
 ;; Copyright (C) 2020 Marco Maggi
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-09 07:06:22 marco>
+;; Time-stamp: <2020-02-16 17:02:43 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -32,11 +32,11 @@
 ;;; Code:
 
 (eval-and-compile
-  (require 'cc-constants)
-  (require 'cc-basics)
-  (require 'cc-number-objects)
-  (require 'cc-bytevector-objects))
+  (require 'mmec-constants)
+  (require 'mmec-basics)
+  (require 'mmec-number-objects)
+  (require 'mmec-bytevector-objects))
 
-(provide 'cc-core)
+(provide 'mmec)
 
-;;; cc-core.el ends here
+;;; mmec.el ends here

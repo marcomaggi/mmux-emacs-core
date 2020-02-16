@@ -382,56 +382,56 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
     .implementation	= Fmmec_bytevector_u8_ref,
     .min_arity		= 2,
     .max_arity		= 2,
-    .documentation	= "Extract an `uint8_t' from a `cc-bytevector' object."
+    .documentation	= "Extract an `uint8_t' from a `mmec-bytevector' object."
   },
   {
     .name		= "mmec-c-bytevector-s8-ref",
     .implementation	= Fmmec_bytevector_s8_ref,
     .min_arity		= 2,
     .max_arity		= 2,
-    .documentation	= "Extract an `int8_t' from a `cc-bytevector' object."
+    .documentation	= "Extract an `int8_t' from a `mmec-bytevector' object."
   },
   {
     .name		= "mmec-c-bytevector-u16-ref",
     .implementation	= Fmmec_bytevector_u16_ref,
     .min_arity		= 2,
     .max_arity		= 2,
-    .documentation	= "Extract an `uint16_t' from a `cc-bytevector' object."
+    .documentation	= "Extract an `uint16_t' from a `mmec-bytevector' object."
   },
   {
     .name		= "mmec-c-bytevector-s16-ref",
     .implementation	= Fmmec_bytevector_s16_ref,
     .min_arity		= 2,
     .max_arity		= 2,
-    .documentation	= "Extract an `int16_t' from a `cc-bytevector' object."
+    .documentation	= "Extract an `int16_t' from a `mmec-bytevector' object."
   },
   {
     .name		= "mmec-c-bytevector-u32-ref",
     .implementation	= Fmmec_bytevector_u32_ref,
     .min_arity		= 2,
     .max_arity		= 2,
-    .documentation	= "Extract an `uint32_t' from a `cc-bytevector' object."
+    .documentation	= "Extract an `uint32_t' from a `mmec-bytevector' object."
   },
   {
     .name		= "mmec-c-bytevector-s32-ref",
     .implementation	= Fmmec_bytevector_s32_ref,
     .min_arity		= 2,
     .max_arity		= 2,
-    .documentation	= "Extract an `int32_t' from a `cc-bytevector' object."
+    .documentation	= "Extract an `int32_t' from a `mmec-bytevector' object."
   },
   {
     .name		= "mmec-c-bytevector-u64-ref",
     .implementation	= Fmmec_bytevector_u64_ref,
     .min_arity		= 2,
     .max_arity		= 2,
-    .documentation	= "Extract an `uint64_t' from a `cc-bytevector' object."
+    .documentation	= "Extract an `uint64_t' from a `mmec-bytevector' object."
   },
   {
     .name		= "mmec-c-bytevector-s64-ref",
     .implementation	= Fmmec_bytevector_s64_ref,
     .min_arity		= 2,
     .max_arity		= 2,
-    .documentation	= "Extract an `int64_t' from a `cc-bytevector' object."
+    .documentation	= "Extract an `int64_t' from a `mmec-bytevector' object."
   },
 
   /* Bytevector objects: setters. */
@@ -440,56 +440,56 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
     .implementation	= Fmmec_bytevector_u8_set,
     .min_arity		= 3,
     .max_arity		= 3,
-    .documentation	= "Set an `uint8_t' into a `cc-bytevector' object."
+    .documentation	= "Set an `uint8_t' into a `mmec-bytevector' object."
   },
   {
     .name		= "mmec-c-bytevector-s8-set",
     .implementation	= Fmmec_bytevector_s8_set,
     .min_arity		= 3,
     .max_arity		= 3,
-    .documentation	= "Set an `int8_t' into a `cc-bytevector' object."
+    .documentation	= "Set an `int8_t' into a `mmec-bytevector' object."
   },
   {
     .name		= "mmec-c-bytevector-u16-set",
     .implementation	= Fmmec_bytevector_u16_set,
     .min_arity		= 3,
     .max_arity		= 3,
-    .documentation	= "Set an `uint16_t' into a `cc-bytevector' object."
+    .documentation	= "Set an `uint16_t' into a `mmec-bytevector' object."
   },
   {
     .name		= "mmec-c-bytevector-s16-set",
     .implementation	= Fmmec_bytevector_s16_set,
     .min_arity		= 3,
     .max_arity		= 3,
-    .documentation	= "Set an `int16_t' into a `cc-bytevector' object."
+    .documentation	= "Set an `int16_t' into a `mmec-bytevector' object."
   },
   {
     .name		= "mmec-c-bytevector-u32-set",
     .implementation	= Fmmec_bytevector_u32_set,
     .min_arity		= 3,
     .max_arity		= 3,
-    .documentation	= "Set an `uint32_t' into a `cc-bytevector' object."
+    .documentation	= "Set an `uint32_t' into a `mmec-bytevector' object."
   },
   {
     .name		= "mmec-c-bytevector-s32-set",
     .implementation	= Fmmec_bytevector_s32_set,
     .min_arity		= 3,
     .max_arity		= 3,
-    .documentation	= "Set an `int32_t' into a `cc-bytevector' object."
+    .documentation	= "Set an `int32_t' into a `mmec-bytevector' object."
   },
   {
     .name		= "mmec-c-bytevector-u64-set",
     .implementation	= Fmmec_bytevector_u64_set,
     .min_arity		= 3,
     .max_arity		= 3,
-    .documentation	= "Set an `uint64_t' into a `cc-bytevector' object."
+    .documentation	= "Set an `uint64_t' into a `mmec-bytevector' object."
   },
   {
     .name		= "mmec-c-bytevector-s64-set",
     .implementation	= Fmmec_bytevector_s64_set,
     .min_arity		= 3,
     .max_arity		= 3,
-    .documentation	= "Set an `int64_t' into a `cc-bytevector' object."
+    .documentation	= "Set an `int64_t' into a `mmec-bytevector' object."
   },
 };
 

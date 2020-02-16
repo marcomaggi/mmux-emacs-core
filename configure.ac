@@ -161,7 +161,7 @@ AC_CACHE_SAVE
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile]
-  [src/cc-constants.el]
+  [src/mmec-constants.el]
   [src/mmux-emacs-core-constants.h]
   [meta/scripts/mmux-emacs-core.pc]
   [meta/slackware/slack-desc])

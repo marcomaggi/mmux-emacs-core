@@ -1,10 +1,10 @@
-;;; cc-basics.el --- basic definitions and module loading
+;;; mmec-basics.el --- basic definitions and module loading
 
 ;; Copyright (C) 2020 Marco Maggi
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-14 06:47:59 marco>
+;; Time-stamp: <2020-02-16 17:01:09 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -86,109 +86,111 @@
 
 ;;;; helpers
 
-(defun cc-debug-print (&rest args)
+(defun mmec-debug-print (&rest args)
   (pp args 'external-debugging-output))
 
 (eval-and-compile
-  (defun cc--prefixed-string-p (STRING)
-    ;;Return true if STRING begins with the prefix "cc-".
+  (defun mmec--prefixed-string-p (STRING)
+    ;;Return true if STRING begins with the prefix "mmec-".
     ;;
-    (string= "cc-" (substring STRING 0 3)))
+    (and (stringp STRING)
+	 (<= 5 (length STRING))
+	 (string= "mmec-" (substring STRING 0 5))))
 
-  (defun cc--strip-prefix-from-symbol-name (SYMBOL)
-    ;;If SYMBOL's  name begins  with the  prefix "cc-": strip  it and  return the  resulting string.
+  (defun mmec--strip-prefix-from-symbol-name (SYMBOL)
+    ;;If SYMBOL's  name begins  with the  prefix "mmec-": strip  it and  return the  resulting string.
     ;;Otherwise return SYMBOL's name itself.
     ;;
     (let ((STRING	(symbol-name SYMBOL)))
-      (if (cc--prefixed-string-p STRING)
+      (if (mmec--prefixed-string-p STRING)
 	  ;;Strip the prefix.
-	  (substring STRING 3)
+	  (substring STRING 5)
 	STRING)))
 
-  (defun cc--prepend-prefix-to-symbol-name (SYMBOL)
-    ;;If SYMBOL's name begins with the prefix "cc-": return SYMBOL's name itself.  Otherwise prepend
+  (defun mmec--prepend-prefix-to-symbol-name (SYMBOL)
+    ;;If SYMBOL's name begins with the prefix "mmec-": return SYMBOL's name itself.  Otherwise prepend
     ;;the prefix to te name and return the resulting string.
     ;;
     ;;
     (let ((STRING	(symbol-name SYMBOL)))
-      (if (cc--prefixed-string-p STRING)
+      (if (mmec--prefixed-string-p STRING)
 	  STRING
 	;;Prepend the prefix
-	(concat (concat "cc-" STRING)))))
+	(concat (concat "mmec-" STRING)))))
 
-  (defun cc--select-normalised-type-stem-from-ancestor-type (ANCESTOR-TYPE)
-    (cond ((eq ANCESTOR-TYPE 'cc-signed-integer)	'sint64)
-	  ((eq ANCESTOR-TYPE 'cc-unsigned-integer)	'uint64)
-	  ((eq ANCESTOR-TYPE 'cc-floating-point)	'ldouble)
+  (defun mmec--select-normalised-type-stem-from-ancestor-type (ANCESTOR-TYPE)
+    (cond ((eq ANCESTOR-TYPE 'mmec-signed-integer)	'sint64)
+	  ((eq ANCESTOR-TYPE 'mmec-unsigned-integer)	'uint64)
+	  ((eq ANCESTOR-TYPE 'mmec-floating-point)	'ldouble)
 	  (t
 	   (signal 'mmec-error-unsupported-init-type ANCESTOR-TYPE))))
 
-  (defun cc--type-elisp-constructor-name (TYPE-OR-STEM)
-    (intern (concat (cc--prepend-prefix-to-symbol-name TYPE-OR-STEM) "--make")))
+  (defun mmec--type-elisp-constructor-name (TYPE-OR-STEM)
+    (intern (concat (mmec--prepend-prefix-to-symbol-name TYPE-OR-STEM) "--make")))
   )
 
-(defmacro cc--make (TYPE-OR-STEM &rest ARGS)
+(defmacro mmec--make (TYPE-OR-STEM &rest ARGS)
   ;;Expand into the application of a struct constructor to the given arguments.  Example:
   ;;
-  ;;  (cl-defstruct (cc-sint64 (:constructor cc-sint64--make))
+  ;;  (cl-defstruct (mmec-sint64 (:constructor mmec-sint64--make))
   ;;    obj)
   ;;
-  ;;  (cc--make sint64 :obj 123)
-  ;;  ==> (cc-sint64--make :obj 123)
+  ;;  (mmec--make sint64 :obj 123)
+  ;;  ==> (mmec-sint64--make :obj 123)
   ;;
-  (cons (cc--type-elisp-constructor-name TYPE-OR-STEM) ARGS))
+  (cons (mmec--type-elisp-constructor-name TYPE-OR-STEM) ARGS))
 
-(defmacro cc--extract-obj (TYPE-OR-STEM VALUE)
+(defmacro mmec--extract-obj (TYPE-OR-STEM VALUE)
   ;;Expand into the application of a struct slot getter to a struct instance.  Example:
   ;;
-  ;;  (cl-defstruct cc-mine obj)
+  ;;  (cl-defstruct mmec-mine obj)
   ;;
-  ;;  (cc--extract-obj mine (cc-mine :obj 123))
-  ;;  ==> (cc-mine-obj (cc-mine :obj 123))
+  ;;  (mmec--extract-obj mine (mmec-mine :obj 123))
+  ;;  ==> (mmec-mine-obj (mmec-mine :obj 123))
   ;;  => 123
   ;;
   ;;Many struct types  defined by this package use  the name "obj" for the slot  holding an internal
   ;;representation (often a user-pointer object).
   ;;
-  (let* ((TYPE.str	(cc--prepend-prefix-to-symbol-name TYPE-OR-STEM))
+  (let* ((TYPE.str	(mmec--prepend-prefix-to-symbol-name TYPE-OR-STEM))
 	 (EXTRACTOR	(intern (concat TYPE.str "-obj"))))
     `(,EXTRACTOR ,VALUE)))
 
-(defmacro cc--clang-constructor (TYPE-OR-STEM &rest ARGS)
+(defmacro mmec--clang-constructor (TYPE-OR-STEM &rest ARGS)
   ;;Expand  into the  application of  the  C language  object  constructor to  the given  arguments.
   ;;Example:
   ;;
-  ;;  (cc--clang-constructor sint32 123)
+  ;;  (mmec--clang-constructor sint32 123)
   ;;  ==> (mmec-c-make-sint32 123)
   ;;
-  (let* ((STEM.str		(cc--strip-prefix-from-symbol-name TYPE-OR-STEM))
+  (let* ((STEM.str		(mmec--strip-prefix-from-symbol-name TYPE-OR-STEM))
 	 (CLANG-CONSTRUCTOR	(intern (concat "mmec-c-make-" STEM.str))))
     (cons CLANG-CONSTRUCTOR ARGS)))
 
-(defmacro cc--number-clang-constructor (TYPE-OR-STEM NORMALISED-TYPE-OR-STEM &rest ARGS)
-  (let ((STEM (intern (concat (cc--strip-prefix-from-symbol-name TYPE-OR-STEM)
+(defmacro mmec--number-clang-constructor (TYPE-OR-STEM NORMALISED-TYPE-OR-STEM &rest ARGS)
+  (let ((STEM (intern (concat (mmec--strip-prefix-from-symbol-name TYPE-OR-STEM)
 			      "-from-"
-			      (cc--strip-prefix-from-symbol-name NORMALISED-TYPE-OR-STEM)))))
-    `(cc--clang-constructor ,STEM . ,ARGS)))
+			      (mmec--strip-prefix-from-symbol-name NORMALISED-TYPE-OR-STEM)))))
+    `(mmec--clang-constructor ,STEM . ,ARGS)))
 
-(defmacro cc--clang-converter (FROMTYPE-OR-STEM TOTYPE-OR-STEM &rest ARGS)
+(defmacro mmec--clang-converter (FROMTYPE-OR-STEM TOTYPE-OR-STEM &rest ARGS)
   ;;Expand  into  the application  of  the  C language  object  converter  to the  given  arguments.
   ;;Examples:
   ;;
-  ;;  (cc--clang-converter sint32 sint64 123)
-  ;;  ==> (mmec-c-sint32-to-sint54 (cc-sint32 123))
+  ;;  (mmec--clang-converter sint32 sint64 123)
+  ;;  ==> (mmec-c-sint32-to-sint54 (mmec-sint32 123))
   ;;
-  ;;  (cc--clang-converter cc-float cc-ldouble 123)
-  ;;  ==> (mmec-c-float-to-ldouble (cc-float 1.2))
+  ;;  (mmec--clang-converter mmec-float mmec-ldouble 123)
+  ;;  ==> (mmec-c-float-to-ldouble (mmec-float 1.2))
   ;;
-  (let* ((FROMSTEM.str		(cc--strip-prefix-from-symbol-name FROMTYPE-OR-STEM))
-	 (TOSTEM.str		(cc--strip-prefix-from-symbol-name TOTYPE-OR-STEM))
+  (let* ((FROMSTEM.str		(mmec--strip-prefix-from-symbol-name FROMTYPE-OR-STEM))
+	 (TOSTEM.str		(mmec--strip-prefix-from-symbol-name TOTYPE-OR-STEM))
 	 (CLANG-CONVERTER	(intern (concat "mmec-c-" FROMSTEM.str "-to-" TOSTEM.str))))
     (cons CLANG-CONVERTER ARGS)))
 
 
 ;;;; done
 
-(provide 'cc-basics)
+(provide 'mmec-basics)
 
-;;; cc-core.el ends here
+;;; mmec-core.el ends here

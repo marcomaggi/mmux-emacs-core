@@ -46,7 +46,7 @@
 @set PackageLibstem                     @file{mmux-emacs-core}
 @set PackageSharedLibraryBasename       @file{libmmux-emacs-core}
 
-@set PackageEmacsModule                 @file{cc-core}
+@set PackageEmacsModule                 @file{mmec-core}
 @set PackageHeader                      mmux-emacs-core.h
 @set PackageHeaderFile                  @file{@value{PackageHeader}}
 
@@ -187,7 +187,7 @@ This package supports @posix{} platforms.  This package is meant to work with @g
 @value{RequiredEmacsVersion}.  This package depends upon the external packages: @code{cl-lib}.  To
 run the test suite: this package requires the @code{ert} package.
 
-@value{PACKAGE} installs the elisp modules @value{PackageEmacsModule}, @file{cc-constants} and a C
+@value{PACKAGE} installs the elisp modules @value{PackageEmacsModule}, @file{mmec-constants} and a C
 language shared library with basename @value{PackageSharedLibraryBasename} (using the @gnu{} Libtool
 infrastructure).  All the elisp definition names are prefixed with
 @code{@value{PackageApiElispPrefix}}.  The C language shared library is installed under
@@ -207,7 +207,7 @@ something like:
 @lisp
 (add-to-list 'load-path "/usr/local/lib64"
                         "/usr/local/share/emacs/site-lisp")
-(require 'cc-core)
+(require 'mmec-core)
 @end lisp
 
 @cindex @value{PackageHeaderFile}, header file
@@ -291,171 +291,171 @@ Return an integer representing the library interface current age.
 @section Size of common C language types
 
 
-The following syntactic bindings are defined in the module @file{cc-constants}, which is required by
+The following syntactic bindings are defined in the module @file{mmec-constants}, which is required by
 @value{PackageEmacsModule}.
 
 
-@deftypevr {Constant} integer cc-SIZEOF_CHAR
+@deftypevr {Constant} integer mmec-SIZEOF_CHAR
 Size of @code{char} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_SIGNED_CHAR
+@deftypevr {Constant} integer mmec-SIZEOF_SIGNED_CHAR
 Size of @code{signed char} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_UNSIGNED_CHAR
+@deftypevr {Constant} integer mmec-SIZEOF_UNSIGNED_CHAR
 Size of @code{unsigned char} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_WCHAR
+@deftypevr {Constant} integer mmec-SIZEOF_WCHAR
 Size of @code{wchar_t} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_SIGNED_SHORT_INT
+@deftypevr {Constant} integer mmec-SIZEOF_SIGNED_SHORT_INT
 Size of @code{signed short int} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_UNSIGNED_SHORT_INT
+@deftypevr {Constant} integer mmec-SIZEOF_UNSIGNED_SHORT_INT
 Size of @code{signed short int} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_SIGNED_INT
+@deftypevr {Constant} integer mmec-SIZEOF_SIGNED_INT
 Size of @code{signed int} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_UNSIGNED_INT
+@deftypevr {Constant} integer mmec-SIZEOF_UNSIGNED_INT
 Size of @code{signed int} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_UNSIGNED_INT
+@deftypevr {Constant} integer mmec-SIZEOF_UNSIGNED_INT
 Size of @code{unsigned int} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_UNUNSIGNED_INT
+@deftypevr {Constant} integer mmec-SIZEOF_UNUNSIGNED_INT
 Size of @code{unsigned int} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_SIGNED_LONG_INT
+@deftypevr {Constant} integer mmec-SIZEOF_SIGNED_LONG_INT
 Size of @code{signed long int} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_UNSIGNED_LONG_INT
+@deftypevr {Constant} integer mmec-SIZEOF_UNSIGNED_LONG_INT
 Size of @code{signed long int} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_UNSIGNED_LONG_INT
+@deftypevr {Constant} integer mmec-SIZEOF_UNSIGNED_LONG_INT
 Size of @code{unsigned long int} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_UNUNSIGNED_LONG_INT
+@deftypevr {Constant} integer mmec-SIZEOF_UNUNSIGNED_LONG_INT
 Size of @code{unsigned long int} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_SIGNED_LONG_LONG_INT
+@deftypevr {Constant} integer mmec-SIZEOF_SIGNED_LONG_LONG_INT
 Size of @code{signed long long int} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_UNSIGNED_LONG_LONG_INT
+@deftypevr {Constant} integer mmec-SIZEOF_UNSIGNED_LONG_LONG_INT
 Size of @code{signed long long int} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_UNSIGNED_LONG_LONG_INT
+@deftypevr {Constant} integer mmec-SIZEOF_UNSIGNED_LONG_LONG_INT
 Size of @code{unsigned long long int} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_UNUNSIGNED_LONG_LONG_INT
+@deftypevr {Constant} integer mmec-SIZEOF_UNUNSIGNED_LONG_LONG_INT
 Size of @code{unsigned long long int} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_SIZE_T
+@deftypevr {Constant} integer mmec-SIZEOF_SIZE_T
 Size of @code{size_t} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_SSIZE_T
+@deftypevr {Constant} integer mmec-SIZEOF_SSIZE_T
 Size of @code{ssize_t} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_INTMAX_T
+@deftypevr {Constant} integer mmec-SIZEOF_INTMAX_T
 Size of @code{intmax_t} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_UINTMAX_T
+@deftypevr {Constant} integer mmec-SIZEOF_UINTMAX_T
 Size of @code{uintmax_t} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_INT8_T
+@deftypevr {Constant} integer mmec-SIZEOF_INT8_T
 Size of @code{int8_t} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_UINT8_T
+@deftypevr {Constant} integer mmec-SIZEOF_UINT8_T
 Size of @code{uint8_t} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_INT16_T
+@deftypevr {Constant} integer mmec-SIZEOF_INT16_T
 Size of @code{int16_t} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_UINT16_T
+@deftypevr {Constant} integer mmec-SIZEOF_UINT16_T
 Size of @code{uint16_t} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_INT32_T
+@deftypevr {Constant} integer mmec-SIZEOF_INT32_T
 Size of @code{int32_t} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_UINT32_T
+@deftypevr {Constant} integer mmec-SIZEOF_UINT32_T
 Size of @code{uint32_t} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_INT64_T
+@deftypevr {Constant} integer mmec-SIZEOF_INT64_T
 Size of @code{int64_t} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_UINT64_T
+@deftypevr {Constant} integer mmec-SIZEOF_UINT64_T
 Size of @code{uint64_t} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_FLOAT
+@deftypevr {Constant} integer mmec-SIZEOF_FLOAT
 Size of @code{float} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_DOUBLE
+@deftypevr {Constant} integer mmec-SIZEOF_DOUBLE
 Size of @code{double} measured in bytes.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZEOF_LONG_DOUBLE
+@deftypevr {Constant} integer mmec-SIZEOF_LONG_DOUBLE
 Size of @code{long double} measured in bytes.
 @end deftypevr
 
@@ -464,241 +464,241 @@ Size of @code{long double} measured in bytes.
 @section Ranges representable by C language types
 
 
-The following syntactic bindings are defined in the module @file{cc-constants}, which is required by
+The following syntactic bindings are defined in the module @file{mmec-constants}, which is required by
 @value{PackageEmacsModule}.
 
 
-@deftypevr {Constant} integer cc-SCHAR_MIN
+@deftypevr {Constant} integer mmec-SCHAR_MIN
 Exact integer representing the minimum value representable by a @code{signed char}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SCHAR_MAX
+@deftypevr {Constant} integer mmec-SCHAR_MAX
 Exact integer representing the maximum value representable by a @code{signed char}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-CHAR_MIN
+@deftypevr {Constant} integer mmec-CHAR_MIN
 Exact integer representing the minimum value representable by a @code{char}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-CHAR_MAX
+@deftypevr {Constant} integer mmec-CHAR_MAX
 Exact integer representing the maximum value representable by a @code{char}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-UCHAR_MIN
+@deftypevr {Constant} integer mmec-UCHAR_MIN
 Exact integer representing the minimum value representable by a @code{unsigned char}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-UCHAR_MAX
+@deftypevr {Constant} integer mmec-UCHAR_MAX
 Exact integer representing the maximum value representable by a @code{unsigned char}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SHRT_MIN
+@deftypevr {Constant} integer mmec-SHRT_MIN
 Exact integer representing the minimum value representable by a @code{signed short int}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SHRT_MAX
+@deftypevr {Constant} integer mmec-SHRT_MAX
 Exact integer representing the maximum value representable by a @code{signed short int}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-USHRT_MIN
+@deftypevr {Constant} integer mmec-USHRT_MIN
 Exact integer representing the minimum value representable by a @code{unsigned short int}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-USHRT_MAX
+@deftypevr {Constant} integer mmec-USHRT_MAX
 Exact integer representing the maximum value representable by a @code{unsigned short int}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-INT_MIN
+@deftypevr {Constant} integer mmec-INT_MIN
 Exact integer representing the minimum value representable by a @code{signed int}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-INT_MAX
+@deftypevr {Constant} integer mmec-INT_MAX
 Exact integer representing the maximum value representable by a @code{signed int}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-UINT_MIN
+@deftypevr {Constant} integer mmec-UINT_MIN
 Exact integer representing the minimum value representable by a @code{unsigned int}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-UINT_MAX
+@deftypevr {Constant} integer mmec-UINT_MAX
 Exact integer representing the maximum value representable by a @code{unsigned int}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-LONG_MIN
+@deftypevr {Constant} integer mmec-LONG_MIN
 Exact integer representing the minimum value representable by a @code{signed long int}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-LONG_MAX
+@deftypevr {Constant} integer mmec-LONG_MAX
 Exact integer representing the maximum value representable by a @code{signed long int}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-ULONG_MIN
+@deftypevr {Constant} integer mmec-ULONG_MIN
 Exact integer representing the minimum value representable by a @code{unsigned long int}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-ULONG_MAX
+@deftypevr {Constant} integer mmec-ULONG_MAX
 Exact integer representing the maximum value representable by a @code{unsigned long int}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-LLONG_MIN
+@deftypevr {Constant} integer mmec-LLONG_MIN
 Exact integer representing the minimum value representable by a @code{signed long long int}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-LLONG_MAX
+@deftypevr {Constant} integer mmec-LLONG_MAX
 Exact integer representing the maximum value representable by a @code{signed long long int}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-ULLONG_MIN
+@deftypevr {Constant} integer mmec-ULLONG_MIN
 Exact integer representing the minimum value representable by a @code{unsigned long long int}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-ULLONG_MAX
+@deftypevr {Constant} integer mmec-ULLONG_MAX
 Exact integer representing the maximum value representable by a @code{unsigned long long int}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-WCHAR_MIN
+@deftypevr {Constant} integer mmec-WCHAR_MIN
 Exact integer representing the minimum value representable by a @code{wchar_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-WCHAR_MAX
+@deftypevr {Constant} integer mmec-WCHAR_MAX
 Exact integer representing the maximum value representable by a @code{wchar_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZE_T_MIN
+@deftypevr {Constant} integer mmec-SIZE_T_MIN
 Exact integer representing the minimum value representable by a @code{size_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SIZE_T_MAX
+@deftypevr {Constant} integer mmec-SIZE_T_MAX
 Exact integer representing the maximum value representable by a @code{size_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SSIZE_T_MIN
+@deftypevr {Constant} integer mmec-SSIZE_T_MIN
 Exact integer representing the minimum value representable by a @code{ssize_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-SSIZE_T_MAX
+@deftypevr {Constant} integer mmec-SSIZE_T_MAX
 Exact integer representing the maximum value representable by a @code{ssize_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-INTMAX_MIN
+@deftypevr {Constant} integer mmec-INTMAX_MIN
 Exact integer representing the minimum value representable by a @code{intmax_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-INTMAX_MAX
+@deftypevr {Constant} integer mmec-INTMAX_MAX
 Exact integer representing the maximum value representable by a @code{intmax_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-UINTMAX_MIN
+@deftypevr {Constant} integer mmec-UINTMAX_MIN
 Exact integer representing the maximum value representable by a @code{uintmax_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-INT8_MIN
+@deftypevr {Constant} integer mmec-INT8_MIN
 Exact integer representing the minimum value representable by a @code{int8_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-INT8_MAX
+@deftypevr {Constant} integer mmec-INT8_MAX
 Exact integer representing the maximum value representable by a @code{int8_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-UINT8_MIN
+@deftypevr {Constant} integer mmec-UINT8_MIN
 Exact integer representing the minimum value representable by a @code{uint8_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-UINT8_MAX
+@deftypevr {Constant} integer mmec-UINT8_MAX
 Exact integer representing the maximum value representable by a @code{uint8_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-INT16_MIN
+@deftypevr {Constant} integer mmec-INT16_MIN
 Exact integer representing the minimum value representable by a @code{int16_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-INT16_MAX
+@deftypevr {Constant} integer mmec-INT16_MAX
 Exact integer representing the maximum value representable by a @code{int16_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-UINT16_MIN
+@deftypevr {Constant} integer mmec-UINT16_MIN
 Exact integer representing the minimum value representable by a @code{uint16_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-UINT16_MAX
+@deftypevr {Constant} integer mmec-UINT16_MAX
 Exact integer representing the maximum value representable by a @code{uint16_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-INT32_MIN
+@deftypevr {Constant} integer mmec-INT32_MIN
 Exact integer representing the minimum value representable by a @code{int32_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-INT32_MAX
+@deftypevr {Constant} integer mmec-INT32_MAX
 Exact integer representing the maximum value representable by a @code{int32_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-UINT32_MIN
+@deftypevr {Constant} integer mmec-UINT32_MIN
 Exact integer representing the minimum value representable by a @code{uint32_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-UINT32_MAX
+@deftypevr {Constant} integer mmec-UINT32_MAX
 Exact integer representing the maximum value representable by a @code{uint32_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-INT64_MIN
+@deftypevr {Constant} integer mmec-INT64_MIN
 Exact integer representing the minimum value representable by a @code{int64_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-INT64_MAX
+@deftypevr {Constant} integer mmec-INT64_MAX
 Exact integer representing the maximum value representable by a @code{int64_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-UINT64_MIN
+@deftypevr {Constant} integer mmec-UINT64_MIN
 Exact integer representing the minimum value representable by a @code{uint64_t}.
 @end deftypevr
 
 
-@deftypevr {Constant} integer cc-UINT64_MAX
+@deftypevr {Constant} integer mmec-UINT64_MAX
 Exact integer representing the maximum value representable by a @code{uint64_t}.
 @end deftypevr
 
@@ -707,151 +707,151 @@ Exact integer representing the maximum value representable by a @code{uint64_t}.
 @section Constants related to floating--point numbers
 
 
-The following syntactic bindings are defined in the module @file{cc-constants}, which is required by
+The following syntactic bindings are defined in the module @file{mmec-constants}, which is required by
 @value{PackageEmacsModule}.
 
 
-@defvr {Constant} cc-FLT_ROUNDS
+@defvr {Constant} mmec-FLT_ROUNDS
 Value of the system constant @code{FLT_ROUNDS}.
 @end defvr
 
 
-@defvr {Constant} cc-FLT_RADIX
+@defvr {Constant} mmec-FLT_RADIX
 Value of the system constant @code{FLT_RADIX}.
 @end defvr
 
 
-@defvr {Constant} cc-FLT_MANT_DIG
+@defvr {Constant} mmec-FLT_MANT_DIG
 Value of the system constant @code{FLT_MANT_DIG}.
 @end defvr
 
 
-@defvr {Constant} cc-DBL_MANT_DIG
+@defvr {Constant} mmec-DBL_MANT_DIG
 Value of the system constant @code{DBL_MANT_DIG}.
 @end defvr
 
 
-@defvr {Constant} cc-LDBL_MANT_DIG
+@defvr {Constant} mmec-LDBL_MANT_DIG
 Value of the system constant @code{LDBL_MANT_DIG}.
 @end defvr
 
 
-@defvr {Constant} cc-FLT_DIG
+@defvr {Constant} mmec-FLT_DIG
 Value of the system constant @code{FLT_DIG}.
 @end defvr
 
 
-@defvr {Constant} cc-DBL_DIG
+@defvr {Constant} mmec-DBL_DIG
 Value of the system constant @code{DBL_DIG}.
 @end defvr
 
 
-@defvr {Constant} cc-LDBL_DIG
+@defvr {Constant} mmec-LDBL_DIG
 Value of the system constant @code{LDBL_DIG}.
 @end defvr
 
 
-@defvr {Constant} cc-FLT_MIN_EXP
+@defvr {Constant} mmec-FLT_MIN_EXP
 Value of the system constant @code{FLT_MIN_EXP}.
 @end defvr
 
 
-@defvr {Constant} cc-DBL_MIN_EXP
+@defvr {Constant} mmec-DBL_MIN_EXP
 Value of the system constant @code{DBL_MIN_EXP}.
 @end defvr
 
 
-@defvr {Constant} cc-LDBL_MIN_EXP
+@defvr {Constant} mmec-LDBL_MIN_EXP
 Value of the system constant @code{LDBL_MIN_EXP}.
 @end defvr
 
 
-@defvr {Constant} cc-FLT_MIN_10_EXP
+@defvr {Constant} mmec-FLT_MIN_10_EXP
 Value of the system constant @code{FLT_MIN_10_EXP}.
 @end defvr
 
 
-@defvr {Constant} cc-DBL_MIN_10_EXP
+@defvr {Constant} mmec-DBL_MIN_10_EXP
 Value of the system constant @code{DBL_MIN_10_EXP}.
 @end defvr
 
 
-@defvr {Constant} cc-LDBL_MIN_10_EXP
+@defvr {Constant} mmec-LDBL_MIN_10_EXP
 Value of the system constant @code{LDBL_MIN_10_EXP}.
 @end defvr
 
 
-@defvr {Constant} cc-FLT_MAX_EXP
+@defvr {Constant} mmec-FLT_MAX_EXP
 Value of the system constant @code{FLT_MAX_EXP}.
 @end defvr
 
 
-@defvr {Constant} cc-DBL_MAX_EXP
+@defvr {Constant} mmec-DBL_MAX_EXP
 Value of the system constant @code{DBL_MAX_EXP}.
 @end defvr
 
 
-@defvr {Constant} cc-LDBL_MAX_EXP
+@defvr {Constant} mmec-LDBL_MAX_EXP
 Value of the system constant @code{LDBL_MAX_EXP}.
 @end defvr
 
 
-@defvr {Constant} cc-FLT_MAX_10_EXP
+@defvr {Constant} mmec-FLT_MAX_10_EXP
 Value of the system constant @code{FLT_MAX_10_EXP}.
 @end defvr
 
 
-@defvr {Constant} cc-DBL_MAX_10_EXP
+@defvr {Constant} mmec-DBL_MAX_10_EXP
 Value of the system constant @code{DBL_MAX_10_EXP}.
 @end defvr
 
 
-@defvr {Constant} cc-LDBL_MAX_10_EXP
+@defvr {Constant} mmec-LDBL_MAX_10_EXP
 Value of the system constant @code{LDBL_MAX_10_EXP}.
 @end defvr
 
 
-@defvr {Constant} cc-FLT_MAX
+@defvr {Constant} mmec-FLT_MAX
 Value of the system constant @code{FLT_MAX}.
 @end defvr
 
 
-@defvr {Constant} cc-DBL_MAX
+@defvr {Constant} mmec-DBL_MAX
 Value of the system constant @code{DBL_MAX}.
 @end defvr
 
 
-@defvr {Constant} cc-LDBL_MAX
+@defvr {Constant} mmec-LDBL_MAX
 Value of the system constant @code{LDBL_MAX}.
 @end defvr
 
 
-@defvr {Constant} cc-FLT_MIN
+@defvr {Constant} mmec-FLT_MIN
 Value of the system constant @code{FLT_MIN}.
 @end defvr
 
 
-@defvr {Constant} cc-DBL_MIN
+@defvr {Constant} mmec-DBL_MIN
 Value of the system constant @code{DBL_MIN}.
 @end defvr
 
 
-@defvr {Constant} cc-LDBL_MIN
+@defvr {Constant} mmec-LDBL_MIN
 Value of the system constant @code{LDBL_MIN}.
 @end defvr
 
 
-@defvr {Constant} cc-FLT_EPSILON
+@defvr {Constant} mmec-FLT_EPSILON
 Value of the system constant @code{FLT_EPSILON}.
 @end defvr
 
 
-@defvr {Constant} cc-DBL_EPSILON
+@defvr {Constant} mmec-DBL_EPSILON
 Value of the system constant @code{DBL_EPSILON}.
 @end defvr
 
 
-@defvr {Constant} cc-LDBL_EPSILON
+@defvr {Constant} mmec-LDBL_EPSILON
 Value of the system constant @code{LDBL_EPSILON}.
 @end defvr
 
@@ -921,40 +921,40 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 following types are to be considered ``abstract'', so we must not instantiate them.
 
 
-@deftp {Abstract Object Type} cc-number
+@deftp {Abstract Object Type} mmec-number
 Base type of all the custom number types defined by this module.
 @end deftp
 
 
-@deftp {Abstract Object Type} cc-integer
-@deftpx {Parent Type} cc-number
+@deftp {Abstract Object Type} mmec-integer
+@deftpx {Parent Type} mmec-number
 Base type of all the custom exact integer number types defined by this module.
 @end deftp
 
 
-@deftp {Abstract Object Type} cc-signed-integer
-@deftpx {Parent Type} cc-integer
+@deftp {Abstract Object Type} mmec-signed-integer
+@deftpx {Parent Type} mmec-integer
 Base type of all the custom exact signed integer number types defined by this module.
 @end deftp
 
 
-@deftp {Abstract Object Type} cc-unsigned-integer
-@deftpx {Parent Type} cc-integer
+@deftp {Abstract Object Type} mmec-unsigned-integer
+@deftpx {Parent Type} mmec-integer
 Base type of all the custom exact unsigned integer number types defined by this module.
 @end deftp
 
 
-@deftp {Abstract Object Type} cc-floating-point
-@deftpx {Parent Type} cc-number
+@deftp {Abstract Object Type} mmec-floating-point
+@deftpx {Parent Type} mmec-number
 Base type of all the custom floating--point number types defined by this module.
 @end deftp
 
 
-@defun cc-number-p @var{OBJ}
-@defunx cc-integer-p @var{OBJ}
-@defunx cc-signed-integer-p @var{OBJ}
-@defunx cc-unsigned-integer-p @var{OBJ}
-@defunx cc-floating-point-p @var{OBJ}
+@defun mmec-number-p @var{OBJ}
+@defunx mmec-integer-p @var{OBJ}
+@defunx mmec-signed-integer-p @var{OBJ}
+@defunx mmec-unsigned-integer-p @var{OBJ}
+@defunx mmec-floating-point-p @var{OBJ}
 Return true if @var{OBJ} is an instance of the specified type; otherwise return false.
 @end defun
 
@@ -966,26 +966,26 @@ Return true if @var{OBJ} is an instance of the specified type; otherwise return 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-char
-@deftpx {Parent Type} cc-signed-integer
+@deftp {Object Type} mmec-char
+@deftpx {Parent Type} mmec-signed-integer
 Object wrapper for the C language type @code{char}.
 @end deftp
 
 
-@deffn {Generic Function} cc-char (@var{INIT})
-@deffnx {Method} cc-char ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-char} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} mmec-char (@var{INIT})
+@deffnx {Method} mmec-char ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-char} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{char}.
 @end deffn
 
 
-@defun cc-char-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-char}, otherwise return false.
+@defun mmec-char-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-char}, otherwise return false.
 @end defun
 
 
-@defun cc-char-obj @var{CH}
-Given an instance of @objtype{cc-char}: return its internal representation as Emacs built--in
+@defun mmec-char-obj @var{CH}
+Given an instance of @objtype{mmec-char}: return its internal representation as Emacs built--in
 @code{integer} object representing its @ascii{} code.
 @end defun
 
@@ -997,26 +997,26 @@ Given an instance of @objtype{cc-char}: return its internal representation as Em
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-schar
-@deftpx {Parent Type} cc-signed-integer
+@deftp {Object Type} mmec-schar
+@deftpx {Parent Type} mmec-signed-integer
 Object wrapper for the C language type @code{signed char}.
 @end deftp
 
 
-@deffn {Generic Function} cc-schar (@var{INIT})
-@deffnx {Method} cc-schar ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-schar} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} mmec-schar (@var{INIT})
+@deffnx {Method} mmec-schar ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-schar} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{signed char}.
 @end deffn
 
 
-@defun cc-schar-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-schar}, otherwise return false.
+@defun mmec-schar-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-schar}, otherwise return false.
 @end defun
 
 
-@defun cc-schar-obj @var{CH}
-Given an instance of @objtype{cc-schar}: return its internal representation as Emacs built--in
+@defun mmec-schar-obj @var{CH}
+Given an instance of @objtype{mmec-schar}: return its internal representation as Emacs built--in
 @code{integer} object representing its @ascii{} code.
 @end defun
 
@@ -1028,26 +1028,26 @@ Given an instance of @objtype{cc-schar}: return its internal representation as E
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-uchar
-@deftpx {Parent Type} cc-unsigned-integer
+@deftp {Object Type} mmec-uchar
+@deftpx {Parent Type} mmec-unsigned-integer
 Object wrapper for the C language type @code{unsigned char}.
 @end deftp
 
 
-@deffn {Generic Function} cc-uchar (@var{INIT})
-@deffnx {Method} cc-uchar ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-uchar} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} mmec-uchar (@var{INIT})
+@deffnx {Method} mmec-uchar ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-uchar} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{unsigned char}.
 @end deffn
 
 
-@defun cc-uchar-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-uchar}, otherwise return false.
+@defun mmec-uchar-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-uchar}, otherwise return false.
 @end defun
 
 
-@defun cc-uchar-obj @var{CH}
-Given an instance of @objtype{cc-uchar}: return its internal representation as Emacs built--in
+@defun mmec-uchar-obj @var{CH}
+Given an instance of @objtype{mmec-uchar}: return its internal representation as Emacs built--in
 @code{integer} object representing its @ascii{} code.
 @end defun
 
@@ -1059,26 +1059,26 @@ Given an instance of @objtype{cc-uchar}: return its internal representation as E
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-wchar
-@deftpx {Parent Type} cc-unsigned-integer
+@deftp {Object Type} mmec-wchar
+@deftpx {Parent Type} mmec-unsigned-integer
 Object wrapper for the C language type @code{wchar_t}.
 @end deftp
 
 
-@deffn {Generic Function} cc-wchar (@var{INIT})
-@deffnx {Method} cc-wchar ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-wchar} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} mmec-wchar (@var{INIT})
+@deffnx {Method} mmec-wchar ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-wchar} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{wchar_t}.
 @end deffn
 
 
-@defun cc-wchar-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-wchar}, otherwise return false.
+@defun mmec-wchar-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-wchar}, otherwise return false.
 @end defun
 
 
-@defun cc-wchar-obj @var{CH}
-Given an instance of @objtype{cc-wchar}: return the exact integer representing its code.
+@defun mmec-wchar-obj @var{CH}
+Given an instance of @objtype{mmec-wchar}: return the exact integer representing its code.
 @end defun
 
 @c page
@@ -1089,26 +1089,26 @@ Given an instance of @objtype{cc-wchar}: return the exact integer representing i
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-sshrt
-@deftpx {Parent Type} cc-signed-integer
+@deftp {Object Type} mmec-sshrt
+@deftpx {Parent Type} mmec-signed-integer
 Object wrapper for the C language type @code{signed short int}.
 @end deftp
 
 
-@deffn {Generic Function} cc-sshrt (@var{INIT})
-@deffnx {Method} cc-sshrt ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-sshrt} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} mmec-sshrt (@var{INIT})
+@deffnx {Method} mmec-sshrt ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-sshrt} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{signed short int}.
 @end deffn
 
 
-@defun cc-sshrt-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-sshrt}, otherwise return false.
+@defun mmec-sshrt-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-sshrt}, otherwise return false.
 @end defun
 
 
-@defun cc-sshrt-obj @var{CH}
-Given an instance of @objtype{cc-sshrt}: return its internal representation as Emacs built--in
+@defun mmec-sshrt-obj @var{CH}
+Given an instance of @objtype{mmec-sshrt}: return its internal representation as Emacs built--in
 @code{integer} object.
 @end defun
 
@@ -1120,26 +1120,26 @@ Given an instance of @objtype{cc-sshrt}: return its internal representation as E
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-ushrt
-@deftpx {Parent Type} cc-unsigned-integer
+@deftp {Object Type} mmec-ushrt
+@deftpx {Parent Type} mmec-unsigned-integer
 Object wrapper for the C language type @code{unsigned short int}.
 @end deftp
 
 
-@deffn {Generic Function} cc-ushrt (@var{INIT})
-@deffnx {Method} cc-ushrt ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-ushrt} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} mmec-ushrt (@var{INIT})
+@deffnx {Method} mmec-ushrt ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-ushrt} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{unsigned short int}.
 @end deffn
 
 
-@defun cc-ushrt-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-ushrt}, otherwise return false.
+@defun mmec-ushrt-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-ushrt}, otherwise return false.
 @end defun
 
 
-@defun cc-ushrt-obj @var{CH}
-Given an instance of @objtype{cc-ushrt}: return its internal representation as Emacs built--in
+@defun mmec-ushrt-obj @var{CH}
+Given an instance of @objtype{mmec-ushrt}: return its internal representation as Emacs built--in
 @code{integer} object.
 @end defun
 
@@ -1151,26 +1151,26 @@ Given an instance of @objtype{cc-ushrt}: return its internal representation as E
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-sint
-@deftpx {Parent Type} cc-signed-integer
+@deftp {Object Type} mmec-sint
+@deftpx {Parent Type} mmec-signed-integer
 Object wrapper for the C language type @code{signed int}.
 @end deftp
 
 
-@deffn {Generic Function} cc-sint (@var{INIT})
-@deffnx {Method} cc-sint ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-sint} initialised with @var{INIT}, which
+@deffn {Generic Function} mmec-sint (@var{INIT})
+@deffnx {Method} mmec-sint ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-sint} initialised with @var{INIT}, which
 must be an exact integer object in the range of the C language type @code{signed int}.
 @end deffn
 
 
-@defun cc-sint-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-sint}, otherwise return false.
+@defun mmec-sint-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-sint}, otherwise return false.
 @end defun
 
 
-@defun cc-sint-obj @var{CH}
-Given an instance of @objtype{cc-sint}: return the its internal representation as
+@defun mmec-sint-obj @var{CH}
+Given an instance of @objtype{mmec-sint}: return the its internal representation as
 user--pointer object.
 @end defun
 
@@ -1182,26 +1182,26 @@ user--pointer object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-uint
-@deftpx {Parent Type} cc-unsigned-integer
+@deftp {Object Type} mmec-uint
+@deftpx {Parent Type} mmec-unsigned-integer
 Object wrapper for the C language type @code{unsigned int}.
 @end deftp
 
 
-@deffn {Generic Function} cc-uint (@var{INIT})
-@deffnx {Method} cc-uint ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-uint} initialised with @var{INIT}, which must
+@deffn {Generic Function} mmec-uint (@var{INIT})
+@deffnx {Method} mmec-uint ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-uint} initialised with @var{INIT}, which must
 be an exact integer object in the range of the C language type @code{unsigned int}.
 @end deffn
 
 
-@defun cc-uint-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-uint}, otherwise return false.
+@defun mmec-uint-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-uint}, otherwise return false.
 @end defun
 
 
-@defun cc-uint-obj @var{CH}
-Given an instance of @objtype{cc-uint}: return the its internal representation as
+@defun mmec-uint-obj @var{CH}
+Given an instance of @objtype{mmec-uint}: return the its internal representation as
 user--pointer object.
 @end defun
 
@@ -1213,26 +1213,26 @@ user--pointer object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-slong
-@deftpx {Parent Type} cc-signed-integer
+@deftp {Object Type} mmec-slong
+@deftpx {Parent Type} mmec-signed-integer
 Object wrapper for the C language type @code{signed long int}.
 @end deftp
 
 
-@deffn {Generic Function} cc-slong (@var{INIT})
-@deffnx {Method} cc-slong ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-slong} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} mmec-slong (@var{INIT})
+@deffnx {Method} mmec-slong ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-slong} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{signed long int}.
 @end deffn
 
 
-@defun cc-slong-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-slong}, otherwise return false.
+@defun mmec-slong-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-slong}, otherwise return false.
 @end defun
 
 
-@defun cc-slong-obj @var{CH}
-Given an instance of @objtype{cc-slong}: return the its internal representation as user--pointer
+@defun mmec-slong-obj @var{CH}
+Given an instance of @objtype{mmec-slong}: return the its internal representation as user--pointer
 object.
 @end defun
 
@@ -1244,26 +1244,26 @@ object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-ulong
-@deftpx {Parent Type} cc-unsigned-integer
+@deftp {Object Type} mmec-ulong
+@deftpx {Parent Type} mmec-unsigned-integer
 Object wrapper for the C language type @code{unsigned long int}.
 @end deftp
 
 
-@deffn {Generic Function} cc-ulong (@var{INIT})
-@deffnx {Method} cc-ulong ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-ulong} initialised with @var{INIT}, which
+@deffn {Generic Function} mmec-ulong (@var{INIT})
+@deffnx {Method} mmec-ulong ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-ulong} initialised with @var{INIT}, which
 must be an exact integer object in the range of the C language type @code{unsigned long int}.
 @end deffn
 
 
-@defun cc-ulong-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-ulong}, otherwise return false.
+@defun mmec-ulong-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-ulong}, otherwise return false.
 @end defun
 
 
-@defun cc-ulong-obj @var{CH}
-Given an instance of @objtype{cc-ulong}: return the its internal representation as
+@defun mmec-ulong-obj @var{CH}
+Given an instance of @objtype{mmec-ulong}: return the its internal representation as
 user--pointer object.
 @end defun
 
@@ -1275,28 +1275,28 @@ user--pointer object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-sllong
-@deftpx {Parent Type} cc-signed-integer
+@deftp {Object Type} mmec-sllong
+@deftpx {Parent Type} mmec-signed-integer
 Object wrapper for the C language type @code{signed long long int}.
 @end deftp
 
 
-@deffn {Generic Function} cc-sllong (@var{INIT})
-@deffnx {Method} cc-sllong ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-sllong} initialised with @var{INIT},
+@deffn {Generic Function} mmec-sllong (@var{INIT})
+@deffnx {Method} mmec-sllong ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-sllong} initialised with @var{INIT},
 which must be an exact integer object in the range of the C language type @code{signed long long
 int}.
 @end deffn
 
 
-@defun cc-sllong-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-sllong}, otherwise return
+@defun mmec-sllong-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-sllong}, otherwise return
 false.
 @end defun
 
 
-@defun cc-sllong-obj @var{CH}
-Given an instance of @objtype{cc-sllong}: return the its internal representation as
+@defun mmec-sllong-obj @var{CH}
+Given an instance of @objtype{mmec-sllong}: return the its internal representation as
 user--pointer object.
 @end defun
 
@@ -1308,28 +1308,28 @@ user--pointer object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-ullong
-@deftpx {Parent Type} cc-unsigned-integer
+@deftp {Object Type} mmec-ullong
+@deftpx {Parent Type} mmec-unsigned-integer
 Object wrapper for the C language type @code{unsigned long long int}.
 @end deftp
 
 
-@deffn {Generic Function} cc-ullong (@var{INIT})
-@deffnx {Method} cc-ullong ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-ullong} initialised with @var{INIT},
+@deffn {Generic Function} mmec-ullong (@var{INIT})
+@deffnx {Method} mmec-ullong ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-ullong} initialised with @var{INIT},
 which must be an exact integer object in the range of the C language type @code{unsigned long long
 int}.
 @end deffn
 
 
-@defun cc-ullong-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-ullong}, otherwise return
+@defun mmec-ullong-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-ullong}, otherwise return
 false.
 @end defun
 
 
-@defun cc-ullong-obj @var{CH}
-Given an instance of @objtype{cc-ullong}: return the its internal representation as
+@defun mmec-ullong-obj @var{CH}
+Given an instance of @objtype{mmec-ullong}: return the its internal representation as
 user--pointer object.
 @end defun
 
@@ -1341,26 +1341,26 @@ user--pointer object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-ssize
-@deftpx {Parent Type} cc-signed-integer
+@deftp {Object Type} mmec-ssize
+@deftpx {Parent Type} mmec-signed-integer
 Object wrapper for the C language type @code{ssize_t}.
 @end deftp
 
 
-@deffn {Generic Function} cc-ssize (@var{INIT})
-@deffnx {Method} cc-ssize ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-ssize} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} mmec-ssize (@var{INIT})
+@deffnx {Method} mmec-ssize ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-ssize} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{ssize_t}.
 @end deffn
 
 
-@defun cc-ssize-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-ssize}, otherwise return false.
+@defun mmec-ssize-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-ssize}, otherwise return false.
 @end defun
 
 
-@defun cc-ssize-obj @var{CH}
-Given an instance of @objtype{cc-ssize}: return the its internal representation as user--pointer
+@defun mmec-ssize-obj @var{CH}
+Given an instance of @objtype{mmec-ssize}: return the its internal representation as user--pointer
 object.
 @end defun
 
@@ -1372,26 +1372,26 @@ object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-usize
-@deftpx {Parent Type} cc-unsigned-integer
+@deftp {Object Type} mmec-usize
+@deftpx {Parent Type} mmec-unsigned-integer
 Object wrapper for the C language type @code{size_t}.
 @end deftp
 
 
-@deffn {Generic Function} cc-usize (@var{INIT})
-@deffnx {Method} cc-usize ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-usize} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} mmec-usize (@var{INIT})
+@deffnx {Method} mmec-usize ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-usize} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{size_t}.
 @end deffn
 
 
-@defun cc-usize-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-usize}, otherwise return false.
+@defun mmec-usize-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-usize}, otherwise return false.
 @end defun
 
 
-@defun cc-usize-obj @var{CH}
-Given an instance of @objtype{cc-usize}: return the its internal representation as user--pointer
+@defun mmec-usize-obj @var{CH}
+Given an instance of @objtype{mmec-usize}: return the its internal representation as user--pointer
 object.
 @end defun
 
@@ -1403,26 +1403,26 @@ object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-sintmax
-@deftpx {Parent Type} cc-signed-integer
+@deftp {Object Type} mmec-sintmax
+@deftpx {Parent Type} mmec-signed-integer
 Object wrapper for the C language type @code{intmax_t}.
 @end deftp
 
 
-@deffn {Generic Function} cc-sintmax (@var{INIT})
-@deffnx {Method} cc-sintmax ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-sintmax} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} mmec-sintmax (@var{INIT})
+@deffnx {Method} mmec-sintmax ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-sintmax} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{intmax_t}.
 @end deffn
 
 
-@defun cc-sintmax-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-sintmax}, otherwise return false.
+@defun mmec-sintmax-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-sintmax}, otherwise return false.
 @end defun
 
 
-@defun cc-sintmax-obj @var{CH}
-Given an instance of @objtype{cc-sintmax}: return the its internal representation as user--pointer
+@defun mmec-sintmax-obj @var{CH}
+Given an instance of @objtype{mmec-sintmax}: return the its internal representation as user--pointer
 object.
 @end defun
 
@@ -1434,26 +1434,26 @@ object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-uintmax
-@deftpx {Parent Type} cc-unsigned-integer
+@deftp {Object Type} mmec-uintmax
+@deftpx {Parent Type} mmec-unsigned-integer
 Object wrapper for the C language type @code{uintmax_t}.
 @end deftp
 
 
-@deffn {Generic Function} cc-uintmax (@var{INIT})
-@deffnx {Method} cc-uintmax ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-uintmax} initialised with @var{INIT}, which must be
+@deffn {Generic Function} mmec-uintmax (@var{INIT})
+@deffnx {Method} mmec-uintmax ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-uintmax} initialised with @var{INIT}, which must be
 an exact integer object in the range of the C language type @code{uintmax_t}.
 @end deffn
 
 
-@defun cc-uintmax-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-uintmax}, otherwise return false.
+@defun mmec-uintmax-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-uintmax}, otherwise return false.
 @end defun
 
 
-@defun cc-uintmax-obj @var{CH}
-Given an instance of @objtype{cc-uintmax}: return the its internal representation as user--pointer
+@defun mmec-uintmax-obj @var{CH}
+Given an instance of @objtype{mmec-uintmax}: return the its internal representation as user--pointer
 object.
 @end defun
 
@@ -1465,26 +1465,26 @@ object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-ptrdiff
-@deftpx {Parent Type} cc-signed-integer
+@deftp {Object Type} mmec-ptrdiff
+@deftpx {Parent Type} mmec-signed-integer
 Object wrapper for the C language type @code{ptrdiff_t}.
 @end deftp
 
 
-@deffn {Generic Function} cc-ptrdiff (@var{INIT})
-@deffnx {Method} cc-ptrdiff ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-ptrdiff} initialised with @var{INIT}, which must be
+@deffn {Generic Function} mmec-ptrdiff (@var{INIT})
+@deffnx {Method} mmec-ptrdiff ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-ptrdiff} initialised with @var{INIT}, which must be
 an exact integer object in the range of the C language type @code{ptrdiff_t}.
 @end deffn
 
 
-@defun cc-ptrdiff-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-ptrdiff}, otherwise return false.
+@defun mmec-ptrdiff-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-ptrdiff}, otherwise return false.
 @end defun
 
 
-@defun cc-ptrdiff-obj @var{CH}
-Given an instance of @objtype{cc-ptrdiff}: return the its internal representation as user--pointer
+@defun mmec-ptrdiff-obj @var{CH}
+Given an instance of @objtype{mmec-ptrdiff}: return the its internal representation as user--pointer
 object.
 @end defun
 
@@ -1496,26 +1496,26 @@ object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-sint8
-@deftpx {Parent Type} cc-signed-integer
+@deftp {Object Type} mmec-sint8
+@deftpx {Parent Type} mmec-signed-integer
 Object wrapper for the C language type @code{int8_t}.
 @end deftp
 
 
-@deffn {Generic Function} cc-sint8 (@var{INIT})
-@deffnx {Method} cc-sint8 ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-sint8} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} mmec-sint8 (@var{INIT})
+@deffnx {Method} mmec-sint8 ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-sint8} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{int8_t}.
 @end deffn
 
 
-@defun cc-sint8-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-sint8}, otherwise return false.
+@defun mmec-sint8-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-sint8}, otherwise return false.
 @end defun
 
 
-@defun cc-sint8-obj @var{CH}
-Given an instance of @objtype{cc-sint8}: return the its internal representation as Emacs built--in
+@defun mmec-sint8-obj @var{CH}
+Given an instance of @objtype{mmec-sint8}: return the its internal representation as Emacs built--in
 @code{integer} object.
 @end defun
 
@@ -1527,26 +1527,26 @@ Given an instance of @objtype{cc-sint8}: return the its internal representation 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-uint8
-@deftpx {Parent Type} cc-unsigned-integer
+@deftp {Object Type} mmec-uint8
+@deftpx {Parent Type} mmec-unsigned-integer
 Object wrapper for the C language type @code{uint8_t}.
 @end deftp
 
 
-@deffn {Generic Function} cc-uint8 (@var{INIT})
-@deffnx {Method} cc-uint8 ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-uint8} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} mmec-uint8 (@var{INIT})
+@deffnx {Method} mmec-uint8 ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-uint8} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{uint8_t}.
 @end deffn
 
 
-@defun cc-uint8-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-uint8}, otherwise return false.
+@defun mmec-uint8-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-uint8}, otherwise return false.
 @end defun
 
 
-@defun cc-uint8-obj @var{CH}
-Given an instance of @objtype{cc-uint8}: return the its internal representation as Emacs built--in
+@defun mmec-uint8-obj @var{CH}
+Given an instance of @objtype{mmec-uint8}: return the its internal representation as Emacs built--in
 @code{integer} object.
 @end defun
 
@@ -1558,26 +1558,26 @@ Given an instance of @objtype{cc-uint8}: return the its internal representation 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-sint16
-@deftpx {Parent Type} cc-signed-integer
+@deftp {Object Type} mmec-sint16
+@deftpx {Parent Type} mmec-signed-integer
 Object wrapper for the C language type @code{int16_t}.
 @end deftp
 
 
-@deffn {Generic Function} cc-sint16 (@var{INIT})
-@deffnx {Method} cc-sint16 ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-sint16} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} mmec-sint16 (@var{INIT})
+@deffnx {Method} mmec-sint16 ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-sint16} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{int16_t}.
 @end deffn
 
 
-@defun cc-sint16-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-sint16}, otherwise return false.
+@defun mmec-sint16-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-sint16}, otherwise return false.
 @end defun
 
 
-@defun cc-sint16-obj @var{CH}
-Given an instance of @objtype{cc-sint16}: return the its internal representation as Emacs built--in
+@defun mmec-sint16-obj @var{CH}
+Given an instance of @objtype{mmec-sint16}: return the its internal representation as Emacs built--in
 @code{integer} object.
 @end defun
 
@@ -1589,26 +1589,26 @@ Given an instance of @objtype{cc-sint16}: return the its internal representation
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-uint16
-@deftpx {Parent Type} cc-unsigned-integer
+@deftp {Object Type} mmec-uint16
+@deftpx {Parent Type} mmec-unsigned-integer
 Object wrapper for the C language type @code{uint16_t}.
 @end deftp
 
 
-@deffn {Generic Function} cc-uint16 (@var{INIT})
-@deffnx {Method} cc-uint16 ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-uint16} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} mmec-uint16 (@var{INIT})
+@deffnx {Method} mmec-uint16 ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-uint16} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{uint16_t}.
 @end deffn
 
 
-@defun cc-uint16-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-uint16}, otherwise return false.
+@defun mmec-uint16-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-uint16}, otherwise return false.
 @end defun
 
 
-@defun cc-uint16-obj @var{CH}
-Given an instance of @objtype{cc-uint16}: return the its internal representation as Emacs built--in
+@defun mmec-uint16-obj @var{CH}
+Given an instance of @objtype{mmec-uint16}: return the its internal representation as Emacs built--in
 @code{integer} object.
 @end defun
 
@@ -1620,26 +1620,26 @@ Given an instance of @objtype{cc-uint16}: return the its internal representation
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-sint32
-@deftpx {Parent Type} cc-signed-integer
+@deftp {Object Type} mmec-sint32
+@deftpx {Parent Type} mmec-signed-integer
 Object wrapper for the C language type @code{int32_t}.
 @end deftp
 
 
-@deffn {Generic Function} cc-sint32 (@var{INIT})
-@deffnx {Method} cc-sint32 ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-sint32} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} mmec-sint32 (@var{INIT})
+@deffnx {Method} mmec-sint32 ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-sint32} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{int32_t}.
 @end deffn
 
 
-@defun cc-sint32-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-sint32}, otherwise return false.
+@defun mmec-sint32-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-sint32}, otherwise return false.
 @end defun
 
 
-@defun cc-sint32-obj @var{CH}
-Given an instance of @objtype{cc-sint32}: return the its internal representation as user--pointer
+@defun mmec-sint32-obj @var{CH}
+Given an instance of @objtype{mmec-sint32}: return the its internal representation as user--pointer
 object.
 @end defun
 
@@ -1651,26 +1651,26 @@ object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-uint32
-@deftpx {Parent Type} cc-unsigned-integer
+@deftp {Object Type} mmec-uint32
+@deftpx {Parent Type} mmec-unsigned-integer
 Object wrapper for the C language type @code{uint32_t}.
 @end deftp
 
 
-@deffn {Generic Function} cc-uint32 (@var{INIT})
-@deffnx {Method} cc-uint32 ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-uint32} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} mmec-uint32 (@var{INIT})
+@deffnx {Method} mmec-uint32 ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-uint32} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{uint32_t}.
 @end deffn
 
 
-@defun cc-uint32-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-uint32}, otherwise return false.
+@defun mmec-uint32-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-uint32}, otherwise return false.
 @end defun
 
 
-@defun cc-uint32-obj @var{CH}
-Given an instance of @objtype{cc-uint32}: return the its internal representation as user--pointer
+@defun mmec-uint32-obj @var{CH}
+Given an instance of @objtype{mmec-uint32}: return the its internal representation as user--pointer
 object.
 @end defun
 
@@ -1682,26 +1682,26 @@ object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-sint64
-@deftpx {Parent Type} cc-signed-integer
+@deftp {Object Type} mmec-sint64
+@deftpx {Parent Type} mmec-signed-integer
 Object wrapper for the C language type @code{int64_t}.
 @end deftp
 
 
-@deffn {Generic Function} cc-sint64 (@var{INIT})
-@deffnx {Method} cc-sint64 ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-sint64} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} mmec-sint64 (@var{INIT})
+@deffnx {Method} mmec-sint64 ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-sint64} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{int64_t}.
 @end deffn
 
 
-@defun cc-sint64-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-sint64}, otherwise return false.
+@defun mmec-sint64-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-sint64}, otherwise return false.
 @end defun
 
 
-@defun cc-sint64-obj @var{CH}
-Given an instance of @objtype{cc-sint64}: return the its internal representation as user--pointer
+@defun mmec-sint64-obj @var{CH}
+Given an instance of @objtype{mmec-sint64}: return the its internal representation as user--pointer
 object.
 @end defun
 
@@ -1713,26 +1713,26 @@ object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-uint64
-@deftpx {Parent Type} cc-unsigned-integer
+@deftp {Object Type} mmec-uint64
+@deftpx {Parent Type} mmec-unsigned-integer
 Object wrapper for the C language type @code{uint64_t}.
 @end deftp
 
 
-@deffn {Generic Function} cc-uint64 (@var{INIT})
-@deffnx {Method} cc-uint64 ((@var{INIT} integer))
-Build and return a new instance of @objtype{cc-uint64} initialised with @var{INIT}, which must be an
+@deffn {Generic Function} mmec-uint64 (@var{INIT})
+@deffnx {Method} mmec-uint64 ((@var{INIT} integer))
+Build and return a new instance of @objtype{mmec-uint64} initialised with @var{INIT}, which must be an
 exact integer object in the range of the C language type @code{uint64_t}.
 @end deffn
 
 
-@defun cc-uint64-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-uint64}, otherwise return false.
+@defun mmec-uint64-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-uint64}, otherwise return false.
 @end defun
 
 
-@defun cc-uint64-obj @var{CH}
-Given an instance of @objtype{cc-uint64}: return the its internal representation as user--pointer
+@defun mmec-uint64-obj @var{CH}
+Given an instance of @objtype{mmec-uint64}: return the its internal representation as user--pointer
 object.
 @end defun
 
@@ -1744,26 +1744,26 @@ object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-float
-@deftpx {Parent Type} cc-floating-point
+@deftp {Object Type} mmec-float
+@deftpx {Parent Type} mmec-floating-point
 Object wrapper for the C language type @code{float}.
 @end deftp
 
 
-@deffn {Generic Function} cc-float (@var{INIT})
-@deffnx {Method} cc-float ((@var{INIT} float))
-Build and return a new instance of @objtype{cc-float} initialised with @var{INIT}, which must be a
+@deffn {Generic Function} mmec-float (@var{INIT})
+@deffnx {Method} mmec-float ((@var{INIT} float))
+Build and return a new instance of @objtype{mmec-float} initialised with @var{INIT}, which must be a
 floating--point object in the range of the C language type @code{float}.
 @end deffn
 
 
-@defun cc-float-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-float}, otherwise return false.
+@defun mmec-float-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-float}, otherwise return false.
 @end defun
 
 
-@defun cc-float-obj @var{CH}
-Given an instance of @objtype{cc-float}: return the its internal representation as user--pointer
+@defun mmec-float-obj @var{CH}
+Given an instance of @objtype{mmec-float}: return the its internal representation as user--pointer
 object.
 @end defun
 
@@ -1775,26 +1775,26 @@ object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-double
-@deftpx {Parent Type} cc-floating-point
+@deftp {Object Type} mmec-double
+@deftpx {Parent Type} mmec-floating-point
 Object wrapper for the C language type @code{double}.
 @end deftp
 
 
-@deffn {Generic Function} cc-double (@var{INIT})
-@deffnx {Method} cc-double ((@var{INIT} float))
-Build and return a new instance of @objtype{cc-double} initialised with @var{INIT}, which must be a
+@deffn {Generic Function} mmec-double (@var{INIT})
+@deffnx {Method} mmec-double ((@var{INIT} float))
+Build and return a new instance of @objtype{mmec-double} initialised with @var{INIT}, which must be a
 floating--point object in the range of the C language type @code{double}.
 @end deffn
 
 
-@defun cc-double-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-double}, otherwise return false.
+@defun mmec-double-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-double}, otherwise return false.
 @end defun
 
 
-@defun cc-double-obj @var{CH}
-Given an instance of @objtype{cc-double}: return the its internal representation as Emacs built--in
+@defun mmec-double-obj @var{CH}
+Given an instance of @objtype{mmec-double}: return the its internal representation as Emacs built--in
 @code{float}.
 @end defun
 
@@ -1806,26 +1806,26 @@ Given an instance of @objtype{cc-double}: return the its internal representation
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} cc-ldouble
-@deftpx {Parent Type} cc-floating-point
+@deftp {Object Type} mmec-ldouble
+@deftpx {Parent Type} mmec-floating-point
 Object wrapper for the C language type @code{long double}.
 @end deftp
 
 
-@deffn {Generic Function} cc-ldouble (@var{INIT})
-@deffnx {Method} cc-ldouble ((@var{INIT} float))
-Build and return a new instance of @objtype{cc-ldouble} initialised with @var{INIT}, which must
+@deffn {Generic Function} mmec-ldouble (@var{INIT})
+@deffnx {Method} mmec-ldouble ((@var{INIT} float))
+Build and return a new instance of @objtype{mmec-ldouble} initialised with @var{INIT}, which must
 be a floating--point object in the range of the C language type @code{long double}.
 @end deffn
 
 
-@defun cc-ldouble-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{cc-ldouble}, otherwise return false.
+@defun mmec-ldouble-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-ldouble}, otherwise return false.
 @end defun
 
 
-@defun cc-ldouble-obj @var{CH}
-Given an instance of @objtype{cc-ldouble}: return the its internal representation as
+@defun mmec-ldouble-obj @var{CH}
+Given an instance of @objtype{mmec-ldouble}: return the its internal representation as
 user--pointer object.
 @end defun
 
@@ -1839,24 +1839,24 @@ follows:
 
 @itemize
 @item
-We convert all the signed integers to @objtype{cc-sint64}.
+We convert all the signed integers to @objtype{mmec-sint64}.
 
 @item
-We convert all the unsigned integers to @objtype{cc-uint64}.
+We convert all the unsigned integers to @objtype{mmec-uint64}.
 
 @item
-We convert all the floating--point numbers to @objtype{cc-ldouble}.
+We convert all the floating--point numbers to @objtype{mmec-ldouble}.
 
 @item
 When comparing integers and floating--point numbers we convert all the integer types to
-@objtype{cc-ldouble}.
+@objtype{mmec-ldouble}.
 @end itemize
 
 @c ------------------------------------------------------------------------
 
 
 @macro mmuxDefunNumericComparisonMethod{OPERATOR, TYPE1, TYPE2}
-@deffn {Method} cc-2\OPERATOR\ ((@vari{op} \TYPE1\) (@varii{op} \TYPE2\))
+@deffn {Method} mmec-2\OPERATOR\ ((@vari{op} \TYPE1\) (@varii{op} \TYPE2\))
 Return true if @vari{OP} \OPERATOR\ @varii{OP}; otherwise return false.
 @end deffn
 
@@ -1866,11 +1866,11 @@ Return true if @vari{OP} \OPERATOR\ @varii{OP}; otherwise return false.
 @macro mmuxDefunNumericComparisonFunction{OPERATOR, OPERATIONDESCRIPTION}
 @defun cc\OPERATOR\ @var{OP} &rest @var{ops}
 Return true if all the operands are \OPERATIONDESCRIPTION\, left to right; otherwise return false.
-The comparison is performed with the generic function @func{cc-2\OPERATOR\}.
+The comparison is performed with the generic function @func{mmec-2\OPERATOR\}.
 @end defun
 
 
-@deffn {Generic Function} {cc-2\OPERATOR\} (@vari{OP} @varii{OP})
+@deffn {Generic Function} {mmec-2\OPERATOR\} (@vari{OP} @varii{OP})
 Return true if @vari{OP} \OPERATOR\ @varii{OP}; otherwise return false.
 @end deffn
 
@@ -1881,56 +1881,56 @@ Return true if @vari{OP} \OPERATOR\ @varii{OP}; otherwise return false.
 @mmuxDefunNumericComparisonMethod{\OPERATOR\, float,   float}
 
 @c These are the methods that actually do the operation on custom user-pointer objects.
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-sint64, cc-sint64}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-uint64, cc-uint64}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-sint64, cc-uint64}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-uint64, cc-sint64}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-ldouble, cc-ldouble}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-sint64, mmec-sint64}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-uint64, mmec-uint64}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-sint64, mmec-uint64}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-uint64, mmec-sint64}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-ldouble, mmec-ldouble}
 
 @c These are the methods that normalise operands among operational types.
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-sint64, cc-ldouble}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-uint64, cc-ldouble}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-ldouble, cc-sint64}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-ldouble, cc-uint64}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-sint64, mmec-ldouble}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-uint64, mmec-ldouble}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-ldouble, mmec-sint64}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-ldouble, mmec-uint64}
 
 @c These are the methods that normalise among integer types.
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-signed-integer,   cc-signed-integer}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-unsigned-integer, cc-unsigned-integer}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-signed-integer,   cc-unsigned-integer}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-unsigned-integer, cc-signed-integer}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-signed-integer,   mmec-signed-integer}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-unsigned-integer, mmec-unsigned-integer}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-signed-integer,   mmec-unsigned-integer}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-unsigned-integer, mmec-signed-integer}
 
 @c These are the methods that normalise among floating point types.
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-floating-point, cc-floating-point}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-floating-point, mmec-floating-point}
 
-@c These are the methods that normalise mixed numeric types: `cc-floating-point', `cc-signed-integer', `cc-unsigned-intger'.
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-floating-point,   cc-signed-integer}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-signed-integer,   cc-floating-point}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-floating-point,   cc-unsigned-integer}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-unsigned-integer, cc-floating-point}
+@c These are the methods that normalise mixed numeric types: `mmec-floating-point', `mmec-signed-integer', `mmec-unsigned-intger'.
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-floating-point,   mmec-signed-integer}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-signed-integer,   mmec-floating-point}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-floating-point,   mmec-unsigned-integer}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-unsigned-integer, mmec-floating-point}
 
-@c These are the methods that normalise mixed numeric types: `integer' and `cc-floating-point'.
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, integer, cc-floating-point}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-floating-point, integer}
+@c These are the methods that normalise mixed numeric types: `integer' and `mmec-floating-point'.
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, integer, mmec-floating-point}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-floating-point, integer}
 
-@c These are the methods that normalise mixed numeric types: `integer' and `cc-signed-integer'.
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, integer, cc-signed-integer}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-signed-integer, integer}
+@c These are the methods that normalise mixed numeric types: `integer' and `mmec-signed-integer'.
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, integer, mmec-signed-integer}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-signed-integer, integer}
 
-@c These are the methods that normalise mixed numeric types: `integer' and `cc-unsigned-integer'.
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, integer, cc-unsigned-integer}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-unsigned-integer, integer}
+@c These are the methods that normalise mixed numeric types: `integer' and `mmec-unsigned-integer'.
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, integer, mmec-unsigned-integer}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-unsigned-integer, integer}
 
-@c These are the methods that normalise mixed numeric types: `float' and `cc-floating-point'.
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, float, cc-floating-point}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-floating-point, float}
+@c These are the methods that normalise mixed numeric types: `float' and `mmec-floating-point'.
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, float, mmec-floating-point}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-floating-point, float}
 
-@c These are the methods that normalise mixed numeric types: `float' and `cc-signed-integer'.
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, float, cc-signed-integer}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-signed-integer, float}
+@c These are the methods that normalise mixed numeric types: `float' and `mmec-signed-integer'.
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, float, mmec-signed-integer}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-signed-integer, float}
 
-@c These are the methods that normalise mixed numeric types: `float' and `cc-unsigned-integer'.
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, float, cc-unsigned-integer}
-@mmuxDefunNumericComparisonMethod{\OPERATOR\, cc-unsigned-integer, float}
+@c These are the methods that normalise mixed numeric types: `float' and `mmec-unsigned-integer'.
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, float, mmec-unsigned-integer}
+@mmuxDefunNumericComparisonMethod{\OPERATOR\, mmec-unsigned-integer, float}
 @end macro
 
 @c ------------------------------------------------------------------------
@@ -2003,7 +2003,7 @@ Return true if @vari{OP} \OPERATOR\ @varii{OP}; otherwise return false.
 @section Type definition
 
 
-@deftp {Object Type} cc-bytevector
+@deftp {Object Type} mmec-bytevector
 Base type of bytevector objects: it can represent binary data with a C language array.  Objects of
 this type are correctly garbage collected.  It has the following fields:
 
@@ -2023,10 +2023,10 @@ Pointer object.
 @end deftp
 
 
-@deftp {Object Type} cc-integer-bytevector
-@deftpx {Parent Type} cc-bytevector
+@deftp {Object Type} mmec-integer-bytevector
+@deftpx {Parent Type} mmec-bytevector
 Base type of bytevector objects holding C language integers in their slots.  Objects of this type
-are correctly garbage collected.  In addition to the slots of @objtype{cc-bytevector}, it has the
+are correctly garbage collected.  In addition to the slots of @objtype{mmec-bytevector}, it has the
 following fields:
 
 @table @code
@@ -2037,90 +2037,90 @@ be interpreted as an unsigned integer.
 @end deftp
 
 
-@deftp {Object Type} cc-float-bytevector
-@deftpx {Parent Type} cc-bytevector
+@deftp {Object Type} mmec-float-bytevector
+@deftpx {Parent Type} mmec-bytevector
 Base type of bytevector objects holding C language floating--point values in their slots.  Objects
 of this type are correctly garbage collected.
 @end deftp
 
 @c ------------------------------------------------------------------------
 
-@deftp {Object Type} cc-bytevector-u8
-@deftpx {Parent Type} cc-integer-bytevector
+@deftp {Object Type} mmec-bytevector-u8
+@deftpx {Parent Type} mmec-integer-bytevector
 Type of bytevector objects holding C language integer of type @code{uint8_t} in their slots.
 Objects of this type are correctly garbage collected.
 @end deftp
 
 
-@deftp {Object Type} cc-bytevector-s8
-@deftpx {Parent Type} cc-integer-bytevector
+@deftp {Object Type} mmec-bytevector-s8
+@deftpx {Parent Type} mmec-integer-bytevector
 Type of bytevector objects holding C language integer of type @code{int8_t} in their slots.  Objects
 of this type are correctly garbage collected.
 @end deftp
 
 @c ------------------------------------------------------------------------
 
-@deftp {Object Type} cc-bytevector-u16
-@deftpx {Parent Type} cc-integer-bytevector
+@deftp {Object Type} mmec-bytevector-u16
+@deftpx {Parent Type} mmec-integer-bytevector
 Type of bytevector objects holding C language integer of type @code{uint16_t} in their slots.
 Objects of this type are correctly garbage collected.
 @end deftp
 
 
-@deftp {Object Type} cc-bytevector-s16
-@deftpx {Parent Type} cc-integer-bytevector
+@deftp {Object Type} mmec-bytevector-s16
+@deftpx {Parent Type} mmec-integer-bytevector
 Type of bytevector objects holding C language integer of type @code{int16_t} in their slots.
 Objects of this type are correctly garbage collected.
 @end deftp
 
 @c ------------------------------------------------------------------------
 
-@deftp {Object Type} cc-bytevector-u32
-@deftpx {Parent Type} cc-integer-bytevector
+@deftp {Object Type} mmec-bytevector-u32
+@deftpx {Parent Type} mmec-integer-bytevector
 Type of bytevector objects holding C language integer of type @code{uint32_t} in their slots.
 Objects of this type are correctly garbage collected.
 @end deftp
 
 
-@deftp {Object Type} cc-bytevector-s32
-@deftpx {Parent Type} cc-integer-bytevector
+@deftp {Object Type} mmec-bytevector-s32
+@deftpx {Parent Type} mmec-integer-bytevector
 Type of bytevector objects holding C language integer of type @code{int32_t} in their slots.
 Objects of this type are correctly garbage collected.
 @end deftp
 
 @c ------------------------------------------------------------------------
 
-@deftp {Object Type} cc-bytevector-u64
-@deftpx {Parent Type} cc-integer-bytevector
+@deftp {Object Type} mmec-bytevector-u64
+@deftpx {Parent Type} mmec-integer-bytevector
 Type of bytevector objects holding C language integer of type @code{uint64_t} in their slots.
 Objects of this type are correctly garbage collected.
 @end deftp
 
 
-@deftp {Object Type} cc-bytevector-s64
-@deftpx {Parent Type} cc-integer-bytevector
+@deftp {Object Type} mmec-bytevector-s64
+@deftpx {Parent Type} mmec-integer-bytevector
 Type of bytevector objects holding C language integer of type @code{int64_t} in their slots.
 Objects of this type are correctly garbage collected.
 @end deftp
 
 @c ------------------------------------------------------------------------
 
-@deftp {Object Type} cc-bytevector-float
-@deftpx {Parent Type} cc-float-bytevector
+@deftp {Object Type} mmec-bytevector-float
+@deftpx {Parent Type} mmec-float-bytevector
 Type of bytevector objects holding C language values of type @code{float} in their slots.  Objects
 of this type are correctly garbage collected.
 @end deftp
 
 
-@deftp {Object Type} cc-bytevector-double
-@deftpx {Parent Type} cc-float-bytevector
+@deftp {Object Type} mmec-bytevector-double
+@deftpx {Parent Type} mmec-float-bytevector
 Type of bytevector objects holding C language values of type @code{double} in their slots.  Objects
 of this type are correctly garbage collected.
 @end deftp
 
 
-@deftp {Object Type} cc-bytevector-ldouble
-@deftpx {Parent Type} cc-float-bytevector
+@deftp {Object Type} mmec-bytevector-ldouble
+@deftpx {Parent Type} mmec-float-bytevector
 Type of bytevector objects holding C language values of type @code{long double} in their slots.
 Objects of this type are correctly garbage collected.
 @end deftp
@@ -2130,78 +2130,78 @@ Objects of this type are correctly garbage collected.
 @section Type predicates
 
 
-@defun cc-bytevector-p @var{OBJ}
-Return true if @var{OBJ} is an instance of @objtype{cc-bytevector}; otherwise return false.
+@defun mmec-bytevector-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{mmec-bytevector}; otherwise return false.
 @end defun
 
 
-@defun cc-integer-bytevector-p @var{OBJ}
-Return true if @var{OBJ} is an instance of @objtype{cc-integer-bytevector}; otherwise return false.
+@defun mmec-integer-bytevector-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{mmec-integer-bytevector}; otherwise return false.
 @end defun
 
 
-@defun cc-float-bytevector-p @var{OBJ}
-Return true if @var{OBJ} is an instance of @objtype{cc-float-bytevector}; otherwise return false.
-@end defun
-
-@c ------------------------------------------------------------------------
-
-@defun cc-bytevector-u8-p @var{OBJ}
-Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-u8}; otherwise return false.
-@end defun
-
-
-@defun cc-bytevector-s8-p @var{OBJ}
-Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-s8}; otherwise return false.
+@defun mmec-float-bytevector-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{mmec-float-bytevector}; otherwise return false.
 @end defun
 
 @c ------------------------------------------------------------------------
 
-@defun cc-bytevector-u16-p @var{OBJ}
-Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-u16}; otherwise return false.
+@defun mmec-bytevector-u8-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{mmec-bytevector-u8}; otherwise return false.
 @end defun
 
 
-@defun cc-bytevector-s16-p @var{OBJ}
-Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-s16}; otherwise return false.
-@end defun
-
-@c ------------------------------------------------------------------------
-
-@defun cc-bytevector-u32-p @var{OBJ}
-Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-u32}; otherwise return false.
-@end defun
-
-
-@defun cc-bytevector-s32-p @var{OBJ}
-Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-s32}; otherwise return false.
+@defun mmec-bytevector-s8-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{mmec-bytevector-s8}; otherwise return false.
 @end defun
 
 @c ------------------------------------------------------------------------
 
-@defun cc-bytevector-u64-p @var{OBJ}
-Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-u64}; otherwise return false.
+@defun mmec-bytevector-u16-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{mmec-bytevector-u16}; otherwise return false.
 @end defun
 
 
-@defun cc-bytevector-s64-p @var{OBJ}
-Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-s64}; otherwise return false.
+@defun mmec-bytevector-s16-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{mmec-bytevector-s16}; otherwise return false.
 @end defun
 
 @c ------------------------------------------------------------------------
 
-@defun cc-bytevector-float-p @var{OBJ}
-Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-float}; otherwise return false.
+@defun mmec-bytevector-u32-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{mmec-bytevector-u32}; otherwise return false.
 @end defun
 
 
-@defun cc-bytevector-double-p @var{OBJ}
-Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-double}; otherwise return false.
+@defun mmec-bytevector-s32-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{mmec-bytevector-s32}; otherwise return false.
+@end defun
+
+@c ------------------------------------------------------------------------
+
+@defun mmec-bytevector-u64-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{mmec-bytevector-u64}; otherwise return false.
 @end defun
 
 
-@defun cc-bytevector-ldouble-p @var{OBJ}
-Return true if @var{OBJ} is an instance of @objtype{cc-bytevector-ldouble}; otherwise return
+@defun mmec-bytevector-s64-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{mmec-bytevector-s64}; otherwise return false.
+@end defun
+
+@c ------------------------------------------------------------------------
+
+@defun mmec-bytevector-float-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{mmec-bytevector-float}; otherwise return false.
+@end defun
+
+
+@defun mmec-bytevector-double-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{mmec-bytevector-double}; otherwise return false.
+@end defun
+
+
+@defun mmec-bytevector-ldouble-p @var{OBJ}
+Return true if @var{OBJ} is an instance of @objtype{mmec-bytevector-ldouble}; otherwise return
 false.
 @end defun
 
@@ -2210,48 +2210,48 @@ false.
 @section Bytevector getters
 
 
-@deffn {Generic Function} cc-bytevector-ref (@var{BV} @var{IDX})
+@deffn {Generic Function} mmec-bytevector-ref (@var{BV} @var{IDX})
 Extract the value at index @var{IDX} from the bytevector @var{BV}.
 @end deffn
 
 
-@deffn {Method} cc-bytevector-ref ((@var{BV} cc-bytevector-u8) (@var{IDX} cc-usize))
-Extract an @code{uint8_t} value from a bytevector and wrap it into a @objtype{cc-uint8} object.
+@deffn {Method} mmec-bytevector-ref ((@var{BV} mmec-bytevector-u8) (@var{IDX} mmec-usize))
+Extract an @code{uint8_t} value from a bytevector and wrap it into a @objtype{mmec-uint8} object.
 @end deffn
 
 
-@deffn {Method} cc-bytevector-ref ((@var{BV} cc-bytevector-s8) (@var{IDX} cc-usize))
-Extract an @code{int8_t} value from a bytevector and wrap it into a @objtype{cc-sint8} object.
+@deffn {Method} mmec-bytevector-ref ((@var{BV} mmec-bytevector-s8) (@var{IDX} mmec-usize))
+Extract an @code{int8_t} value from a bytevector and wrap it into a @objtype{mmec-sint8} object.
 @end deffn
 
 
-@deffn {Method} cc-bytevector-ref ((@var{BV} cc-bytevector-u16) (@var{IDX} cc-usize))
-Extract an @code{uint16_t} value from a bytevector and wrap it into a @objtype{cc-uin1t16} object.
+@deffn {Method} mmec-bytevector-ref ((@var{BV} mmec-bytevector-u16) (@var{IDX} mmec-usize))
+Extract an @code{uint16_t} value from a bytevector and wrap it into a @objtype{mmec-uin1t16} object.
 @end deffn
 
 
-@deffn {Method} cc-bytevector-ref ((@var{BV} cc-bytevector-s16) (@var{IDX} cc-usize))
-Extract an @code{int16_t} value from a bytevector and wrap it into a @objtype{cc-sint16} object.
+@deffn {Method} mmec-bytevector-ref ((@var{BV} mmec-bytevector-s16) (@var{IDX} mmec-usize))
+Extract an @code{int16_t} value from a bytevector and wrap it into a @objtype{mmec-sint16} object.
 @end deffn
 
 
-@deffn {Method} cc-bytevector-ref ((@var{BV} cc-bytevector-u32) (@var{IDX} cc-usize))
-Extract an @code{uint32_t} value from a bytevector and wrap it into a @objtype{cc-uint32} object.
+@deffn {Method} mmec-bytevector-ref ((@var{BV} mmec-bytevector-u32) (@var{IDX} mmec-usize))
+Extract an @code{uint32_t} value from a bytevector and wrap it into a @objtype{mmec-uint32} object.
 @end deffn
 
 
-@deffn {Method} cc-bytevector-ref ((@var{BV} cc-bytevector-s32) (@var{IDX} cc-usize))
-Extract an @code{int32_t} value from a bytevector and wrap it into a @objtype{cc-sint32} object.
+@deffn {Method} mmec-bytevector-ref ((@var{BV} mmec-bytevector-s32) (@var{IDX} mmec-usize))
+Extract an @code{int32_t} value from a bytevector and wrap it into a @objtype{mmec-sint32} object.
 @end deffn
 
 
-@deffn {Method} cc-bytevector-ref ((@var{BV} cc-bytevector-u64) (@var{IDX} cc-usize))
-Extract an @code{uint64_t} value from a bytevector and wrap it into a @objtype{cc-uint64} object.
+@deffn {Method} mmec-bytevector-ref ((@var{BV} mmec-bytevector-u64) (@var{IDX} mmec-usize))
+Extract an @code{uint64_t} value from a bytevector and wrap it into a @objtype{mmec-uint64} object.
 @end deffn
 
 
-@deffn {Method} cc-bytevector-ref ((@var{BV} cc-bytevector-s64) (@var{IDX} cc-usize))
-Extract an @code{int64_t} value from a bytevector and wrap it into a @objtype{cc-sint64} object.
+@deffn {Method} mmec-bytevector-ref ((@var{BV} mmec-bytevector-s64) (@var{IDX} mmec-usize))
+Extract an @code{int64_t} value from a bytevector and wrap it into a @objtype{mmec-sint64} object.
 @end deffn
 
 @c page
@@ -2259,47 +2259,47 @@ Extract an @code{int64_t} value from a bytevector and wrap it into a @objtype{cc
 @section Bytevector setters
 
 
-@deffn {Generic Function} cc-bytevector-set! (bv idx val)
+@deffn {Generic Function} mmec-bytevector-set! (bv idx val)
 Store the value @var{VAL} into the bytevector @var{BV} at index @var{idx}.
 @end deffn
 
 
-@deffn {Method} cc-bytevector-set! ((@var{BV} cc-bytevector-u8) (@var{IDX} cc-usize) (@var{VAL} cc-uint8))
+@deffn {Method} mmec-bytevector-set! ((@var{BV} mmec-bytevector-u8) (@var{IDX} mmec-usize) (@var{VAL} mmec-uint8))
 Store the value @var{VAL} of type @code{uint8_t} into the bytevector @var{BV} at index @var{IDX}.
 @end deffn
 
 
-@deffn {Method} cc-bytevector-set! ((@var{BV} cc-bytevector-s8) (@var{IDX} cc-usize) (@var{VAL} cc-sint8))
+@deffn {Method} mmec-bytevector-set! ((@var{BV} mmec-bytevector-s8) (@var{IDX} mmec-usize) (@var{VAL} mmec-sint8))
 Store the value @var{VAL} of type @code{int8_t} into the bytevector @var{BV} at index @var{IDX}.
 @end deffn
 
 
-@deffn {Method} cc-bytevector-set! ((@var{BV} cc-bytevector-u16) (@var{IDX} cc-usize) (@var{VAL} cc-uint16))
+@deffn {Method} mmec-bytevector-set! ((@var{BV} mmec-bytevector-u16) (@var{IDX} mmec-usize) (@var{VAL} mmec-uint16))
 Store the value @var{VAL} of type @code{uint16_t} into the bytevector @var{BV} at index @var{IDX}.
 @end deffn
 
 
-@deffn {Method} cc-bytevector-set! ((@var{BV} cc-bytevector-s16) (@var{IDX} cc-usize) (@var{VAL} cc-sint16))
+@deffn {Method} mmec-bytevector-set! ((@var{BV} mmec-bytevector-s16) (@var{IDX} mmec-usize) (@var{VAL} mmec-sint16))
 Store the value @var{VAL} of type @code{int16_t} into the bytevector @var{BV} at index @var{IDX}.
 @end deffn
 
 
-@deffn {Method} cc-bytevector-set! ((@var{BV} cc-bytevector-u32) (@var{IDX} cc-usize) (@var{VAL} cc-uint32))
+@deffn {Method} mmec-bytevector-set! ((@var{BV} mmec-bytevector-u32) (@var{IDX} mmec-usize) (@var{VAL} mmec-uint32))
 Store the value @var{VAL} of type @code{uint32_t} into the bytevector @var{BV} at index @var{IDX}.
 @end deffn
 
 
-@deffn {Method} cc-bytevector-set! ((@var{BV} cc-bytevector-s32) (@var{IDX} cc-usize) (@var{VAL} cc-sint32))
+@deffn {Method} mmec-bytevector-set! ((@var{BV} mmec-bytevector-s32) (@var{IDX} mmec-usize) (@var{VAL} mmec-sint32))
 Store the value @var{VAL} of type @code{int32_t} into the bytevector @var{BV} at index @var{IDX}.
 @end deffn
 
 
-@deffn {Method} cc-bytevector-set! ((@var{BV} cc-bytevector-u64) (@var{IDX} cc-usize) (@var{VAL} cc-uint64))
+@deffn {Method} mmec-bytevector-set! ((@var{BV} mmec-bytevector-u64) (@var{IDX} mmec-usize) (@var{VAL} mmec-uint64))
 Store the value @var{VAL} of type @code{uint64_t} into the bytevector @var{BV} at index @var{IDX}.
 @end deffn
 
 
-@deffn {Method} cc-bytevector-set! ((@var{BV} cc-bytevector-s64) (@var{IDX} cc-usize) (@var{VAL} cc-sint64))
+@deffn {Method} mmec-bytevector-set! ((@var{BV} mmec-bytevector-s64) (@var{IDX} mmec-usize) (@var{VAL} mmec-sint64))
 Store the value @var{VAL} of type @code{int64_t} into the bytevector @var{BV} at index @var{IDX}.
 @end deffn
 

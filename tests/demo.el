@@ -20,15 +20,15 @@
 ;;; Code:
 
 (require 'ert)
-(require 'cc-number-objects)
+(require 'mmec-number-objects)
 
 
 ;;;; demo tests
 
 (ert-deftest demo ()
   "Demo test."
-  (cc-debug-print (cc-wchar 1))
-  (should (cc= (cc-wchar 1) (cc-wchar 1)))
+  (mmec-debug-print (mmec-wchar 1))
+  (should (cc= (mmec-wchar 1) (mmec-wchar 1)))
   nil)
 
 

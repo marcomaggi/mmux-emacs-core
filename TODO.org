@@ -5,6 +5,7 @@
 * Add documentation for all the numeric types constructors.
 * Add bytevector types for all the integer numbers.
 * Add bytevector types for all the floating-point numbers.
+* Add printer functions for all the number types.
 * Local Variables
 
 # Local Variables:

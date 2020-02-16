@@ -73,10 +73,11 @@
 @c ------------------------------------------------------------
 
 @copying
-This package installs a @gnu{} Emacs module on top of a C11 language library providing basic
-infrastructure to write dynamic modules for Emacs.
+This package installs a @gnu{} Emacs module, written in Emacs Lisp, on top of a C11 language library
+implementing an Emacs dynamic module; these modules provide basic infrastructure to write dynamic
+modules for Emacs, especially interfaces to foreign C language libraries.
 
-The library supports @posix{} platforms.  This package is meant to work with @gnu{} Emacs version
+This package supports @posix{} platforms.  This package is meant to work with @gnu{} Emacs version
 @value{RequiredEmacsVersion}.  This package depends upon the external packages: @code{cl-lib}. To
 run the test suite: this package requires the @code{ert} package.
 
@@ -179,9 +180,10 @@ External documents
 @chapter Overview of the package
 
 
-This document describes version @value{VERSION} of @value{PACKAGE}, a @gnu{} Emacs module
-implemented on top of a C11 language library; it provides basic infrastructure to write dynamic
-modules for Emacs.
+This document describes version @value{VERSION} of @value{PACKAGE}; this package installs a @gnu{}
+Emacs module, written in Emacs Lisp, on top of a C11 language library implementing an Emacs dynamic
+module; these modules provide basic infrastructure to write dynamic modules for Emacs, especially
+interfaces to foreign C language libraries.
 
 This package supports @posix{} platforms.  This package is meant to work with @gnu{} Emacs version
 @value{RequiredEmacsVersion}.  This package depends upon the external packages: @code{cl-lib}.  To

@@ -20,14 +20,15 @@ Topics
 1. Introduction
 ---------------
 
-This  package installs  a GNU  Emacs  module on  top of  a C11  language
-library  providing basic  infrastructure  to write  dynamic modules  for
-Emacs.
+This package installs a GNU Emacs  module, written in Emacs Lisp, on top
+of a  C11 language library  implementing an Emacs dynamic  module; these
+modules provide basic infrastructure to write dynamic modules for Emacs,
+especially interfaces to foreign C language libraries.
 
-  The library targets POSIX systems.  This package is meant to work with
-GNU Emacs version 26+.  This package depends upon the external packages:
-"cl-lib".   To run  the  test  suite: this  package  requires the  "ert"
-package.
+  This package  targets POSIX  systems.  This package  is meant  to work
+with  GNU Emacs  version 26+.   This package  depends upon  the external
+packages: "cl-lib".   To run the  test suite: this package  requires the
+"ert" package.
 
   The package uses the GNU Autotools  and it is tested, using Travis CI,
 on both Ubuntu  GNU+Linux systems and OS X systems.   The package relies

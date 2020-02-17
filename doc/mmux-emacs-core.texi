@@ -272,10 +272,6 @@ Return an integer representing the library interface current age.
 @section Size of common C language types
 
 
-The following syntactic bindings are defined in the module @file{mmec-constants}, which is required by
-@value{PackageEmacsModule}.
-
-
 @deftypevr {Constant} integer mmec-SIZEOF_CHAR
 Size of @code{char} measured in bytes.
 @end deftypevr
@@ -443,10 +439,6 @@ Size of @code{long double} measured in bytes.
 @c page
 @node constants limits
 @section Ranges representable by C language types
-
-
-The following syntactic bindings are defined in the module @file{mmec-constants}, which is required by
-@value{PackageEmacsModule}.
 
 
 @deftypevr {Constant} integer mmec-SCHAR_MIN
@@ -686,10 +678,6 @@ Exact integer representing the maximum value representable by a @code{uint64_t}.
 @c page
 @node constants float
 @section Constants related to floating--point numbers
-
-
-The following syntactic bindings are defined in the module @file{mmec-constants}, which is required by
-@value{PackageEmacsModule}.
 
 
 @defvr {Constant} mmec-FLT_ROUNDS

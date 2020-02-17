@@ -72,6 +72,7 @@ libmmux_emacs_core_la_SOURCES	= \
 	src/mmux-emacs-core-internals.h			\
 	src/mmux-emacs-core-library.c			\
 	src/mmux-emacs-core-numbers.c			\
+	src/mmux-emacs-core-constants.c			\
 	src/mmux-emacs-core-bytevectors.c		\
 	src/mmux-emacs-core-errors.c
 
@@ -82,8 +83,8 @@ MMUX_EMACS_CORE_OBJ_PREREQ	= \
 
 src/mmux-emacs-core-errors.$(OBJEXT):			$(MMUX_EMACS_CORE_OBJ_PREREQ)
 src/mmux-emacs-core-library.$(OBJEXT):			$(MMUX_EMACS_CORE_OBJ_PREREQ)
-src/mmux-emacs-core-user-pointer-objects.$(OBJEXT):	$(MMUX_EMACS_CORE_OBJ_PREREQ)
 src/mmux-emacs-core-numbers.$(OBJEXT):			$(MMUX_EMACS_CORE_OBJ_PREREQ)
+src/mmux-emacs-core-constants.$(OBJEXT):		$(MMUX_EMACS_CORE_OBJ_PREREQ)
 src/mmux-emacs-core-bytevectors.$(OBJEXT):		$(MMUX_EMACS_CORE_OBJ_PREREQ)
 
 .PHONY: library
@@ -98,32 +99,35 @@ library: libmmux-emacs-core.la
 AM_ELCFLAGS	= --quick --directory $(builddir)/src --directory $(PWD)/.libs $(MMUX_EMACS_ELCFLAGS)
 
 dist_lisp_LISP	= \
-	src/mmec-constants.el				\
 	src/mmec-basics.el				\
 	src/mmec-number-objects.el			\
+	src/mmec-constants.el				\
 	src/mmec-bytevector-objects.el			\
 	src/mmec.el
 
 src/mmec-basics.elc: \
-	src/mmec-constants.elc				\
 	libmmux-emacs-core.la
 
 src/mmec-number-objects.elc: \
 	src/mmec-basics.elc				\
-	src/mmec-constants.elc				\
+	libmmux-emacs-core.la
+
+src/mmec-constants.elc: \
+	src/mmec-number-objects.elc			\
+	src/mmec-basics.elc				\
 	libmmux-emacs-core.la
 
 src/mmec-bytevector-objects.elc: \
+	src/mmec-constants.elc				\
 	src/mmec-number-objects.elc			\
 	src/mmec-basics.elc				\
-	src/mmec-constants.elc				\
 	libmmux-emacs-core.la
 
 src/mmec.elc: \
 	src/mmec-bytevector-objects.elc			\
+	src/mmec-constants.elc				\
 	src/mmec-number-objects.elc			\
 	src/mmec-basics.elc				\
-	src/mmec-constants.elc				\
 	libmmux-emacs-core.la
 
 

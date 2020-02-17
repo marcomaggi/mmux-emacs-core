@@ -340,7 +340,7 @@ mmec_new_emacs_value_string (emacs_env * env, char const * ptr, size_t len)
   static inline emacs_value						\
   mmec_new_emacs_value_from_intrep_ ## STEM (emacs_env * env, mmec_intrep_ ## STEM ## _t val) \
   {									\
-    return mmec_new_emacs_value_integer(env, (intmax_t)val);		\
+    return mmec_new_emacs_value_integer(env, val);			\
   }									\
 									\
   static inline emacs_value						\
@@ -397,7 +397,7 @@ MMEC_DEFINE_WRAPPER_TYPE_INTEGER_REP(uint16)
   static inline emacs_value						\
   mmec_new_emacs_value_from_intrep_ ## STEM (emacs_env * env, mmec_intrep_ ## STEM ## _t val) \
   {									\
-    return mmec_new_emacs_value_integer(env, (intmax_t)val);		\
+    return mmec_new_emacs_value_float(env, val);			\
   }									\
 									\
   static inline emacs_value						\

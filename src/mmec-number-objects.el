@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-16 16:55:27 marco>
+;; Time-stamp: <2020-02-17 06:13:41 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -32,7 +32,6 @@
 ;;; Code:
 
 (require 'mmec-basics)
-(require 'mmec-constants)
 
 
 ;;;; basic numeric type definitions

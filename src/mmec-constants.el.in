@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-16 16:56:19 marco>
+;; Time-stamp: <2020-02-17 07:23:26 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -31,537 +31,492 @@
 
 ;;; Code:
 
-
-;;;; helpers
-
-(defun mmec--or-most-positive-fixnum (N)
-  (if (<= N 0)
-      most-positive-fixnum
-    N))
-
-(defun mmec--or-most-negative-fixnum (N)
-  (if (>= N 0)
-      most-negative-fixnum
-    N))
+(require 'mmec-number-objects)
 
 
 ;;;; size of basic types in measured in bytes
 
 (defconst mmec-SIZEOF_CHAR
   @VALUEOF_MMUX_SIZEOF_CHAR@
-  "Size of `char' measured in bytes.")
+  "Value of type `integer' representing the size of `char' measured in bytes.")
 
 (defconst mmec-SIZEOF_SIGNED_CHAR
   @VALUEOF_MMUX_SIZEOF_UNSIGNED_CHAR@
-  "Size of `signed char' measured in bytes.")
+  "Value of type `integer' representing the size of `signed char' measured in bytes.")
 
 (defconst mmec-SIZEOF_UNSIGNED_CHAR
   @VALUEOF_MMUX_SIZEOF_UNSIGNED_CHAR@
-  "Size of `unsigned char' measured in bytes.")
+  "Value of type `integer' representing the size of `unsigned char' measured in bytes.")
 
 (defconst mmec-SIZEOF_WCHAR
   @VALUEOF_MMUX_SIZEOF_WCHAR@
-  "Size of `wchar_t' measured in bytes.")
+  "Value of type `integer' representing the size of `wchar_t' measured in bytes.")
 
 ;;; --------------------------------------------------------------------
 
 (defconst mmec-SIZEOF_SIGNED_SHORT_INT
   @VALUEOF_MMUX_SIZEOF_SIGNED_SHORT_INT@
-  "Size of `signed short int' measured in bytes.")
+  "Value of type `integer' representing the size of `signed short int' measured in bytes.")
 
 (defconst mmec-SIZEOF_UNSIGNED_SHORT_INT
   @VALUEOF_MMUX_SIZEOF_UNSIGNED_SHORT_INT@
-  "Size of `signed short int' measured in bytes.")
+  "Value of type `integer' representing the size of `signed short int' measured in bytes.")
 
 ;;; --------------------------------------------------------------------
 
 (defconst mmec-SIZEOF_SIGNED_INT
   @VALUEOF_MMUX_SIZEOF_SIGNED_INT@
-  "Size of `signed int' measured in bytes.")
+  "Value of type `integer' representing the size of `signed int' measured in bytes.")
 
 (defconst mmec-SIZEOF_UNSIGNED_INT
   @VALUEOF_MMUX_SIZEOF_UNSIGNED_INT@
-  "Size of `signed int' measured in bytes.")
+  "Value of type `integer' representing the size of `signed int' measured in bytes.")
 
 ;;; --------------------------------------------------------------------
 
 (defconst mmec-SIZEOF_SIGNED_LONG_INT
   @VALUEOF_MMUX_SIZEOF_SIGNED_LONG_INT@
-  "Size of `signed long int' measured in bytes.")
+  "Value of type `integer' representing the size of `signed long int' measured in bytes.")
 
 (defconst mmec-SIZEOF_UNSIGNED_LONG_INT
   @VALUEOF_MMUX_SIZEOF_UNSIGNED_LONG_INT@
-  "Size of `signed long int' measured in bytes.")
+  "Value of type `integer' representing the size of `signed long int' measured in bytes.")
 
 ;;; --------------------------------------------------------------------
 
 (defconst mmec-SIZEOF_SIGNED_LONG_LONG_INT
   @VALUEOF_MMUX_SIZEOF_SIGNED_LONG_LONG_INT@
-  "Size of `signed long long int' measured in bytes.")
+  "Value of type `integer' representing the size of `signed long long int' measured in bytes.")
 
 (defconst mmec-SIZEOF_UNSIGNED_LONG_LONG_INT
   @VALUEOF_MMUX_SIZEOF_UNSIGNED_LONG_LONG_INT@
-  "Size of `signed long long int' measured in bytes.")
+  "Value of type `integer' representing the size of `signed long long int' measured in bytes.")
 
 ;;; --------------------------------------------------------------------
 
 (defconst mmec-SIZEOF_SIZE_T
   @VALUEOF_MMUX_SIZEOF_SIZE_T@
-  "Size of `size_t' measured in bytes.")
+  "Value of type `integer' representing the size of `size_t' measured in bytes.")
 
 (defconst mmec-SIZEOF_SSIZE_T
   @VALUEOF_MMUX_SIZEOF_SSIZE_T@
-  "Size of `ssize_t' measured in bytes.")
+  "Value of type `integer' representing the size of `ssize_t' measured in bytes.")
 
 ;;; --------------------------------------------------------------------
 
 (defconst mmec-SIZEOF_INTMAX_T
   @VALUEOF_MMUX_SIZEOF_INTMAX_T@
-  "Size of `intmax_t' measured in bytes.")
+  "Value of type `integer' representing the size of `intmax_t' measured in bytes.")
 
 (defconst mmec-SIZEOF_UINTMAX_T
   @VALUEOF_MMUX_SIZEOF_UINTMAX_T@
-  "Size of `uintmax_t' measured in bytes.")
+  "Value of type `integer' representing the size of `uintmax_t' measured in bytes.")
 
 ;;; --------------------------------------------------------------------
 
 (defconst mmec-SIZEOF_PTRDIFF_T
   @VALUEOF_MMUX_SIZEOF_PTRDIFF_T@
-  "Size of `ptrdiff_t' measured in bytes.")
+  "Value of type `integer' representing the size of `ptrdiff_t' measured in bytes.")
 
 ;;; --------------------------------------------------------------------
 
 (defconst mmec-SIZEOF_INT8_T
   1
-  "Size of `int8_t' measured in bytes.")
+  "Value of type `integer' representing the size of `int8_t' measured in bytes.")
 
 (defconst mmec-SIZEOF_UINT8_T
   1
-  "Size of `uint8_t' measured in bytes.")
+  "Value of type `integer' representing the size of `uint8_t' measured in bytes.")
 
 ;;; --------------------------------------------------------------------
 
 (defconst mmec-SIZEOF_INT16_T
   2
-  "Size of `int16_t' measured in bytes.")
+  "Value of type `integer' representing the size of `int16_t' measured in bytes.")
 
 (defconst mmec-SIZEOF_UINT16_T
   2
-  "Size of `uint16_t' measured in bytes.")
+  "Value of type `integer' representing the size of `uint16_t' measured in bytes.")
 
 ;;; --------------------------------------------------------------------
 
 (defconst mmec-SIZEOF_INT32_T
   4
-  "Size of `int32_t' measured in bytes.")
+  "Value of type `integer' representing the size of `int32_t' measured in bytes.")
 
 (defconst mmec-SIZEOF_UINT32_T
   4
-  "Size of `uint32_t' measured in bytes.")
+  "Value of type `integer' representing the size of `uint32_t' measured in bytes.")
 
 ;;; --------------------------------------------------------------------
 
 (defconst mmec-SIZEOF_INT64_T
   8
-  "Size of `int64_t' measured in bytes.")
+  "Value of type `integer' representing the size of `int64_t' measured in bytes.")
 
 (defconst mmec-SIZEOF_UINT64_T
   8
-  "Size of `uint64_t' measured in bytes.")
+  "Value of type `integer' representing the size of `uint64_t' measured in bytes.")
 
 ;;; --------------------------------------------------------------------
 
 (defconst mmec-SIZEOF_FLOAT
   @VALUEOF_MMUX_SIZEOF_FLOAT@
-  "Size of `float' measured in bytes.")
+  "Value of type `integer' representing the size of `float' measured in bytes.")
 
 (defconst mmec-SIZEOF_DOUBLE
   @VALUEOF_MMUX_SIZEOF_DOUBLE@
-  "Size of `double' measured in bytes.")
+  "Value of type `integer' representing the size of `double' measured in bytes.")
 
 (defconst mmec-SIZEOF_LDOUBLE
   @VALUEOF_MMUX_SIZEOF_LDOUBLE@
-  "Size of `long double' measured in bytes.")
+  "Value of type `integer' representing the size of `long double' measured in bytes.")
 
 
 ;;;; integer representation range limits
 
-(defconst mmec-SCHAR_MIN
-  (max most-negative-fixnum @VALUEOF_SCHAR_MIN@)
-  "Exact integer representing the minimum value representable by a `signed char'.")
-
-(defconst mmec-SCHAR_MAX
-  (min most-positive-fixnum @VALUEOF_SCHAR_MAX@)
-  "Exact integer representing the maximum value representable by a `signed char'.")
-
 (defconst mmec-CHAR_MIN
-  (max most-negative-fixnum @VALUEOF_CHAR_MIN@)
-  "Exact integer representing the minimum value representable by a `char'.")
+  (mmec--make mmec-char :obj @VALUEOF_CHAR_MIN@)
+  "Value of type `mmec-char' representing the minimum value representable by a `char'.")
 
 (defconst mmec-CHAR_MAX
-  (min most-positive-fixnum @VALUEOF_CHAR_MAX@)
-  "Exact integer representing the maximum value representable by a `char'.")
+  (mmec--make mmec-char :obj @VALUEOF_CHAR_MAX@)
+  "Value of type `mmec-char' representing the maximum value representable by a `char'.")
+
+(defconst mmec-SCHAR_MIN
+  (mmec--make mmec-schar :obj @VALUEOF_SCHAR_MIN@)
+  "Value of type `mmec-schar' representing the minimum value representable by a `signed char'.")
+
+(defconst mmec-SCHAR_MAX
+  (mmec--make mmec-schar :obj @VALUEOF_SCHAR_MAX@)
+  "Value of type `mmec-scar' representing the maximum value representable by a `signed char'.")
 
 (defconst mmec-UCHAR_MIN
-  0
-  "Exact integer representing the minimum value representable by a `unsigned char'.")
+  (mmec--make mmec-uchar :obj 0)
+  "Value of type `mmec-uchar' representing the minimum value representable by a `unsigned char'.")
 
 (defconst mmec-UCHAR_MAX
-  (min most-positive-fixnum @VALUEOF_UCHAR_MAX@)
-  "Exact integer representing the maximum value representable by a `unsigned char'.")
+  (mmec--make mmec-uchar :obj @VALUEOF_UCHAR_MAX@)
+  "Value of type `mmec-uchar' representing the maximum value representable by a `unsigned char'.")
 
 ;;; --------------------------------------------------------------------
 
-(defconst mmec-SHRT_MIN
-  (max most-negative-fixnum @VALUEOF_SHRT_MIN@)
-  "Exact integer representing the minimum value representable by a `signed short int'.")
+(defconst mmec-SSHRT_MIN
+  (mmec--make mmec-sshrt :obj @VALUEOF_SHRT_MIN@)
+  "Value of type `mmec-sshrt' representing the minimum value representable by a `signed short int'.")
 
-(defconst mmec-SHRT_MAX
-  (min most-positive-fixnum @VALUEOF_SHRT_MAX@)
-  "Exact integer representing the maximum value representable by a `signed short int'.")
+(defconst mmec-SSHRT_MAX
+  (mmec--make mmec-sshrt :obj @VALUEOF_SHRT_MAX@)
+  "Value of type `mmec-sshrt' representing the maximum value representable by a `signed short int'.")
 
 (defconst mmec-USHRT_MIN
-  0
-  "Exact integer representing the minimum value representable by a `unsigned short int'.")
+  (mmec--make mmec-ushrt :obj 0)
+  "Value of type `mmec-ushrt' representing the minimum value representable by a `unsigned short int'.")
 
 (defconst mmec-USHRT_MAX
-  (min most-positive-fixnum @VALUEOF_USHRT_MAX@)
-  "Exact integer representing the maximum value representable by a `unsigned short int'.")
+  (mmec--make mmec-ushrt :obj @VALUEOF_USHRT_MAX@)
+  "Value of type `mmec-ushrt' representing the maximum value representable by a `unsigned short int'.")
 
 ;;; --------------------------------------------------------------------
 
-(defconst mmec-INT_MIN
-  (max most-negative-fixnum @VALUEOF_INT_MIN@)
-  "Exact integer representing the minimum value representable by a `signed int'.")
+(defconst mmec-SINT_MIN
+  (mmec--make mmec-sint :obj (mmec-c-constant-sint-min))
+  "Value of type `mmec-sint' representing the minimum value representable by a `signed int'.")
 
-(defconst mmec-INT_MAX
-  (min most-positive-fixnum @VALUEOF_INT_MAX@)
-  "Exact integer representing the maximum value representable by a `signed int'.")
+(defconst mmec-SINT_MAX
+  (mmec--make mmec-sint :obj (mmec-c-constant-sint-max))
+  "Value of type `mmec-sint' representing the maximum value representable by a `signed int'.")
 
 (defconst mmec-UINT_MIN
-  0
-  "Exact integer representing the minimum value representable by a `unsigned int'.")
+  (mmec--make mmec-uint :obj (mmec-c-constant-uint-min))
+  "Value of type `mmec-uint' representing the minimum value representable by a `unsigned int'.")
 
 (defconst mmec-UINT_MAX
-  (min most-positive-fixnum @VALUEOF_UINT_MAX@)
-  "Exact integer representing the maximum value representable by a `unsigned int'.")
+  (mmec--make mmec-uint :obj (mmec-c-constant-uint-max))
+  "Value of type `mmec-uint' representing the maximum value representable by a `unsigned int'.")
 
 ;;; --------------------------------------------------------------------
 
-(defconst mmec-LONG_MIN
-  (mmec--or-most-negative-fixnum @VALUEOF_LONG_MIN@)
-  "Exact integer representing the minimum value representable by a `signed long int'.")
+(defconst mmec-SLONG_MIN
+  (mmec--make mmec-slong :obj (mmec-c-constant-slong-min))
+  "Value of type `mmec-slong' representing the minimum value representable by a `signed long int'.")
 
-(defconst mmec-LONG_MAX
-  (mmec--or-most-positive-fixnum @VALUEOF_LONG_MAX@)
-  "Exact integer representing the maximum value representable by a `signed long int'.")
+(defconst mmec-SLONG_MAX
+  (mmec--make mmec-slong :obj (mmec-c-constant-slong-max))
+  "Value of type `mmec-slong' representing the maximum value representable by a `signed long int'.")
 
 (defconst mmec-ULONG_MIN
-  0
-  "Exact integer representing the minimum value representable by a `unsigned long int'.")
+  (mmec--make mmec-ulong :obj (mmec-c-constant-ulong-min))
+  "Value of type `mmec-ulong' representing the minimum value representable by a `unsigned long int'.")
 
 (defconst mmec-ULONG_MAX
-  (mmec--or-most-positive-fixnum @VALUEOF_ULONG_MAX@)
-  "Exact integer representing the maximum value representable by a `unsigned long int'.")
+  (mmec--make mmec-ulong :obj (mmec-c-constant-ulong-max))
+  "Value of type `mmec-ulong' representing the maximum value representable by a `unsigned long int'.")
 
 ;;; --------------------------------------------------------------------
 
-(defconst mmec-LLONG_MIN
-  (mmec--or-most-negative-fixnum @VALUEOF_LLONG_MIN@)
-  "Exact integer representing the minimum value representable by a `signed long long int'.")
+(defconst mmec-SLLONG_MIN
+  (mmec--make mmec-sllong :obj (mmec-c-constant-sllong-min))
+  "Value of type `mmec-sllong' representing the minimum value representable by a `signed long long int'.")
 
-(defconst mmec-LLONG_MAX
-  (mmec--or-most-positive-fixnum @VALUEOF_LLONG_MAX@)
-  "Exact integer representing the maximum value representable by a `signed long long int'.")
+(defconst mmec-SLLONG_MAX
+  (mmec--make mmec-sllong :obj (mmec-c-constant-sllong-max))
+  "Value of type `mmec-sllong' representing the maximum value representable by a `signed long long int'.")
 
 (defconst mmec-ULLONG_MIN
-  0
-  "Exact integer representing the minimum value representable by a `unsigned long long int'.")
+  (mmec--make mmec-ullong :obj (mmec-c-constant-ullong-min))
+  "Value of type `mmec-ullong' representing the minimum value representable by a `unsigned long long int'.")
 
 (defconst mmec-ULLONG_MAX
-  (min most-positive-fixnum @VALUEOF_ULLONG_MAX@)
-  "Exact integer representing the maximum value representable by a `unsigned long long int'.")
+  (mmec--make mmec-ullong :obj (mmec-c-constant-ullong-max))
+  "Value of type `mmec-ullong' representing the maximum value representable by a `unsigned long long int'.")
 
 ;;; --------------------------------------------------------------------
 
 (defconst mmec-WCHAR_MIN
-  0
-  "Exact integer representing the minimum value representable by a `wchar_t'.")
+  (mmec--make mmec-wchar :obj (mmec-c-constant-wchar-min))
+  "Value of type `mmec-wchar' representing the minimum value representable by a `wchar_t'.")
 
 (defconst mmec-WCHAR_MAX
-  (min most-positive-fixnum @VALUEOF_WCHAR_MAX@)
-  "Exact integer representing the maximum value representable by a `wchar_t'.")
+  (mmec--make mmec-wchar :obj (mmec-c-constant-wchar-max))
+  "Value of type `mmec-wchar' representing the maximum value representable by a `wchar_t'.")
 
 ;;; --------------------------------------------------------------------
 
-(defconst mmec-SIZE_T_MIN
-  0
-  "Exact integer representing the minimum value representable by a `size_t'.")
+(defconst mmec-SSIZE_MIN
+  (mmec--make mmec-ssize :obj (mmec-c-constant-ssize-min))
+  "Value of type `mmec-ssize' representing the minimum value representable by a `ssize_t'.")
 
-(defconst mmec-SIZE_T_MAX
-  (cond ((= mmec-SIZEOF_SIZE_T mmec-SIZEOF_SIGNED_INT)		mmec-INT_MAX)
-	((= mmec-SIZEOF_SIZE_T mmec-SIZEOF_SIGNED_LONG_INT)		mmec-LONG_MAX)
-	((= mmec-SIZEOF_SIZE_T mmec-SIZEOF_SIGNED_LONG_LONG_INT)	mmec-LLONG_MAX)
-	(t							0))
-  "Exact integer representing the maximum value representable by a `size_t'.")
+(defconst mmec-SSIZE_MAX
+  (mmec--make mmec-ssize :obj (mmec-c-constant-ssize-max))
+  "Value of type `mmec-ssize' representing the maximum value representable by a `ssize_t'.")
 
-;;; --------------------------------------------------------------------
+(defconst mmec-USIZE_MIN
+  (mmec--make mmec-usize :obj (mmec-c-constant-usize-min))
+  "Value of type `mmec-usize' representing the minimum value representable by a `size_t'.")
 
-(defconst mmec-SSIZE_T_MIN
-  (cond ((= mmec-SIZEOF_SSIZE_T mmec-SIZEOF_SIGNED_INT)		mmec-INT_MIN)
-	((= mmec-SIZEOF_SSIZE_T mmec-SIZEOF_SIGNED_LONG_INT)	mmec-LONG_MIN)
-	((= mmec-SIZEOF_SSIZE_T mmec-SIZEOF_SIGNED_LONG_LONG_INT)	mmec-LLONG_MIN)
-	(t							0))
-  "Exact integer representing the minimum value representable by a `ssize_t'.")
-
-(defconst mmec-SSIZE_T_MAX
-  (cond ((= mmec-SIZEOF_SSIZE_T mmec-SIZEOF_SIGNED_INT)		mmec-INT_MAX)
-	((= mmec-SIZEOF_SSIZE_T mmec-SIZEOF_SIGNED_LONG_INT)	mmec-LONG_MAX)
-	((= mmec-SIZEOF_SSIZE_T mmec-SIZEOF_SIGNED_LONG_LONG_INT)	mmec-LLONG_MAX)
-	(t							0))
-  "Exact integer representing the maximum value representable by a `ssize_t'.")
+(defconst mmec-USIZE_MAX
+  (mmec--make mmec-usize :obj (mmec-c-constant-usize-max))
+  "Value of type `mmec-usize' representing the maximum value representable by a `size_t'.")
 
 ;;; --------------------------------------------------------------------
 
-(defconst mmec-INTMAX_MIN
-  (cond ((= mmec-SIZEOF_INTMAX_T mmec-SIZEOF_SIGNED_INT)		mmec-INT_MIN)
-	((= mmec-SIZEOF_INTMAX_T mmec-SIZEOF_SIGNED_LONG_INT)	mmec-LONG_MIN)
-	((= mmec-SIZEOF_INTMAX_T mmec-SIZEOF_SIGNED_LONG_LONG_INT)	mmec-LLONG_MIN)
-	(t							0))
-  "Exact integer representing the minimum value representable by a `intmax_t'.")
+(defconst mmec-SINTMAX_MIN
+  (mmec--make mmec-sintmax :obj (mmec-c-constant-sintmax-min))
+  "Value of type `mmec-sintmax' representing the minimum value representable by a `intmax_t'.")
 
-(defconst mmec-INTMAX_MAX
-  (cond ((= mmec-SIZEOF_INTMAX_T mmec-SIZEOF_SIGNED_INT)		mmec-INT_MAX)
-	((= mmec-SIZEOF_INTMAX_T mmec-SIZEOF_SIGNED_LONG_INT)	mmec-LONG_MAX)
-	((= mmec-SIZEOF_INTMAX_T mmec-SIZEOF_SIGNED_LONG_LONG_INT)	mmec-LLONG_MAX)
-	(t							0))
-  "Exact integer representing the maximum value representable by a `intmax_t'.")
+(defconst mmec-SINTMAX_MAX
+  (mmec--make mmec-sintmax :obj (mmec-c-constant-sintmax-max))
+  "Value of type `mmec-sintmax' representing the maximum value representable by a `intmax_t'.")
 
 (defconst mmec-UINTMAX_MIN
-  0
-  "Exact integer representing the minimum value representable by a `uintmax_t'.")
+  (mmec--make mmec-uintmax :obj (mmec-c-constant-uintmax-min))
+  "Value of type `mmec-uintmax' representing the minimum value representable by a `intmax_t'.")
 
 (defconst mmec-UINTMAX_MAX
-  (cond ((= mmec-SIZEOF_UINTMAX_T mmec-SIZEOF_SIGNED_INT)		mmec-INT_MAX)
-	((= mmec-SIZEOF_UINTMAX_T mmec-SIZEOF_SIGNED_LONG_INT)	mmec-LONG_MAX)
-	((= mmec-SIZEOF_UINTMAX_T mmec-SIZEOF_SIGNED_LONG_LONG_INT)	mmec-LLONG_MAX)
-	(t							0))
-  "Exact integer representing the maximum value representable by a `uintmax_t'.")
+  (mmec--make mmec-uintmax :obj (mmec-c-constant-uintmax-max))
+  "Value of type `mmec-uintmax' representing the maximum value representable by a `intmax_t'.")
 
 ;;; --------------------------------------------------------------------
 
 (defconst mmec-PTRDIFF_MIN
-  (cond ((= mmec-SIZEOF_PTRDIFF_T mmec-SIZEOF_SIGNED_INT)		mmec-INT_MIN)
-	((= mmec-SIZEOF_PTRDIFF_T mmec-SIZEOF_SIGNED_LONG_INT)	mmec-LONG_MIN)
-	((= mmec-SIZEOF_PTRDIFF_T mmec-SIZEOF_SIGNED_LONG_LONG_INT)	mmec-LLONG_MIN)
-	(t							0))
-  "Exact integer representing the minimum value representable by a `ptrdiff_t'.")
+  (mmec--make mmec-ptrdiff :obj (mmec-c-constant-ptrdiff-min))
+  "Value of type `mmec-ptrdiff' representing the minimum value representable by a `ptrdiff_t'.")
 
 (defconst mmec-PTRDIFF_MAX
-  (cond ((= mmec-SIZEOF_PTRDIFF_T mmec-SIZEOF_SIGNED_INT)		mmec-INT_MAX)
-	((= mmec-SIZEOF_PTRDIFF_T mmec-SIZEOF_SIGNED_LONG_INT)	mmec-LONG_MAX)
-	((= mmec-SIZEOF_PTRDIFF_T mmec-SIZEOF_SIGNED_LONG_LONG_INT)	mmec-LLONG_MAX)
-	(t							0))
-  "Exact integer representing the maximum value representable by a `ptrdiff_t'.")
+  (mmec--make mmec-ptrdiff :obj (mmec-c-constant-ptrdiff-max))
+  "Value of type `mmec-ptrdiff' representing the maximum value representable by a `ptrdiff_t'.")
 
 ;;; --------------------------------------------------------------------
 
-(defconst mmec-INT8_MIN
-  (- (expt 2 (1- (* 8 mmec-SIZEOF_INT8_T))))
-  "Exact integer representing the minimum value representable by a `int8_t'.")
+(defconst mmec-SINT8_MIN
+  (mmec--make mmec-sint8 :obj (mmec-c-constant-sint8-min))
+  "Value of type `mmec-sint8' representing the minimum value representable by a `int8_t'.")
 
-(defconst mmec-INT8_MAX
-  (1- (expt 2 (1- (* 8 mmec-SIZEOF_INT8_T))))
-  "Exact integer representing the maximum value representable by a `int8_t'.")
-
-;;; --------------------------------------------------------------------
+(defconst mmec-SINT8_MAX
+  (mmec--make mmec-sint8 :obj (mmec-c-constant-sint8-max))
+  "Value of type `mmec-sint8' representing the maximum value representable by a `int8_t'.")
 
 (defconst mmec-UINT8_MIN
-  0
-  "Exact integer representing the minimum value representable by a `uint8_t'.")
+  (mmec--make mmec-uint8 :obj (mmec-c-constant-uint8-min))
+  "Value of type `mmec-uint8' representing the minimum value representable by a `uint8_t'.")
 
 (defconst mmec-UINT8_MAX
-  (1- (expt 2 (* 8 mmec-SIZEOF_UINT8_T)))
-  "Exact integer representing the maximum value representable by a `uint8_t'.")
+  (mmec--make mmec-uint8 :obj (mmec-c-constant-uint8-max))
+  "Value of type `mmec-uint8' representing the maximum value representable by a `uint8_t'.")
 
 ;;; --------------------------------------------------------------------
 
-(defconst mmec-INT16_MIN
-  (- (expt 2 (1- (* 8 mmec-SIZEOF_INT16_T))))
-  "Exact integer representing the minimum value representable by a `int16_t'.")
+(defconst mmec-SINT16_MIN
+  (mmec--make mmec-sint16 :obj (mmec-c-constant-sint16-min))
+  "Value of type `mmec-sint16' representing the minimum value representable by a `int16_t'.")
 
-(defconst mmec-INT16_MAX
-  (1- (expt 2 (1- (* 8 mmec-SIZEOF_INT16_T))))
-  "Exact integer representing the maximum value representable by a `int16_t'.")
-
-;;; --------------------------------------------------------------------
+(defconst mmec-SINT16_MAX
+  (mmec--make mmec-sint16 :obj (mmec-c-constant-sint16-max))
+  "Value of type `mmec-sint16' representing the maximum value representable by a `int16_t'.")
 
 (defconst mmec-UINT16_MIN
-  0
-  "Exact integer representing the minimum value representable by a `uint16_t'.")
+  (mmec--make mmec-uint16 :obj (mmec-c-constant-uint16-min))
+  "Value of type `mmec-uint16' representing the minimum value representable by a `uint16_t'.")
 
 (defconst mmec-UINT16_MAX
-  (1- (expt 2 (* 8 mmec-SIZEOF_UINT16_T)))
-  "Exact integer representing the maximum value representable by a `uint16_t'.")
+  (mmec--make mmec-uint16 :obj (mmec-c-constant-uint16-max))
+  "Value of type `mmec-uint16' representing the maximum value representable by a `uint16_t'.")
 
 ;;; --------------------------------------------------------------------
 
-(defconst mmec-INT32_MIN
-  (- (expt 2 (1- (* 8 mmec-SIZEOF_INT32_T))))
-  "Exact integer representing the minimum value representable by a `int32_t'.")
+(defconst mmec-SINT32_MIN
+  (mmec--make mmec-sint32 :obj (mmec-c-constant-sint32-min))
+  "Value of type `mmec-sint32' representing the minimum value representable by a `int32_t'.")
 
-(defconst mmec-INT32_MAX
-  (1- (expt 2 (1- (* 8 mmec-SIZEOF_INT32_T))))
-  "Exact integer representing the maximum value representable by a `int32_t'.")
-
-;;; --------------------------------------------------------------------
+(defconst mmec-SINT32_MAX
+  (mmec--make mmec-sint32 :obj (mmec-c-constant-sint32-max))
+  "Value of type `mmec-sint32' representing the maximum value representable by a `int32_t'.")
 
 (defconst mmec-UINT32_MIN
-  0
-  "Exact integer representing the minimum value representable by a `uint32_t'.")
+  (mmec--make mmec-uint32 :obj (mmec-c-constant-uint32-min))
+  "Value of type `mmec-uint32' representing the minimum value representable by a `uint32_t'.")
 
 (defconst mmec-UINT32_MAX
-  (1- (expt 2 (* 8 mmec-SIZEOF_UINT32_T)))
-  "Exact integer representing the maximum value representable by a `uint32_t'.")
+  (mmec--make mmec-uint32 :obj (mmec-c-constant-uint32-max))
+  "Value of type `mmec-uint32' representing the maximum value representable by a `uint32_t'.")
 
 ;;; --------------------------------------------------------------------
 
-(defconst mmec-INT64_MIN
-  (mmec--or-most-negative-fixnum (- (expt 2 (1- (* 8 mmec-SIZEOF_INT64_T)))))
-  "Exact integer representing the minimum value representable by a `int64_t'.")
+(defconst mmec-SINT64_MIN
+  (mmec--make mmec-sint64 :obj (mmec-c-constant-sint64-min))
+  "Value of type `mmec-sint64' representing the minimum value representable by a `int64_t'.")
 
-(defconst mmec-INT64_MAX
-  (mmec--or-most-positive-fixnum (1- (expt 2 (1- (* 8 mmec-SIZEOF_INT64_T)))))
-  "Exact integer representing the maximum value representable by a `int64_t'.")
-
-;;; --------------------------------------------------------------------
+(defconst mmec-SINT64_MAX
+  (mmec--make mmec-sint64 :obj (mmec-c-constant-sint64-max))
+  "Value of type `mmec-sint64' representing the maximum value representable by a `int64_t'.")
 
 (defconst mmec-UINT64_MIN
-  0
-  "Exact integer representing the minimum value representable by a `uint64_t'.")
+  (mmec--make mmec-uint64 :obj (mmec-c-constant-uint64-min))
+  "Value of type `mmec-uint64' representing the minimum value representable by a `uint64_t'.")
 
 (defconst mmec-UINT64_MAX
-  (mmec--or-most-positive-fixnum (1- (expt 2 (* 8 mmec-SIZEOF_UINT64_T))))
-  "Exact integer representing the maximum value representable by a `uint64_t'.")
+  (mmec--make mmec-uint64 :obj (mmec-c-constant-uint64-max))
+  "Value of type `mmec-uint64' representing the maximum value representable by a `uint64_t'.")
 
 
 ;;;; constants related to floating-point numbers
 
 (defconst mmec-FLT_ROUNDS
   @VALUEOF_FLT_ROUNDS@
-  "Value of the system constant `FLT_ROUNDS'.")
+  "Value of type `integer' representing the system constant `FLT_ROUNDS'.")
 
 (defconst mmec-FLT_RADIX
   @VALUEOF_FLT_RADIX@
-  "Value of the system constant `FLT_RADIX'.")
+  "Value of type `integer' representing the system constant `FLT_RADIX'.")
 
 (defconst mmec-FLT_MANT_DIG
   @VALUEOF_FLT_MANT_DIG@
-  "Value of the system constant `FLT_MANT_DIG'.")
+  "Value of type `integer' representing the system constant `FLT_MANT_DIG'.")
 
 (defconst mmec-DBL_MANT_DIG
   @VALUEOF_DBL_MANT_DIG@
-  "Value of the system constant `DBL_MANT_DIG'.")
+  "Value of type `integer' representing the system constant `DBL_MANT_DIG'.")
 
 (defconst mmec-LDBL_MANT_DIG
   @VALUEOF_LDBL_MANT_DIG@
-  "Value of the system constant `LDBL_MANT_DIG'.")
+  "Value of type `integer' representing the system constant `LDBL_MANT_DIG'.")
 
 (defconst mmec-FLT_DIG
   @VALUEOF_FLT_DIG@
-  "Value of the system constant `FLT_DIG'.")
+  "Value of type `integer' representing the system constant `FLT_DIG'.")
 
 (defconst mmec-DBL_DIG
   @VALUEOF_DBL_DIG@
-  "Value of the system constant `DBL_DIG'.")
+  "Value of type `integer' representing the system constant `DBL_DIG'.")
 
 (defconst mmec-LDBL_DIG
   @VALUEOF_LDBL_DIG@
-  "Value of the system constant `LDBL_DIG'.")
+  "Value of type `integer' representing the system constant `LDBL_DIG'.")
 
 (defconst mmec-FLT_MIN_EXP
   @VALUEOF_FLT_MIN_EXP@
-  "Value of the system constant `FLT_MIN_EXP'.")
+  "Value of type `integer' representing the system constant `FLT_MIN_EXP'.")
 
 (defconst mmec-DBL_MIN_EXP
   @VALUEOF_DBL_MIN_EXP@
-  "Value of the system constant `DBL_MIN_EXP'.")
+  "Value of type `integer' representing the system constant `DBL_MIN_EXP'.")
 
 (defconst mmec-LDBL_MIN_EXP
   @VALUEOF_LDBL_MIN_EXP@
-  "Value of the system constant `LDBL_MIN_EXP'.")
+  "Value of type `integer' representing the system constant `LDBL_MIN_EXP'.")
 
 (defconst mmec-FLT_MIN_10_EXP
   @VALUEOF_FLT_MIN_10_EXP@
-  "Value of the system constant `FLT_MIN_10_EXP'.")
+  "Value of type `integer' representing the system constant `FLT_MIN_10_EXP'.")
 
 (defconst mmec-DBL_MIN_10_EXP
   @VALUEOF_DBL_MIN_10_EXP@
-  "Value of the system constant `DBL_MIN_10_EXP'.")
+  "Value of type `integer' representing the system constant `DBL_MIN_10_EXP'.")
 
 (defconst mmec-LDBL_MIN_10_EXP
   @VALUEOF_LDBL_MIN_10_EXP@
-  "Value of the system constant `LDBL_MIN_10_EXP'.")
+  "Value of type `integer' representing the system constant `LDBL_MIN_10_EXP'.")
 
 (defconst mmec-FLT_MAX_EXP
   @VALUEOF_FLT_MAX_EXP@
-  "Value of the system constant `FLT_MAX_EXP'.")
+  "Value of type `integer' representing the system constant `FLT_MAX_EXP'.")
 
 (defconst mmec-DBL_MAX_EXP
   @VALUEOF_DBL_MAX_EXP@
-  "Value of the system constant `DBL_MAX_EXP'.")
+  "Value of type `integer' representing the system constant `DBL_MAX_EXP'.")
 
 (defconst mmec-LDBL_MAX_EXP
   @VALUEOF_LDBL_MAX_EXP@
-  "Value of the system constant `LDBL_MAX_EXP'.")
+  "Value of type `integer' representing the system constant `LDBL_MAX_EXP'.")
 
 (defconst mmec-FLT_MAX_10_EXP
   @VALUEOF_FLT_MAX_10_EXP@
-  "Value of the system constant `FLT_MAX_10_EXP'.")
+  "Value of type `integer' representing the system constant `FLT_MAX_10_EXP'.")
 
 (defconst mmec-DBL_MAX_10_EXP
   @VALUEOF_DBL_MAX_10_EXP@
-  "Value of the system constant `DBL_MAX_10_EXP'.")
+  "Value of type `integer' representing the system constant `DBL_MAX_10_EXP'.")
 
 (defconst mmec-LDBL_MAX_10_EXP
   @VALUEOF_LDBL_MAX_10_EXP@
-  "Value of the system constant `LDBL_MAX_10_EXP'.")
-
-(defconst mmec-FLT_MAX
-  @VALUEOF_FLT_MAX@
-  "Value of the system constant `FLT_MAX'.")
-
-(defconst mmec-DBL_MAX
-  @VALUEOF_DBL_MAX@
-  "Value of the system constant `DBL_MAX'.")
-
-(defconst mmec-LDBL_MAX
-  @VALUEOF_LDBL_MAX@
-  "Value of the system constant `LDBL_MAX'.")
+  "Value of type `integer' representing the system constant `LDBL_MAX_10_EXP'.")
 
 (defconst mmec-FLT_MIN
-  @VALUEOF_FLT_MIN@
-  "Value of the system constant `FLT_MIN'.")
+  (mmec--make mmec-float :obj (mmec-c-constant-flt-min))
+  "Value of the `mmec-float' representing system constant `FLT_MIN'.")
+
+(defconst mmec-FLT_MAX
+  (mmec--make mmec-float :obj (mmec-c-constant-flt-max))
+  "Value of type `mmec-float' representing the system constant `FLT_MAX'.")
 
 (defconst mmec-DBL_MIN
-  @VALUEOF_DBL_MIN@
-  "Value of the system constant `DBL_MIN'.")
+  (mmec--make mmec-double :obj (mmec-c-constant-dbl-min))
+  "Value of type `mmec-double' representing the system constant `DBL_MIN'.")
+
+(defconst mmec-DBL_MAX
+  (mmec--make mmec-double :obj (mmec-c-constant-dbl-max))
+  "Value of type `mmec-double' representing the system constant `DBL_MAX'.")
 
 (defconst mmec-LDBL_MIN
-  @VALUEOF_LDBL_MIN@
-  "Value of the system constant `LDBL_MIN'.")
+  (mmec--make mmec-ldouble :obj (mmec-c-constant-ldbl-min))
+  "Value of type `mmec-ldouble' representing the system constant `LDBL_MIN'.")
+
+(defconst mmec-LDBL_MAX
+  (mmec--make mmec-ldouble :obj (mmec-c-constant-ldbl-max))
+  "Value of type `mmec-ldouble' representing the system constant `LDBL_MAX'.")
 
 (defconst mmec-FLT_EPSILON
-  @VALUEOF_FLT_EPSILON@
-  "Value of the system constant `FLT_EPSILON'.")
+  (mmec--make mmec-float :obj (mmec-c-constant-flt-epsilon))
+  "Value of type `mmec-float' representing the system constant `FLT_EPSILON'.")
 
 (defconst mmec-DBL_EPSILON
-  @VALUEOF_DBL_EPSILON@
-  "Value of the system constant `DBL_EPSILON'.")
+  (mmec--make mmec-double :obj (mmec-c-constant-dbl-epsilon))
+  "Value of type `mmec-double' representing the system constant `DBL_EPSILON'.")
 
 (defconst mmec-LDBL_EPSILON
-  @VALUEOF_LDBL_EPSILON@
-  "Value of the system constant `LDBL_EPSILON'.")
+  (mmec--make mmec-ldouble :obj (mmec-c-constant-ldbl-epsilon))
+  "Value of type `mmec-ldouble' the system constant `LDBL_EPSILON'.")
 
 
 ;;;; done

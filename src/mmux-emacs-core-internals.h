@@ -60,7 +60,10 @@ mmec_private_decl void mmec_bytevector_objects_init (emacs_env * env)
   __attribute__((__nonnull__(1)));
 
 mmec_private_decl void mmec_number_objects_init (emacs_env * env)
-    __attribute__((__nonnull__(1)));
+  __attribute__((__nonnull__(1)));
+
+mmec_private_decl void mmec_number_constants_init (emacs_env * env)
+  __attribute__((__nonnull__(1)));
 
 
 /** --------------------------------------------------------------------

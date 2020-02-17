@@ -173,6 +173,7 @@ emacs_module_init (struct emacs_runtime *ert)
     } else {
       mmec_define_elisp_functions_from_table(env, module_functions_table, NUMBER_OF_MODULE_FUNCTIONS, 0);
       mmec_number_objects_init(env);
+      mmec_number_constants_init(env);
       mmec_bytevector_objects_init(env);
       return 0;
     }

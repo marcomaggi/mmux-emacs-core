@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-18 06:29:42 marco>
+;; Time-stamp: <2020-02-18 07:42:25 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -1751,43 +1751,42 @@ This constructor  method signals that the  given initialisation argument
 is invalid."
   (signal 'mmec-error-unsupported-init-type (list 'mmec-sint64 init)))
 
-(progn
-  (defmacro mmec--define-sint64-constructor-method-for-integer-intrep-init (INIT-TYPE-OR-STEM)
-    "Expand into a `cl-defmethod' form defining a constructor method for `mmec-sint64' values.
+(cl-macrolet ((mmec--define-sint64-constructor-method-for-integer-intrep-init
+	       (INIT-TYPE-OR-STEM)
+	       "Expand into a `cl-defmethod' form defining a constructor method for `mmec-sint64' values.
 
 The argument INIT-TYPE-OR-STEM must be a symbol representing a type name
 or type stem name; this type must  be a signed integer with `integer' as
 internal representation."
-    (let* ((INIT-TYPE	(intern (mmec--prepend-prefix-to-symbol-name INIT-TYPE-OR-STEM)))
-	   (DOCSTRING	(format "Constructor for number objects of type `mmec-sint64'.
+	       (let* ((INIT-TYPE	(intern (mmec--prepend-prefix-to-symbol-name INIT-TYPE-OR-STEM)))
+		      (DOCSTRING	(format "Constructor for number objects of type `mmec-sint64'.
 
 The argument INIT must be an object of type `%s'." INIT-TYPE)))
-      `(cl-defmethod mmec-sint64 ((init ,INIT-TYPE))
-	 ,DOCSTRING
-	 (mmec--make sint64 :obj (mmec-c-make-usrptr-sint64-from-elisp-integer (mmec--extract-obj ,INIT-TYPE init))))))
-
+		 `(cl-defmethod mmec-sint64 ((init ,INIT-TYPE))
+		    ,DOCSTRING
+		    (mmec--make sint64 :obj (mmec-c-make-usrptr-sint64-from-elisp-integer (mmec--extract-obj ,INIT-TYPE init)))))))
   (mmec--define-sint64-constructor-method-for-integer-intrep-init char)
   (mmec--define-sint64-constructor-method-for-integer-intrep-init schar)
   (mmec--define-sint64-constructor-method-for-integer-intrep-init sshrt)
   (mmec--define-sint64-constructor-method-for-integer-intrep-init sint8)
   (mmec--define-sint64-constructor-method-for-integer-intrep-init sint16))
 
-(progn
-  (defmacro mmec--define-sint64-constructor-method-for-usrptr-intrep-init (INIT-TYPE-OR-STEM)
-    "Expand into a `cl-defmethod' form defining a constructor method for `mmec-sint64' values.
+(cl-macrolet
+    ((mmec--define-sint64-constructor-method-for-usrptr-intrep-init
+      (INIT-TYPE-OR-STEM)
+      "Expand into a `cl-defmethod' form defining a constructor method for `mmec-sint64' values.
 
 The argument INIT-TYPE-OR-STEM must be a symbol representing a type name
 or  type  stem  name;  this  type  must  be  a  signed  integer  with  a
 user-pointer object as internal representation."
-    (let* ((INIT-TYPE		(intern (mmec--prepend-prefix-to-symbol-name INIT-TYPE-OR-STEM)))
-	   (CLANG-CONSTRUCTOR	(intern (format "mmec-c-make-usrptr-sint64-from-usrptr-%s" INIT-TYPE-OR-STEM)))
-	   (DOCSTRING		(format "Constructor for number objects of type `mmec-sint64'.
+      (let* ((INIT-TYPE		(intern (mmec--prepend-prefix-to-symbol-name INIT-TYPE-OR-STEM)))
+	     (CLANG-CONSTRUCTOR	(intern (format "mmec-c-make-usrptr-sint64-from-usrptr-%s" INIT-TYPE-OR-STEM)))
+	     (DOCSTRING		(format "Constructor for number objects of type `mmec-sint64'.
 
 The argument INIT must be an object of type `%s'." INIT-TYPE)))
-      `(cl-defmethod mmec-sint64 ((init ,INIT-TYPE))
-	 ,DOCSTRING
-	 (mmec--make sint64 :obj (,CLANG-CONSTRUCTOR (mmec--extract-obj ,INIT-TYPE init))))))
-
+	`(cl-defmethod mmec-sint64 ((init ,INIT-TYPE))
+	   ,DOCSTRING
+	   (mmec--make sint64 :obj (,CLANG-CONSTRUCTOR (mmec--extract-obj ,INIT-TYPE init)))))))
   (mmec--define-sint64-constructor-method-for-usrptr-intrep-init sint)
   (mmec--define-sint64-constructor-method-for-usrptr-intrep-init slong)
   (mmec--define-sint64-constructor-method-for-usrptr-intrep-init sllong)
@@ -1849,39 +1848,41 @@ This  constructor method  signals that  the given  initialisation
 argument is invalid."
   (signal 'mmec-error-unsupported-init-type (list 'mmec-uint64 init)))
 
-(defmacro mmec--define-uint64-constructor-method-for-integer-init (INIT-TYPE-OR-STEM)
-  (let* ((INIT-TYPE	(intern (mmec--prepend-prefix-to-symbol-name INIT-TYPE-OR-STEM)))
-	 (DOCSTRING	(format "Constructor for number objects of type `mmec-uint64'.
+(cl-macrolet ((mmec--define-uint64-constructor-method-for-integer-init
+	       (INIT-TYPE-OR-STEM)
+	       (let* ((INIT-TYPE	(intern (mmec--prepend-prefix-to-symbol-name INIT-TYPE-OR-STEM)))
+		      (DOCSTRING	(format "Constructor for number objects of type `mmec-uint64'.
 
 This  constructor method  accepts as  initialisation argument  an
 instance of type `%s'." INIT-TYPE)))
-    `(cl-defmethod mmec-uint64 ((init ,INIT-TYPE))
-       ,DOCSTRING
-       (mmec--make uint64 :obj (mmec-c-make-usrptr-uint64-from-elisp-integer (mmec--extract-obj ,INIT-TYPE init))))))
+		 `(cl-defmethod mmec-uint64 ((init ,INIT-TYPE))
+		    ,DOCSTRING
+		    (mmec--make uint64 :obj (mmec-c-make-usrptr-uint64-from-elisp-integer (mmec--extract-obj ,INIT-TYPE init)))))))
+  (mmec--define-uint64-constructor-method-for-integer-init uchar)
+  (mmec--define-uint64-constructor-method-for-integer-init ushrt)
+  (mmec--define-uint64-constructor-method-for-integer-init uint8)
+  (mmec--define-uint64-constructor-method-for-integer-init uint16))
 
-(mmec--define-uint64-constructor-method-for-integer-init uchar)
-(mmec--define-uint64-constructor-method-for-integer-init ushrt)
-(mmec--define-uint64-constructor-method-for-integer-init uint8)
-(mmec--define-uint64-constructor-method-for-integer-init uint16)
-
-(defmacro mmec--define-uint64-constructor-method-for-usrptr-init (INIT-TYPE-OR-STEM)
-  (let* ((INIT-TYPE		(intern (mmec--prepend-prefix-to-symbol-name INIT-TYPE-OR-STEM)))
-	 (CLANG-CONSTRUCTOR	(intern (format "mmec-c-make-usrptr-uint64-from-usrptr-%s" INIT-TYPE-OR-STEM)))
-	 (DOCSTRING		(format "Constructor for number objects of type `mmec-uint64'.
+(cl-macrolet
+    ((mmec--define-uint64-constructor-method-for-usrptr-init
+      (INIT-TYPE-OR-STEM)
+      (let* ((INIT-TYPE		(intern (mmec--prepend-prefix-to-symbol-name INIT-TYPE-OR-STEM)))
+	     (CLANG-CONSTRUCTOR	(intern (format "mmec-c-make-usrptr-uint64-from-usrptr-%s" INIT-TYPE-OR-STEM)))
+	     (DOCSTRING		(format "Constructor for number objects of type `mmec-uint64'.
 
 This  constructor method  accepts as  initialisation argument  an
 instance of type `%s'." INIT-TYPE)))
-    `(cl-defmethod mmec-uint64 ((init ,INIT-TYPE))
-       ,DOCSTRING
-       (mmec--make uint64 :obj (,CLANG-CONSTRUCTOR  (mmec--extract-obj ,INIT-TYPE init))))))
+	`(cl-defmethod mmec-uint64 ((init ,INIT-TYPE))
+	   ,DOCSTRING
+	   (mmec--make uint64 :obj (,CLANG-CONSTRUCTOR  (mmec--extract-obj ,INIT-TYPE init)))))))
 
-(mmec--define-uint64-constructor-method-for-usrptr-init wchar)
-(mmec--define-uint64-constructor-method-for-usrptr-init uint)
-(mmec--define-uint64-constructor-method-for-usrptr-init ulong)
-(mmec--define-uint64-constructor-method-for-usrptr-init ullong)
-(mmec--define-uint64-constructor-method-for-usrptr-init uintmax)
-(mmec--define-uint64-constructor-method-for-usrptr-init usize)
-(mmec--define-uint64-constructor-method-for-usrptr-init uint32)
+  (mmec--define-uint64-constructor-method-for-usrptr-init wchar)
+  (mmec--define-uint64-constructor-method-for-usrptr-init uint)
+  (mmec--define-uint64-constructor-method-for-usrptr-init ulong)
+  (mmec--define-uint64-constructor-method-for-usrptr-init ullong)
+  (mmec--define-uint64-constructor-method-for-usrptr-init uintmax)
+  (mmec--define-uint64-constructor-method-for-usrptr-init usize)
+  (mmec--define-uint64-constructor-method-for-usrptr-init uint32))
 
 
 ;;;; C language type wrappers: float
@@ -2123,65 +2124,69 @@ argument is invalid."
 
 ;;;; range inclusion
 
-(defmacro mmec--define-fits-function (TYPE-OR-STEM USRPTR-ARGTYPE NORMALISED-TYPE-OR-STEM)
-  (let* ((TYPE-STEM.str		(mmec--strip-prefix-from-symbol-name TYPE-OR-STEM))
-	 (TYPE			(intern (mmec--prepend-prefix-to-symbol-name TYPE-OR-STEM)))
-	 (NORMALISED-STEM.str	(mmec--strip-prefix-from-symbol-name NORMALISED-TYPE-OR-STEM))
-	 (NORMALISED-TYPE	(intern (mmec--prepend-prefix-to-symbol-name NORMALISED-TYPE-OR-STEM)))
-	 (FUNCNAME		(intern (format "mmec-fits-%s-p" TYPE-STEM.str)))
-	 (CLANG-FUNCNAME	(intern (format "mmec-c-%s-fits-%s-p" NORMALISED-STEM.str TYPE-STEM.str)))
-	 (DOCSTRING		(format "Return true if the argument fits an object of type `%s'." TYPE)))
-    `(progn
-       (cl-defgeneric ,FUNCNAME (op)
-	 ,DOCSTRING)
-       (cl-defmethod  ,FUNCNAME ((op ,USRPTR-ARGTYPE))
-	 ,DOCSTRING
-	 (,CLANG-FUNCNAME (mmec--extract-obj ,NORMALISED-TYPE (,NORMALISED-TYPE op))))
-       (cl-defmethod  ,FUNCNAME ((op integer))
-	 ,DOCSTRING
-	 (,CLANG-FUNCNAME (mmec--extract-obj ,NORMALISED-TYPE (,NORMALISED-TYPE op))))
-       (cl-defmethod  ,FUNCNAME ((op float))
-	 ,DOCSTRING
-	 (,CLANG-FUNCNAME (mmec--extract-obj ,NORMALISED-TYPE (,NORMALISED-TYPE op))))
-       )))
+(cl-macrolet
+    ((mmec--define-fits-function
+      (TYPE-OR-STEM USRPTR-ARGTYPE NORMALISED-TYPE-OR-STEM)
+      (let* ((TYPE-STEM.str		(mmec--strip-prefix-from-symbol-name TYPE-OR-STEM))
+	     (TYPE			(intern (mmec--prepend-prefix-to-symbol-name TYPE-OR-STEM)))
+	     (NORMALISED-STEM.str	(mmec--strip-prefix-from-symbol-name NORMALISED-TYPE-OR-STEM))
+	     (NORMALISED-TYPE	(intern (mmec--prepend-prefix-to-symbol-name NORMALISED-TYPE-OR-STEM)))
+	     (FUNCNAME		(intern (format "mmec-fits-%s-p" TYPE-STEM.str)))
+	     (CLANG-FUNCNAME	(intern (format "mmec-c-%s-fits-%s-p" NORMALISED-STEM.str TYPE-STEM.str)))
+	     (DOCSTRING		(format "Return true if the argument fits an object of type `%s'." TYPE)))
+	`(progn
+	   (cl-defgeneric ,FUNCNAME (op)
+	     ,DOCSTRING)
+	   (cl-defmethod  ,FUNCNAME ((op ,USRPTR-ARGTYPE))
+	     ,DOCSTRING
+	     (,CLANG-FUNCNAME (mmec--extract-obj ,NORMALISED-TYPE (,NORMALISED-TYPE op))))
+	   (cl-defmethod  ,FUNCNAME ((op integer))
+	     ,DOCSTRING
+	     (,CLANG-FUNCNAME (mmec--extract-obj ,NORMALISED-TYPE (,NORMALISED-TYPE op))))
+	   (cl-defmethod  ,FUNCNAME ((op float))
+	     ,DOCSTRING
+	     (,CLANG-FUNCNAME (mmec--extract-obj ,NORMALISED-TYPE (,NORMALISED-TYPE op))))
+	   ))))
 
-(defmacro mmec--define-fits-function/signed-integer (TYPE-OR-STEM)
-  `(mmec--define-fits-function ,TYPE-OR-STEM mmec-signed-integer   mmec-sint64))
+  (cl-macrolet
+      ((mmec--define-fits-function/signed-integer
+	(TYPE-OR-STEM)
+	`(mmec--define-fits-function ,TYPE-OR-STEM mmec-signed-integer   mmec-sint64))
+       (mmec--define-fits-function/unsigned-integer
+	(TYPE-OR-STEM)
+	`(mmec--define-fits-function ,TYPE-OR-STEM mmec-unsigned-integer mmec-uint64))
+       (mmec--define-fits-function/floating-point
+	(TYPE-OR-STEM)
+	`(mmec--define-fits-function ,TYPE-OR-STEM mmec-floating-point   mmec-ldouble)))
 
-(defmacro mmec--define-fits-function/unsigned-integer (TYPE-OR-STEM)
-  `(mmec--define-fits-function ,TYPE-OR-STEM mmec-unsigned-integer mmec-uint64))
-
-(defmacro mmec--define-fits-function/floating-point (TYPE-OR-STEM)
-  `(mmec--define-fits-function ,TYPE-OR-STEM mmec-floating-point   mmec-ldouble))
-
-(mmec--define-fits-function/signed-integer	char)
-(mmec--define-fits-function/signed-integer	schar)
-(mmec--define-fits-function/unsigned-integer	uchar)
-(mmec--define-fits-function/unsigned-integer	wchar)
-(mmec--define-fits-function/signed-integer	sshrt)
-(mmec--define-fits-function/unsigned-integer	ushrt)
-(mmec--define-fits-function/signed-integer	sint)
-(mmec--define-fits-function/unsigned-integer	uint)
-(mmec--define-fits-function/signed-integer	slong)
-(mmec--define-fits-function/unsigned-integer	ulong)
-(mmec--define-fits-function/signed-integer	sllong)
-(mmec--define-fits-function/unsigned-integer	ullong)
-(mmec--define-fits-function/signed-integer	ssize)
-(mmec--define-fits-function/unsigned-integer	usize)
-(mmec--define-fits-function/signed-integer	sintmax)
-(mmec--define-fits-function/unsigned-integer	uintmax)
-(mmec--define-fits-function/signed-integer	ptrdiff)
-(mmec--define-fits-function/signed-integer	sint8)
-(mmec--define-fits-function/unsigned-integer	uint8)
-(mmec--define-fits-function/signed-integer	sint16)
-(mmec--define-fits-function/unsigned-integer	uint16)
-(mmec--define-fits-function/signed-integer	sint32)
-(mmec--define-fits-function/unsigned-integer	uint32)
-(mmec--define-fits-function/signed-integer	sint64)
-(mmec--define-fits-function/unsigned-integer	uint64)
-(mmec--define-fits-function/floating-point	float)
-(mmec--define-fits-function/floating-point	double)
-(mmec--define-fits-function/floating-point	ldouble)
+    (mmec--define-fits-function/signed-integer		char)
+    (mmec--define-fits-function/signed-integer		schar)
+    (mmec--define-fits-function/unsigned-integer	uchar)
+    (mmec--define-fits-function/unsigned-integer	wchar)
+    (mmec--define-fits-function/signed-integer		sshrt)
+    (mmec--define-fits-function/unsigned-integer	ushrt)
+    (mmec--define-fits-function/signed-integer		sint)
+    (mmec--define-fits-function/unsigned-integer	uint)
+    (mmec--define-fits-function/signed-integer		slong)
+    (mmec--define-fits-function/unsigned-integer	ulong)
+    (mmec--define-fits-function/signed-integer		sllong)
+    (mmec--define-fits-function/unsigned-integer	ullong)
+    (mmec--define-fits-function/signed-integer		ssize)
+    (mmec--define-fits-function/unsigned-integer	usize)
+    (mmec--define-fits-function/signed-integer		sintmax)
+    (mmec--define-fits-function/unsigned-integer	uintmax)
+    (mmec--define-fits-function/signed-integer		ptrdiff)
+    (mmec--define-fits-function/signed-integer		sint8)
+    (mmec--define-fits-function/unsigned-integer	uint8)
+    (mmec--define-fits-function/signed-integer		sint16)
+    (mmec--define-fits-function/unsigned-integer	uint16)
+    (mmec--define-fits-function/signed-integer		sint32)
+    (mmec--define-fits-function/unsigned-integer	uint32)
+    (mmec--define-fits-function/signed-integer		sint64)
+    (mmec--define-fits-function/unsigned-integer	uint64)
+    (mmec--define-fits-function/floating-point		float)
+    (mmec--define-fits-function/floating-point		double)
+    (mmec--define-fits-function/floating-point		ldouble)))
 
 
 ;;;; numeric comparison operations
@@ -2276,8 +2281,8 @@ The argument OP2 must be of type `%s'.
        (mmec--def-numeric-compar-method ,MMEC-FUNC2 ,OPERATOR ,OPERATION-SINT64-UINT64 mmec-sint64 mmec-sint64-obj mmec-uint64 mmec-uint64-obj)
        (mmec--def-numeric-compar-method ,MMEC-FUNC2 ,OPERATOR ,OPERATION-UINT64-SINT64 mmec-uint64 mmec-uint64-obj mmec-sint64 mmec-sint64-obj)
        (mmec--def-numeric-compar-method ,MMEC-FUNC2 ,OPERATOR ,OPERATION-LDOUBLE
-				      mmec-ldouble mmec-ldouble-obj
-				      mmec-ldouble mmec-ldouble-obj)
+					mmec-ldouble mmec-ldouble-obj
+					mmec-ldouble mmec-ldouble-obj)
 
        ;; These are the methods that normalise operands among operational types.
        (mmec--def-numeric-compar-method ,MMEC-FUNC2 ,OPERATOR ,MMEC-FUNC2 mmec-sint64 mmec-ldouble mmec-ldouble identity)

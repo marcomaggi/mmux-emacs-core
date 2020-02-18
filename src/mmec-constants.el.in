@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-17 07:23:26 marco>
+;; Time-stamp: <2020-02-18 07:59:54 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -48,7 +48,7 @@
   @VALUEOF_MMUX_SIZEOF_UNSIGNED_CHAR@
   "Value of type `integer' representing the size of `unsigned char' measured in bytes.")
 
-(defconst mmec-SIZEOF_WCHAR
+(defconst mmec-SIZEOF_WCHAR_T
   @VALUEOF_MMUX_SIZEOF_WCHAR@
   "Value of type `integer' representing the size of `wchar_t' measured in bytes.")
 
@@ -168,7 +168,7 @@
   @VALUEOF_MMUX_SIZEOF_DOUBLE@
   "Value of type `integer' representing the size of `double' measured in bytes.")
 
-(defconst mmec-SIZEOF_LDOUBLE
+(defconst mmec-SIZEOF_LONG_DOUBLE
   @VALUEOF_MMUX_SIZEOF_LDOUBLE@
   "Value of type `integer' representing the size of `long double' measured in bytes.")
 

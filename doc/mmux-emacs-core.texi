@@ -865,7 +865,7 @@ Value of type @objtype{mmec-ldouble} representing the system constant @code{LDBL
 
 
 @value{PACKAGE} defines elisp data types in the module @value{PackageEmacsModule}.  Many wrappers
-for integer types are implemented for safety of writing interfaces to C language library and for
+for integer types are implemented for safety of writing interfaces to C language libraries and for
 better dispatching of multimethods.
 
 @quotation
@@ -915,6 +915,90 @@ range of such type is available.
 * ctypes typedefs double::      Wrapper for @code{double}.
 * ctypes typedefs ldouble::     Wrapper for @code{long double}.
 @end menu
+
+@c ------------------------------------------------------------------------
+
+@macro ElispNumberValueDefinition{ETYPESTEM, CTYPE, EANCESTORTYPESTEM, ENORMTYPESTEM, INTREPDESCR}
+@ElispNumberValueTypeDefinition{\ETYPESTEM\, \CTYPE\, \EANCESTORTYPESTEM\, \ENORMTYPESTEM\, \INTREPDESCR\}
+@ElispNumberValueDefaultMethods{\ETYPESTEM\, \CTYPE\, \EANCESTORTYPESTEM\, \ENORMTYPESTEM\, \INTREPDESCR\}
+@ElispNumberValueSpecialisedMethods{\ETYPESTEM\, \CTYPE\, \EANCESTORTYPESTEM\, \ENORMTYPESTEM\, \INTREPDESCR\}
+@end macro
+
+@c ------------------------------------------------------------------------
+
+@macro ElispNumberValueTypeDefinition{ETYPESTEM, CTYPE, EANCESTORTYPESTEM, ENORMTYPESTEM, INTREPDESCR}
+@deftp {Object Type} mmec-\ETYPESTEM\
+@deftpx {Parent Type} mmec-\EANCESTORTYPESTEM\
+Object wrapper for the C language type @code{\CTYPE\}.
+@end deftp
+
+
+@defun mmec-\ETYPESTEM\-p @var{obj}
+Return true if @var{obj} is an instance of @objtype{mmec-\ETYPESTEM\}, otherwise return false.
+@end defun
+
+
+@defun mmec-\ETYPESTEM\-obj @var{CH}
+Given an instance of @objtype{mmec-\ETYPESTEM\}: return its internal representation as
+\INTREPDESCR\.
+@end defun
+
+@end macro
+
+@c ------------------------------------------------------------------------
+
+@macro ElispNumberValueDefaultMethods{ETYPESTEM, CTYPE, EANCESTORTYPESTEM, ENORMTYPESTEM, INTREPDESCR}
+@deffn {Generic Function} mmec-\ETYPESTEM\ (@var{INIT})
+Constructor for number of objects of type @objtype{mmec-\ETYPESTEM\}.  The argument @var{INIT} must be a
+number value.
+@end deffn
+
+
+@deffn {Method} mmec-\ETYPESTEM\ (@var{INIT} mmec-\ETYPESTEM\)
+This is the copy constructor implemented as method.  This method creates a duplicate of the
+@var{INIT} value, but it reuses the internal representation (which is immutable).
+@end deffn
+
+@end macro
+
+@c ------------------------------------------------------------------------
+
+@macro ElispNumberValueSpecialisedMethods{ETYPESTEM, CTYPE, EANCESTORTYPESTEM, ENORMTYPESTEM, INTREPDESCR}
+@deffn {Method} mmec-\ETYPESTEM\ (@var{INIT} integer)
+Specialised constructor for number values of type @objtype{mmec-\ETYPESTEM\}.
+
+This constructor normalises the initialisation argument to an object of type @objtype{mmec-\ENORMTYPESTEM\},
+then it checks if the range is valid: if it is is builds an object of type @objtype{mmec-\ETYPESTEM\},
+otherwise it raises the error condition @code{mmec-error-value-out-of-range}.
+@end deffn
+
+
+@deffn {Method} mmec-\ETYPESTEM\ (@var{INIT} float)
+Specialised constructor for number values of type @objtype{mmec-\ETYPESTEM\}.
+
+This constructor normalises the initialisation argument to an object of type @objtype{mmec-\ENORMTYPESTEM\},
+then it checks if the range is valid: if it is is builds an object of type @objtype{mmec-\ETYPESTEM\},
+otherwise it raises the error condition @code{mmec-error-value-out-of-range}.
+@end deffn
+
+
+@deffn {Method} mmec-\ETYPESTEM\ (@var{INIT} mmec-\EANCESTORTYPESTEM\)
+Specialised constructor for number values of type @objtype{mmec-\ETYPESTEM\}.
+
+This constructor normalises the initialisation argument to an object of type @objtype{mmec-\ENORMTYPESTEM\},
+then it checks if the range is valid: if it is is builds an object of type @objtype{mmec-\ETYPESTEM\},
+otherwise it raises the error condition @code{mmec-error-value-out-of-range}.
+@end deffn
+
+
+@deffn {Method} mmec-\ETYPESTEM\ (@var{INIT} mmec-number)
+Specialised constructor for number values of type @objtype{mmec-\ETYPESTEM\}.
+
+This constructor signals that the given initialisation argument is invalid by raising the condition
+@code{mmec-error-unsupported-init-type}.
+@end deffn
+
+@end macro
 
 @c page
 @node ctypes typedefs base
@@ -970,28 +1054,7 @@ Return true if @var{OBJ} is an instance of the specified type; otherwise return 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-char
-@deftpx {Parent Type} mmec-signed-integer
-Object wrapper for the C language type @code{char}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-char (@var{INIT})
-@deffnx {Method} mmec-char ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-char} initialised with @var{INIT}, which must be an
-exact integer object in the range of the C language type @code{char}.
-@end deffn
-
-
-@defun mmec-char-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-char}, otherwise return false.
-@end defun
-
-
-@defun mmec-char-obj @var{CH}
-Given an instance of @objtype{mmec-char}: return its internal representation as Emacs built--in
-@code{integer} object representing its @ascii{} code.
-@end defun
+@ElispNumberValueDefinition{char, char, signed-integer, sint64, Emacs built--in @code{integer} object representing its @ascii{} code}
 
 @c page
 @node ctypes typedefs schar
@@ -1001,28 +1064,7 @@ Given an instance of @objtype{mmec-char}: return its internal representation as 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-schar
-@deftpx {Parent Type} mmec-signed-integer
-Object wrapper for the C language type @code{signed char}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-schar (@var{INIT})
-@deffnx {Method} mmec-schar ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-schar} initialised with @var{INIT}, which must be an
-exact integer object in the range of the C language type @code{signed char}.
-@end deffn
-
-
-@defun mmec-schar-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-schar}, otherwise return false.
-@end defun
-
-
-@defun mmec-schar-obj @var{CH}
-Given an instance of @objtype{mmec-schar}: return its internal representation as Emacs built--in
-@code{integer} object representing its @ascii{} code.
-@end defun
+@ElispNumberValueDefinition{schar, signed char, signed-integer, sint64, Emacs built--in @code{integer} object representing its @ascii{} code}
 
 @c page
 @node ctypes typedefs uchar
@@ -1032,28 +1074,7 @@ Given an instance of @objtype{mmec-schar}: return its internal representation as
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-uchar
-@deftpx {Parent Type} mmec-unsigned-integer
-Object wrapper for the C language type @code{unsigned char}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-uchar (@var{INIT})
-@deffnx {Method} mmec-uchar ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-uchar} initialised with @var{INIT}, which must be an
-exact integer object in the range of the C language type @code{unsigned char}.
-@end deffn
-
-
-@defun mmec-uchar-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-uchar}, otherwise return false.
-@end defun
-
-
-@defun mmec-uchar-obj @var{CH}
-Given an instance of @objtype{mmec-uchar}: return its internal representation as Emacs built--in
-@code{integer} object representing its @ascii{} code.
-@end defun
+@ElispNumberValueDefinition{uchar, unsigned char, unsigned-integer, uint64, Emacs built--in @code{integer} object representing its @ascii{} code}
 
 @c page
 @node ctypes typedefs wchar
@@ -1063,27 +1084,7 @@ Given an instance of @objtype{mmec-uchar}: return its internal representation as
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-wchar
-@deftpx {Parent Type} mmec-unsigned-integer
-Object wrapper for the C language type @code{wchar_t}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-wchar (@var{INIT})
-@deffnx {Method} mmec-wchar ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-wchar} initialised with @var{INIT}, which must be an
-exact integer object in the range of the C language type @code{wchar_t}.
-@end deffn
-
-
-@defun mmec-wchar-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-wchar}, otherwise return false.
-@end defun
-
-
-@defun mmec-wchar-obj @var{CH}
-Given an instance of @objtype{mmec-wchar}: return the exact integer representing its code.
-@end defun
+@ElispNumberValueDefinition{wchar, wchar_t, unsigned-integer, uint64, Emacs user--pointer object representing its code}
 
 @c page
 @node ctypes typedefs sshrt
@@ -1093,28 +1094,7 @@ Given an instance of @objtype{mmec-wchar}: return the exact integer representing
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-sshrt
-@deftpx {Parent Type} mmec-signed-integer
-Object wrapper for the C language type @code{signed short int}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-sshrt (@var{INIT})
-@deffnx {Method} mmec-sshrt ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-sshrt} initialised with @var{INIT}, which must be an
-exact integer object in the range of the C language type @code{signed short int}.
-@end deffn
-
-
-@defun mmec-sshrt-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-sshrt}, otherwise return false.
-@end defun
-
-
-@defun mmec-sshrt-obj @var{CH}
-Given an instance of @objtype{mmec-sshrt}: return its internal representation as Emacs built--in
-@code{integer} object.
-@end defun
+@ElispNumberValueDefinition{sshrt, signed short int, signed-integer, sint64, Emacs built--in @objtype{integer} value}
 
 @c page
 @node ctypes typedefs ushrt
@@ -1124,28 +1104,7 @@ Given an instance of @objtype{mmec-sshrt}: return its internal representation as
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-ushrt
-@deftpx {Parent Type} mmec-unsigned-integer
-Object wrapper for the C language type @code{unsigned short int}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-ushrt (@var{INIT})
-@deffnx {Method} mmec-ushrt ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-ushrt} initialised with @var{INIT}, which must be an
-exact integer object in the range of the C language type @code{unsigned short int}.
-@end deffn
-
-
-@defun mmec-ushrt-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-ushrt}, otherwise return false.
-@end defun
-
-
-@defun mmec-ushrt-obj @var{CH}
-Given an instance of @objtype{mmec-ushrt}: return its internal representation as Emacs built--in
-@code{integer} object.
-@end defun
+@ElispNumberValueDefinition{ushrt, unsigned short int, unsigned-integer, uint64, Emacs built--in @objtype{integer} value}
 
 @c page
 @node ctypes typedefs sint
@@ -1155,28 +1114,7 @@ Given an instance of @objtype{mmec-ushrt}: return its internal representation as
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-sint
-@deftpx {Parent Type} mmec-signed-integer
-Object wrapper for the C language type @code{signed int}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-sint (@var{INIT})
-@deffnx {Method} mmec-sint ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-sint} initialised with @var{INIT}, which
-must be an exact integer object in the range of the C language type @code{signed int}.
-@end deffn
-
-
-@defun mmec-sint-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-sint}, otherwise return false.
-@end defun
-
-
-@defun mmec-sint-obj @var{CH}
-Given an instance of @objtype{mmec-sint}: return the its internal representation as
-user--pointer object.
-@end defun
+@ElispNumberValueDefinition{sint, signed int, signed-integer, sint64, Emacs user--pointer object representing its value}
 
 @c page
 @node ctypes typedefs uint
@@ -1186,28 +1124,7 @@ user--pointer object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-uint
-@deftpx {Parent Type} mmec-unsigned-integer
-Object wrapper for the C language type @code{unsigned int}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-uint (@var{INIT})
-@deffnx {Method} mmec-uint ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-uint} initialised with @var{INIT}, which must
-be an exact integer object in the range of the C language type @code{unsigned int}.
-@end deffn
-
-
-@defun mmec-uint-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-uint}, otherwise return false.
-@end defun
-
-
-@defun mmec-uint-obj @var{CH}
-Given an instance of @objtype{mmec-uint}: return the its internal representation as
-user--pointer object.
-@end defun
+@ElispNumberValueDefinition{uint, unsigned int, unsigned-integer, uint64, Emacs user--pointer object representing its value}
 
 @c page
 @node ctypes typedefs slong
@@ -1217,28 +1134,7 @@ user--pointer object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-slong
-@deftpx {Parent Type} mmec-signed-integer
-Object wrapper for the C language type @code{signed long int}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-slong (@var{INIT})
-@deffnx {Method} mmec-slong ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-slong} initialised with @var{INIT}, which must be an
-exact integer object in the range of the C language type @code{signed long int}.
-@end deffn
-
-
-@defun mmec-slong-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-slong}, otherwise return false.
-@end defun
-
-
-@defun mmec-slong-obj @var{CH}
-Given an instance of @objtype{mmec-slong}: return the its internal representation as user--pointer
-object.
-@end defun
+@ElispNumberValueDefinition{slong, signed long int, signed-integer, sint64, Emacs user--pointer object representing its value}
 
 @c page
 @node ctypes typedefs ulong
@@ -1248,28 +1144,7 @@ object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-ulong
-@deftpx {Parent Type} mmec-unsigned-integer
-Object wrapper for the C language type @code{unsigned long int}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-ulong (@var{INIT})
-@deffnx {Method} mmec-ulong ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-ulong} initialised with @var{INIT}, which
-must be an exact integer object in the range of the C language type @code{unsigned long int}.
-@end deffn
-
-
-@defun mmec-ulong-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-ulong}, otherwise return false.
-@end defun
-
-
-@defun mmec-ulong-obj @var{CH}
-Given an instance of @objtype{mmec-ulong}: return the its internal representation as
-user--pointer object.
-@end defun
+@ElispNumberValueDefinition{ulong, unsigned long int, unsigned-integer, uint64, Emacs user--pointer object representing its value}
 
 @c page
 @node ctypes typedefs sllong
@@ -1279,30 +1154,7 @@ user--pointer object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-sllong
-@deftpx {Parent Type} mmec-signed-integer
-Object wrapper for the C language type @code{signed long long int}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-sllong (@var{INIT})
-@deffnx {Method} mmec-sllong ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-sllong} initialised with @var{INIT},
-which must be an exact integer object in the range of the C language type @code{signed long long
-int}.
-@end deffn
-
-
-@defun mmec-sllong-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-sllong}, otherwise return
-false.
-@end defun
-
-
-@defun mmec-sllong-obj @var{CH}
-Given an instance of @objtype{mmec-sllong}: return the its internal representation as
-user--pointer object.
-@end defun
+@ElispNumberValueDefinition{sllong, signed long long int, signed-integer, sint64, Emacs user--pointer object representing its value}
 
 @c page
 @node ctypes typedefs ullong
@@ -1312,30 +1164,7 @@ user--pointer object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-ullong
-@deftpx {Parent Type} mmec-unsigned-integer
-Object wrapper for the C language type @code{unsigned long long int}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-ullong (@var{INIT})
-@deffnx {Method} mmec-ullong ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-ullong} initialised with @var{INIT},
-which must be an exact integer object in the range of the C language type @code{unsigned long long
-int}.
-@end deffn
-
-
-@defun mmec-ullong-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-ullong}, otherwise return
-false.
-@end defun
-
-
-@defun mmec-ullong-obj @var{CH}
-Given an instance of @objtype{mmec-ullong}: return the its internal representation as
-user--pointer object.
-@end defun
+@ElispNumberValueDefinition{ullong, unsigned long long int, unsigned-integer, uint64, Emacs user--pointer object representing its value}
 
 @c page
 @node ctypes typedefs ssize
@@ -1345,28 +1174,7 @@ user--pointer object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-ssize
-@deftpx {Parent Type} mmec-signed-integer
-Object wrapper for the C language type @code{ssize_t}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-ssize (@var{INIT})
-@deffnx {Method} mmec-ssize ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-ssize} initialised with @var{INIT}, which must be an
-exact integer object in the range of the C language type @code{ssize_t}.
-@end deffn
-
-
-@defun mmec-ssize-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-ssize}, otherwise return false.
-@end defun
-
-
-@defun mmec-ssize-obj @var{CH}
-Given an instance of @objtype{mmec-ssize}: return the its internal representation as user--pointer
-object.
-@end defun
+@ElispNumberValueDefinition{ssize, ssize_t, signed-integer, sint64, Emacs user--pointer object representing its value}
 
 @c page
 @node ctypes typedefs usize
@@ -1376,28 +1184,7 @@ object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-usize
-@deftpx {Parent Type} mmec-unsigned-integer
-Object wrapper for the C language type @code{size_t}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-usize (@var{INIT})
-@deffnx {Method} mmec-usize ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-usize} initialised with @var{INIT}, which must be an
-exact integer object in the range of the C language type @code{size_t}.
-@end deffn
-
-
-@defun mmec-usize-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-usize}, otherwise return false.
-@end defun
-
-
-@defun mmec-usize-obj @var{CH}
-Given an instance of @objtype{mmec-usize}: return the its internal representation as user--pointer
-object.
-@end defun
+@ElispNumberValueDefinition{usize, size_t, unsigned-integer, uint64, Emacs user--pointer object representing its value}
 
 @c page
 @node ctypes typedefs sintmax
@@ -1407,28 +1194,7 @@ object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-sintmax
-@deftpx {Parent Type} mmec-signed-integer
-Object wrapper for the C language type @code{intmax_t}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-sintmax (@var{INIT})
-@deffnx {Method} mmec-sintmax ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-sintmax} initialised with @var{INIT}, which must be an
-exact integer object in the range of the C language type @code{intmax_t}.
-@end deffn
-
-
-@defun mmec-sintmax-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-sintmax}, otherwise return false.
-@end defun
-
-
-@defun mmec-sintmax-obj @var{CH}
-Given an instance of @objtype{mmec-sintmax}: return the its internal representation as user--pointer
-object.
-@end defun
+@ElispNumberValueDefinition{sintmax, intmax_t, signed-integer, sint64, Emacs user--pointer object representing its value}
 
 @c page
 @node ctypes typedefs uintmax
@@ -1438,28 +1204,7 @@ object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-uintmax
-@deftpx {Parent Type} mmec-unsigned-integer
-Object wrapper for the C language type @code{uintmax_t}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-uintmax (@var{INIT})
-@deffnx {Method} mmec-uintmax ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-uintmax} initialised with @var{INIT}, which must be
-an exact integer object in the range of the C language type @code{uintmax_t}.
-@end deffn
-
-
-@defun mmec-uintmax-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-uintmax}, otherwise return false.
-@end defun
-
-
-@defun mmec-uintmax-obj @var{CH}
-Given an instance of @objtype{mmec-uintmax}: return the its internal representation as user--pointer
-object.
-@end defun
+@ElispNumberValueDefinition{uintmax, uintmax_t, unsigned-integer, uint64, Emacs user--pointer object representing its value}
 
 @c page
 @node ctypes typedefs ptrdiff
@@ -1469,28 +1214,7 @@ object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-ptrdiff
-@deftpx {Parent Type} mmec-signed-integer
-Object wrapper for the C language type @code{ptrdiff_t}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-ptrdiff (@var{INIT})
-@deffnx {Method} mmec-ptrdiff ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-ptrdiff} initialised with @var{INIT}, which must be
-an exact integer object in the range of the C language type @code{ptrdiff_t}.
-@end deffn
-
-
-@defun mmec-ptrdiff-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-ptrdiff}, otherwise return false.
-@end defun
-
-
-@defun mmec-ptrdiff-obj @var{CH}
-Given an instance of @objtype{mmec-ptrdiff}: return the its internal representation as user--pointer
-object.
-@end defun
+@ElispNumberValueDefinition{ptrdiff, ptrdiff_t, signed-integer, sint64, Emacs user--pointer object representing its value}
 
 @c page
 @node ctypes typedefs sint8
@@ -1500,28 +1224,7 @@ object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-sint8
-@deftpx {Parent Type} mmec-signed-integer
-Object wrapper for the C language type @code{int8_t}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-sint8 (@var{INIT})
-@deffnx {Method} mmec-sint8 ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-sint8} initialised with @var{INIT}, which must be an
-exact integer object in the range of the C language type @code{int8_t}.
-@end deffn
-
-
-@defun mmec-sint8-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-sint8}, otherwise return false.
-@end defun
-
-
-@defun mmec-sint8-obj @var{CH}
-Given an instance of @objtype{mmec-sint8}: return the its internal representation as Emacs built--in
-@code{integer} object.
-@end defun
+@ElispNumberValueDefinition{sint8, int8_t, signed-integer, sint64, Emacs built--in @objtype{integer} value}
 
 @c page
 @node ctypes typedefs uint8
@@ -1531,28 +1234,7 @@ Given an instance of @objtype{mmec-sint8}: return the its internal representatio
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-uint8
-@deftpx {Parent Type} mmec-unsigned-integer
-Object wrapper for the C language type @code{uint8_t}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-uint8 (@var{INIT})
-@deffnx {Method} mmec-uint8 ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-uint8} initialised with @var{INIT}, which must be an
-exact integer object in the range of the C language type @code{uint8_t}.
-@end deffn
-
-
-@defun mmec-uint8-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-uint8}, otherwise return false.
-@end defun
-
-
-@defun mmec-uint8-obj @var{CH}
-Given an instance of @objtype{mmec-uint8}: return the its internal representation as Emacs built--in
-@code{integer} object.
-@end defun
+@ElispNumberValueDefinition{uint8, uint8_t, unsigned-integer, uint64, Emacs built--in @objtype{integer} value}
 
 @c page
 @node ctypes typedefs sint16
@@ -1562,28 +1244,7 @@ Given an instance of @objtype{mmec-uint8}: return the its internal representatio
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-sint16
-@deftpx {Parent Type} mmec-signed-integer
-Object wrapper for the C language type @code{int16_t}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-sint16 (@var{INIT})
-@deffnx {Method} mmec-sint16 ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-sint16} initialised with @var{INIT}, which must be an
-exact integer object in the range of the C language type @code{int16_t}.
-@end deffn
-
-
-@defun mmec-sint16-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-sint16}, otherwise return false.
-@end defun
-
-
-@defun mmec-sint16-obj @var{CH}
-Given an instance of @objtype{mmec-sint16}: return the its internal representation as Emacs built--in
-@code{integer} object.
-@end defun
+@ElispNumberValueDefinition{sint16, int16_t, signed-integer, sint64, Emacs built--in @objtype{integer} value}
 
 @c page
 @node ctypes typedefs uint16
@@ -1593,28 +1254,7 @@ Given an instance of @objtype{mmec-sint16}: return the its internal representati
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-uint16
-@deftpx {Parent Type} mmec-unsigned-integer
-Object wrapper for the C language type @code{uint16_t}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-uint16 (@var{INIT})
-@deffnx {Method} mmec-uint16 ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-uint16} initialised with @var{INIT}, which must be an
-exact integer object in the range of the C language type @code{uint16_t}.
-@end deffn
-
-
-@defun mmec-uint16-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-uint16}, otherwise return false.
-@end defun
-
-
-@defun mmec-uint16-obj @var{CH}
-Given an instance of @objtype{mmec-uint16}: return the its internal representation as Emacs built--in
-@code{integer} object.
-@end defun
+@ElispNumberValueDefinition{uint16, uint16_t, unsigned-integer, uint64, Emacs built--in @objtype{integer} value}
 
 @c page
 @node ctypes typedefs sint32
@@ -1624,28 +1264,7 @@ Given an instance of @objtype{mmec-uint16}: return the its internal representati
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-sint32
-@deftpx {Parent Type} mmec-signed-integer
-Object wrapper for the C language type @code{int32_t}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-sint32 (@var{INIT})
-@deffnx {Method} mmec-sint32 ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-sint32} initialised with @var{INIT}, which must be an
-exact integer object in the range of the C language type @code{int32_t}.
-@end deffn
-
-
-@defun mmec-sint32-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-sint32}, otherwise return false.
-@end defun
-
-
-@defun mmec-sint32-obj @var{CH}
-Given an instance of @objtype{mmec-sint32}: return the its internal representation as user--pointer
-object.
-@end defun
+@ElispNumberValueDefinition{sint32, int32_t, signed-integer, sint64, Emacs user--pointer object representing its value}
 
 @c page
 @node ctypes typedefs uint32
@@ -1655,90 +1274,121 @@ object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-uint32
-@deftpx {Parent Type} mmec-unsigned-integer
-Object wrapper for the C language type @code{uint32_t}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-uint32 (@var{INIT})
-@deffnx {Method} mmec-uint32 ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-uint32} initialised with @var{INIT}, which must be an
-exact integer object in the range of the C language type @code{uint32_t}.
-@end deffn
-
-
-@defun mmec-uint32-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-uint32}, otherwise return false.
-@end defun
-
-
-@defun mmec-uint32-obj @var{CH}
-Given an instance of @objtype{mmec-uint32}: return the its internal representation as user--pointer
-object.
-@end defun
+@ElispNumberValueDefinition{uint32, uint32_t, unsigned-integer, uint64, Emacs user--pointer object representing its value}
 
 @c page
 @node ctypes typedefs sint64
 @subsection Wrapper for @code{int64_t}
 
 
-The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.  The custom
+number type @objtype{mmec-sint64} is special because it is used for normalised representation of all
+the exact signed integer numbers, both built--in and custom.
 
 
-@deftp {Object Type} mmec-sint64
-@deftpx {Parent Type} mmec-signed-integer
-Object wrapper for the C language type @code{int64_t}.
-@end deftp
+@ElispNumberValueTypeDefinition{sint64, int64_t, signed-integer, sint64, Emacs user--pointer object representing its value}
+@ElispNumberValueDefaultMethods{sint64, int64_t, signed-integer, sint64, Emacs user--pointer object representing its value}
 
 
-@deffn {Generic Function} mmec-sint64 (@var{INIT})
-@deffnx {Method} mmec-sint64 ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-sint64} initialised with @var{INIT}, which must be an
-exact integer object in the range of the C language type @code{int64_t}.
+@deffn {Method} mmec-sint64 (@var{INIT} integer)
+Specialised constructor for number values of type @objtype{mmec-sint64}.
+
+This constructor assumes that a value of type @objtype{integer} always fits into the internal
+representation of a @objtype{mmec-sint64} value.
 @end deffn
 
 
-@defun mmec-sint64-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-sint64}, otherwise return false.
-@end defun
+@deffn {Method} mmec-sint64 (@var{INIT} float)
+Specialised constructor for number values of type @objtype{mmec-sint64}.
+
+This constructor assumes that a value of type @objtype{float} always fits into the internal
+representation of a @objtype{mmec-sint64} value.  The floating--point number is first rounded to
+integer with the standard C language function @cfunc{round}.
+@end deffn
 
 
-@defun mmec-sint64-obj @var{CH}
-Given an instance of @objtype{mmec-sint64}: return the its internal representation as user--pointer
-object.
-@end defun
+@deffn {Method} mmec-sint64 (@var{INIT} mmec-char)
+@deffnx {Method} mmec-sint64 (@var{INIT} mmec-schar)
+@deffnx {Method} mmec-sint64 (@var{INIT} mmec-sshrt)
+@deffnx {Method} mmec-sint64 (@var{INIT} mmec-sint)
+@deffnx {Method} mmec-sint64 (@var{INIT} mmec-slong)
+@deffnx {Method} mmec-sint64 (@var{INIT} mmec-sllong)
+@deffnx {Method} mmec-sint64 (@var{INIT} mmec-sintmax)
+@deffnx {Method} mmec-sint64 (@var{INIT} mmec-ssize)
+@deffnx {Method} mmec-sint64 (@var{INIT} mmec-ptrdiff)
+@deffnx {Method} mmec-sint64 (@var{INIT} mmec-sint8)
+@deffnx {Method} mmec-sint64 (@var{INIT} mmec-sint16)
+@deffnx {Method} mmec-sint64 (@var{INIT} mmec-sint32)
+Specialised constructor for number values of type @objtype{mmec-sint64}.
+
+This constructor normalises the internal representation of @var{INIT} to a @code{int64_t} value,
+assuming that the internal representation always fits the range of @code{int64_t}.
+@end deffn
+
+
+@deffn {Method} mmec-sint64 (@var{INIT} mmec-number)
+Specialised constructor for number values of type @objtype{mmec-sint64}.
+
+This constructor signals that the given initialisation argument is invalid by raising the condition
+@code{mmec-error-unsupported-init-type}.
+@end deffn
 
 @c page
 @node ctypes typedefs uint64
 @subsection Wrapper for @code{uint64_t}
 
 
-The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.  The custom
+number type @objtype{mmec-uint64} is special because it is used for normalised representation of all
+the exact unsigned integer numbers, both built--in and custom.
 
 
-@deftp {Object Type} mmec-uint64
-@deftpx {Parent Type} mmec-unsigned-integer
-Object wrapper for the C language type @code{uint64_t}.
-@end deftp
+@ElispNumberValueTypeDefinition{uint64, uint64_t, unsigned-integer, uint64, Emacs user--pointer object representing its value}
+@ElispNumberValueDefaultMethods{uint64, uint64_t, unsigned-integer, uint64, Emacs user--pointer object representing its value}
 
 
-@deffn {Generic Function} mmec-uint64 (@var{INIT})
-@deffnx {Method} mmec-uint64 ((@var{INIT} integer))
-Build and return a new instance of @objtype{mmec-uint64} initialised with @var{INIT}, which must be an
-exact integer object in the range of the C language type @code{uint64_t}.
+@deffn {Method} mmec-uint64 (@var{INIT} integer)
+Specialised constructor for number values of type @objtype{mmec-uint64}.
+
+This constructor assumes that a value of type @objtype{integer} always fits into the internal
+representation of a @objtype{mmec-uint64} value.  If @var{INIT} is negative: this method raises the
+condition @code{mmec-error-value-out-of-range}.
 @end deffn
 
 
-@defun mmec-uint64-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-uint64}, otherwise return false.
-@end defun
+@deffn {Method} mmec-uint64 (@var{INIT} float)
+Specialised constructor for number values of type @objtype{mmec-uint64}.
+
+This constructor assumes that a value of type @objtype{float} always fits into the internal
+representation of a @objtype{mmec-uint64} value.  The floating--point number is first rounded to
+integer with the standard C language function @cfunc{round}.  If @var{INIT} is negative: this method
+raises the condition @code{mmec-error-value-out-of-range}.
+@end deffn
 
 
-@defun mmec-uint64-obj @var{CH}
-Given an instance of @objtype{mmec-uint64}: return the its internal representation as user--pointer
-object.
-@end defun
+@deffn {Method} mmec-uint64 (@var{INIT} mmec-uchar)
+@deffnx {Method} mmec-uint64 (@var{INIT} mmec-ushrt)
+@deffnx {Method} mmec-uint64 (@var{INIT} mmec-uint)
+@deffnx {Method} mmec-uint64 (@var{INIT} mmec-ulong)
+@deffnx {Method} mmec-uint64 (@var{INIT} mmec-ullong)
+@deffnx {Method} mmec-uint64 (@var{INIT} mmec-uintmax)
+@deffnx {Method} mmec-uint64 (@var{INIT} mmec-usize)
+@deffnx {Method} mmec-uint64 (@var{INIT} mmec-uint8)
+@deffnx {Method} mmec-uint64 (@var{INIT} mmec-uint16)
+@deffnx {Method} mmec-uint64 (@var{INIT} mmec-uint32)
+Specialised constructor for number values of type @objtype{mmec-uint64}.
+
+This constructor normalises the internal representation of @var{INIT} to a @code{uint64_t} value,
+assuming that the internal representation always fits the range of @code{uint64_t}.
+@end deffn
+
+
+@deffn {Method} mmec-uint64 (@var{INIT} mmec-number)
+Specialised constructor for number values of type @objtype{mmec-uint64}.
+
+This constructor signals that the given initialisation argument is invalid by raising the condition
+@code{mmec-error-unsupported-init-type}.
+@end deffn
 
 @c page
 @node ctypes typedefs float
@@ -1748,28 +1398,7 @@ object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-float
-@deftpx {Parent Type} mmec-floating-point
-Object wrapper for the C language type @code{float}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-float (@var{INIT})
-@deffnx {Method} mmec-float ((@var{INIT} float))
-Build and return a new instance of @objtype{mmec-float} initialised with @var{INIT}, which must be a
-floating--point object in the range of the C language type @code{float}.
-@end deffn
-
-
-@defun mmec-float-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-float}, otherwise return false.
-@end defun
-
-
-@defun mmec-float-obj @var{CH}
-Given an instance of @objtype{mmec-float}: return the its internal representation as user--pointer
-object.
-@end defun
+@ElispNumberValueDefinition{float, float, floating-point, ldouble, Emacs user--pointer object representing its value}
 
 @c page
 @node ctypes typedefs double
@@ -1779,59 +1408,54 @@ object.
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@deftp {Object Type} mmec-double
-@deftpx {Parent Type} mmec-floating-point
-Object wrapper for the C language type @code{double}.
-@end deftp
-
-
-@deffn {Generic Function} mmec-double (@var{INIT})
-@deffnx {Method} mmec-double ((@var{INIT} float))
-Build and return a new instance of @objtype{mmec-double} initialised with @var{INIT}, which must be a
-floating--point object in the range of the C language type @code{double}.
-@end deffn
-
-
-@defun mmec-double-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-double}, otherwise return false.
-@end defun
-
-
-@defun mmec-double-obj @var{CH}
-Given an instance of @objtype{mmec-double}: return the its internal representation as Emacs built--in
-@code{float}.
-@end defun
+@ElispNumberValueDefinition{double, double, floating-point, ldouble, Emacs built--in @objtype{float} value}
 
 @c page
 @node ctypes typedefs ldouble
 @subsection Wrapper for @code{long double}
 
 
-The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
+The following syntactic bindings are defined in the module @value{PackageEmacsModule}.  The custom
+number type @objtype{mmec-ldouble} is special because it is used for normalised representation of
+all the floating--point numbers, both built--in and custom.
 
 
-@deftp {Object Type} mmec-ldouble
-@deftpx {Parent Type} mmec-floating-point
-Object wrapper for the C language type @code{long double}.
-@end deftp
+@ElispNumberValueTypeDefinition{ldouble, long double, floating-point, ldouble, Emacs user--pointer object representing its value}
+@ElispNumberValueDefaultMethods{ldouble, long double, floating-point, ldouble, Emacs user--pointer object representing its value}
 
 
-@deffn {Generic Function} mmec-ldouble (@var{INIT})
-@deffnx {Method} mmec-ldouble ((@var{INIT} float))
-Build and return a new instance of @objtype{mmec-ldouble} initialised with @var{INIT}, which must
-be a floating--point object in the range of the C language type @code{long double}.
+@deffn {Method} mmec-ldouble (@var{INIT} integer)
+Specialised constructor for number values of type @objtype{mmec-ldouble}.
+
+This constructor assumes that a value of type @objtype{integer} always fits into the internal
+representation of a @objtype{mmec-ldouble} value.  The argument @var{INIT} is first converted to the
+Emacs built--in type @objtype{float} with the function @func{float}.
 @end deffn
 
 
-@defun mmec-ldouble-p @var{obj}
-Return true if @var{obj} is an instance of @objtype{mmec-ldouble}, otherwise return false.
-@end defun
+@deffn {Method} mmec-ldouble (@var{INIT} float)
+Specialised constructor for number values of type @objtype{mmec-ldouble}.
+
+This constructor assumes that a value of type @objtype{float} always fits into the internal
+representation of a @objtype{mmec-ldouble} value.
+@end deffn
 
 
-@defun mmec-ldouble-obj @var{CH}
-Given an instance of @objtype{mmec-ldouble}: return the its internal representation as
-user--pointer object.
-@end defun
+@deffn {Method} mmec-ldouble (@var{INIT} mmec-float)
+@deffnx {Method} mmec-ldouble (@var{INIT} mmec-double)
+Specialised constructor for number values of type @objtype{mmec-ldouble}.
+
+This constructor normalises the internal representation of @var{INIT} to a @code{long double} value,
+assuming that the internal representation always fits the range of @code{long double}.
+@end deffn
+
+
+@deffn {Method} mmec-ldouble (@var{INIT} mmec-number)
+Specialised constructor for number values of type @objtype{mmec-ldouble}.
+
+This constructor signals that the given initialisation argument is invalid by raising the condition
+@code{mmec-error-unsupported-init-type}.
+@end deffn
 
 @c page
 @node ctypes comparison

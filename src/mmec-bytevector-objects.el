@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-16 16:55:18 marco>
+;; Time-stamp: <2020-02-18 07:47:23 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -31,10 +31,9 @@
 
 ;;; Code:
 
-(eval-and-compile
-  (require 'mmec-constants)
-  (require 'mmec-basics)
-  (require 'mmec-number-objects))
+(require 'mmec-constants)
+(require 'mmec-basics)
+(require 'mmec-number-objects)
 
 
 ;;;; bytevector objects: object definitions
@@ -54,18 +53,29 @@
 ;;slots; if the value is 0, the bytevector holds unsigned integers in its slots.
 ;;
 
-(cl-defstruct mmec-bytevector
+(cl-defstruct (mmec-bytevector
+	       (:constructor mmec-bytevector--make))
   number-of-slots
   slot-size
   number-of-allocated-bytes
   obj)
 
 (cl-defstruct (mmec-integer-bytevector
-	       (:include mmec-bytevector))
+	       (:include	mmec-bytevector)
+	       (:constructor	mmec-integer-bytevector--make))
   signed)
 
 (cl-defstruct (mmec-float-bytevector
-	       (:include mmec-bytevector)))
+	       (:include	mmec-bytevector)
+	       (:constructor	mmec-float-bytevector--make)))
+
+(cl-macrolet ((mmec--define-abstract-type-constructor
+	       (TYPE)
+	       `(defun ,TYPE (&rest args)
+		  (signal 'mmux-core-instantiating-abstract-type (quote ,TYPE)))))
+  (mmec--define-abstract-type-constructor mmec-bytevector)
+  (mmec--define-abstract-type-constructor mmec-integer-bytevector)
+  (mmec--define-abstract-type-constructor mmec-float-bytevector))
 
 ;;; --------------------------------------------------------------------
 

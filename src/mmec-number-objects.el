@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-18 07:42:25 marco>
+;; Time-stamp: <2020-02-18 07:46:56 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -62,15 +62,15 @@
 
 ;;; --------------------------------------------------------------------
 
-(defmacro mmec--define-abstract-type-constructor (TYPE)
-  `(defun ,TYPE (&rest args)
-     (signal 'mmux-core-instantiating-abstract-type (quote ,TYPE))))
-
-(mmec--define-abstract-type-constructor mmec-number)
-(mmec--define-abstract-type-constructor mmec-integer)
-(mmec--define-abstract-type-constructor mmec-signed-integer)
-(mmec--define-abstract-type-constructor mmec-unsigned-integer)
-(mmec--define-abstract-type-constructor mmec-floating-point)
+(cl-macrolet ((mmec--define-abstract-type-constructor
+	       (TYPE)
+	       `(defun ,TYPE (&rest args)
+		  (signal 'mmux-core-instantiating-abstract-type (quote ,TYPE)))))
+  (mmec--define-abstract-type-constructor mmec-number)
+  (mmec--define-abstract-type-constructor mmec-integer)
+  (mmec--define-abstract-type-constructor mmec-signed-integer)
+  (mmec--define-abstract-type-constructor mmec-unsigned-integer)
+  (mmec--define-abstract-type-constructor mmec-floating-point))
 
 
 ;;;; C language type wrappers: char

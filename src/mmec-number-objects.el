@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-17 06:13:41 marco>
+;; Time-stamp: <2020-02-18 06:29:42 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -83,24 +83,24 @@
 (cl-defgeneric mmec-char (init)
   "Constructor for number objects of type `mmec-char'.
 
-This type constructor is implemented  as a generic function.  The
+This  type  constructor  is  implemented as  a  generic  function.   The
 argument INIT must be a number value.")
 
 (cl-defmethod mmec-char ((init mmec-char))
   "Constructor for number objects of type `mmec-char'.
 
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
-internal representation (which is immutable)."
+This is the copy constructor implemented as method.  This method creates
+a   duplicate  of   the  INIT   value,  but   it  reuses   the  internal
+representation (which is immutable)."
   (mmec-char--make :obj (mmec-char-obj init)))
 
 (cl-defmethod mmec-char ((init mmec-signed-integer))
   "Constructor for number objects of type `mmec-char'.
 
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
-if it  is is  builds an  object of  type `mmec-char',  otherwise is
-raised the error condition `mmec-error-value-out-of-range'."
+This constructor normalises the initialisation  argument to an object of
+type `mmec-sint64', then  it checks if the  range is valid: if  it is is
+builds  an object  of type  `mmec-char', otherwise  is raised  the error
+condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
     (unless (mmec-fits-char-p obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-char init)))
@@ -109,13 +109,13 @@ raised the error condition `mmec-error-value-out-of-range'."
 (cl-defmethod mmec-char ((init integer))
   "Constructor for number objects of type `mmec-char'.
 
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
+This  constructor accepts  as initialisation  argument a  value of  type
+`integer'.
 
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
-if it  is is  builds an  object of  type `mmec-char',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
+This constructor normalises the initialisation  argument to an object of
+type `mmec-sint64', then  it checks if the  range is valid: if  it is is
+builds  an object  of type  `mmec-char', otherwise  it raises  the error
+condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
     (unless (mmec-fits-char-p obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-char init)))
@@ -124,13 +124,13 @@ raises the error condition `mmec-error-value-out-of-range'."
 (cl-defmethod mmec-char ((init float))
   "Constructor for number objects of type `mmec-char'.
 
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
+This  constructor accepts  as initialisation  argument a  value of  type
+`float'.
 
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
-if it  is is builds  an object  of type `mmec-char',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
+This constructor normalises the initialisation  argument to an object of
+type `mmec-sint64', then  it checks if the  range is valid: if  it is is
+builds  an object  of type  `mmec-char', otherwise  it raises  the error
+condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
     (unless (mmec-fits-char-p obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-char init)))
@@ -139,8 +139,8 @@ raises the error condition `mmec-error-value-out-of-range'."
 (cl-defmethod mmec-char ((init mmec-number))
   "Constructor for number objects of type `mmec-char'.
 
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
+This constructor  method signals that the  given initialisation argument
+is invalid."
   (signal 'mmec-error-unsupported-init-type (list 'mmec-char init)))
 
 
@@ -161,7 +161,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-schar'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-schar--make :obj (mmec-schar-obj init)))
 
@@ -169,7 +169,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-schar'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-schar',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -184,7 +184,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-schar',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -199,7 +199,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-schar',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -232,7 +232,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-uchar'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-uchar--make :obj (mmec-uchar-obj init)))
 
@@ -240,7 +240,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-uchar'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uchar',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -255,7 +255,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uchar',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -270,7 +270,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uchar',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -303,7 +303,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-wchar'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-wchar--make :obj (mmec-wchar-obj init)))
 
@@ -311,7 +311,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-wchar'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-wchar',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -326,7 +326,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uchar',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -341,7 +341,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uchar',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -374,7 +374,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-sshrt'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-sshrt--make :obj (mmec-sshrt-obj init)))
 
@@ -382,7 +382,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-sshrt'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-sshrt',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -397,7 +397,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-sshrt',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -412,7 +412,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-sshrt',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -445,7 +445,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-ushrt'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-ushrt--make :obj (mmec-ushrt-obj init)))
 
@@ -453,7 +453,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-ushrt'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-ushrt',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -468,7 +468,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-ushrt',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -483,7 +483,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-ushrt',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -516,7 +516,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-sint'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-sint--make :obj (mmec-sint-obj init)))
 
@@ -524,7 +524,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-sint'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-sint',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -539,7 +539,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-sint',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -554,7 +554,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-sint',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -587,7 +587,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-uint'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-uint--make :obj (mmec-uint-obj init)))
 
@@ -595,7 +595,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-uint'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uint',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -610,7 +610,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uint',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -625,7 +625,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uint',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -658,7 +658,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-slong'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-slong--make :obj (mmec-slong-obj init)))
 
@@ -666,7 +666,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-slong'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-slong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -681,7 +681,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-slong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -696,7 +696,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-slong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -729,7 +729,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-ulong'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-ulong--make :obj (mmec-ulong-obj init)))
 
@@ -737,7 +737,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-ulong'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-ulong',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -752,7 +752,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-ulong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -767,7 +767,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-ulong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -800,7 +800,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-sllong'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-sllong--make :obj (mmec-sllong-obj init)))
 
@@ -808,7 +808,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-sllong'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-sllong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -823,7 +823,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-sllong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -838,7 +838,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-sllong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -871,7 +871,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-ullong'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-ullong--make :obj (mmec-ullong-obj init)))
 
@@ -879,7 +879,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-ullong'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-ullong',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -894,7 +894,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-ullong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -909,7 +909,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-ullong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -942,7 +942,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-sintmax'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-sintmax--make :obj (mmec-sintmax-obj init)))
 
@@ -950,7 +950,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-sintmax'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-sintmax',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -965,7 +965,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-sintmax',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -980,7 +980,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-sintmax',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -1013,7 +1013,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-uintmax'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-uintmax--make :obj (mmec-uintmax-obj init)))
 
@@ -1021,7 +1021,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-uintmax'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uintmax',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -1036,7 +1036,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uintmax',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -1051,7 +1051,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uintmax',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -1084,7 +1084,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-ssize'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-ssize--make :obj (mmec-ssize-obj init)))
 
@@ -1092,7 +1092,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-ssize'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-ssize',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -1107,7 +1107,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-ssize',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -1122,7 +1122,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-ssize',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -1155,7 +1155,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-usize'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-usize--make :obj (mmec-usize-obj init)))
 
@@ -1163,7 +1163,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-usize'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-usize',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -1178,7 +1178,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-usize',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -1193,7 +1193,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-usize',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -1226,7 +1226,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-ptrdiff'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-ptrdiff--make :obj (mmec-ptrdiff-obj init)))
 
@@ -1234,7 +1234,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-ptrdiff'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it is  is builds an object of type  `mmec-ptrdiff', otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -1249,7 +1249,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it is  is builds an object of type  `mmec-ptrdiff', otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -1264,7 +1264,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it is  is builds an object of type  `mmec-ptrdiff', otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -1297,7 +1297,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-sint8'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-sint8--make :obj (mmec-sint8-obj init)))
 
@@ -1305,7 +1305,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-sint8'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-sint8',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -1320,7 +1320,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-sint8',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -1335,7 +1335,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-sint8',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -1368,7 +1368,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-uint8'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-uint8--make :obj (mmec-uint8-obj init)))
 
@@ -1376,7 +1376,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-uint8'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uint8',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -1391,7 +1391,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uint8',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -1406,7 +1406,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uint8',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -1439,7 +1439,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-sint16'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-sint16--make :obj (mmec-sint16-obj init)))
 
@@ -1447,7 +1447,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-sint16'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds an  object of type `mmec-sint16',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -1462,7 +1462,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-sint16',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -1477,7 +1477,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-sint16',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -1510,7 +1510,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-uint16'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-uint16--make :obj (mmec-uint16-obj init)))
 
@@ -1518,7 +1518,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-uint16'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds an  object of type `mmec-uint16',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -1533,7 +1533,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uint16',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -1548,7 +1548,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uint16',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -1581,7 +1581,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-sint32'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-sint32--make :obj (mmec-sint32-obj init)))
 
@@ -1589,7 +1589,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-sint32'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds an  object of type `mmec-sint32',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -1604,7 +1604,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-sint32',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -1619,7 +1619,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', the it  checks if the range is valid:
+object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-sint32',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
@@ -1652,7 +1652,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-uint32'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-uint32--make :obj (mmec-uint32-obj init)))
 
@@ -1660,7 +1660,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-uint32'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds an  object of type `mmec-uint32',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -1675,7 +1675,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uint32',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -1690,7 +1690,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', the it  checks if the range is valid:
+object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uint32',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
@@ -1708,8 +1708,8 @@ argument is invalid."
 
 ;;;; C language type wrappers: sint64_t
 ;;
-;;The custom number type `mmec-sint64' is special  because it is used for normalised representation of
-;;all the unsigned integer numbers, both built-in and custom.
+;;The custom number type  `mmec-sint64' is special because it is  used for normalised representation
+;;of all the signed integer numbers, both built-in and custom.
 ;;
 
 (cl-defstruct (mmec-sint64
@@ -1726,16 +1726,16 @@ argument INIT must be a number value.")
 (cl-defmethod mmec-sint64 ((init mmec-sint64))
   "Constructor for number objects of type `mmec-sint64'.
 
-The argument INIT is an instance  of type `mmec-sit64': this is the
-copy constructor  implemented as  method.  This method  creates a
-duplicate  of  the  elisp  object, but  it  reuses  the  internal
-representation (which is immutable)."
+The argument INIT is an instance  of type `mmec-sit64': this is the copy
+constructor implemented as  method.  This method creates  a duplicate of
+the elisp  object, but it  reuses the internal representation  (which is
+immutable)."
   (mmec--make mmec-sint64 :obj (mmec--extract-obj mmec-sint64 init)))
 
 (cl-defmethod mmec-sint64 ((init integer))
   "Constructor for number objects of type `mmec-sint64'.
 
-The argument INIT must be a  value of type `integer'."
+The argument INIT must be a value of type `integer'."
   (mmec--make sint64 :obj (mmec-c-make-usrptr-sint64-from-elisp-integer init)))
 
 (cl-defmethod mmec-sint64 ((init float))
@@ -1747,58 +1747,60 @@ The argument INIT must be a  value of type `float'."
 (cl-defmethod mmec-sint64 ((init mmec-number))
   "Constructor for number objects of type `mmec-sint64'.
 
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
+This constructor  method signals that the  given initialisation argument
+is invalid."
   (signal 'mmec-error-unsupported-init-type (list 'mmec-sint64 init)))
 
-(defmacro mmec--define-sint64-constructor-method-for-integer-intrep-init (INIT-TYPE-OR-STEM)
-  "Expand into a `cl-defmethod' form defining a constructor method for `mmec-sint64' values.
+(progn
+  (defmacro mmec--define-sint64-constructor-method-for-integer-intrep-init (INIT-TYPE-OR-STEM)
+    "Expand into a `cl-defmethod' form defining a constructor method for `mmec-sint64' values.
 
-The argument  INIT-TYPE-OR-STEM must  be a symbol  representing a
-type name or  type stem name; this type must  be a signed integer
-with `integer' as internal representation."
-  (let* ((INIT-TYPE	(intern (mmec--prepend-prefix-to-symbol-name INIT-TYPE-OR-STEM)))
-	 (DOCSTRING	(format "Constructor for number objects of type `mmec-sint64'.
-
-The argument INIT must be an object of type `%s'." INIT-TYPE)))
-    `(cl-defmethod mmec-sint64 ((init ,INIT-TYPE))
-       ,DOCSTRING
-       (mmec--make sint64 :obj (mmec-c-make-usrptr-sint64-from-elisp-integer (mmec--extract-obj ,INIT-TYPE init))))))
-
-(mmec--define-sint64-constructor-method-for-integer-intrep-init char)
-(mmec--define-sint64-constructor-method-for-integer-intrep-init schar)
-(mmec--define-sint64-constructor-method-for-integer-intrep-init sshrt)
-(mmec--define-sint64-constructor-method-for-integer-intrep-init sint8)
-(mmec--define-sint64-constructor-method-for-integer-intrep-init sint16)
-
-(defmacro mmec--define-sint64-constructor-method-for-usrptr-intrep-init (INIT-TYPE-OR-STEM)
-  "Expand into a `cl-defmethod' form defining a constructor method for `mmec-sint64' values.
-
-The argument  INIT-TYPE-OR-STEM must  be a symbol  representing a
-type name or  type stem name; this type must  be a signed integer
-with a user-pointer object as internal representation."
-  (let* ((INIT-TYPE		(intern (mmec--prepend-prefix-to-symbol-name INIT-TYPE-OR-STEM)))
-	 (CLANG-CONSTRUCTOR	(intern (format "mmec-c-make-usrptr-sint64-from-usrptr-%s" INIT-TYPE-OR-STEM)))
-	 (DOCSTRING		(format "Constructor for number objects of type `mmec-sint64'.
+The argument INIT-TYPE-OR-STEM must be a symbol representing a type name
+or type stem name; this type must  be a signed integer with `integer' as
+internal representation."
+    (let* ((INIT-TYPE	(intern (mmec--prepend-prefix-to-symbol-name INIT-TYPE-OR-STEM)))
+	   (DOCSTRING	(format "Constructor for number objects of type `mmec-sint64'.
 
 The argument INIT must be an object of type `%s'." INIT-TYPE)))
-    `(cl-defmethod mmec-sint64 ((init ,INIT-TYPE))
-       ,DOCSTRING
-       (mmec--make sint64 :obj (,CLANG-CONSTRUCTOR (mmec--extract-obj ,INIT-TYPE init))))))
+      `(cl-defmethod mmec-sint64 ((init ,INIT-TYPE))
+	 ,DOCSTRING
+	 (mmec--make sint64 :obj (mmec-c-make-usrptr-sint64-from-elisp-integer (mmec--extract-obj ,INIT-TYPE init))))))
 
-(mmec--define-sint64-constructor-method-for-usrptr-intrep-init sint)
-(mmec--define-sint64-constructor-method-for-usrptr-intrep-init slong)
-(mmec--define-sint64-constructor-method-for-usrptr-intrep-init sllong)
-(mmec--define-sint64-constructor-method-for-usrptr-intrep-init sintmax)
-(mmec--define-sint64-constructor-method-for-usrptr-intrep-init ssize)
-(mmec--define-sint64-constructor-method-for-usrptr-intrep-init sint32)
-(mmec--define-sint64-constructor-method-for-usrptr-intrep-init ptrdiff)
+  (mmec--define-sint64-constructor-method-for-integer-intrep-init char)
+  (mmec--define-sint64-constructor-method-for-integer-intrep-init schar)
+  (mmec--define-sint64-constructor-method-for-integer-intrep-init sshrt)
+  (mmec--define-sint64-constructor-method-for-integer-intrep-init sint8)
+  (mmec--define-sint64-constructor-method-for-integer-intrep-init sint16))
+
+(progn
+  (defmacro mmec--define-sint64-constructor-method-for-usrptr-intrep-init (INIT-TYPE-OR-STEM)
+    "Expand into a `cl-defmethod' form defining a constructor method for `mmec-sint64' values.
+
+The argument INIT-TYPE-OR-STEM must be a symbol representing a type name
+or  type  stem  name;  this  type  must  be  a  signed  integer  with  a
+user-pointer object as internal representation."
+    (let* ((INIT-TYPE		(intern (mmec--prepend-prefix-to-symbol-name INIT-TYPE-OR-STEM)))
+	   (CLANG-CONSTRUCTOR	(intern (format "mmec-c-make-usrptr-sint64-from-usrptr-%s" INIT-TYPE-OR-STEM)))
+	   (DOCSTRING		(format "Constructor for number objects of type `mmec-sint64'.
+
+The argument INIT must be an object of type `%s'." INIT-TYPE)))
+      `(cl-defmethod mmec-sint64 ((init ,INIT-TYPE))
+	 ,DOCSTRING
+	 (mmec--make sint64 :obj (,CLANG-CONSTRUCTOR (mmec--extract-obj ,INIT-TYPE init))))))
+
+  (mmec--define-sint64-constructor-method-for-usrptr-intrep-init sint)
+  (mmec--define-sint64-constructor-method-for-usrptr-intrep-init slong)
+  (mmec--define-sint64-constructor-method-for-usrptr-intrep-init sllong)
+  (mmec--define-sint64-constructor-method-for-usrptr-intrep-init sintmax)
+  (mmec--define-sint64-constructor-method-for-usrptr-intrep-init ssize)
+  (mmec--define-sint64-constructor-method-for-usrptr-intrep-init sint32)
+  (mmec--define-sint64-constructor-method-for-usrptr-intrep-init ptrdiff))
 
 
 ;;;; C language type wrappers: uint64_t
 ;;
-;;The custom number type `mmec-uint64' is special  because it is used for normalised representation of
-;;all the unsigned integer numbers, both built-in and custom.
+;;The custom number type  `mmec-uint64' is special because it is  used for normalised representation
+;;of all the unsigned integer numbers, both built-in and custom.
 ;;
 
 (cl-defstruct (mmec-uint64
@@ -1816,7 +1818,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-uint64'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec--make mmec-uint64 :obj (mmec--extract-obj mmec-uint64 init)))
 
@@ -1825,6 +1827,8 @@ internal representation (which is immutable)."
 
 This  constructor method  accepts  as  initialisation argument  a
 value of the Emacs's built-in type `integer'."
+  (when (> 0 init)
+    (signal 'mmec-error-value-out-of-range (list 'mmec-uint64 init)))
   (mmec--make uint64 :obj (mmec-c-make-usrptr-uint64-from-elisp-integer init)))
 
 (cl-defmethod mmec-uint64 ((init float))
@@ -1897,7 +1901,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-float'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-float--make :obj (mmec-float-obj init)))
 
@@ -1907,7 +1911,7 @@ internal representation (which is immutable)."
 The argument INIT is a value of type `mmec-integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-ldouble', the it checks if the range is valid:
+object of type `mmec-ldouble', then it checks if the range is valid:
 if it  is is builds  an object  of type `mmec-float',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-ldouble init)))
@@ -1922,7 +1926,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-ldouble', the it checks if the range is valid:
+object of type `mmec-ldouble', then it checks if the range is valid:
 if it  is is builds  an object  of type `mmec-float',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-ldouble init)))
@@ -1937,7 +1941,7 @@ This constructor  accepts as  initialisation argument a  value of
 type `float'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-ldouble', the it checks if the range is valid:
+object of type `mmec-ldouble', then it checks if the range is valid:
 if it  is is builds  an object  of type `mmec-float',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-ldouble init)))
@@ -1970,7 +1974,7 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-double'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
+creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
   (mmec-double--make :obj (mmec-double-obj init)))
 
@@ -1978,7 +1982,7 @@ internal representation (which is immutable)."
   "Constructor for number objects of type `mmec-double'.
 
 This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-ldouble', the it checks if the range is valid:
+object of type `mmec-ldouble', then it checks if the range is valid:
 if it  is is builds an  object of type `mmec-double',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-ldouble init)))
@@ -1992,10 +1996,10 @@ raised the error condition `mmec-error-value-out-of-range'."
 This constructor  accepts as  initialisation argument a  value of
 type `integer'.
 
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-ldouble', the it checks if the range is valid:
-if it  is is builds an  object of type `mmec-double',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
+This constructor normalises the initialisation  argument to an object of
+type `mmec-ldouble', then it  checks if the range is valid:  if it is is
+builds an  object of type  `mmec-double', otherwise it raises  the error
+condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-ldouble init)))
     (unless (mmec-fits-double-p obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-double init)))
@@ -2018,8 +2022,8 @@ argument is invalid."
 
 ;;;; C language type wrappers: long double float
 ;;
-;;The custom number type `mmec-ldouble' is special because it is used for normalised representation of
-;;all the floating-point numbers, both built-in and custom.
+;;The custom number type `mmec-ldouble' is special  because it is used for normalised representation
+;;of all the floating-point numbers, both built-in and custom.
 ;;
 
 (cl-defstruct (mmec-ldouble
@@ -2037,8 +2041,8 @@ argument INIT must be a number value.")
   "Constructor for number objects of type `mmec-ldouble'.
 
 This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  elisp object,  but  it reuses  the
-internal representation (which is immutable)."
+creates a duplicate of the INIT value, but it reuses the internal
+representation (which is immutable)."
   (mmec--make mmec-ldouble :obj (mmec--extract-obj mmec-ldouble init)))
 
 ;;; --------------------------------------------------------------------

@@ -1,7 +1,5 @@
 ﻿-*- coding: utf-8-with-signature-unix; fill-column: 200 -*-
 
-* Reimplement numeric limit constants as structures rather than raw numbers.
-* Add documentation for all the numeric types constructors.
 * Add bytevector types for all the integer numbers.
 * Add bytevector types for all the floating-point numbers.
 * Add printer functions for all the number types.

@@ -922,6 +922,7 @@ range of such type is available.
 @ElispNumberValueTypeDefinition{\ETYPESTEM\, \CTYPE\, \EANCESTORTYPESTEM\, \ENORMTYPESTEM\, \INTREPDESCR\}
 @ElispNumberValueDefaultMethods{\ETYPESTEM\, \CTYPE\, \EANCESTORTYPESTEM\, \ENORMTYPESTEM\, \INTREPDESCR\}
 @ElispNumberValueSpecialisedMethods{\ETYPESTEM\, \CTYPE\, \EANCESTORTYPESTEM\, \ENORMTYPESTEM\, \INTREPDESCR\}
+@ElispNumberValueFitsFunctions{\ETYPESTEM\, \CTYPE\, \EANCESTORTYPESTEM\, \ENORMTYPESTEM\, \INTREPDESCR\}
 @end macro
 
 @c ------------------------------------------------------------------------
@@ -938,7 +939,7 @@ Return true if @var{obj} is an instance of @objtype{mmec-\ETYPESTEM\}, otherwise
 @end defun
 
 
-@defun mmec-\ETYPESTEM\-obj @var{CH}
+@defun mmec-\ETYPESTEM\-obj @var{OBJ}
 Given an instance of @objtype{mmec-\ETYPESTEM\}: return its internal representation as
 \INTREPDESCR\.
 @end defun
@@ -948,7 +949,7 @@ Given an instance of @objtype{mmec-\ETYPESTEM\}: return its internal representat
 @c ------------------------------------------------------------------------
 
 @macro ElispNumberValueDefaultMethods{ETYPESTEM, CTYPE, EANCESTORTYPESTEM, ENORMTYPESTEM, INTREPDESCR}
-@deffn {Generic Function} mmec-\ETYPESTEM\ (@var{INIT})
+@deffn {Generic Function} mmec-\ETYPESTEM\ @var{INIT}
 Constructor for number of objects of type @objtype{mmec-\ETYPESTEM\}.  The argument @var{INIT} must be a
 number value.
 @end deffn
@@ -996,6 +997,26 @@ Specialised constructor for number values of type @objtype{mmec-\ETYPESTEM\}.
 
 This constructor signals that the given initialisation argument is invalid by raising the condition
 @code{mmec-error-unsupported-init-type}.
+@end deffn
+
+@end macro
+
+@c ------------------------------------------------------------------------
+
+@macro ElispNumberValueFitsFunctions{ETYPESTEM, CTYPE, EANCESTORTYPESTEM, ENORMTYPESTEM, INTREPDESCR}
+@deffn {Generic Function} mmec-fits-\ETYPESTEM\-p @var{INIT}
+Generic function that returns true if the argument @var{INIT} would fit a representation as
+@objtype{mmec-\ETYPESTEM\}; otherwise it returns false.  The argument @var{INIT} must be a number
+value.
+@end deffn
+
+
+@deffn {Method} mmec-fits-\ETYPESTEM\-p (@var{INIT} mmec-\EANCESTORTYPESTEM\)
+@deffnx {Method} mmec-fits-\ETYPESTEM\-p (@var{INIT} integer)
+@deffnx {Method} mmec-fits-\ETYPESTEM\-p (@var{INIT} float)
+Specialised method that converts @var{INIT} into a value of type @objtype{mmec-\ENORMTYPESTEM\},
+then returns true if the converted value would fit a representation as @objtype{mmec-\ETYPESTEM\};
+otherwise it returns false.
 @end deffn
 
 @end macro
@@ -1333,6 +1354,10 @@ This constructor signals that the given initialisation argument is invalid by ra
 @code{mmec-error-unsupported-init-type}.
 @end deffn
 
+@c ------------------------------------------------------------------------
+
+@ElispNumberValueFitsFunctions{sint64, int64_t, signed-integer, sint64, Emacs user--pointer object representing its value}
+
 @c page
 @node ctypes typedefs uint64
 @subsection Wrapper for @code{uint64_t}
@@ -1389,6 +1414,10 @@ Specialised constructor for number values of type @objtype{mmec-uint64}.
 This constructor signals that the given initialisation argument is invalid by raising the condition
 @code{mmec-error-unsupported-init-type}.
 @end deffn
+
+@c ------------------------------------------------------------------------
+
+@ElispNumberValueFitsFunctions{uint64, uint64_t, unsigned-integer, uint64, Emacs user--pointer object representing its value}
 
 @c page
 @node ctypes typedefs float
@@ -1457,6 +1486,10 @@ This constructor signals that the given initialisation argument is invalid by ra
 @code{mmec-error-unsupported-init-type}.
 @end deffn
 
+@c ------------------------------------------------------------------------
+
+@ElispNumberValueFitsFunctions{ldouble, long double, floating-point, ldouble, Emacs user--pointer object representing its value}
+
 @c page
 @node ctypes comparison
 @section Comparison operations
@@ -1492,7 +1525,7 @@ Return true if @vari{OP} \OPERATOR\ @varii{OP}; otherwise return false.
 
 
 @macro mmuxDefunNumericComparisonFunction{OPERATOR, OPERATIONDESCRIPTION}
-@defun cc\OPERATOR\ @var{OP} &rest @var{ops}
+@defun mmec\OPERATOR\ @var{OP} &rest @var{ops}
 Return true if all the operands are \OPERATIONDESCRIPTION\, left to right; otherwise return false.
 The comparison is performed with the generic function @func{mmec-2\OPERATOR\}.
 @end defun

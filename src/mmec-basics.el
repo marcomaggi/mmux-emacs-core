@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-16 17:01:09 marco>
+;; Time-stamp: <2020-02-18 07:17:09 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -118,13 +118,6 @@
 	;;Prepend the prefix
 	(concat (concat "mmec-" STRING)))))
 
-  (defun mmec--select-normalised-type-stem-from-ancestor-type (ANCESTOR-TYPE)
-    (cond ((eq ANCESTOR-TYPE 'mmec-signed-integer)	'sint64)
-	  ((eq ANCESTOR-TYPE 'mmec-unsigned-integer)	'uint64)
-	  ((eq ANCESTOR-TYPE 'mmec-floating-point)	'ldouble)
-	  (t
-	   (signal 'mmec-error-unsupported-init-type ANCESTOR-TYPE))))
-
   (defun mmec--type-elisp-constructor-name (TYPE-OR-STEM)
     (intern (concat (mmec--prepend-prefix-to-symbol-name TYPE-OR-STEM) "--make")))
   )
@@ -155,38 +148,6 @@
   (let* ((TYPE.str	(mmec--prepend-prefix-to-symbol-name TYPE-OR-STEM))
 	 (EXTRACTOR	(intern (concat TYPE.str "-obj"))))
     `(,EXTRACTOR ,VALUE)))
-
-(defmacro mmec--clang-constructor (TYPE-OR-STEM &rest ARGS)
-  ;;Expand  into the  application of  the  C language  object  constructor to  the given  arguments.
-  ;;Example:
-  ;;
-  ;;  (mmec--clang-constructor sint32 123)
-  ;;  ==> (mmec-c-make-sint32 123)
-  ;;
-  (let* ((STEM.str		(mmec--strip-prefix-from-symbol-name TYPE-OR-STEM))
-	 (CLANG-CONSTRUCTOR	(intern (concat "mmec-c-make-" STEM.str))))
-    (cons CLANG-CONSTRUCTOR ARGS)))
-
-(defmacro mmec--number-clang-constructor (TYPE-OR-STEM NORMALISED-TYPE-OR-STEM &rest ARGS)
-  (let ((STEM (intern (concat (mmec--strip-prefix-from-symbol-name TYPE-OR-STEM)
-			      "-from-"
-			      (mmec--strip-prefix-from-symbol-name NORMALISED-TYPE-OR-STEM)))))
-    `(mmec--clang-constructor ,STEM . ,ARGS)))
-
-(defmacro mmec--clang-converter (FROMTYPE-OR-STEM TOTYPE-OR-STEM &rest ARGS)
-  ;;Expand  into  the application  of  the  C language  object  converter  to the  given  arguments.
-  ;;Examples:
-  ;;
-  ;;  (mmec--clang-converter sint32 sint64 123)
-  ;;  ==> (mmec-c-sint32-to-sint54 (mmec-sint32 123))
-  ;;
-  ;;  (mmec--clang-converter mmec-float mmec-ldouble 123)
-  ;;  ==> (mmec-c-float-to-ldouble (mmec-float 1.2))
-  ;;
-  (let* ((FROMSTEM.str		(mmec--strip-prefix-from-symbol-name FROMTYPE-OR-STEM))
-	 (TOSTEM.str		(mmec--strip-prefix-from-symbol-name TOTYPE-OR-STEM))
-	 (CLANG-CONVERTER	(intern (concat "mmec-c-" FROMSTEM.str "-to-" TOSTEM.str))))
-    (cons CLANG-CONVERTER ARGS)))
 
 
 ;;;; done

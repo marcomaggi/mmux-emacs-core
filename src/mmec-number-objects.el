@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-18 07:46:56 marco>
+;; Time-stamp: <2020-02-18 18:18:07 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -2204,7 +2204,7 @@ argument is invalid."
 ;;
 
 (defmacro mmec--define-numeric-comparison-generic-functions (OPERATOR)
-  (let* ((MMEC-FUNC	(intern (format "cc%s"   OPERATOR)))
+  (let* ((MMEC-FUNC	(intern (format "mmec%s"   OPERATOR)))
 	 (MMEC-FUNC2	(intern (format "mmec-2%s" OPERATOR)))
 	 (DOCSTRING	(format "Return true if every operand is %s to the one following it; otherwise return false." OPERATOR))
 	 (DOCSTRING2	(format "Return true if OP1 %s OP2; otherwise return false." OPERATOR)))

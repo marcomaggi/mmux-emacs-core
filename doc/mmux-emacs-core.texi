@@ -1679,7 +1679,7 @@ Non--negative exact integer representing the size of a slot measured in bytes.
 Non--negative exact integer representing the number of bytes allocated in the data area.
 
 @item obj
-Pointer object.
+User--pointer object.
 @end table
 @end deftp
 

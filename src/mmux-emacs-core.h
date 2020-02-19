@@ -111,7 +111,7 @@ mmec_decl int		mmec_version_interface_age	(void);
 
 #undef  MMEC_ELISP_FUNCTION_UNUSED_ARGS
 #define MMEC_ELISP_FUNCTION_UNUSED_ARGS \
-  emacs_env *env, ptrdiff_t nargs MMEC_UNUSED, emacs_value args[] MMEC_UNUSED, void *data MMEC_UNUSED
+  emacs_env *env, ptrdiff_t nargs MMEC_UNUSED, emacs_value args[] MMEC_UNUSED, void *elisp_func_data MMEC_UNUSED
 
 #define MMEC_PC(POINTER_TYPE, POINTER_NAME, EXPRESSION)	\
   POINTER_TYPE * POINTER_NAME = (POINTER_TYPE *) (EXPRESSION)
@@ -463,7 +463,7 @@ struct mmec_intrep_bytevector_t {
   size_t	number_of_slots;
   size_t	slot_size;
   int		hold_signed_values;
-  uint8_t	* ptr;
+  void		* ptr;
 };
 
 static inline mmec_intrep_bytevector_t *

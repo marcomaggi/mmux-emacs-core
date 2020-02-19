@@ -20,16 +20,19 @@
 ;;; Code:
 
 (require 'ert)
-(require 'mmec-number-objects)
+(require 'mmec)
 
 
 ;;;; demo tests
 
-(ert-deftest demo ()
-  "Demo test."
-  (mmec-debug-print (mmec-wchar 1))
-  (should (cc= (mmec-wchar 1) (mmec-wchar 1)))
-  nil)
+(ert-deftest mmec-sint16-bytevector ()
+  "Setters and getters for a `mmec-sint16-bytevector' object."
+  (let ((bv	(mmec-sint16-bytevector 10)))
+    (dotimes (i 10)
+      (mmec-bytevector-set bv i (mmec-sint16 (+ -10 i))))
+    (dotimes (i 10)
+      (should (mmec= (mmec-sint16 (+ -10 i))
+		     (mmec-bytevector-ref bv i))))))
 
 
 ;;;; done

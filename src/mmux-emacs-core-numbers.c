@@ -40,7 +40,7 @@
 #undef  MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_ELISP_FUNC
 #define MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_ELISP_FUNC(NSTEM, BSTEM) \
   static emacs_value							\
-  Fmmec_ ## NSTEM ## _fits_ ## BSTEM ## _range_p (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED) \
+  Fmmec_ ## NSTEM ## _fits_ ## BSTEM ## _range_p (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED) \
   {									\
     assert(1 == nargs);							\
     mmec_clang_ ## NSTEM ## _t nval;					\
@@ -131,7 +131,7 @@ MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(ldouble,	ldouble,	LDOUBLE)
 #undef  MMEC_DEFINE_INTEGER_NUMBER_CONSTRUCTOR
 #define MMEC_DEFINE_INTEGER_NUMBER_CONSTRUCTOR(BSTEM, NSTEM)		\
   emacs_value								\
-  Fmmec_make_integer_ ## BSTEM ## _from_usrptr_ ## NSTEM (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED) \
+  Fmmec_make_integer_ ## BSTEM ## _from_usrptr_ ## NSTEM (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED) \
   {									\
     assert(nargs == 1);							\
     mmec_clang_ ## NSTEM ## _t nval =					\
@@ -172,7 +172,7 @@ MMEC_DEFINE_INTEGER_NUMBER_CONSTRUCTOR(uint16,	uint64)
 #undef  MMEC_DEFINE_FLOAT_NUMBER_CONSTRUCTOR
 #define MMEC_DEFINE_FLOAT_NUMBER_CONSTRUCTOR(BSTEM, NSTEM)		\
   emacs_value								\
-  Fmmec_make_elisp_float_from_usrptr_ ## NSTEM (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED) \
+  Fmmec_make_elisp_float_from_usrptr_ ## NSTEM (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED) \
   {									\
     assert(nargs == 1);							\
     mmec_clang_ ## NSTEM ## _t nval =					\
@@ -288,7 +288,7 @@ MMEC_DEFINE_FLOAT_NUMBER_CONSTRUCTOR(double,	ldouble)
 #undef  MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR
 #define MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(BSTEM, NSTEM)	\
   emacs_value								\
-  Fmmec_make_usrptr_ ## BSTEM ## _from_usrptr_ ## NSTEM (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED) \
+  Fmmec_make_usrptr_ ## BSTEM ## _from_usrptr_ ## NSTEM (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED) \
   {									\
     assert(nargs == 1);							\
     mmec_clang_ ## NSTEM ## _t nval =					\
@@ -352,7 +352,7 @@ MMEC_DEFINE_USRPTR_BASE_TYPE_FUNCTIONS(ldouble)
 #define MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(BSTEM, ARGSTEM, ARGINTREP) \
   emacs_value								\
   Fmmec_make_usrptr_ ## BSTEM ## _from_ ## ARGINTREP ## _ ## ARGSTEM	\
-  (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED) \
+  (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED) \
   {									\
     assert(nargs == 1);							\
     mmec_clang_ ## ARGSTEM ## _t nval =					\
@@ -393,7 +393,7 @@ MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(ldouble,		ldouble,	usrptr)
 /* ------------------------------------------------------------------ */
 
 emacs_value
-Fmmec_make_usrptr_sint64_from_elisp_integer (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
+Fmmec_make_usrptr_sint64_from_elisp_integer (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
 {
   assert(nargs == 1);
   mmec_clang_sintmax_t argval = mmec_extract_elisp_integer_from_emacs_value(env, args[0]);
@@ -402,7 +402,7 @@ Fmmec_make_usrptr_sint64_from_elisp_integer (emacs_env *env, ptrdiff_t nargs, em
 }
 
 emacs_value
-Fmmec_make_usrptr_sint64_from_elisp_float (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
+Fmmec_make_usrptr_sint64_from_elisp_float (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
 {
   assert(nargs == 1);
   mmec_clang_double_t	argval = mmec_extract_elisp_float_from_emacs_value(env, args[0]);
@@ -413,7 +413,7 @@ Fmmec_make_usrptr_sint64_from_elisp_float (emacs_env *env, ptrdiff_t nargs, emac
 /* ------------------------------------------------------------------ */
 
 emacs_value
-Fmmec_make_usrptr_uint64_from_elisp_integer (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
+Fmmec_make_usrptr_uint64_from_elisp_integer (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
 {
   assert(nargs == 1);
   mmec_clang_sintmax_t argval = mmec_extract_elisp_integer_from_emacs_value(env, args[0]);
@@ -422,7 +422,7 @@ Fmmec_make_usrptr_uint64_from_elisp_integer (emacs_env *env, ptrdiff_t nargs, em
 }
 
 emacs_value
-Fmmec_make_usrptr_uint64_from_elisp_float (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
+Fmmec_make_usrptr_uint64_from_elisp_float (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
 {
   assert(nargs == 1);
   mmec_clang_double_t	argval = mmec_extract_elisp_float_from_emacs_value(env, args[0]);
@@ -433,7 +433,7 @@ Fmmec_make_usrptr_uint64_from_elisp_float (emacs_env *env, ptrdiff_t nargs, emac
 /* ------------------------------------------------------------------ */
 
 emacs_value
-Fmmec_make_usrptr_ldouble_from_usrptr_sint64 (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
+Fmmec_make_usrptr_ldouble_from_usrptr_sint64 (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
 {
   assert(nargs == 1);
   mmec_clang_sint64_t argval = mmec_extract_clang_sint64_from_emacs_value(env, args[0]);
@@ -442,7 +442,7 @@ Fmmec_make_usrptr_ldouble_from_usrptr_sint64 (emacs_env *env, ptrdiff_t nargs, e
 }
 
 emacs_value
-Fmmec_make_usrptr_ldouble_from_usrptr_uint64 (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
+Fmmec_make_usrptr_ldouble_from_usrptr_uint64 (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
 {
   assert(nargs == 1);
   mmec_clang_uint64_t argval = mmec_extract_clang_uint64_from_emacs_value(env, args[0]);
@@ -451,7 +451,7 @@ Fmmec_make_usrptr_ldouble_from_usrptr_uint64 (emacs_env *env, ptrdiff_t nargs, e
 }
 
 emacs_value
-Fmmec_make_usrptr_ldouble_from_elisp_float (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED)
+Fmmec_make_usrptr_ldouble_from_elisp_float (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
 {
   assert(nargs == 1);
   mmec_clang_double_t argval = mmec_extract_elisp_float_from_emacs_value(env, args[0]);
@@ -467,7 +467,7 @@ Fmmec_make_usrptr_ldouble_from_elisp_float (emacs_env *env, ptrdiff_t nargs, ema
 #undef  MMEC_COMPARISON_OPERATION
 #define MMEC_COMPARISON_OPERATION(OPNAME, OPERATOR, STEM)		\
   static emacs_value							\
-  Fmmec_compare_ ## STEM ## _ ## OPNAME(emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED) \
+  Fmmec_compare_ ## STEM ## _ ## OPNAME(emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED) \
   {									\
     assert(2 == nargs);							\
     mmec_clang_ ## STEM ## _t op1 = mmec_extract_clang_ ## STEM ## _from_emacs_value(env, args[0]); \

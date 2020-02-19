@@ -273,166 +273,171 @@ Return an integer representing the library interface current age.
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_CHAR
+@deftypevrx {Constant} integer mmec-sizeof-char
 Value of type @objtype{integer} representing the size of @code{char} measured in bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_SIGNED_CHAR
+@deftypevrx {Constant} integer mmec-sizeof-schar
 Value of type @objtype{integer} representing the size of @code{signed char} measured in bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_UNSIGNED_CHAR
+@deftypevrx {Constant} integer mmec-sizeof-uchar
 Value of type @objtype{integer} representing the size of @code{unsigned char} measured in bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_WCHAR_T
+@deftypevrx {Constant} integer mmec-sizeof-wchar
 Value of type @objtype{integer} representing the size of @code{wchar_t} measured in bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_SIGNED_SHORT_INT
+@deftypevrx {Constant} integer mmec-sizeof-sshrt
 Value of type @objtype{integer} representing the size of @code{signed short int} measured in bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_UNSIGNED_SHORT_INT
-Value of type @objtype{integer} representing the size of @code{signed short int} measured in bytes.
+@deftypevrx {Constant} integer mmec-sizeof-ushrt
+Value of type @objtype{integer} representing the size of @code{unsigned short int} measured in bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_SIGNED_INT
+@deftypevrx {Constant} integer mmec-sizeof-sint
 Value of type @objtype{integer} representing the size of @code{signed int} measured in bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_UNSIGNED_INT
-Value of type @objtype{integer} representing the size of @code{signed int} measured in bytes.
-@end deftypevr
-
-
-@deftypevr {Constant} integer mmec-SIZEOF_UNSIGNED_INT
-Value of type @objtype{integer} representing the size of @code{unsigned int} measured in bytes.
-@end deftypevr
-
-
-@deftypevr {Constant} integer mmec-SIZEOF_UNUNSIGNED_INT
+@deftypevrx {Constant} integer mmec-sizeof-uint
 Value of type @objtype{integer} representing the size of @code{unsigned int} measured in bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_SIGNED_LONG_INT
+@deftypevrx {Constant} integer mmec-sizeof-slong
 Value of type @objtype{integer} representing the size of @code{signed long int} measured in bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_UNSIGNED_LONG_INT
-Value of type @objtype{integer} representing the size of @code{signed long int} measured in bytes.
-@end deftypevr
-
-
-@deftypevr {Constant} integer mmec-SIZEOF_UNSIGNED_LONG_INT
-Value of type @objtype{integer} representing the size of @code{unsigned long int} measured in bytes.
-@end deftypevr
-
-
-@deftypevr {Constant} integer mmec-SIZEOF_UNUNSIGNED_LONG_INT
+@deftypevrx {Constant} integer mmec-sizeof-ulong
 Value of type @objtype{integer} representing the size of @code{unsigned long int} measured in bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_SIGNED_LONG_LONG_INT
-Value of type @objtype{integer} representing the size of @code{signed long long int} measured in bytes.
+@deftypevrx {Constant} integer mmec-sizeof-sllong
+Value of type @objtype{integer} representing the size of @code{signed long long int} measured in
+bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_UNSIGNED_LONG_LONG_INT
-Value of type @objtype{integer} representing the size of @code{signed long long int} measured in bytes.
-@end deftypevr
-
-
-@deftypevr {Constant} integer mmec-SIZEOF_UNSIGNED_LONG_LONG_INT
-Value of type @objtype{integer} representing the size of @code{unsigned long long int} measured in bytes.
-@end deftypevr
-
-
-@deftypevr {Constant} integer mmec-SIZEOF_UNUNSIGNED_LONG_LONG_INT
-Value of type @objtype{integer} representing the size of @code{unsigned long long int} measured in bytes.
-@end deftypevr
-
-
-@deftypevr {Constant} integer mmec-SIZEOF_SIZE_T
-Value of type @objtype{integer} representing the size of @code{size_t} measured in bytes.
+@deftypevrx {Constant} integer mmec-sizeof-ullong
+Value of type @objtype{integer} representing the size of @code{unsigned long long int} measured in
+bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_SSIZE_T
+@deftypevrx {Constant} integer mmec-sizeof-ssize
 Value of type @objtype{integer} representing the size of @code{ssize_t} measured in bytes.
 @end deftypevr
 
 
+@deftypevr {Constant} integer mmec-SIZEOF_SIZE_T
+@deftypevrx {Constant} integer mmec-sizeof-usize
+Value of type @objtype{integer} representing the size of @code{size_t} measured in bytes.
+@end deftypevr
+
+
 @deftypevr {Constant} integer mmec-SIZEOF_INTMAX_T
+@deftypevrx {Constant} integer mmec-sizeof-sintmax
 Value of type @objtype{integer} representing the size of @code{intmax_t} measured in bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_UINTMAX_T
+@deftypevrx {Constant} integer mmec-sizeof-uintmax
 Value of type @objtype{integer} representing the size of @code{uintmax_t} measured in bytes.
 @end deftypevr
 
 
+@deftypevr {Constant} integer mmec-SIZEOF_PTRDIFF_T
+@deftypevrx {Constant} integer mmec-sizeof-ptrdiff
+Value of type @objtype{integer} representing the size of @code{ptrdiff_t} measured in bytes.
+@end deftypevr
+
+
 @deftypevr {Constant} integer mmec-SIZEOF_INT8_T
+@deftypevrx {Constant} integer mmec-sizeof-sint8
 Value of type @objtype{integer} representing the size of @code{int8_t} measured in bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_UINT8_T
+@deftypevrx {Constant} integer mmec-sizeof-uint8
 Value of type @objtype{integer} representing the size of @code{uint8_t} measured in bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_INT16_T
+@deftypevrx {Constant} integer mmec-sizeof-sint16
 Value of type @objtype{integer} representing the size of @code{int16_t} measured in bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_UINT16_T
+@deftypevrx {Constant} integer mmec-sizeof-uint16
 Value of type @objtype{integer} representing the size of @code{uint16_t} measured in bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_INT32_T
+@deftypevrx {Constant} integer mmec-sizeof-sint32
 Value of type @objtype{integer} representing the size of @code{int32_t} measured in bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_UINT32_T
+@deftypevrx {Constant} integer mmec-sizeof-uint32
 Value of type @objtype{integer} representing the size of @code{uint32_t} measured in bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_INT64_T
+@deftypevrx {Constant} integer mmec-sizeof-sint64
 Value of type @objtype{integer} representing the size of @code{int64_t} measured in bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_UINT64_T
+@deftypevrx {Constant} integer mmec-sizeof-uint64
 Value of type @objtype{integer} representing the size of @code{uint64_t} measured in bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_FLOAT
+@deftypevrx {Constant} integer mmec-sizeof-float
 Value of type @objtype{integer} representing the size of @code{float} measured in bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_DOUBLE
+@deftypevrx {Constant} integer mmec-sizeof-double
 Value of type @objtype{integer} representing the size of @code{double} measured in bytes.
 @end deftypevr
 
 
 @deftypevr {Constant} integer mmec-SIZEOF_LONG_DOUBLE
+@deftypevrx {Constant} integer mmec-sizeof-ldouble
 Value of type @objtype{integer} representing the size of @code{long double} measured in bytes.
 @end deftypevr
 
@@ -442,301 +447,376 @@ Value of type @objtype{integer} representing the size of @code{long double} meas
 
 
 @deftypevr {Constant} mmec-char mmec-CHAR_MIN
-Value of type @objtype{mmec-char} representing the minimum value representable by a @code{char}.
+@deftypevrx {Constant} mmec-char mmec-char-min
+Value of type @objtype{mmec-char} representing the minimum value in the range of by a @code{char}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-char mmec-CHAR_MAX
-Value of type @objtype{mmec-char} representing the maximum value representable by a @code{char}.
+@deftypevrx {Constant} mmec-char mmec-char-max
+Value of type @objtype{mmec-char} representing the maximum value in the range of by a @code{char}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-schar mmec-SCHAR_MIN
-Value of type @objtype{mmec-schar} representing the minimum value representable by a @code{signed
+@deftypevrx {Constant} mmec-schar mmec-schar-min
+Value of type @objtype{mmec-schar} representing the minimum value in the range of by a @code{signed
 char}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-schar mmec-SCHAR_MAX
-Value of type @objtype{mmec-schar} representing the maximum value representable by a @code{signed
+@deftypevrx {Constant} mmec-schar mmec-schar-max
+Value of type @objtype{mmec-schar} representing the maximum value in the range of by a @code{signed
 char}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-uchar mmec-UCHAR_MIN
-Value of type @objtype{mmec-uchar} representing the minimum value representable by a @code{unsigned
+@deftypevrx {Constant} mmec-uchar mmec-uchar-min
+Value of type @objtype{mmec-uchar} representing the minimum value in the range of by a @code{unsigned
 char}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-uchar mmec-UCHAR_MAX
-Value of type @objtype{mmec-uchar} representing the maximum value representable by a @code{unsigned
+@deftypevrx {Constant} mmec-uchar mmec-uchar-max
+Value of type @objtype{mmec-uchar} representing the maximum value in the range of by a @code{unsigned
 char}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-sshrt mmec-SHRT_MIN
-Value of type @objtype{mmec-sshrt} representing the minimum value representable by a @code{signed
+@deftypevrx {Constant} mmec-sshrt mmec-sshrt-min
+Value of type @objtype{mmec-sshrt} representing the minimum value in the range of by a @code{signed
 short int}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-sshrt mmec-SHRT_MAX
-Value of type @objtype{mmec-sshrt} representing the maximum value representable by a @code{signed
+@deftypevrx {Constant} mmec-sshrt mmec-sshrt-max
+Value of type @objtype{mmec-sshrt} representing the maximum value in the range of by a @code{signed
 short int}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-ushrt mmec-USHRT_MIN
-Value of type @objtype{mmec-ushrt} representing the minimum value representable by a @code{unsigned
+@deftypevrx {Constant} mmec-ushrt mmec-ushrt-min
+Value of type @objtype{mmec-ushrt} representing the minimum value in the range of by a @code{unsigned
 short int}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-ushrt mmec-USHRT_MAX
-Value of type @objtype{mmec-ushrt} representing the maximum value representable by a @code{unsigned
+@deftypevrx {Constant} mmec-ushrt mmec-ushrt-max
+Value of type @objtype{mmec-ushrt} representing the maximum value in the range of by a @code{unsigned
 short int}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-sint mmec-INT_MIN
-Value of type @objtype{mmec-sint} representing the minimum value representable by a @code{signed
+@deftypevrx {Constant} mmec-sint mmec-sint-min
+Value of type @objtype{mmec-sint} representing the minimum value in the range of by a @code{signed
 int}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-sint mmec-INT_MAX
-Value of type @objtype{mmec-sint} representing the maximum value representable by a @code{signed
+@deftypevrx {Constant} mmec-sint mmec-sint-max
+Value of type @objtype{mmec-sint} representing the maximum value in the range of by a @code{signed
 int}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-uint mmec-UINT_MIN
-Value of type @objtype{mmec-uint} representing the minimum value representable by a @code{unsigned
+@deftypevrx {Constant} mmec-uint mmec-uint-min
+Value of type @objtype{mmec-uint} representing the minimum value in the range of by a @code{unsigned
 int}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-uint mmec-UINT_MAX
-Value of type @objtype{mmec-uint} representing the maximum value representable by a @code{unsigned
+@deftypevrx {Constant} mmec-uint mmec-uint-max
+Value of type @objtype{mmec-uint} representing the maximum value in the range of by a @code{unsigned
 int}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-slong mmec-LONG_MIN
-Value of type @objtype{mmec-slong} representing the minimum value representable by a @code{signed
+@deftypevrx {Constant} mmec-slong mmec-slong-min
+Value of type @objtype{mmec-slong} representing the minimum value in the range of by a @code{signed
 long int}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-slong mmec-LONG_MAX
-Value of type @objtype{mmec-slong} representing the maximum value representable by a @code{signed
+@deftypevrx {Constant} mmec-slong mmec-slong-max
+Value of type @objtype{mmec-slong} representing the maximum value in the range of by a @code{signed
 long int}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-ulong mmec-ULONG_MIN
-Value of type @objtype{mmec-ulong} representing the minimum value representable by a @code{unsigned
+@deftypevrx {Constant} mmec-ulong mmec-ulong-min
+Value of type @objtype{mmec-ulong} representing the minimum value in the range of by a @code{unsigned
 long int}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-ulong mmec-ULONG_MAX
-Value of type @objtype{mmec-ulong} representing the maximum value representable by a @code{unsigned
+@deftypevrx {Constant} mmec-ulong mmec-ulong-max
+Value of type @objtype{mmec-ulong} representing the maximum value in the range of by a @code{unsigned
 long int}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-sllong mmec-LLONG_MIN
-Value of type @objtype{mmec-sllong} representing the minimum value representable by a @code{signed
+@deftypevrx {Constant} mmec-sllong mmec-sllong-min
+Value of type @objtype{mmec-sllong} representing the minimum value in the range of by a @code{signed
 long long int}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-sllong mmec-LLONG_MAX
-Value of type @objtype{mmec-sllong} representing the maximum value representable by a @code{signed
+@deftypevrx {Constant} mmec-sllong mmec-sllong-max
+Value of type @objtype{mmec-sllong} representing the maximum value in the range of by a @code{signed
 long long int}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-ullong mmec-ULLONG_MIN
-Value of type @objtype{mmec-ullong} representing the minimum value representable by a @code{unsigned
+@deftypevrx {Constant} mmec-ullong mmec-ullong-min
+Value of type @objtype{mmec-ullong} representing the minimum value in the range of by a @code{unsigned
 long long int}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-ullong mmec-ULLONG_MAX
-Value of type @objtype{mmec-ullong} representing the maximum value representable by a @code{unsigned
+@deftypevrx {Constant} mmec-ullong mmec-ullong-max
+Value of type @objtype{mmec-ullong} representing the maximum value in the range of by a @code{unsigned
 long long int}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-wchar mmec-WCHAR_MIN
-Value of type @objtype{mmec-wchar} representing the minimum value representable by a @code{wchar_t}.
+@deftypevrx {Constant} mmec-wchar mmec-wchar-min
+Value of type @objtype{mmec-wchar} representing the minimum value in the range of by a @code{wchar_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-wchar mmec-WCHAR_MAX
-Value of type @objtype{mmec-wchar} representing the maximum value representable by a @code{wchar_t}.
+@deftypevrx {Constant} mmec-wchar mmec-wchar-max
+Value of type @objtype{mmec-wchar} representing the maximum value in the range of by a @code{wchar_t}.
+Valuex of type @objtype{mmec-wchar} representing the maximum value in the range of by a @code{wchar-t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-ssize mmec-SSIZE_T_MIN
-Value of type @objtype{mmec-ssize} representing the minimum value representable by a @code{ssize_t}.
+@deftypevrx {Constant} mmec-ssize mmec-ssize-min
+Value of type @objtype{mmec-ssize} representing the minimum value in the range of by a @code{ssize_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-ssize mmec-SSIZE_T_MAX
-Value of type @objtype{mmec-ssize} representing the maximum value representable by a @code{ssize_t}.
+@deftypevrx {Constant} mmec-ssize mmec-ssize-max
+Value of type @objtype{mmec-ssize} representing the maximum value in the range of by a @code{ssize_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} mmec-ptrdiff mmec-PTRDIFF_T_MIN
+@deftypevrx {Constant} mmec-ptrdiff mmec-ptrdiff-min
+Value of type @objtype{mmec-ptrdiff} representing the minimum value in the range of by a
+@code{ptrdiff_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} mmec-ptrdiff mmec-PTRDIFF_T_MAX
+@deftypevrx {Constant} mmec-ptrdiff mmec-ptrdiff-max
+Value of type @objtype{mmec-ptrdiff} representing the maximum value in the range of by a
+@code{ptrdiff_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-usize mmec-SIZE_T_MIN
-Value of type @objtype{mmec-usize} representing the minimum value representable by a @code{size_t}.
+@deftypevrx {Constant} mmec-usize mmec-usize-min
+Value of type @objtype{mmec-usize} representing the minimum value in the range of by a @code{size_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-usize mmec-SIZE_T_MAX
-Value of type @objtype{mmec-usize} representing the maximum value representable by a @code{size_t}.
+@deftypevrx {Constant} mmec-usize mmec-usize-max
+Value of type @objtype{mmec-usize} representing the maximum value in the range of by a @code{size_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-sintmax mmec-INTMAX_MIN
-Value of type @objtype{mmec-sintmax} representing the minimum value representable by a
+@deftypevrx {Constant} mmec-sintmax mmec-sintmax-min
+Value of type @objtype{mmec-sintmax} representing the minimum value in the range of by a
 @code{intmax_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-sintmax mmec-INTMAX_MAX
-Value of type @objtype{mmec-sintmax} representing the maximum value representable by a
+@deftypevrx {Constant} mmec-sintmax mmec-sintmax-max
+Value of type @objtype{mmec-sintmax} representing the maximum value in the range of by a
 @code{intmax_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-uintmax mmec-UINTMAX_MIN
-Value of type @objtype{mmec-uintmax} representing the maximum value representable by a
+@deftypevrx {Constant} mmec-uintmax mmec-uintmax-min
+Value of type @objtype{mmec-uintmax} representing the minimum value in the range of by a
+@code{uintmax_t}.
+@end deftypevr
+
+
+@deftypevr {Constant} mmec-uintmax mmec-UINTMAX_MAX
+@deftypevrx {Constant} mmec-uintmax mmec-uintmax-max
+Value of type @objtype{mmec-uintmax} representing the maximum value in the range of by a
 @code{uintmax_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-sint8 mmec-INT8_MIN
-Value of type @objtype{mmec-sint8} representing the minimum value representable by a @code{int8_t}.
+@deftypevrx {Constant} mmec-sint8 mmec-sint8-min
+Value of type @objtype{mmec-sint8} representing the minimum value in the range of by a @code{int8_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-sint8 mmec-INT8_MAX
-Value of type @objtype{mmec-sint8} representing the maximum value representable by a @code{int8_t}.
+@deftypevrx {Constant} mmec-sint8 mmec-sint8-max
+Value of type @objtype{mmec-sint8} representing the maximum value in the range of by a @code{int8_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-uint8 mmec-UINT8_MIN
-Value of type @objtype{mmec-uint8} representing the minimum value representable by a @code{uint8_t}.
+@deftypevrx {Constant} mmec-uint8 mmec-uint8-min
+Value of type @objtype{mmec-uint8} representing the minimum value in the range of by a @code{uint8_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-uint8 mmec-UINT8_MAX
-Value of type @objtype{mmec-uint8} representing the maximum value representable by a @code{uint8_t}.
+@deftypevrx {Constant} mmec-uint8 mmec-uint8-max
+Value of type @objtype{mmec-uint8} representing the maximum value in the range of by a @code{uint8_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-sint16 mmec-INT16_MIN
-Value of type @objtype{mmec-sint16} representing the minimum value representable by a
+@deftypevrx {Constant} mmec-sint16 mmec-sint16-min
+Value of type @objtype{mmec-sint16} representing the minimum value in the range of by a
 @code{int16_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-sint16 mmec-INT16_MAX
-Value of type @objtype{mmec-sint16} representing the maximum value representable by a
+@deftypevrx {Constant} mmec-sint16 mmec-sint16-max
+Value of type @objtype{mmec-sint16} representing the maximum value in the range of by a
 @code{int16_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-uint16 mmec-UINT16_MIN
-Value of type @objtype{mmec-uint16} representing the minimum value representable by a
+@deftypevrx {Constant} mmec-uint16 mmec-uint16-min
+Value of type @objtype{mmec-uint16} representing the minimum value in the range of by a
 @code{uint16_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-uint16 mmec-UINT16_MAX
-Value of type @objtype{mmec-uint16} representing the maximum value representable by a
+@deftypevrx {Constant} mmec-uint16 mmec-uint16-max
+Value of type @objtype{mmec-uint16} representing the maximum value in the range of by a
 @code{uint16_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-sint32 mmec-INT32_MIN
-Value of type @objtype{mmec-sint32} representing the minimum value representable by a
+@deftypevrx {Constant} mmec-sint32 mmec-int32-min
+Value of type @objtype{mmec-sint32} representing the minimum value in the range of by a
 @code{int32_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-sint32 mmec-INT32_MAX
-Value of type @objtype{mmec-sint32} representing the maximum value representable by a
+@deftypevrx {Constant} mmec-sint32 mmec-int32-max
+Value of type @objtype{mmec-sint32} representing the maximum value in the range of by a
 @code{int32_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-uint32 mmec-UINT32_MIN
-Value of type @objtype{mmec-uint32} representing the minimum value representable by a
+@deftypevrx {Constant} mmec-uint32 mmec-uint32-min
+Value of type @objtype{mmec-uint32} representing the minimum value in the range of by a
 @code{uint32_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-uint32 mmec-UINT32_MAX
-Value of type @objtype{mmec-uint32} representing the maximum value representable by a
+@deftypevrx {Constant} mmec-uint32 mmec-uint32-max
+Value of type @objtype{mmec-uint32} representing the maximum value in the range of by a
 @code{uint32_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-sint64 mmec-INT64_MIN
-Value of type @objtype{mmec-sint64} representing the minimum value representable by a
+@deftypevrx {Constant} mmec-sint64 mmec-sint64-min
+Value of type @objtype{mmec-sint64} representing the minimum value in the range of by a
 @code{int64_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-sint64 mmec-INT64_MAX
-Value of type @objtype{mmec-sint64} representing the maximum value representable by a
+@deftypevrx {Constant} mmec-sint64 mmec-sint64-max
+Value of type @objtype{mmec-sint64} representing the maximum value in the range of by a
 @code{int64_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-uint64 mmec-UINT64_MIN
-Value of type @objtype{mmec-uint64} representing the minimum value representable by a
+@deftypevrx {Constant} mmec-uint64 mmec-uint64-min
+Value of type @objtype{mmec-uint64} representing the minimum value in the range of by a
 @code{uint64_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-uint64 mmec-UINT64_MAX
-Value of type @objtype{mmec-uint64} representing the maximum value representable by a
+@deftypevrx {Constant} mmec-uint64 mmec-uint64-max
+Value of type @objtype{mmec-uint64} representing the maximum value in the range of by a
 @code{uint64_t}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-float mmec-FLT_MIN
+@deftypevrx {Constant} mmec-float mmec-float-min
 Value of type @objtype{mmec-float} representing the system constant @code{FLT_MIN}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-float mmec-FLT_MAX
+@deftypevrx {Constant} mmec-float mmec-float-max
 Value of type @objtype{mmec-float} representing the system constant @code{FLT_MAX}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-double mmec-DBL_MIN
+@deftypevrx {Constant} mmec-double mmec-double-min
 Value of type @objtype{mmec-double} representing the system constant @code{DBL_MIN}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-double mmec-DBL_MAX
+@deftypevrx {Constant} mmec-double mmec-double-max
 Value of type @objtype{mmec-double} representing the system constant @code{DBL_MAX}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-ldouble mmec-LDBL_MIN
+@deftypevrx {Constant} mmec-ldouble mmec-ldouble-min
 Value of type @objtype{mmec-ldouble} representing the system constant @code{LDBL_MIN}.
 @end deftypevr
 
 
 @deftypevr {Constant} mmec-ldouble mmec-LDBL_MAX
+@deftypevrx {Constant} mmec-ldouble mmec-ldouble-max
 Value of type @objtype{mmec-ldouble} representing the system constant @code{LDBL_MAX}.
 @end deftypevr
 

@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-19 11:11:45 marco>
+;; Time-stamp: <2020-02-19 14:58:23 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -538,6 +538,285 @@
   (mmec--make mmec-uint64 :obj (mmec-c-constant-uint64-max))
   "Value of type `mmec-uint64' representing the maximum value representable by a `uint64_t'.")
 
+;;; --------------------------------------------------------------------
+
+(defconst mmec-FLT_MIN
+  (mmec--make mmec-float :obj (mmec-c-constant-flt-min))
+  "Value of the `mmec-float' representing system constant `FLT_MIN'.")
+
+(defconst mmec-FLT_MAX
+  (mmec--make mmec-float :obj (mmec-c-constant-flt-max))
+  "Value of type `mmec-float' representing the system constant `FLT_MAX'.")
+
+(defconst mmec-DBL_MIN
+  (mmec--make mmec-double :obj (mmec-c-constant-dbl-min))
+  "Value of type `mmec-double' representing the system constant `DBL_MIN'.")
+
+(defconst mmec-DBL_MAX
+  (mmec--make mmec-double :obj (mmec-c-constant-dbl-max))
+  "Value of type `mmec-double' representing the system constant `DBL_MAX'.")
+
+(defconst mmec-LDBL_MIN
+  (mmec--make mmec-ldouble :obj (mmec-c-constant-ldbl-min))
+  "Value of type `mmec-ldouble' representing the system constant `LDBL_MIN'.")
+
+(defconst mmec-LDBL_MAX
+  (mmec--make mmec-ldouble :obj (mmec-c-constant-ldbl-max))
+  "Value of type `mmec-ldouble' representing the system constant `LDBL_MAX'.")
+
+
+;;;; integer representation range limits: aliases using type stems
+
+(defconst mmec-char-min
+  mmec-CHAR_MIN
+  "Value of type `mmec-char' representing the minimum value representable by a `char'.")
+
+(defconst mmec-char-max
+  mmec-CHAR_MAX
+  "Value of type `mmec-char' representing the maximum value representable by a `char'.")
+
+(defconst mmec-schar-min
+  mmec-SCHAR_MIN
+  "Value of type `mmec-schar' representing the minimum value representable by a `signed char'.")
+
+(defconst mmec-schar-max
+  mmec-SCHAR_MAX
+  "Value of type `mmec-scar' representing the maximum value representable by a `signed char'.")
+
+(defconst mmec-uchar-min
+  mmec-UCHAR_MIN
+  "Value of type `mmec-uchar' representing the minimum value representable by a `unsigned char'.")
+
+(defconst mmec-uchar-max
+  mmec-UCHAR_MAX
+  "Value of type `mmec-uchar' representing the maximum value representable by a `unsigned char'.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-sshrt-min
+  mmec-SSHRT_MIN
+  "Value of type `mmec-sshrt' representing the minimum value representable by a `signed short int'.")
+
+(defconst mmec-sshrt-max
+  mmec-SSHRT_MAX
+  "Value of type `mmec-sshrt' representing the maximum value representable by a `signed short int'.")
+
+(defconst mmec-ushrt-min
+  mmec-USHRT_MIN
+  "Value of type `mmec-ushrt' representing the minimum value representable by a `unsigned short int'.")
+
+(defconst mmec-ushrt-max
+  mmec-USHRT_MAX
+  "Value of type `mmec-ushrt' representing the maximum value representable by a `unsigned short int'.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-sint-min
+  mmec-SINT_MIN
+  "Value of type `mmec-sint' representing the minimum value representable by a `signed int'.")
+
+(defconst mmec-sint-max
+  mmec-SINT_MAX
+  "Value of type `mmec-sint' representing the maximum value representable by a `signed int'.")
+
+(defconst mmec-uint-min
+  mmec-UINT_MIN
+  "Value of type `mmec-uint' representing the minimum value representable by a `unsigned int'.")
+
+(defconst mmec-uint-max
+  mmec-UINT_MAX
+  "Value of type `mmec-uint' representing the maximum value representable by a `unsigned int'.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-slong-min
+  mmec-SLONG_MIN
+  "Value of type `mmec-slong' representing the minimum value representable by a `signed long int'.")
+
+(defconst mmec-slong-max
+  mmec-SLONG_MAX
+  "Value of type `mmec-slong' representing the maximum value representable by a `signed long int'.")
+
+(defconst mmec-ulong-min
+  mmec-ULONG_MIN
+  "Value of type `mmec-ulong' representing the minimum value representable by a `unsigned long int'.")
+
+(defconst mmec-ulong-max
+  mmec-ULONG_MAX
+  "Value of type `mmec-ulong' representing the maximum value representable by a `unsigned long int'.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-sllong-min
+  mmec-SLLONG_MIN
+  "Value of type `mmec-sllong' representing the minimum value representable by a `signed long long int'.")
+
+(defconst mmec-sllong-max
+  mmec-SLLONG_MAX
+  "Value of type `mmec-sllong' representing the maximum value representable by a `signed long long int'.")
+
+(defconst mmec-ullong-min
+  mmec-ULLONG_MIN
+  "Value of type `mmec-ullong' representing the minimum value representable by a `unsigned long long int'.")
+
+(defconst mmec-ullong-max
+  mmec-ULLONG_MAX
+  "Value of type `mmec-ullong' representing the maximum value representable by a `unsigned long long int'.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-wchar-min
+  mmec-WCHAR_MIN
+  "Value of type `mmec-wchar' representing the minimum value representable by a `wchar_t'.")
+
+(defconst mmec-wchar-max
+  mmec-WCHAR_MAX
+  "Value of type `mmec-wchar' representing the maximum value representable by a `wchar_t'.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-ssize-min
+  mmec-SSIZE_MIN
+  "Value of type `mmec-ssize' representing the minimum value representable by a `ssize_t'.")
+
+(defconst mmec-ssize-max
+  mmec-SSIZE_MAX
+  "Value of type `mmec-ssize' representing the maximum value representable by a `ssize_t'.")
+
+(defconst mmec-usize-min
+  mmec-USIZE_MIN
+  "Value of type `mmec-usize' representing the minimum value representable by a `size_t'.")
+
+(defconst mmec-usize-max
+  mmec-USIZE_MAX
+  "Value of type `mmec-usize' representing the maximum value representable by a `size_t'.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-sintmax-min
+  mmec-SINTMAX_MIN
+  "Value of type `mmec-sintmax' representing the minimum value representable by a `intmax_t'.")
+
+(defconst mmec-sintmax-max
+  mmec-SINTMAX_MAX
+  "Value of type `mmec-sintmax' representing the maximum value representable by a `intmax_t'.")
+
+(defconst mmec-uintmax-min
+  mmec-UINTMAX_MIN
+  "Value of type `mmec-uintmax' representing the minimum value representable by a `intmax_t'.")
+
+(defconst mmec-uintmax-max
+  mmec-UINTMAX_MAX
+  "Value of type `mmec-uintmax' representing the maximum value representable by a `intmax_t'.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-ptrdiff-min
+  mmec-PTRDIFF_MIN
+  "Value of type `mmec-ptrdiff' representing the minimum value representable by a `ptrdiff_t'.")
+
+(defconst mmec-ptrdiff-max
+  mmec-PTRDIFF_MAX
+  "Value of type `mmec-ptrdiff' representing the maximum value representable by a `ptrdiff_t'.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-sint8-min
+  mmec-SINT8_MIN
+  "Value of type `mmec-sint8' representing the minimum value representable by a `int8_t'.")
+
+(defconst mmec-sint8-max
+  mmec-SINT8_MAX
+  "Value of type `mmec-sint8' representing the maximum value representable by a `int8_t'.")
+
+(defconst mmec-uint8-min
+  mmec-UINT8_MIN
+  "Value of type `mmec-uint8' representing the minimum value representable by a `uint8_t'.")
+
+(defconst mmec-uint8-max
+  mmec-UINT8_MAX
+  "Value of type `mmec-uint8' representing the maximum value representable by a `uint8_t'.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-sint16-min
+  mmec-SINT16_MIN
+  "Value of type `mmec-sint16' representing the minimum value representable by a `int16_t'.")
+
+(defconst mmec-sint16-max
+  mmec-SINT16_MAX
+  "Value of type `mmec-sint16' representing the maximum value representable by a `int16_t'.")
+
+(defconst mmec-uint16-min
+  mmec-UINT16_MIN
+  "Value of type `mmec-uint16' representing the minimum value representable by a `uint16_t'.")
+
+(defconst mmec-uint16-max
+  mmec-UINT16_MAX
+  "Value of type `mmec-uint16' representing the maximum value representable by a `uint16_t'.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-sint32-min
+  mmec-SINT32_MIN
+  "Value of type `mmec-sint32' representing the minimum value representable by a `int32_t'.")
+
+(defconst mmec-sint32-max
+  mmec-SINT32_MAX
+  "Value of type `mmec-sint32' representing the maximum value representable by a `int32_t'.")
+
+(defconst mmec-uint32-min
+  mmec-UINT32_MIN
+  "Value of type `mmec-uint32' representing the minimum value representable by a `uint32_t'.")
+
+(defconst mmec-uint32-max
+  mmec-UINT32_MAX
+  "Value of type `mmec-uint32' representing the maximum value representable by a `uint32_t'.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-sint64-min
+  mmec-SINT64_MIN
+  "Value of type `mmec-sint64' representing the minimum value representable by a `int64_t'.")
+
+(defconst mmec-sint64-max
+  mmec-SINT64_MAX
+  "Value of type `mmec-sint64' representing the maximum value representable by a `int64_t'.")
+
+(defconst mmec-uint64-min
+  mmec-UINT64_MIN
+  "Value of type `mmec-uint64' representing the minimum value representable by a `uint64_t'.")
+
+(defconst mmec-uint64-max
+  mmec-UINT64_MAX
+  "Value of type `mmec-uint64' representing the maximum value representable by a `uint64_t'.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-float-min
+  mmec-FLT_MIN
+  "Value of the `mmec-float' representing system constant `FLT_MIN'.")
+
+(defconst mmec-float-max
+  mmec-FLT_MAX
+  "Value of type `mmec-float' representing the system constant `FLT_MAX'.")
+
+(defconst mmec-double-min
+  mmec-DBL_MIN
+  "Value of type `mmec-double' representing the system constant `DBL_MIN'.")
+
+(defconst mmec-double-max
+  mmec-DBL_MAX
+  "Value of type `mmec-double' representing the system constant `DBL_MAX'.")
+
+(defconst mmec-ldouble-min
+  mmec-LDBL_MIN
+  "Value of type `mmec-ldouble' representing the system constant `LDBL_MIN'.")
+
+(defconst mmec-ldouble-max
+  mmec-LDBL_MAX
+  "Value of type `mmec-ldouble' representing the system constant `LDBL_MAX'.")
+
 
 ;;;; constants related to floating-point numbers
 
@@ -620,30 +899,6 @@
 (defconst mmec-LDBL_MAX_10_EXP
   @VALUEOF_LDBL_MAX_10_EXP@
   "Value of type `integer' representing the system constant `LDBL_MAX_10_EXP'.")
-
-(defconst mmec-FLT_MIN
-  (mmec--make mmec-float :obj (mmec-c-constant-flt-min))
-  "Value of the `mmec-float' representing system constant `FLT_MIN'.")
-
-(defconst mmec-FLT_MAX
-  (mmec--make mmec-float :obj (mmec-c-constant-flt-max))
-  "Value of type `mmec-float' representing the system constant `FLT_MAX'.")
-
-(defconst mmec-DBL_MIN
-  (mmec--make mmec-double :obj (mmec-c-constant-dbl-min))
-  "Value of type `mmec-double' representing the system constant `DBL_MIN'.")
-
-(defconst mmec-DBL_MAX
-  (mmec--make mmec-double :obj (mmec-c-constant-dbl-max))
-  "Value of type `mmec-double' representing the system constant `DBL_MAX'.")
-
-(defconst mmec-LDBL_MIN
-  (mmec--make mmec-ldouble :obj (mmec-c-constant-ldbl-min))
-  "Value of type `mmec-ldouble' representing the system constant `LDBL_MIN'.")
-
-(defconst mmec-LDBL_MAX
-  (mmec--make mmec-ldouble :obj (mmec-c-constant-ldbl-max))
-  "Value of type `mmec-ldouble' representing the system constant `LDBL_MAX'.")
 
 (defconst mmec-FLT_EPSILON
   (mmec--make mmec-float :obj (mmec-c-constant-flt-epsilon))

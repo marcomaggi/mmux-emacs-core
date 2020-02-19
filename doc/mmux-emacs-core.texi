@@ -1653,46 +1653,39 @@ Return true if @vari{OP} \OPERATOR\ @varii{OP}; otherwise return false.
 
 
 @menu
-* bytevec typedefs::            Type definition.
-* bytevec getters::             Bytevector getters.
-* bytevec setters::             Bytevector setters.
-@end menu
-
-@c page
-@node bytevec typedefs
-@section Type definition
-
-
-@menu
-* bytevec typedefs abstract::   Abstract bytevector types.
-* bytevec typedefs char::       Bytevector of @code{char} values.
-* bytevec typedefs schar::      Bytevector of @code{schar} values.
-* bytevec typedefs uchar::      Bytevector of @code{uchar} values.
-* bytevec typedefs wchar::      Bytevector of @code{wchar} values.
-* bytevec typedefs sshrt::      Bytevector of @code{sshrt} values.
-* bytevec typedefs ushrt::      Bytevector of @code{ushrt} values.
-* bytevec typedefs sint::       Bytevector of @code{sint} values.
-* bytevec typedefs uint::       Bytevector of @code{uint} values.
-* bytevec typedefs slong::      Bytevector of @code{slong} values.
-* bytevec typedefs ulong::      Bytevector of @code{ulong} values.
-* bytevec typedefs sllong::     Bytevector of @code{sllong} values.
-* bytevec typedefs ullong::     Bytevector of @code{ullong} values.
-* bytevec typedefs sintmax::    Bytevector of @code{sintmax} values.
-* bytevec typedefs uintmax::    Bytevector of @code{uintmax} values.
-* bytevec typedefs ssize::      Bytevector of @code{ssize} values.
-* bytevec typedefs usize::      Bytevector of @code{usize} values.
-* bytevec typedefs ptrdiff::    Bytevector of @code{ptrdiff} values.
-* bytevec typedefs sint8::      Bytevector of @code{sint8} values.
-* bytevec typedefs uint8::      Bytevector of @code{uint8} values.
-* bytevec typedefs sint16::     Bytevector of @code{sint16} values.
-* bytevec typedefs uint16::     Bytevector of @code{uint16} values.
-* bytevec typedefs sint32::     Bytevector of @code{sint32} values.
-* bytevec typedefs uint32::     Bytevector of @code{uint32} values.
-* bytevec typedefs sint64::     Bytevector of @code{sint64} values.
-* bytevec typedefs uint64::     Bytevector of @code{uint64} values.
-* bytevec typedefs float::      Bytevector of @code{float} values.
-* bytevec typedefs double::     Bytevector of @code{double} values.
-* bytevec typedefs ldouble::    Bytevector of @code{ldouble} values.
+* bytevec base::                Abstract base bytevector type.
+* bytevec integer::             Abstract bytevector type for integers.
+* bytevec signed-integer::      Abstract bytevector type for signed integers.
+* bytevec unsigned-integer::    Abstract bytevector type for unsigned integers.
+* bytevec floating-point::      Abstract bytevector type for floating-point numbers.
+* bytevec char::                Bytevector of @code{char} values.
+* bytevec schar::               Bytevector of @code{schar} values.
+* bytevec uchar::               Bytevector of @code{uchar} values.
+* bytevec wchar::               Bytevector of @code{wchar} values.
+* bytevec sshrt::               Bytevector of @code{sshrt} values.
+* bytevec ushrt::               Bytevector of @code{ushrt} values.
+* bytevec sint::                Bytevector of @code{sint} values.
+* bytevec uint::                Bytevector of @code{uint} values.
+* bytevec slong::               Bytevector of @code{slong} values.
+* bytevec ulong::               Bytevector of @code{ulong} values.
+* bytevec sllong::              Bytevector of @code{sllong} values.
+* bytevec ullong::              Bytevector of @code{ullong} values.
+* bytevec sintmax::             Bytevector of @code{sintmax} values.
+* bytevec uintmax::             Bytevector of @code{uintmax} values.
+* bytevec ssize::               Bytevector of @code{ssize} values.
+* bytevec usize::               Bytevector of @code{usize} values.
+* bytevec ptrdiff::             Bytevector of @code{ptrdiff} values.
+* bytevec sint8::               Bytevector of @code{sint8} values.
+* bytevec uint8::               Bytevector of @code{uint8} values.
+* bytevec sint16::              Bytevector of @code{sint16} values.
+* bytevec uint16::              Bytevector of @code{uint16} values.
+* bytevec sint32::              Bytevector of @code{sint32} values.
+* bytevec uint32::              Bytevector of @code{uint32} values.
+* bytevec sint64::              Bytevector of @code{sint64} values.
+* bytevec uint64::              Bytevector of @code{uint64} values.
+* bytevec float::               Bytevector of @code{float} values.
+* bytevec double::              Bytevector of @code{double} values.
+* bytevec ldouble::             Bytevector of @code{ldouble} values.
 @end menu
 
 @c ------------------------------------------------------------------------
@@ -1711,24 +1704,30 @@ Return true if @var{OBJ} is an instance of @objtype{mmec-\TYPESTEM\-bytevector};
 false.
 @end defun
 
+@ElispBytevectorCommonMethods{\TYPESTEM\, \PARENTSTEM\, \CTYPE\}
+@end macro
+
+@c ------------------------------------------------------------------------
+
+@macro ElispBytevectorCommonMethods{TYPESTEM, PARENTSTEM, CTYPE}
+@deffn {Method} mmec-bytevector-ref (@var{BV} mmec-\TYPESTEM\-bytevector) (@var{IDX} integer)
+Extract a value of C language type @code{\CTYPE\} from the binary data area of @var{BV}, at slot
+index @var{IDX}, and return it as value of type @objtype{mmec-\TYPESTEM\}.  If the slot index
+@var{IDX} is invalid: raise the condition @code{mmec-error-bytevector-index-out-of-range}.
+@end deffn
+
+
+@deffn {Method} mmec-bytevector-set (@var{BV} mmec-\TYPESTEM\-bytevector) (@var{IDX} integer) (@var{VAL} mmec-\TYPESTEM\)
+Extract a value of C language type @code{\CTYPE\} from the value @var{VAL} and store it in the
+binary data area of @var{BV}, at slot index @var{IDX}; return @nil{}.  If the slot index @var{IDX}
+is invalid: raise the condition @code{mmec-error-bytevector-index-out-of-range}.
+@end deffn
+
 @end macro
 
 @c page
-@node bytevec typedefs abstract
-@subsection Abstract type definitions
-
-
-@menu
-* bytevec typedefs abstract base::              Base bytevector type.
-* bytevec typedefs abstract integer::           Base bytevector type for integers.
-* bytevec typedefs abstract signed integer::    Base bytevector type for signed integers.
-* bytevec typedefs abstract unsigned integer::  Base bytevector type for unsigned integers.
-* bytevec typedefs abstract float::             Base bytevector type for floating-point numbers.
-@end menu
-
-@c page
-@node bytevec typedefs abstract base
-@subsubsection Base bytevector type
+@node bytevec base
+@section Abstract base bytevector type
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.  All the
@@ -1759,9 +1758,26 @@ User--pointer object.
 Return true if @var{OBJ} is an instance of @objtype{mmec-bytevector}; otherwise return false.
 @end defun
 
+
+@deffn {Generic Function} mmec-bytevector-ref @var{BV} @var{IDX}
+Extract the value at slot index @var{IDX} from the bytevector @var{BV}.  The argument @var{BV} must
+be a concrete subtype of @objtype{mmec-bytevector}.  The argument @var{IDX} must be a non--negative
+number value of type @objtype{integer}; if the slot index @var{IDX} is invalid: raise the condition
+@code{mmec-error-bytevector-index-out-of-range}.
+@end deffn
+
+
+@deffn {Generic Function} mmec-bytevector-set! @var{BV} @var{IDX} @var{VAL}
+Store the value @var{VAL} into the bytevector @var{BV} at index @var{IDX}.  The argument @var{BV}
+must be a concrete subtype of @objtype{mmec-bytevector}.  The argument @var{IDX} must be a
+non--negative number value of type @objtype{integer}; if the slot index @var{IDX} is invalid: raise
+the condition @code{mmec-error-bytevector-index-out-of-range}.  The argument @var{VAL} must be a
+number object of type compatible with @var{BV}.
+@end deffn
+
 @c page
-@node bytevec typedefs abstract integer
-@subsubsection Base bytevector type for integers
+@node bytevec integer
+@section Abstract bytevector type for integers
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.  All the
@@ -1787,8 +1803,8 @@ Return true if @var{OBJ} is an instance of @objtype{mmec-integer-bytevector}; ot
 @end defun
 
 @c page
-@node bytevec typedefs abstract signed integer
-@subsubsection Base bytevector type for signed integers
+@node bytevec signed-integer
+@section Abstract bytevector type for signed integers
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.  All the
@@ -1808,8 +1824,8 @@ return false.
 @end defun
 
 @c page
-@node bytevec typedefs abstract unsigned integer
-@subsubsection Base bytevector type for unsigned integers
+@node bytevec unsigned-integer
+@section Abstract bytevector type for unsigned integers
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.  All the
@@ -1829,8 +1845,8 @@ return false.
 @end defun
 
 @c page
-@node bytevec typedefs abstract float
-@subsubsection Base bytevector type for floating--point numbers
+@node bytevec floating-point
+@section Abstract bytevector type for floating--point numbers
 
 
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.  All the
@@ -1850,298 +1866,200 @@ return false.
 @end defun
 
 @c page
-@node bytevec typedefs char
-@subsection Bytevector of @code{char} values
+@node bytevec char
+@section Bytevector of @code{char} values
 
 
 @ElispBytevectorTypeDefinition{char, signed-integer, char}
 
 @c page
-@node bytevec typedefs schar
-@subsection Bytevector of @code{schar} values
+@node bytevec schar
+@section Bytevector of @code{schar} values
 
 
 @ElispBytevectorTypeDefinition{schar, signed-integer, signed char}
 
 @c page
-@node bytevec typedefs uchar
-@subsection Bytevector of @code{uchar} values
+@node bytevec uchar
+@section Bytevector of @code{uchar} values
 
 
 @ElispBytevectorTypeDefinition{uchar, unsigned-integer, unsigned char}
 
 @c page
-@node bytevec typedefs wchar
-@subsection Bytevector of @code{wchar} values
+@node bytevec wchar
+@section Bytevector of @code{wchar} values
 
 
 @ElispBytevectorTypeDefinition{wchar, unsigned-integer, wchar_t}
 
 @c page
-@node bytevec typedefs sshrt
-@subsection Bytevector of @code{sshrt} values
+@node bytevec sshrt
+@section Bytevector of @code{sshrt} values
 
 
 @ElispBytevectorTypeDefinition{sshrt, signed-integer, signed short int}
 
 @c page
-@node bytevec typedefs ushrt
-@subsection Bytevector of @code{ushrt} values
+@node bytevec ushrt
+@section Bytevector of @code{ushrt} values
 
 
 @ElispBytevectorTypeDefinition{ushrt, unsigned-integer, unsigned short int}
 
 @c page
-@node bytevec typedefs sint
-@subsection Bytevector of @code{sint} values
+@node bytevec sint
+@section Bytevector of @code{sint} values
 
 
 @ElispBytevectorTypeDefinition{sint, signed-integer, signed int}
 
 @c page
-@node bytevec typedefs uint
-@subsection Bytevector of @code{uint} values
+@node bytevec uint
+@section Bytevector of @code{uint} values
 
 
 @ElispBytevectorTypeDefinition{uint, unsigned-integer, unsigned int}
 
 @c page
-@node bytevec typedefs slong
-@subsection Bytevector of @code{slong} values
+@node bytevec slong
+@section Bytevector of @code{slong} values
 
 
 @ElispBytevectorTypeDefinition{slong, signed-integer, signed long int}
 
 @c page
-@node bytevec typedefs ulong
-@subsection Bytevector of @code{ulong} values
+@node bytevec ulong
+@section Bytevector of @code{ulong} values
 
 
 @ElispBytevectorTypeDefinition{ulong, unsigned-integer, unsigned long int}
 
 @c page
-@node bytevec typedefs sllong
-@subsection Bytevector of @code{sllong} values
+@node bytevec sllong
+@section Bytevector of @code{sllong} values
 
 
 @ElispBytevectorTypeDefinition{sllong, signed-integer, signed long long int}
 
 @c page
-@node bytevec typedefs ullong
-@subsection Bytevector of @code{ullong} values
+@node bytevec ullong
+@section Bytevector of @code{ullong} values
 
 
 @ElispBytevectorTypeDefinition{ullong, unsigned-integer, unsigned long long int}
 
 @c page
-@node bytevec typedefs sintmax
-@subsection Bytevector of @code{sintmax} values
+@node bytevec sintmax
+@section Bytevector of @code{sintmax} values
 
 
 @ElispBytevectorTypeDefinition{sintmax, signed-integer, intmax_t}
 
 @c page
-@node bytevec typedefs uintmax
-@subsection Bytevector of @code{uintmax} values
+@node bytevec uintmax
+@section Bytevector of @code{uintmax} values
 
 
 @ElispBytevectorTypeDefinition{uintmax, unsigned-integer, uintmax_t}
 
 @c page
-@node bytevec typedefs ssize
-@subsection Bytevector of @code{ssize} values
+@node bytevec ssize
+@section Bytevector of @code{ssize} values
 
 
 @ElispBytevectorTypeDefinition{ssize, signed-integer, ssize_t}
 
 @c page
-@node bytevec typedefs usize
-@subsection Bytevector of @code{usize} values
+@node bytevec usize
+@section Bytevector of @code{usize} values
 
 
 @ElispBytevectorTypeDefinition{usize, unsigned-integer, size_t}
 
 @c page
-@node bytevec typedefs ptrdiff
-@subsection Bytevector of @code{ptrdiff} values
+@node bytevec ptrdiff
+@section Bytevector of @code{ptrdiff} values
 
 
 @ElispBytevectorTypeDefinition{ptrdiff, signed-integer, ptrdiff_t}
 
 @c page
-@node bytevec typedefs sint8
-@subsection Bytevector of @code{sint8} values
+@node bytevec sint8
+@section Bytevector of @code{sint8} values
 
 
 @ElispBytevectorTypeDefinition{sint8, signed-integer, int8_t}
 
 @c page
-@node bytevec typedefs uint8
-@subsection Bytevector of @code{uint8} values
+@node bytevec uint8
+@section Bytevector of @code{uint8} values
 
 
 @ElispBytevectorTypeDefinition{uint8, unsigned-integer, uint8_t}
 
 @c page
-@node bytevec typedefs sint16
-@subsection Bytevector of @code{sint16} values
+@node bytevec sint16
+@section Bytevector of @code{sint16} values
 
 
 @ElispBytevectorTypeDefinition{sint16, signed-integer, int16_t}
 
 @c page
-@node bytevec typedefs uint16
-@subsection Bytevector of @code{uint16} values
+@node bytevec uint16
+@section Bytevector of @code{uint16} values
 
 
 @ElispBytevectorTypeDefinition{uint16, unsigned-integer, uint16_t}
 
 @c page
-@node bytevec typedefs sint32
-@subsection Bytevector of @code{sint32} values
+@node bytevec sint32
+@section Bytevector of @code{sint32} values
 
 
 @ElispBytevectorTypeDefinition{sint32, signed-integer, int32_t}
 
 @c page
-@node bytevec typedefs uint32
-@subsection Bytevector of @code{uint32} values
+@node bytevec uint32
+@section Bytevector of @code{uint32} values
 
 
 @ElispBytevectorTypeDefinition{uint32, unsigned-integer, uint32_t}
 
 @c page
-@node bytevec typedefs sint64
-@subsection Bytevector of @code{sint64} values
+@node bytevec sint64
+@section Bytevector of @code{sint64} values
 
 
 @ElispBytevectorTypeDefinition{sint64, signed-integer, int64_t}
 
 @c page
-@node bytevec typedefs uint64
-@subsection Bytevector of @code{uint64} values
+@node bytevec uint64
+@section Bytevector of @code{uint64} values
 
 
 @ElispBytevectorTypeDefinition{uint64, unsigned-integer, uint64_t}
 
 @c page
-@node bytevec typedefs float
-@subsection Bytevector of @code{float} values
+@node bytevec float
+@section Bytevector of @code{float} values
 
 
 @ElispBytevectorTypeDefinition{float, floating-point, float}
 
 @c page
-@node bytevec typedefs double
-@subsection Bytevector of @code{double} values
+@node bytevec double
+@section Bytevector of @code{double} values
 
 
 @ElispBytevectorTypeDefinition{double, floating-point, double}
 
 @c page
-@node bytevec typedefs ldouble
-@subsection Bytevector of @code{ldouble} values
+@node bytevec ldouble
+@section Bytevector of @code{ldouble} values
 
 
 @ElispBytevectorTypeDefinition{ldouble, floating-point, long double}
-
-@c page
-@node bytevec getters
-@section Bytevector getters
-
-
-@deffn {Generic Function} mmec-bytevector-ref (@var{BV} @var{IDX})
-Extract the value at index @var{IDX} from the bytevector @var{BV}.
-@end deffn
-
-
-@deffn {Method} mmec-bytevector-ref ((@var{BV} mmec-bytevector-u8) (@var{IDX} mmec-usize))
-Extract an @code{uint8_t} value from a bytevector and wrap it into a @objtype{mmec-uint8} object.
-@end deffn
-
-
-@deffn {Method} mmec-bytevector-ref ((@var{BV} mmec-bytevector-s8) (@var{IDX} mmec-usize))
-Extract an @code{int8_t} value from a bytevector and wrap it into a @objtype{mmec-sint8} object.
-@end deffn
-
-
-@deffn {Method} mmec-bytevector-ref ((@var{BV} mmec-bytevector-u16) (@var{IDX} mmec-usize))
-Extract an @code{uint16_t} value from a bytevector and wrap it into a @objtype{mmec-uin1t16} object.
-@end deffn
-
-
-@deffn {Method} mmec-bytevector-ref ((@var{BV} mmec-bytevector-s16) (@var{IDX} mmec-usize))
-Extract an @code{int16_t} value from a bytevector and wrap it into a @objtype{mmec-sint16} object.
-@end deffn
-
-
-@deffn {Method} mmec-bytevector-ref ((@var{BV} mmec-bytevector-u32) (@var{IDX} mmec-usize))
-Extract an @code{uint32_t} value from a bytevector and wrap it into a @objtype{mmec-uint32} object.
-@end deffn
-
-
-@deffn {Method} mmec-bytevector-ref ((@var{BV} mmec-bytevector-s32) (@var{IDX} mmec-usize))
-Extract an @code{int32_t} value from a bytevector and wrap it into a @objtype{mmec-sint32} object.
-@end deffn
-
-
-@deffn {Method} mmec-bytevector-ref ((@var{BV} mmec-bytevector-u64) (@var{IDX} mmec-usize))
-Extract an @code{uint64_t} value from a bytevector and wrap it into a @objtype{mmec-uint64} object.
-@end deffn
-
-
-@deffn {Method} mmec-bytevector-ref ((@var{BV} mmec-bytevector-s64) (@var{IDX} mmec-usize))
-Extract an @code{int64_t} value from a bytevector and wrap it into a @objtype{mmec-sint64} object.
-@end deffn
-
-@c page
-@node bytevec setters
-@section Bytevector setters
-
-
-@deffn {Generic Function} mmec-bytevector-set! (bv idx val)
-Store the value @var{VAL} into the bytevector @var{BV} at index @var{idx}.
-@end deffn
-
-
-@deffn {Method} mmec-bytevector-set! ((@var{BV} mmec-bytevector-u8) (@var{IDX} mmec-usize) (@var{VAL} mmec-uint8))
-Store the value @var{VAL} of type @code{uint8_t} into the bytevector @var{BV} at index @var{IDX}.
-@end deffn
-
-
-@deffn {Method} mmec-bytevector-set! ((@var{BV} mmec-bytevector-s8) (@var{IDX} mmec-usize) (@var{VAL} mmec-sint8))
-Store the value @var{VAL} of type @code{int8_t} into the bytevector @var{BV} at index @var{IDX}.
-@end deffn
-
-
-@deffn {Method} mmec-bytevector-set! ((@var{BV} mmec-bytevector-u16) (@var{IDX} mmec-usize) (@var{VAL} mmec-uint16))
-Store the value @var{VAL} of type @code{uint16_t} into the bytevector @var{BV} at index @var{IDX}.
-@end deffn
-
-
-@deffn {Method} mmec-bytevector-set! ((@var{BV} mmec-bytevector-s16) (@var{IDX} mmec-usize) (@var{VAL} mmec-sint16))
-Store the value @var{VAL} of type @code{int16_t} into the bytevector @var{BV} at index @var{IDX}.
-@end deffn
-
-
-@deffn {Method} mmec-bytevector-set! ((@var{BV} mmec-bytevector-u32) (@var{IDX} mmec-usize) (@var{VAL} mmec-uint32))
-Store the value @var{VAL} of type @code{uint32_t} into the bytevector @var{BV} at index @var{IDX}.
-@end deffn
-
-
-@deffn {Method} mmec-bytevector-set! ((@var{BV} mmec-bytevector-s32) (@var{IDX} mmec-usize) (@var{VAL} mmec-sint32))
-Store the value @var{VAL} of type @code{int32_t} into the bytevector @var{BV} at index @var{IDX}.
-@end deffn
-
-
-@deffn {Method} mmec-bytevector-set! ((@var{BV} mmec-bytevector-u64) (@var{IDX} mmec-usize) (@var{VAL} mmec-uint64))
-Store the value @var{VAL} of type @code{uint64_t} into the bytevector @var{BV} at index @var{IDX}.
-@end deffn
-
-
-@deffn {Method} mmec-bytevector-set! ((@var{BV} mmec-bytevector-s64) (@var{IDX} mmec-usize) (@var{VAL} mmec-sint64))
-Store the value @var{VAL} of type @code{int64_t} into the bytevector @var{BV} at index @var{IDX}.
-@end deffn
 
 @c page
 @node errors
@@ -2235,6 +2153,7 @@ Cannot compare a signed integer with an unsigned integer.
 * capi errors::                 Signalling errors.
 * capi modules::                Modules related definitions.
 * capi objects::                Handling Emacs Lisp objects.
+* capi bytevec::                Bytevector objects.
 @end menu
 
 @c page
@@ -3059,6 +2978,139 @@ is @nil{}.
 @DocumentNumberValueWithUsrptrRep{float, float}
 @DocumentNumberValueWithFloatRep{double, double}
 @DocumentNumberValueWithUsrptrRep{ldouble, ldouble}
+
+@c page
+@node capi bytevec
+@section Bytevector objects
+
+
+@menu
+* capi bytevec typedefs::       Bytevector type definitions.
+* capi bytevec getters::        Getters for bytevector objects.
+* capi bytevec setters::        Setters for bytevector objects.
+@end menu
+
+@c page
+@node capi bytevec typedefs
+@subsection Bytevector type definitions
+
+
+@deftp {Struct Typedef} mmec_intrep_bytevector_t
+Structure type for the internal representation of bytevectors as Emacs Lisp values of type
+@objtype{mmec-bytevector}.  It has the following fields:
+
+@table @code
+@item intmax_t number_of_slots
+Number of slots allocated in the binary data area.
+
+@item intmax_t slot_size
+Size in bytes of a slot in the binary data area.
+
+@item bool hold_signed_values
+True if the slots hold signed numeric values.
+
+@item void * ptr
+Pointer to the binary data area.
+@end table
+@end deftp
+
+
+@deftypefun {mmec_intrep_bytevector_t *} mmec_get_intrep_bytevector_from_emacs_value (emacs_env * @var{ENV}, emacs_value @var{ARG})
+Given an Emacs user--pointer object of type @objtype{bytevector} retrieve a pointer to its internal
+representation.  The structure referenced by the returned pointer is the actual one used by the
+Emacs value: mutating the structure mutates the Emacs value.
+@end deftypefun
+
+
+@deftypefun bool mmec_bytevector_valid_slot_index (mmec_intrep_bytevector_t * @var{BV}, intmax_t @var{idx})
+Return true if @var{IDX} is a valid slot index for the bytevector @var{BV}; otherwise return false.
+@end deftypefun
+
+@c page
+@node capi bytevec getters
+@subsection Getters for bytevector objects
+
+
+@macro CapiBytevectorGetter{TYPESTEM}
+@deftypefun {mmec_clang_\TYPESTEM\_t} mmec_bytevector_\TYPESTEM\_ref (mmec_intrep_bytevector_t * @var{BV}, intmax_t @var{IDX})
+Extract a value of type @code{mmec_clang_\TYPESTEM\_t} from the data area of the bytevector @var{BV}
+at slot index @var{IDX}.
+@end deftypefun
+
+@end macro
+
+
+@CapiBytevectorGetter{char}
+@CapiBytevectorGetter{schar}
+@CapiBytevectorGetter{uchar}
+@CapiBytevectorGetter{wchar}
+@CapiBytevectorGetter{sshrt}
+@CapiBytevectorGetter{ushrt}
+@CapiBytevectorGetter{sint}
+@CapiBytevectorGetter{uint}
+@CapiBytevectorGetter{slong}
+@CapiBytevectorGetter{ulong}
+@CapiBytevectorGetter{sllong}
+@CapiBytevectorGetter{ullong}
+@CapiBytevectorGetter{sintmax}
+@CapiBytevectorGetter{uintmax}
+@CapiBytevectorGetter{ssize}
+@CapiBytevectorGetter{usize}
+@CapiBytevectorGetter{ptrdiff}
+@CapiBytevectorGetter{sint8}
+@CapiBytevectorGetter{uint8}
+@CapiBytevectorGetter{sint16}
+@CapiBytevectorGetter{uint16}
+@CapiBytevectorGetter{sint32}
+@CapiBytevectorGetter{uint32}
+@CapiBytevectorGetter{sint64}
+@CapiBytevectorGetter{uint64}
+@CapiBytevectorGetter{float}
+@CapiBytevectorGetter{double}
+@CapiBytevectorGetter{ldouble}
+
+@c page
+@node capi bytevec setters
+@subsection Setters for bytevector objects
+
+
+@macro CapiBytevectorSetter{TYPESTEM}
+@deftypefun void mmec_bytevector_\TYPESTEM\_set (mmec_intrep_bytevector_t * @var{BV}, intmax_t @var{IDX}, {mmec_clang_\TYPESTEM\_t} @var{VAL})
+Store a value of type @code{mmec_clang_\TYPESTEM\_t} in the data area of the bytevector @var{BV} at
+slot index @var{IDX}.
+@end deftypefun
+
+@end macro
+
+
+@CapiBytevectorSetter{char}
+@CapiBytevectorSetter{schar}
+@CapiBytevectorSetter{uchar}
+@CapiBytevectorSetter{wchar}
+@CapiBytevectorSetter{sshrt}
+@CapiBytevectorSetter{ushrt}
+@CapiBytevectorSetter{sint}
+@CapiBytevectorSetter{uint}
+@CapiBytevectorSetter{slong}
+@CapiBytevectorSetter{ulong}
+@CapiBytevectorSetter{sllong}
+@CapiBytevectorSetter{ullong}
+@CapiBytevectorSetter{sintmax}
+@CapiBytevectorSetter{uintmax}
+@CapiBytevectorSetter{ssize}
+@CapiBytevectorSetter{usize}
+@CapiBytevectorSetter{ptrdiff}
+@CapiBytevectorSetter{sint8}
+@CapiBytevectorSetter{uint8}
+@CapiBytevectorSetter{sint16}
+@CapiBytevectorSetter{uint16}
+@CapiBytevectorSetter{sint32}
+@CapiBytevectorSetter{uint32}
+@CapiBytevectorSetter{sint64}
+@CapiBytevectorSetter{uint64}
+@CapiBytevectorSetter{float}
+@CapiBytevectorSetter{double}
+@CapiBytevectorSetter{ldouble}
 
 @c page
 @c ------------------------------------------------------------

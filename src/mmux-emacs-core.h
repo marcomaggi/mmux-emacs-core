@@ -460,17 +460,77 @@ MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP(ldouble)
 typedef struct mmec_intrep_bytevector_t	mmec_intrep_bytevector_t;
 
 struct mmec_intrep_bytevector_t {
-  size_t	number_of_slots;
-  size_t	slot_size;
-  int		hold_signed_values;
+  intmax_t	number_of_slots;
+  intmax_t	slot_size;
+  bool		hold_signed_values;
   void		* ptr;
 };
 
 static inline mmec_intrep_bytevector_t *
-mmec_extract_intrep_bytevector (emacs_env * env, emacs_value arg)
+mmec_get_intrep_bytevector_from_emacs_value (emacs_env * env, emacs_value arg)
 {
   return ((mmec_intrep_bytevector_t *)mmec_get_usrptr_object_from_emacs_value(env, arg));
 }
+
+static inline bool
+mmec_bytevector_valid_slot_index (mmec_intrep_bytevector_t * bv, intmax_t idx)
+{
+  return ((0 <= idx) && (idx < bv->number_of_slots))? true : false;
+}
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_BYTEVECTOR_GETTER
+#define MMEC_DEFINE_BYTEVECTOR_GETTER(TYPESTEM)				\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_bytevector_ ## TYPESTEM ## _ref (mmec_intrep_bytevector_t *bv, intmax_t idx) \
+  {									\
+    MMEC_PC(mmec_clang_ ## TYPESTEM ## _t, data, bv->ptr);		\
+    return data[idx];							\
+  }
+
+#undef  MMEC_DEFINE_BYTEVECTOR_SETTER
+#define MMEC_DEFINE_BYTEVECTOR_SETTER(TYPESTEM)				\
+  static inline void							\
+  mmec_bytevector_ ## TYPESTEM ## _set (mmec_intrep_bytevector_t *bv, intmax_t idx, mmec_clang_ ## TYPESTEM ## _t val) \
+  {									\
+    MMEC_PC(mmec_clang_ ## TYPESTEM ## _t, data, bv->ptr);		\
+    data[idx] = val;							\
+  }									\
+
+#undef  MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER
+#define MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(TYPESTEM)			\
+  MMEC_DEFINE_BYTEVECTOR_SETTER(TYPESTEM)				\
+  MMEC_DEFINE_BYTEVECTOR_GETTER(TYPESTEM)
+
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(char)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(schar)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(uchar)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(wchar)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(sshrt)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(ushrt)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(sint)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(uint)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(slong)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(ulong)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(sllong)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(ullong)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(sintmax)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(uintmax)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(ssize)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(usize)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(ptrdiff)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(sint8)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(uint8)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(sint16)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(uint16)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(sint32)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(uint32)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(sint64)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(uint64)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(float)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(double)
+MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(ldouble)
 
 
 /** --------------------------------------------------------------------

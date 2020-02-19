@@ -47,20 +47,24 @@ static emacs_value
 Fmmec_make_bytevector (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
 {
   assert(nargs == 3);
-  size_t	number_of_slots		= (size_t)mmec_extract_elisp_integer_from_emacs_value(env, args[0]);
-  size_t	slot_size		= (size_t)mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
-  int		hold_signed_values	= (int)   mmec_extract_elisp_integer_from_emacs_value(env, args[2]);
+  intmax_t	number_of_slots		= mmec_extract_elisp_integer_from_emacs_value(env, args[0]);
+  intmax_t	slot_size		= mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
+  intmax_t	hold_signed_values	= mmec_extract_elisp_integer_from_emacs_value(env, args[2]);
   mmec_intrep_bytevector_t	* obj;
+
+  if ((number_of_slots < 0) || (slot_size < 0)) {
+    return mmec_error_constructor(env);
+  }
 
   errno = 0;
   obj   = (mmec_intrep_bytevector_t *)malloc(sizeof(mmec_intrep_bytevector_t));
   if (obj) {
     errno	= 0;
-    obj->ptr	= (uint8_t *)calloc(number_of_slots, slot_size);
+    obj->ptr	= calloc(number_of_slots, slot_size);
     if (obj->ptr) {
       obj->number_of_slots	= number_of_slots;
       obj->slot_size		= slot_size;
-      obj->hold_signed_values	= hold_signed_values? 1 : 0;
+      obj->hold_signed_values	= (hold_signed_values)? 1 : 0;
       return mmec_new_emacs_value_from_usrptr_object(env, mmec_bytevector_finalizer, obj);
     } else {
       return mmec_error_memory_allocation(env);
@@ -72,107 +76,76 @@ Fmmec_make_bytevector (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void
 
 
 /** --------------------------------------------------------------------
- ** Bytevector objects: getters.
+ ** Bytevector objects: getters and setters.
  ** ----------------------------------------------------------------- */
 
-#undef  MMEC_DEFINE_BYTEVECTOR_GETTER
-#define MMEC_DEFINE_BYTEVECTOR_GETTER(TYPESTEM)				\
+#undef  MMEC_DEFINE_ELISP_BYTEVECTOR_GETTER
+#define MMEC_DEFINE_ELISP_BYTEVECTOR_GETTER(TYPESTEM)			\
   static emacs_value							\
   Fmmec_bytevector_ ## TYPESTEM ## _ref (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED) \
   {									\
     assert(2 == nargs);							\
-    mmec_intrep_bytevector_t	*bv	= mmec_extract_intrep_bytevector(env, args[0]); \
-    size_t			idx	= (size_t)mmec_extract_elisp_integer_from_emacs_value(env, args[1]); \
+    mmec_intrep_bytevector_t	*bv	= mmec_get_intrep_bytevector_from_emacs_value(env, args[0]); \
+    intmax_t			idx	= mmec_extract_elisp_integer_from_emacs_value(env, args[1]); \
 									\
-    if (idx <= bv->number_of_slots) {					\
-      MMEC_PC(mmec_clang_ ## TYPESTEM ## _t, data, bv->ptr);		\
-      return mmec_new_emacs_value_from_clang_ ## TYPESTEM (env, data[idx]); \
+    if (mmec_bytevector_valid_slot_index(bv, idx)) {			\
+      return mmec_new_emacs_value_from_clang_ ## TYPESTEM (env, mmec_bytevector_ ## TYPESTEM ## _ref(bv, idx)); \
     } else {								\
       return mmec_error_bytevector_index_out_of_range(env);		\
     }									\
   }
 
-MMEC_DEFINE_BYTEVECTOR_GETTER(char)
-MMEC_DEFINE_BYTEVECTOR_GETTER(schar)
-MMEC_DEFINE_BYTEVECTOR_GETTER(uchar)
-MMEC_DEFINE_BYTEVECTOR_GETTER(wchar)
-MMEC_DEFINE_BYTEVECTOR_GETTER(sshrt)
-MMEC_DEFINE_BYTEVECTOR_GETTER(ushrt)
-MMEC_DEFINE_BYTEVECTOR_GETTER(sint)
-MMEC_DEFINE_BYTEVECTOR_GETTER(uint)
-MMEC_DEFINE_BYTEVECTOR_GETTER(slong)
-MMEC_DEFINE_BYTEVECTOR_GETTER(ulong)
-MMEC_DEFINE_BYTEVECTOR_GETTER(sllong)
-MMEC_DEFINE_BYTEVECTOR_GETTER(ullong)
-MMEC_DEFINE_BYTEVECTOR_GETTER(sintmax)
-MMEC_DEFINE_BYTEVECTOR_GETTER(uintmax)
-MMEC_DEFINE_BYTEVECTOR_GETTER(ssize)
-MMEC_DEFINE_BYTEVECTOR_GETTER(usize)
-MMEC_DEFINE_BYTEVECTOR_GETTER(ptrdiff)
-MMEC_DEFINE_BYTEVECTOR_GETTER(sint8)
-MMEC_DEFINE_BYTEVECTOR_GETTER(uint8)
-MMEC_DEFINE_BYTEVECTOR_GETTER(sint16)
-MMEC_DEFINE_BYTEVECTOR_GETTER(uint16)
-MMEC_DEFINE_BYTEVECTOR_GETTER(sint32)
-MMEC_DEFINE_BYTEVECTOR_GETTER(uint32)
-MMEC_DEFINE_BYTEVECTOR_GETTER(sint64)
-MMEC_DEFINE_BYTEVECTOR_GETTER(uint64)
-MMEC_DEFINE_BYTEVECTOR_GETTER(float)
-MMEC_DEFINE_BYTEVECTOR_GETTER(double)
-MMEC_DEFINE_BYTEVECTOR_GETTER(ldouble)
-
-
-/** --------------------------------------------------------------------
- ** Bytevector objects: setters.
- ** ----------------------------------------------------------------- */
-
-#undef  MMEC_DEFINE_BYTEVECTOR_SETTER
-#define MMEC_DEFINE_BYTEVECTOR_SETTER(TYPESTEM)				\
+#undef  MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER
+#define MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER(TYPESTEM)			\
   static emacs_value							\
   Fmmec_bytevector_ ## TYPESTEM ## _set (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED) \
   {									\
     assert(3 == nargs);							\
-    mmec_intrep_bytevector_t	*bv	= mmec_extract_intrep_bytevector(env, args[0]); \
-    size_t			idx	= (size_t)mmec_extract_elisp_integer_from_emacs_value(env, args[1]); \
+    mmec_intrep_bytevector_t	*bv	= mmec_get_intrep_bytevector_from_emacs_value(env, args[0]); \
+    intmax_t			idx	= mmec_extract_elisp_integer_from_emacs_value(env, args[1]); \
 									\
-    if (idx <= bv->number_of_slots) {					\
+    if (mmec_bytevector_valid_slot_index(bv, idx)) {			\
       mmec_clang_ ## TYPESTEM ## _t val	= mmec_extract_clang_ ## TYPESTEM ##_from_emacs_value(env, args[2]); \
-      MMEC_PC(mmec_clang_ ## TYPESTEM ## _t, data, bv->ptr);		\
-      data[idx] = val;							\
+      mmec_bytevector_ ## TYPESTEM ## _set(bv, idx, val);		\
       return mmec_new_emacs_value_nil(env);				\
     } else {								\
       return mmec_error_bytevector_index_out_of_range(env);		\
     }									\
   }
 
-MMEC_DEFINE_BYTEVECTOR_SETTER(char)
-MMEC_DEFINE_BYTEVECTOR_SETTER(schar)
-MMEC_DEFINE_BYTEVECTOR_SETTER(uchar)
-MMEC_DEFINE_BYTEVECTOR_SETTER(wchar)
-MMEC_DEFINE_BYTEVECTOR_SETTER(sshrt)
-MMEC_DEFINE_BYTEVECTOR_SETTER(ushrt)
-MMEC_DEFINE_BYTEVECTOR_SETTER(sint)
-MMEC_DEFINE_BYTEVECTOR_SETTER(uint)
-MMEC_DEFINE_BYTEVECTOR_SETTER(slong)
-MMEC_DEFINE_BYTEVECTOR_SETTER(ulong)
-MMEC_DEFINE_BYTEVECTOR_SETTER(sllong)
-MMEC_DEFINE_BYTEVECTOR_SETTER(ullong)
-MMEC_DEFINE_BYTEVECTOR_SETTER(sintmax)
-MMEC_DEFINE_BYTEVECTOR_SETTER(uintmax)
-MMEC_DEFINE_BYTEVECTOR_SETTER(ssize)
-MMEC_DEFINE_BYTEVECTOR_SETTER(usize)
-MMEC_DEFINE_BYTEVECTOR_SETTER(ptrdiff)
-MMEC_DEFINE_BYTEVECTOR_SETTER(sint8)
-MMEC_DEFINE_BYTEVECTOR_SETTER(uint8)
-MMEC_DEFINE_BYTEVECTOR_SETTER(sint16)
-MMEC_DEFINE_BYTEVECTOR_SETTER(uint16)
-MMEC_DEFINE_BYTEVECTOR_SETTER(sint32)
-MMEC_DEFINE_BYTEVECTOR_SETTER(uint32)
-MMEC_DEFINE_BYTEVECTOR_SETTER(sint64)
-MMEC_DEFINE_BYTEVECTOR_SETTER(uint64)
-MMEC_DEFINE_BYTEVECTOR_SETTER(float)
-MMEC_DEFINE_BYTEVECTOR_SETTER(double)
-MMEC_DEFINE_BYTEVECTOR_SETTER(ldouble)
+#undef  MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER
+#define MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(TYPESTEM)		\
+  MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER(TYPESTEM)				\
+  MMEC_DEFINE_ELISP_BYTEVECTOR_GETTER(TYPESTEM)
+
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(char)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(schar)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(uchar)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(wchar)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(sshrt)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(ushrt)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(sint)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(uint)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(slong)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(ulong)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(sllong)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(ullong)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(sintmax)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(uintmax)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(ssize)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(usize)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(ptrdiff)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(sint8)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(uint8)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(sint16)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(uint16)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(sint32)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(uint32)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(sint64)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(uint64)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(float)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(double)
+MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(ldouble)
 
 
 /** --------------------------------------------------------------------

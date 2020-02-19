@@ -1,8 +1,8 @@
 ﻿-*- coding: utf-8-with-signature-unix; fill-column: 200 -*-
 
-* Add bytevector types for all the integer numbers.
-* Add bytevector types for all the floating-point numbers.
 * Add printer functions for all the number types.
+* Add printer functions for the bytevector types.
+* Read the elisp docs node Sequence Functions to understand how to interface bytevectors with sequence functions.
 * Local Variables
 
 # Local Variables:

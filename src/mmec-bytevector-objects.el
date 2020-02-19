@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-19 11:36:13 marco>
+;; Time-stamp: <2020-02-19 21:15:21 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -90,65 +90,63 @@
 
 ;;;; bytevector type definitions
 
-(cl-macrolet
-    ((mmec--define-bytevector-type
-      (TYPESTEM PARENT-STEM)
-      (let* ((BYTEVECTOR-TYPE		(intern (format "mmec-%s-bytevector" TYPESTEM)))
-	     (BYTEVECTOR-TYPE-MAKER	(intern (format "mmec-%s-bytevector--make" TYPESTEM)))
-	     (PARENT-BYTEVECTOR-TYPE	(intern (format "mmec-%s-bytevector" PARENT-STEM)))
-	     (SIZEOF-SLOT		(intern (format "mmec-sizeof-%s" TYPESTEM)))
-	     (SIGNED-BOOL		(cl-case PARENT-STEM
-					  (signed-integer	't)
-					  (unsigned-integer	'nil)
-					  (floating-point	't)
-					  (t
-					   (signal 'mmec-error (list 'mmec--define-bytevector-type PARENT-STEM)))))
-	     (DOCSTRING			(format "Build and return a new instance of `mmec-%s-bytevector'." TYPESTEM)))
-	`(progn
-	   (cl-defstruct (,BYTEVECTOR-TYPE
-			  (:constructor	,BYTEVECTOR-TYPE-MAKER)
-			  (:include		,PARENT-BYTEVECTOR-TYPE)))
+(defmacro mmec--define-bytevector-type (TYPESTEM PARENT-STEM)
+  (let* ((BYTEVECTOR-TYPE		(intern (format "mmec-%s-bytevector" TYPESTEM)))
+	 (BYTEVECTOR-TYPE-MAKER	(intern (format "mmec-%s-bytevector--make" TYPESTEM)))
+	 (PARENT-BYTEVECTOR-TYPE	(intern (format "mmec-%s-bytevector" PARENT-STEM)))
+	 (SIZEOF-SLOT		(intern (format "mmec-sizeof-%s" TYPESTEM)))
+	 (SIGNED-BOOL		(cl-case PARENT-STEM
+				  (signed-integer	't)
+				  (unsigned-integer	'nil)
+				  (floating-point	't)
+				  (t
+				   (signal 'mmec-error (list 'mmec--define-bytevector-type PARENT-STEM)))))
+	 (DOCSTRING			(format "Build and return a new instance of `mmec-%s-bytevector'." TYPESTEM)))
+    `(progn
+       (cl-defstruct (,BYTEVECTOR-TYPE
+		      (:constructor	,BYTEVECTOR-TYPE-MAKER)
+		      (:include		,PARENT-BYTEVECTOR-TYPE)))
 
-	   (cl-defgeneric ,BYTEVECTOR-TYPE (number-of-slots)
-	     ,DOCSTRING)
-	   (cl-defmethod  ,BYTEVECTOR-TYPE ((number-of-slots integer))
-	     ,DOCSTRING
-	     (mmec--make ,BYTEVECTOR-TYPE
-			 :number-of-slots		number-of-slots
-			 :slot-size			,SIZEOF-SLOT
-			 :signed			,SIGNED-BOOL
-			 :obj			(mmec-c-make-bytevector number-of-slots ,SIZEOF-SLOT ,SIGNED-BOOL)
-			 :number-of-allocated-bytes	(* number-of-slots ,SIZEOF-SLOT)))
-	   ))))
+       (cl-defgeneric ,BYTEVECTOR-TYPE (number-of-slots)
+	 ,DOCSTRING)
+       (cl-defmethod  ,BYTEVECTOR-TYPE ((number-of-slots integer))
+	 ,DOCSTRING
+	 (mmec--make ,BYTEVECTOR-TYPE
+		     :number-of-slots		number-of-slots
+		     :slot-size			,SIZEOF-SLOT
+		     :signed			,SIGNED-BOOL
+		     :obj			(mmec-c-make-bytevector number-of-slots ,SIZEOF-SLOT ,SIGNED-BOOL)
+		     :number-of-allocated-bytes	(* number-of-slots ,SIZEOF-SLOT)))
+       )))
 
-  (mmec--define-bytevector-type char	signed-integer)
-  (mmec--define-bytevector-type schar	signed-integer)
-  (mmec--define-bytevector-type uchar	unsigned-integer)
-  (mmec--define-bytevector-type wchar	unsigned-integer)
-  (mmec--define-bytevector-type sshrt	signed-integer)
-  (mmec--define-bytevector-type ushrt	unsigned-integer)
-  (mmec--define-bytevector-type sint	signed-integer)
-  (mmec--define-bytevector-type uint	unsigned-integer)
-  (mmec--define-bytevector-type slong	signed-integer)
-  (mmec--define-bytevector-type ulong	unsigned-integer)
-  (mmec--define-bytevector-type sllong	signed-integer)
-  (mmec--define-bytevector-type ullong	unsigned-integer)
-  (mmec--define-bytevector-type sintmax	signed-integer)
-  (mmec--define-bytevector-type uintmax	unsigned-integer)
-  (mmec--define-bytevector-type ssize	signed-integer)
-  (mmec--define-bytevector-type usize	unsigned-integer)
-  (mmec--define-bytevector-type ptrdiff	signed-integer)
-  (mmec--define-bytevector-type sint8	signed-integer)
-  (mmec--define-bytevector-type uint8	unsigned-integer)
-  (mmec--define-bytevector-type sint16	signed-integer)
-  (mmec--define-bytevector-type uint16	unsigned-integer)
-  (mmec--define-bytevector-type sint32	signed-integer)
-  (mmec--define-bytevector-type uint32	unsigned-integer)
-  (mmec--define-bytevector-type sint64	signed-integer)
-  (mmec--define-bytevector-type uint64	unsigned-integer)
-  (mmec--define-bytevector-type float	floating-point)
-  (mmec--define-bytevector-type double	floating-point)
-  (mmec--define-bytevector-type ldouble	floating-point))
+(mmec--define-bytevector-type char	signed-integer)
+(mmec--define-bytevector-type schar	signed-integer)
+(mmec--define-bytevector-type uchar	unsigned-integer)
+(mmec--define-bytevector-type wchar	unsigned-integer)
+(mmec--define-bytevector-type sshrt	signed-integer)
+(mmec--define-bytevector-type ushrt	unsigned-integer)
+(mmec--define-bytevector-type sint	signed-integer)
+(mmec--define-bytevector-type uint	unsigned-integer)
+(mmec--define-bytevector-type slong	signed-integer)
+(mmec--define-bytevector-type ulong	unsigned-integer)
+(mmec--define-bytevector-type sllong	signed-integer)
+(mmec--define-bytevector-type ullong	unsigned-integer)
+(mmec--define-bytevector-type sintmax	signed-integer)
+(mmec--define-bytevector-type uintmax	unsigned-integer)
+(mmec--define-bytevector-type ssize	signed-integer)
+(mmec--define-bytevector-type usize	unsigned-integer)
+(mmec--define-bytevector-type ptrdiff	signed-integer)
+(mmec--define-bytevector-type sint8	signed-integer)
+(mmec--define-bytevector-type uint8	unsigned-integer)
+(mmec--define-bytevector-type sint16	signed-integer)
+(mmec--define-bytevector-type uint16	unsigned-integer)
+(mmec--define-bytevector-type sint32	signed-integer)
+(mmec--define-bytevector-type uint32	unsigned-integer)
+(mmec--define-bytevector-type sint64	signed-integer)
+(mmec--define-bytevector-type uint64	unsigned-integer)
+(mmec--define-bytevector-type float	floating-point)
+(mmec--define-bytevector-type double	floating-point)
+(mmec--define-bytevector-type ldouble	floating-point)
 
 
 ;;;; bytevector objects: getters and setters

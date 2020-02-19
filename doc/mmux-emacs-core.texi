@@ -3071,6 +3071,7 @@ is @nil{}.
 
 @menu
 * capi bytevec typedefs::       Bytevector type definitions.
+* capi bytevec ctors::          Bytevector constructors.
 * capi bytevec getters::        Getters for bytevector objects.
 * capi bytevec setters::        Setters for bytevector objects.
 @end menu
@@ -3109,6 +3110,17 @@ Emacs value: mutating the structure mutates the Emacs value.
 
 @deftypefun bool mmec_bytevector_valid_slot_index (mmec_intrep_bytevector_t * @var{BV}, intmax_t @var{idx})
 Return true if @var{IDX} is a valid slot index for the bytevector @var{BV}; otherwise return false.
+@end deftypefun
+
+
+@c page
+@node capi bytevec ctors
+@subsection Bytevector constructors
+
+
+@deftypefun {mmec_interp_bytevector_t *} mmec_make_bytevector (intmax_t @var{number_of_slots}, intmax_t @var{slot_size}, bool @var{hold_signed_values})
+Allocate, initialise and return a new bytevector user--pointer object.  If memory allocation fails:
+return @cnull{}.
 @end deftypefun
 
 @c page

@@ -43,18 +43,10 @@ mmec_bytevector_finalizer (void * _obj)
   free(obj);
 }
 
-static emacs_value
-Fmmec_make_bytevector (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
+mmec_intrep_bytevector_t *
+mmec_make_bytevector (intmax_t number_of_slots, intmax_t slot_size, bool hold_signed_values)
 {
-  assert(nargs == 3);
-  intmax_t	number_of_slots		= mmec_extract_elisp_integer_from_emacs_value(env, args[0]);
-  intmax_t	slot_size		= mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
-  bool		hold_signed_values	= mmec_extract_boolean_from_emacs_value(env, args[2]);
   mmec_intrep_bytevector_t	* obj;
-
-  if ((number_of_slots < 0) || (slot_size < 0)) {
-    return mmec_error_constructor(env);
-  }
 
   errno = 0;
   obj   = (mmec_intrep_bytevector_t *)malloc(sizeof(mmec_intrep_bytevector_t));
@@ -65,12 +57,34 @@ Fmmec_make_bytevector (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void
       obj->number_of_slots	= number_of_slots;
       obj->slot_size		= slot_size;
       obj->hold_signed_values	= hold_signed_values;
+      return obj;
+    } else {
+      free(obj);
+      return NULL;
+    }
+  } else {
+    return NULL;
+  }
+}
+
+static emacs_value
+Fmmec_make_bytevector (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
+{
+  assert(nargs == 3);
+  intmax_t	number_of_slots		= mmec_extract_elisp_integer_from_emacs_value(env, args[0]);
+  intmax_t	slot_size		= mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
+  bool		hold_signed_values	= mmec_extract_boolean_from_emacs_value(env, args[2]);
+
+  if ((number_of_slots < 0) || (slot_size < 0)) {
+    return mmec_error_constructor(env);
+  } else {
+    mmec_intrep_bytevector_t	* obj = mmec_make_bytevector(number_of_slots, slot_size, hold_signed_values);
+
+    if (obj) {
       return mmec_new_emacs_value_from_usrptr_object(env, mmec_bytevector_finalizer, obj);
     } else {
       return mmec_error_memory_allocation(env);
     }
-  } else {
-    return mmec_error_memory_allocation(env);
   }
 }
 
@@ -146,6 +160,25 @@ MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(uint64)
 MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(float)
 MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(double)
 MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(ldouble)
+
+
+/** --------------------------------------------------------------------
+ ** Bytevector objects: operations.
+ ** ----------------------------------------------------------------- */
+
+/* static emacs_value */
+/* Fmmec_subbytevector (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED) */
+/* { */
+/*   assert((2 == nargs) || (3 == nargs)); */
+/*   mmec_intrep_bytevector_t	*bv	= mmec_get_intrep_bytevector_from_emacs_value(env, args[0]); */
+/*   intmax_t			idx	= mmec_extract_elisp_integer_from_emacs_value(env, args[1]); */
+
+/*   if (mmec_bytevector_valid_slot_index(bv, idx)) { */
+/*     return mmec_new_emacs_value_from_clang_ (env, mmec_bytevector_ ## TYPESTEM ## _ref(bv, idx)); */
+/*   } else { */
+/*     return mmec_error_bytevector_index_out_of_range(env); */
+/*   } */
+/* } */
 
 
 /** --------------------------------------------------------------------

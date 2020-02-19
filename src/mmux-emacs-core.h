@@ -478,6 +478,8 @@ mmec_get_intrep_bytevector_from_emacs_value (emacs_env * env, emacs_value arg)
   return ((mmec_intrep_bytevector_t *)mmec_get_usrptr_object_from_emacs_value(env, arg));
 }
 
+mmec_decl mmec_intrep_bytevector_t * mmec_make_bytevector (intmax_t number_of_slots, intmax_t slot_size, bool hold_signed_values);
+
 static inline bool
 mmec_bytevector_valid_slot_index (mmec_intrep_bytevector_t * bv, intmax_t idx)
 {

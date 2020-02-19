@@ -49,7 +49,7 @@ Fmmec_make_bytevector (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void
   assert(nargs == 3);
   intmax_t	number_of_slots		= mmec_extract_elisp_integer_from_emacs_value(env, args[0]);
   intmax_t	slot_size		= mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
-  intmax_t	hold_signed_values	= mmec_extract_elisp_integer_from_emacs_value(env, args[2]);
+  bool		hold_signed_values	= mmec_extract_boolean_from_emacs_value(env, args[2]);
   mmec_intrep_bytevector_t	* obj;
 
   if ((number_of_slots < 0) || (slot_size < 0)) {
@@ -64,7 +64,7 @@ Fmmec_make_bytevector (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void
     if (obj->ptr) {
       obj->number_of_slots	= number_of_slots;
       obj->slot_size		= slot_size;
-      obj->hold_signed_values	= (hold_signed_values)? 1 : 0;
+      obj->hold_signed_values	= hold_signed_values;
       return mmec_new_emacs_value_from_usrptr_object(env, mmec_bytevector_finalizer, obj);
     } else {
       return mmec_error_memory_allocation(env);

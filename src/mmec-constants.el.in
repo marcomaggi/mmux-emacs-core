@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-18 07:59:54 marco>
+;; Time-stamp: <2020-02-19 11:11:45 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -170,6 +170,145 @@
 
 (defconst mmec-SIZEOF_LONG_DOUBLE
   @VALUEOF_MMUX_SIZEOF_LDOUBLE@
+  "Value of type `integer' representing the size of `long double' measured in bytes.")
+
+
+;;;; size of basic types in measured in bytes: aliases using type stems
+
+(defconst mmec-sizeof-char
+  mmec-SIZEOF_CHAR
+  "Value of type `integer' representing the size of `char' measured in bytes.")
+
+(defconst mmec-sizeof-schar
+  mmec-SIZEOF_SIGNED_CHAR
+  "Value of type `integer' representing the size of `signed char' measured in bytes.")
+
+(defconst mmec-sizeof-uchar
+  mmec-SIZEOF_UNSIGNED_CHAR
+  "Value of type `integer' representing the size of `unsigned char' measured in bytes.")
+
+(defconst mmec-sizeof-wchar
+  mmec-SIZEOF_WCHAR_T
+  "Value of type `integer' representing the size of `wchar_t' measured in bytes.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-sizeof-sshrt
+  mmec-SIZEOF_SIGNED_SHORT_INT
+  "Value of type `integer' representing the size of `signed short int' measured in bytes.")
+
+(defconst mmec-sizeof-ushrt
+  mmec-SIZEOF_UNSIGNED_SHORT_INT
+  "Value of type `integer' representing the size of `signed short int' measured in bytes.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-sizeof-sint
+  mmec-SIZEOF_SIGNED_INT
+  "Value of type `integer' representing the size of `signed int' measured in bytes.")
+
+(defconst mmec-sizeof-uint
+  mmec-SIZEOF_UNSIGNED_INT
+  "Value of type `integer' representing the size of `signed int' measured in bytes.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-sizeof-slong
+  mmec-SIZEOF_SIGNED_LONG_INT
+  "Value of type `integer' representing the size of `signed long int' measured in bytes.")
+
+(defconst mmec-sizeof-ulong
+  mmec-SIZEOF_UNSIGNED_LONG_INT
+  "Value of type `integer' representing the size of `signed long int' measured in bytes.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-sizeof-sllong
+  mmec-SIZEOF_SIGNED_LONG_LONG_INT
+  "Value of type `integer' representing the size of `signed long long int' measured in bytes.")
+
+(defconst mmec-sizeof-ullong
+  mmec-SIZEOF_UNSIGNED_LONG_LONG_INT
+  "Value of type `integer' representing the size of `signed long long int' measured in bytes.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-sizeof-usize
+  mmec-SIZEOF_SIZE_T
+  "Value of type `integer' representing the size of `size_t' measured in bytes.")
+
+(defconst mmec-sizeof-ssize
+  mmec-SIZEOF_SSIZE_T
+  "Value of type `integer' representing the size of `ssize_t' measured in bytes.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-sizeof-sintmax
+  mmec-SIZEOF_INTMAX_T
+  "Value of type `integer' representing the size of `intmax_t' measured in bytes.")
+
+(defconst mmec-sizeof-uintmax
+  mmec-SIZEOF_UINTMAX_T
+  "Value of type `integer' representing the size of `uintmax_t' measured in bytes.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-sizeof-ptrdiff
+  mmec-SIZEOF_PTRDIFF_T
+  "Value of type `integer' representing the size of `ptrdiff_t' measured in bytes.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-sizeof-sint8
+  mmec-SIZEOF_INT8_T
+  "Value of type `integer' representing the size of `int8_t' measured in bytes.")
+
+(defconst mmec-sizeof-uint8
+  1
+  "Value of type `integer' representing the size of `uint8_t' measured in bytes.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-sizeof-sint16
+  mmec-SIZEOF_INT16_T
+  "Value of type `integer' representing the size of `int16_t' measured in bytes.")
+
+(defconst mmec-sizeof-uint16
+  mmec-SIZEOF_UINT16_T
+  "Value of type `integer' representing the size of `uint16_t' measured in bytes.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-sizeof-sint32
+  mmec-SIZEOF_INT32_T
+  "Value of type `integer' representing the size of `int32_t' measured in bytes.")
+
+(defconst mmec-sizeof-uint32
+  mmec-SIZEOF_UINT32_T
+  "Value of type `integer' representing the size of `uint32_t' measured in bytes.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-sizeof-sint64
+  mmec-SIZEOF_INT64_T
+  "Value of type `integer' representing the size of `int64_t' measured in bytes.")
+
+(defconst mmec-sizeof-uint64
+  mmec-SIZEOF_UINT64_T
+  "Value of type `integer' representing the size of `uint64_t' measured in bytes.")
+
+;;; --------------------------------------------------------------------
+
+(defconst mmec-sizeof-float
+  mmec-SIZEOF_FLOAT
+  "Value of type `integer' representing the size of `float' measured in bytes.")
+
+(defconst mmec-sizeof-double
+  mmec-SIZEOF_DOUBLE
+  "Value of type `integer' representing the size of `double' measured in bytes.")
+
+(defconst mmec-sizeof-ldouble
+  mmec-SIZEOF_LONG_DOUBLE
   "Value of type `integer' representing the size of `long double' measured in bytes.")
 
 

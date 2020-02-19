@@ -260,6 +260,12 @@ mmec_extract_elisp_float_from_emacs_value (emacs_env * env, emacs_value arg)
   return env->extract_float(env, arg);
 }
 
+static inline bool
+mmec_extract_boolean_from_emacs_value (emacs_env * env, emacs_value arg)
+{
+  return (env->eq(env, arg, env->intern(env, "nil")))? false : true;
+}
+
 /* ------------------------------------------------------------------ */
 
 static inline emacs_value

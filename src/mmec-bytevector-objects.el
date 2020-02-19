@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-18 18:24:20 marco>
+;; Time-stamp: <2020-02-19 11:36:13 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -58,12 +58,12 @@
   number-of-slots
   slot-size
   number-of-allocated-bytes
+  signed
   obj)
 
 (cl-defstruct (mmec-integer-bytevector
 	       (:include	mmec-bytevector)
-	       (:constructor	mmec-integer-bytevector--make))
-  signed)
+	       (:constructor	mmec-integer-bytevector--make)))
 
 (cl-defstruct (mmec-signed-integer-bytevector
 	       (:include	mmec-integer-bytevector)
@@ -88,513 +88,67 @@
   (mmec--define-abstract-type-constructor mmec-floating-point-bytevector))
 
 
-;;;; bytevector objects: slots of type char, schar, uchar
-
-(cl-defstruct (mmec-char-bytevector
-	       (:constructor	mmec-char-bytevector--make)
-	       (:include	mmec-signed-integer-bytevector)))
-
-(cl-defgeneric mmec-char-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-char-bytevector'.")
-(cl-defmethod  mmec-char-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-char-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-char-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			mmec-SIZEOF_CHAR
-   :signed			t
-   :obj				(mmec-c-make-bytevector number-of-slots mmec-SIZEOF_CHAR t)
-   :number-of-allocated-bytes	(* number-of-slots mmec-SIZEOF_CHAR)))
-
-;;; --------------------------------------------------------------------
-
-(cl-defstruct (mmec-schar-bytevector
-	       (:constructor	mmec-schar-bytevector--make)
-	       (:include	mmec-signed-integer-bytevector)))
-
-(cl-defgeneric mmec-schar-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-schar-bytevector'.")
-(cl-defmethod  mmec-schar-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-schar-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-schar-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			mmec-SIZEOF_SIGNED_CHAR
-   :signed			t
-   :obj				(mmec-c-make-bytevector number-of-slots mmec-SIZEOF_SIGNED_CHAR 1)
-   :number-of-allocated-bytes	(* number-of-slots mmec-SIZEOF_SIGNED_CHAR)))
-
-;;; --------------------------------------------------------------------
-
-(cl-defstruct (mmec-uchar-bytevector
-	       (:constructor	mmec-uchar-bytevector--make)
-	       (:include	mmec-unsigned-integer-bytevector)))
-
-(cl-defgeneric mmec-uchar-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-uchar-bytevector'.")
-(cl-defmethod  mmec-uchar-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-uchar-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-uchar-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			mmec-SIZEOF_UNSIGNED_CHAR
-   :signed			nil
-   :obj				(mmec-c-make-bytevector number-of-slots mmec-SIZEOF_UNSIGNED_CHAR 0)
-   :number-of-allocated-bytes	(* number-of-slots mmec-SIZEOF_UNSIGNED_CHAR)))
-
-
-;;;; bytevector objects: slots of type sshrt and ushrt
-
-(cl-defstruct (mmec-sshrt-bytevector
-	       (:constructor	mmec-sshrt-bytevector--make)
-	       (:include	mmec-signed-integer-bytevector)))
-
-(cl-defgeneric mmec-sshrt-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-sshrt-bytevector'.")
-(cl-defmethod  mmec-sshrt-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-sshrt-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-sshrt-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			mmec-SIZEOF_SIGNED_SHORT_INT
-   :signed			t
-   :obj				(mmec-c-make-bytevector number-of-slots mmec-SIZEOF_SIGNED_SHORT_INT 1)
-   :number-of-allocated-bytes	(* number-of-slots mmec-SIZEOF_SIGNED_SHORT_INT)))
-
-;;; --------------------------------------------------------------------
-
-(cl-defstruct (mmec-ushrt-bytevector
-	       (:constructor	mmec-ushrt-bytevector--make)
-	       (:include	mmec-unsigned-integer-bytevector)))
-
-(cl-defgeneric mmec-ushrt-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-ushrt-bytevector'.")
-(cl-defmethod  mmec-ushrt-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-ushrt-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-ushrt-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			mmec-SIZEOF_UNSIGNED_SHORT_INT
-   :signed			nil
-   :obj				(mmec-c-make-bytevector number-of-slots mmec-SIZEOF_UNSIGNED_SHORT_INT 0)
-   :number-of-allocated-bytes	(* number-of-slots mmec-SIZEOF_UNSIGNED_SHORT_INT)))
-
-
-;;;; bytevector objects: slots of type sint and uint
-
-(cl-defstruct (mmec-sint-bytevector
-	       (:constructor	mmec-sint-bytevector--make)
-	       (:include	mmec-signed-integer-bytevector)))
-
-(cl-defgeneric mmec-sint-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-sint-bytevector'.")
-(cl-defmethod  mmec-sint-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-sint-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-sint-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			mmec-SIZEOF_SIGNED_INT
-   :signed			t
-   :obj				(mmec-c-make-bytevector number-of-slots mmec-SIZEOF_SIGNED_INT 1)
-   :number-of-allocated-bytes	(* number-of-slots mmec-SIZEOF_SIGNED_INT)))
-
-;;; --------------------------------------------------------------------
-
-(cl-defstruct (mmec-uint-bytevector
-	       (:constructor	mmec-uint-bytevector--make)
-	       (:include	mmec-unsigned-integer-bytevector)))
-
-(cl-defgeneric mmec-uint-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-uint-bytevector'.")
-(cl-defmethod  mmec-uint-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-uint-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-uint-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			mmec-SIZEOF_UNSIGNED_INT
-   :signed			nil
-   :obj				(mmec-c-make-bytevector number-of-slots mmec-SIZEOF_UNSIGNED_INT 0)
-   :number-of-allocated-bytes	(* number-of-slots mmec-SIZEOF_UNSIGNED_INT)))
-
-
-;;;; bytevector objects: slots of type slong and ulong
-
-(cl-defstruct (mmec-slong-bytevector
-	       (:constructor	mmec-slong-bytevector--make)
-	       (:include	mmec-signed-integer-bytevector)))
-
-(cl-defgeneric mmec-slong-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-slong-bytevector'.")
-(cl-defmethod  mmec-slong-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-slong-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-slong-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			mmec-SIZEOF_SIGNED_LONG_INT
-   :signed			t
-   :obj				(mmec-c-make-bytevector number-of-slots mmec-SIZEOF_SIGNED_LONG_INT 1)
-   :number-of-allocated-bytes	(* number-of-slots mmec-SIZEOF_SIGNED_LONG_INT)))
-
-;;; --------------------------------------------------------------------
-
-(cl-defstruct (mmec-ulong-bytevector
-	       (:constructor	mmec-ulong-bytevector--make)
-	       (:include	mmec-unsigned-integer-bytevector)))
-
-(cl-defgeneric mmec-ulong-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-ulong-bytevector'.")
-(cl-defmethod  mmec-ulong-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-ulong-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-ulong-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			mmec-SIZEOF_UNSIGNED_LONG_INT
-   :signed			nil
-   :obj				(mmec-c-make-bytevector number-of-slots mmec-SIZEOF_UNSIGNED_LONG_INT 0)
-   :number-of-allocated-bytes	(* number-of-slots mmec-SIZEOF_UNSIGNED_LONG_INT)))
-
-
-;;;; bytevector objects: slots of type sllong and ullong
-
-(cl-defstruct (mmec-sllong-bytevector
-	       (:constructor	mmec-sllong-bytevector--make)
-	       (:include	mmec-signed-integer-bytevector)))
-
-(cl-defgeneric mmec-sllong-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-sllong-bytevector'.")
-(cl-defmethod  mmec-sllong-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-sllong-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-sllong-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			mmec-SIZEOF_SIGNED_LONG_LONG_INT
-   :signed			t
-   :obj				(mmec-c-make-bytevector number-of-slots mmec-SIZEOF_SIGNED_LONG_LONG_INT 1)
-   :number-of-allocated-bytes	(* number-of-slots mmec-SIZEOF_SIGNED_LONG_LONG_INT)))
-
-;;; --------------------------------------------------------------------
-
-(cl-defstruct (mmec-ullong-bytevector
-	       (:constructor	mmec-ullong-bytevector--make)
-	       (:include	mmec-unsigned-integer-bytevector)))
-
-(cl-defgeneric mmec-ullong-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-ullong-bytevector'.")
-(cl-defmethod  mmec-ullong-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-ullong-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-ullong-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			mmec-SIZEOF_UNSIGNED_LONG_LONG_INT
-   :signed			nil
-   :obj				(mmec-c-make-bytevector number-of-slots mmec-SIZEOF_UNSIGNED_LONG_LONG_INT 0)
-   :number-of-allocated-bytes	(* number-of-slots mmec-SIZEOF_UNSIGNED_LONG_LONG_INT)))
-
-
-;;;; bytevector objects: slots of type sintmax and uintmax
-
-(cl-defstruct (mmec-sintmax-bytevector
-	       (:constructor	mmec-sintmax-bytevector--make)
-	       (:include	mmec-signed-integer-bytevector)))
-
-(cl-defgeneric mmec-sintmax-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-sintmax-bytevector'.")
-(cl-defmethod  mmec-sintmax-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-sintmax-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-sintmax-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			mmec-SIZEOF_INTMAX_T
-   :signed			t
-   :obj				(mmec-c-make-bytevector number-of-slots mmec-SIZEOF_INTMAX_T 1)
-   :number-of-allocated-bytes	(* number-of-slots mmec-SIZEOF_INTMAX_T)))
-
-;;; --------------------------------------------------------------------
-
-(cl-defstruct (mmec-uintmax-bytevector
-	       (:constructor	mmec-uintmax-bytevector--make)
-	       (:include	mmec-unsigned-integer-bytevector)))
-
-(cl-defgeneric mmec-uintmax-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-uintmax-bytevector'.")
-(cl-defmethod  mmec-uintmax-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-uintmax-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-uintmax-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			mmec-SIZEOF_UINTMAX_T
-   :signed			nil
-   :obj				(mmec-c-make-bytevector number-of-slots mmec-SIZEOF_UINTMAX_T 0)
-   :number-of-allocated-bytes	(* number-of-slots mmec-SIZEOF_UINTMAX_T)))
-
-
-;;;; bytevector objects: slots of type ssize and usize
-
-(cl-defstruct (mmec-ssize-bytevector
-	       (:constructor	mmec-ssize-bytevector--make)
-	       (:include	mmec-signed-integer-bytevector)))
-
-(cl-defgeneric mmec-ssize-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-ssize-bytevector'.")
-(cl-defmethod  mmec-ssize-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-ssize-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-ssize-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			mmec-SIZEOF_SSIZE_T
-   :signed			t
-   :obj				(mmec-c-make-bytevector number-of-slots mmec-SIZEOF_SSIZE_T 1)
-   :number-of-allocated-bytes	(* number-of-slots mmec-SIZEOF_SSIZE_T)))
-
-;;; --------------------------------------------------------------------
-
-(cl-defstruct (mmec-usize-bytevector
-	       (:constructor	mmec-usize-bytevector--make)
-	       (:include	mmec-unsigned-integer-bytevector)))
-
-(cl-defgeneric mmec-usize-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-usize-bytevector'.")
-(cl-defmethod  mmec-usize-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-usize-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-usize-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			mmec-SIZEOF_SIZE_T
-   :signed			nil
-   :obj				(mmec-c-make-bytevector number-of-slots mmec-SIZEOF_SIZE_T 0)
-   :number-of-allocated-bytes	(* number-of-slots mmec-SIZEOF_SIZE_T)))
-
-
-;;;; bytevector objects: slots of type ptrdiff
-
-(cl-defstruct (mmec-ptrdiff-bytevector
-	       (:constructor	mmec-ptrdiff-bytevector--make)
-	       (:include	mmec-signed-integer-bytevector)))
-
-(cl-defgeneric mmec-ptrdiff-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-ptrdiff-bytevector'.")
-(cl-defmethod  mmec-ptrdiff-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-ptrdiff-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-ptrdiff-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			mmec-SIZEOF_PTRDIFF_T
-   :signed			t
-   :obj				(mmec-c-make-bytevector number-of-slots mmec-SIZEOF_PTRDIFF_T 1)
-   :number-of-allocated-bytes	(* number-of-slots mmec-SIZEOF_PTRDIFF_T)))
-
-
-;;;; bytevector objects: slots of type wchar
-
-(cl-defstruct (mmec-wchar-bytevector
-	       (:constructor	mmec-wchar-bytevector--make)
-	       (:include	mmec-unsigned-integer-bytevector)))
-
-(cl-defgeneric mmec-wchar-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-wchar-bytevector'.")
-(cl-defmethod  mmec-wchar-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-wchar-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-wchar-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			mmec-SIZEOF_WCHAR_T
-   :signed			nil
-   :obj				(mmec-c-make-bytevector number-of-slots mmec-SIZEOF_WCHAR_T 0)
-   :number-of-allocated-bytes	(* number-of-slots mmec-SIZEOF_WCHAR_T)))
-
-
-;;;; bytevector objects: slots of type sint8 and uint8
-
-(cl-defstruct (mmec-uint8-bytevector
-	       (:constructor	mmec-uint8-bytevector--make)
-	       (:include	mmec-unsigned-integer-bytevector)))
-
-(cl-defgeneric mmec-uint8-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-uint8-bytevector'.")
-(cl-defmethod  mmec-uint8-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-uint8-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-uint8-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			1
-   :signed			nil
-   :obj				(mmec-c-make-bytevector number-of-slots 1 0)
-   :number-of-allocated-bytes	(* number-of-slots 1)))
-
-(cl-defstruct (mmec-sint8-bytevector
-	       (:constructor	mmec-sint8-bytevector--make)
-	       (:include	mmec-signed-integer-bytevector)))
-
-(cl-defgeneric mmec-sint8-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-sint8-bytevector'.")
-(cl-defmethod  mmec-sint8-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-sint8-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-sint8-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			1
-   :signed			t
-   :obj				(mmec-c-make-bytevector number-of-slots 1 1)
-   :number-of-allocated-bytes	(* number-of-slots 1)))
-
-
-;;;; bytevector objects: slots of type sint16 and uint16
-
-(cl-defstruct (mmec-uint16-bytevector
-	       (:constructor	mmec-uint16-bytevector--make)
-	       (:include	mmec-unsigned-integer-bytevector)))
-
-(cl-defgeneric mmec-uint16-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-uint16-bytevector'.")
-(cl-defmethod  mmec-uint16-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-uint16-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-uint16-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			2
-   :signed			nil
-   :obj				(mmec-c-make-bytevector number-of-slots 2 0)
-   :number-of-allocated-bytes	(* number-of-slots 2)))
-
-(cl-defstruct (mmec-sint16-bytevector
-	       (:constructor	mmec-sint16-bytevector--make)
-	       (:include	mmec-signed-integer-bytevector)))
-
-(cl-defgeneric mmec-sint16-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-sint16-bytevector'.")
-(cl-defmethod  mmec-sint16-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-sint16-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-sint16-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			2
-   :signed			t
-   :obj				(mmec-c-make-bytevector number-of-slots 2 1)
-   :number-of-allocated-bytes	(* number-of-slots 2)))
-
-
-;;;; bytevector objects: slots of type sint32 and uint32
-
-(cl-defstruct (mmec-uint32-bytevector
-	       (:constructor	mmec-uint32-bytevector--make)
-	       (:include	mmec-unsigned-integer-bytevector)))
-
-(cl-defgeneric mmec-uint32-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-uint32-bytevector'.")
-(cl-defmethod  mmec-uint32-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-uint32-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-uint32-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			4
-   :signed			nil
-   :obj				(mmec-c-make-bytevector number-of-slots 4 0)
-   :number-of-allocated-bytes	(* number-of-slots 4)))
-
-(cl-defstruct (mmec-sint32-bytevector
-	       (:constructor	mmec-sint32-bytevector--make)
-	       (:include	mmec-signed-integer-bytevector)))
-
-(cl-defgeneric mmec-sint32-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-sint32-bytevector'.")
-(cl-defmethod  mmec-sint32-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-sint32-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-sint32-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			4
-   :signed			t
-   :obj				(mmec-c-make-bytevector number-of-slots 4 1)
-   :number-of-allocated-bytes	(* number-of-slots 4)))
-
-
-;;;; bytevector objects: slots of type sint64 and uint64
-
-(cl-defstruct (mmec-uint64-bytevector
-	       (:constructor	mmec-uint64-bytevector--make)
-	       (:include	mmec-unsigned-integer-bytevector)))
-
-(cl-defgeneric mmec-uint64-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-uint64-bytevector'.")
-(cl-defmethod  mmec-uint64-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-uint64-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-uint64-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			8
-   :signed			nil
-   :obj				(mmec-c-make-bytevector number-of-slots 8 0)
-   :number-of-allocated-bytes	(* number-of-slots 8)))
-
-(cl-defstruct (mmec-sint64-bytevector
-	       (:constructor	mmec-sint64-bytevector--make)
-	       (:include	mmec-signed-integer-bytevector)))
-
-(cl-defgeneric mmec-sint64-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-sint64-bytevector'.")
-(cl-defmethod  mmec-sint64-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-sint64-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-sint64-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			8
-   :signed			t
-   :obj				(mmec-c-make-bytevector number-of-slots 8 1)
-   :number-of-allocated-bytes	(* number-of-slots 8)))
-
-
-;;;; bytevector objects: slots of type float
-
-(cl-defstruct (mmec-float-bytevector
-	       (:constructor	mmec-float-bytevector--make)
-	       (:include	mmec-floating-point-bytevector)))
-
-(cl-defgeneric mmec-float-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-float-bytevector'.")
-(cl-defmethod  mmec-float-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-float-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-float-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			mmec-SIZEOF_FLOAT
-   :obj				(mmec-c-make-bytevector number-of-slots mmec-SIZEOF_FLOAT 1)
-   :number-of-allocated-bytes	(* number-of-slots mmec-SIZEOF_FLOAT)))
-
-
-;;;; bytevector objects: slots of type double
-
-(cl-defstruct (mmec-double-bytevector
-	       (:constructor	mmec-double-bytevector--make)
-	       (:include	mmec-floating-point-bytevector)))
-
-(cl-defgeneric mmec-double-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-double-bytevector'.")
-(cl-defmethod  mmec-double-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-double-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-double-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			mmec-SIZEOF_DOUBLE
-   :obj				(mmec-c-make-bytevector number-of-slots mmec-SIZEOF_DOUBLE 1)
-   :number-of-allocated-bytes	(* number-of-slots mmec-SIZEOF_DOUBLE)))
-
-
-;;;; bytevector objects: slots of type ldouble
-
-(cl-defstruct (mmec-ldouble-bytevector
-	       (:constructor	mmec-ldouble-bytevector--make)
-	       (:include	mmec-floating-point-bytevector)))
-
-(cl-defgeneric mmec-ldouble-bytevector (number-of-slots)
-  "Build and return a new instance of `mmec-ldouble-bytevector'.")
-(cl-defmethod  mmec-ldouble-bytevector ((number-of-slots integer))
-  "Build and return a new instance of `mmec-ldouble-bytevector'."
-  (cl-assert (<= 0 number-of-slots))
-  (mmec--make mmec-ldouble-bytevector
-   :number-of-slots		number-of-slots
-   :slot-size			mmec-SIZEOF_LONG_DOUBLE
-   :obj				(mmec-c-make-bytevector number-of-slots mmec-SIZEOF_LONG_DOUBLE 1)
-   :number-of-allocated-bytes	(* number-of-slots mmec-SIZEOF_LONG_DOUBLE)))
+;;;; bytevector type definitions
+
+(cl-macrolet
+    ((mmec--define-bytevector-type
+      (TYPESTEM PARENT-STEM)
+      (let* ((BYTEVECTOR-TYPE		(intern (format "mmec-%s-bytevector" TYPESTEM)))
+	     (BYTEVECTOR-TYPE-MAKER	(intern (format "mmec-%s-bytevector--make" TYPESTEM)))
+	     (PARENT-BYTEVECTOR-TYPE	(intern (format "mmec-%s-bytevector" PARENT-STEM)))
+	     (SIZEOF-SLOT		(intern (format "mmec-sizeof-%s" TYPESTEM)))
+	     (SIGNED-BOOL		(cl-case PARENT-STEM
+					  (signed-integer	't)
+					  (unsigned-integer	'nil)
+					  (floating-point	't)
+					  (t
+					   (signal 'mmec-error (list 'mmec--define-bytevector-type PARENT-STEM)))))
+	     (DOCSTRING			(format "Build and return a new instance of `mmec-%s-bytevector'." TYPESTEM)))
+	`(progn
+	   (cl-defstruct (,BYTEVECTOR-TYPE
+			  (:constructor	,BYTEVECTOR-TYPE-MAKER)
+			  (:include		,PARENT-BYTEVECTOR-TYPE)))
+
+	   (cl-defgeneric ,BYTEVECTOR-TYPE (number-of-slots)
+	     ,DOCSTRING)
+	   (cl-defmethod  ,BYTEVECTOR-TYPE ((number-of-slots integer))
+	     ,DOCSTRING
+	     (mmec--make ,BYTEVECTOR-TYPE
+			 :number-of-slots		number-of-slots
+			 :slot-size			,SIZEOF-SLOT
+			 :signed			,SIGNED-BOOL
+			 :obj			(mmec-c-make-bytevector number-of-slots ,SIZEOF-SLOT ,SIGNED-BOOL)
+			 :number-of-allocated-bytes	(* number-of-slots ,SIZEOF-SLOT)))
+	   ))))
+
+  (mmec--define-bytevector-type char	signed-integer)
+  (mmec--define-bytevector-type schar	signed-integer)
+  (mmec--define-bytevector-type uchar	unsigned-integer)
+  (mmec--define-bytevector-type wchar	unsigned-integer)
+  (mmec--define-bytevector-type sshrt	signed-integer)
+  (mmec--define-bytevector-type ushrt	unsigned-integer)
+  (mmec--define-bytevector-type sint	signed-integer)
+  (mmec--define-bytevector-type uint	unsigned-integer)
+  (mmec--define-bytevector-type slong	signed-integer)
+  (mmec--define-bytevector-type ulong	unsigned-integer)
+  (mmec--define-bytevector-type sllong	signed-integer)
+  (mmec--define-bytevector-type ullong	unsigned-integer)
+  (mmec--define-bytevector-type sintmax	signed-integer)
+  (mmec--define-bytevector-type uintmax	unsigned-integer)
+  (mmec--define-bytevector-type ssize	signed-integer)
+  (mmec--define-bytevector-type usize	unsigned-integer)
+  (mmec--define-bytevector-type ptrdiff	signed-integer)
+  (mmec--define-bytevector-type sint8	signed-integer)
+  (mmec--define-bytevector-type uint8	unsigned-integer)
+  (mmec--define-bytevector-type sint16	signed-integer)
+  (mmec--define-bytevector-type uint16	unsigned-integer)
+  (mmec--define-bytevector-type sint32	signed-integer)
+  (mmec--define-bytevector-type uint32	unsigned-integer)
+  (mmec--define-bytevector-type sint64	signed-integer)
+  (mmec--define-bytevector-type uint64	unsigned-integer)
+  (mmec--define-bytevector-type float	floating-point)
+  (mmec--define-bytevector-type double	floating-point)
+  (mmec--define-bytevector-type ldouble	floating-point))
 
 
 ;;;; bytevector objects: getters and setters

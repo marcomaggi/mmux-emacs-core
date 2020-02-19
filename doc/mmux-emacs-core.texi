@@ -2612,6 +2612,11 @@ If @var{arg} is not an exact integer value: the @code{wrong-type-argument} error
 raised.
 @end deftypefun
 
+
+@deftypefun bool mmec_extract_boolean_from_emacs_value (emacs_env * @var{env}, emacs_value @var{arg})
+Return false if @var{arg} is @nil{}; otherwise return true.
+@end deftypefun
+
 @c page
 @node capi objects elisp makers
 @subsubsection Making new Emacs built--in values

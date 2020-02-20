@@ -1,5 +1,9 @@
 ﻿-*- coding: utf-8-with-signature-unix; fill-column: 200 -*-
 
+* Write the list to/from bytevector functions.
+* Document the list to/from bytevector functions.
+* Test the list to/from bytevector functions.
+* Test the bytevector comparison functions.
 * Add printer functions for all the number types.
 * Add printer functions for the bytevector types.
 * Read the elisp docs node Sequence Functions to understand how to interface bytevectors with sequence functions.

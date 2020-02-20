@@ -524,11 +524,11 @@ mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_ldouble_intrep_bytevector;
  ** Bytevector user-pointer objects: inspection.
  ** ----------------------------------------------------------------- */
 
-static inline bool
-mmec_bytevector_valid_slot_index (mmec_intrep_bytevector_t * bv, intmax_t idx)
-{
-  return ((0 <= idx) && (idx < bv->number_of_slots))? true : false;
-}
+mmec_decl bool mmec_bytevector_valid_slot_index (mmec_intrep_bytevector_t const * const bv, intmax_t const idx)
+  __attribute__((__nonnull__(1)));
+
+mmec_decl bool mmec_intrep_bytevector_valid_start_and_past (mmec_intrep_bytevector_t const * bv, intmax_t start, intmax_t past)
+  __attribute__((__nonnull__(1)));
 
 
 /** --------------------------------------------------------------------
@@ -538,7 +538,7 @@ mmec_bytevector_valid_slot_index (mmec_intrep_bytevector_t * bv, intmax_t idx)
 #undef  MMEC_DEFINE_BYTEVECTOR_GETTER
 #define MMEC_DEFINE_BYTEVECTOR_GETTER(TYPESTEM)				\
   static inline mmec_clang_ ## TYPESTEM ## _t				\
-  mmec_bytevector_ ## TYPESTEM ## _ref (mmec_intrep_bytevector_t *bv, intmax_t idx) \
+  mmec_bytevector_ ## TYPESTEM ## _ref (mmec_intrep_bytevector_t const * const bv, intmax_t idx) \
   {									\
     MMEC_PC(mmec_clang_ ## TYPESTEM ## _t, data, bv->ptr);		\
     return data[idx];							\
@@ -586,6 +586,66 @@ MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(uint64)
 MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(float)
 MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(double)
 MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(ldouble)
+
+
+/** --------------------------------------------------------------------
+ ** Bytevector user-pointer objects: comparison.
+ ** ----------------------------------------------------------------- */
+
+typedef int mmec_intrep_bytevector_compare_fun_t \
+    (mmec_intrep_bytevector_t const * const src, intmax_t const src_start, intmax_t const src_past,
+     mmec_intrep_bytevector_t const * const dst, intmax_t const dst_start, intmax_t const dst_past);
+
+typedef bool mmec_intrep_bytevector_comparison_fun_t \
+    (mmec_intrep_bytevector_t const * const src, intmax_t const src_start, intmax_t const src_past,
+     mmec_intrep_bytevector_t const * const dst, intmax_t const dst_start, intmax_t const dst_past);
+
+#undef  MMEC_DECLARE_BYTEVECTOR_COMPARISON
+#define MMEC_DECLARE_BYTEVECTOR_COMPARISON(TYPESTEM)			\
+  mmec_decl mmec_intrep_bytevector_compare_fun_t mmec_ ## TYPESTEM ## _intrep_bytevector_compare    __attribute__((__nonnull__(1,4))); \
+  mmec_decl mmec_intrep_bytevector_comparison_fun_t mmec_ ## TYPESTEM ## _intrep_bytevector_equal   __attribute__((__nonnull__(1,4))); \
+  mmec_decl mmec_intrep_bytevector_comparison_fun_t mmec_ ## TYPESTEM ## _intrep_bytevector_less    __attribute__((__nonnull__(1,4))); \
+  mmec_decl mmec_intrep_bytevector_comparison_fun_t mmec_ ## TYPESTEM ## _intrep_bytevector_greater __attribute__((__nonnull__(1,4))); \
+  mmec_decl mmec_intrep_bytevector_comparison_fun_t mmec_ ## TYPESTEM ## _intrep_bytevector_leq     __attribute__((__nonnull__(1,4))); \
+  mmec_decl mmec_intrep_bytevector_comparison_fun_t mmec_ ## TYPESTEM ## _intrep_bytevector_geq     __attribute__((__nonnull__(1,4)));
+
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(char)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(schar)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(uchar)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(wchar)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(sshrt)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(ushrt)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(sint)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(uint)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(slong)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(ulong)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(sllong)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(ullong)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(sintmax)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(uintmax)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(ssize)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(usize)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(ptrdiff)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(sint8)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(uint8)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(sint16)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(uint16)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(sint32)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(uint32)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(sint64)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(uint64)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(float)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(double)
+MMEC_DECLARE_BYTEVECTOR_COMPARISON(ldouble)
+
+
+/** --------------------------------------------------------------------
+ ** Bytevector user-pointer objects: operations.
+ ** ----------------------------------------------------------------- */
+
+mmec_decl mmec_intrep_bytevector_t * mmec_new_intrep_bytevector_subsequence (mmec_intrep_bytevector_t const * src,
+									     intmax_t start, intmax_t past)
+  __attribute__((__nonnull__(1)));
 
 
 /** --------------------------------------------------------------------

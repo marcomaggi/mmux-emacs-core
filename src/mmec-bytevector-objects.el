@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-19 21:15:21 marco>
+;; Time-stamp: <2020-02-20 15:45:53 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -229,6 +229,166 @@ slots in the bytevector BV.")
 (mmec--define-bytevector-getter-and-setter float	"float")
 (mmec--define-bytevector-getter-and-setter double	"double")
 (mmec--define-bytevector-getter-and-setter ldouble	"ldouble")
+
+
+;;;; bytevector objects: comparison generic functions
+
+(cl-defgeneric mmec-bytevector-compare (bv1 start1 past1 bv2 start2 past2)
+  "Compare the selected spans in the bytevectors BV1 and BV2, return -1, 0 or +1.
+
+The arguments START  and PAST must be valid slot  indexes satisfying the
+conditions:
+
+  0 <= START <= PAST <= number of slots
+
+otherwise the  behaviour of the  functions is undefined.   The functions
+compare a  span in  the data  area of the  bytevectors starting  at slot
+index START, included, and ending at slot index PAST, excluded.
+
+ return the following code:
+
+ 0, if the following condition is true:
+
+    (PAST1 - START1) == (PAST2 - START2)
+
+  and all the values in the slots are equal slot by slot.
+
++1, if the following condition is true:
+
+    (PAST1 - START1) > (PAST2 - START2)
+
+  or, while  visiting the  slots from  START to PAST,  BV1 holds  a slot
+  value that is greater than the corresponding slot value in BV2.
+
+-1, if the following condition is true:
+
+   (PAST1 - START1) < (PAST2 - START2)
+
+  or, while  visiting the  slots from  START to PAST,  BV1 holds  a slot
+  value that is less than the corresponding slot value in BV2.")
+
+(cl-defgeneric mmec-bytevector-equal (bv1 start1 past1 bv2 start2 past2)
+  "Compare the selected spans in the bytevectors BV1 and BV2: return true or false.")
+
+(cl-defgeneric mmec-bytevector-less (bv1 start1 past1 bv2 start2 past2)
+  "Compare the selected spans in the bytevectors BV1 and BV2: return true or false.")
+
+(cl-defgeneric mmec-bytevector-greater (bv1 start1 past1 bv2 start2 past2)
+  "Compare the selected spans in the bytevectors BV1 and BV2: return true or false.")
+
+(cl-defgeneric mmec-bytevector-leq (bv1 start1 past1 bv2 start2 past2)
+  "Compare the selected spans in the bytevectors BV1 and BV2: return true or false.")
+
+(cl-defgeneric mmec-bytevector-geq (bv1 start1 past1 bv2 start2 past2)
+  "Compare the selected spans in the bytevectors BV1 and BV2: return true or false.")
+
+
+;;;; bytevector objects: comparison specialised methods
+
+(defmacro mmec--define-bytevector-comparison (TYPESTEM)
+  (let* ((BV-TYPE		(intern (format "mmec-%s-bytevector" TYPESTEM)))
+	 (CFUNC-COMPARE		(intern (format "mmec-c-%s-bytevector-compare"	TYPESTEM)))
+	 (CFUNC-EQUAL		(intern (format "mmec-c-%s-bytevector-equal"	TYPESTEM)))
+	 (CFUNC-LESS		(intern (format "mmec-c-%s-bytevector-less"	TYPESTEM)))
+	 (CFUNC-GREATER		(intern (format "mmec-c-%s-bytevector-greater"	TYPESTEM)))
+	 (CFUNC-LEQ		(intern (format "mmec-c-%s-bytevector-leq"	TYPESTEM)))
+	 (CFUNC-GEQ		(intern (format "mmec-c-%s-bytevector-geq"	TYPESTEM))))
+    `(progn
+       (cl-defmethod mmec-bytevector-compare ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
+					      (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
+	 "Compare the selected spans in the bytevectors BV1 and BV2, return -1, 0 or +1.
+
+The arguments START  and PAST must be valid slot  indexes satisfying the
+conditions:
+
+  0 <= START <= PAST <= number of slots
+
+otherwise the  behaviour of the  functions is undefined.   The functions
+compare a  span in  the data  area of the  bytevectors starting  at slot
+index START, included, and ending at slot index PAST, excluded.
+
+ return the following code:
+
+ 0, if the following condition is true:
+
+    (PAST1 - START1) == (PAST2 - START2)
+
+  and all the values in the slots are equal slot by slot.
+
++1, if the following condition is true:
+
+    (PAST1 - START1) > (PAST2 - START2)
+
+  or, while  visiting the  slots from  START to PAST,  BV1 holds  a slot
+  value that is greater than the corresponding slot value in BV2.
+
+-1, if the following condition is true:
+
+   (PAST1 - START1) < (PAST2 - START2)
+
+  or, while  visiting the  slots from  START to PAST,  BV1 holds  a slot
+  value that is less than the corresponding slot value in BV2."	 (,CFUNC-COMPARE (mmec--extract-obj ,BV-TYPE bv1) start1 past1
+										 (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
+
+       (cl-defmethod mmec-bytevector-equal ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
+					    (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
+	 "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
+	 (,CFUNC-EQUAL (mmec--extract-obj ,BV-TYPE bv1) start1 past1
+		       (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
+
+       (cl-defmethod mmec-bytevector-less ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
+					   (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
+	 "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
+	 (,CFUNC-LESS (mmec--extract-obj ,BV-TYPE bv1) start1 past1
+		      (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
+
+       (cl-defmethod mmec-bytevector-greater ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
+					      (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
+	 "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
+	 (,CFUNC-GREATER (mmec--extract-obj ,BV-TYPE bv1) start1 past1
+			 (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
+
+       (cl-defmethod mmec-bytevector-leq ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
+					  (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
+	 "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
+	 (,CFUNC-LEQ (mmec--extract-obj ,BV-TYPE bv1) start1 past1
+		     (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
+
+       (cl-defmethod mmec-bytevector-geq ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
+					  (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
+	 "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
+	 (,CFUNC-GEQ (mmec--extract-obj ,BV-TYPE bv1) start1 past1
+		     (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
+       )))
+
+(mmec--define-bytevector-comparison char)
+(mmec--define-bytevector-comparison schar)
+(mmec--define-bytevector-comparison uchar)
+(mmec--define-bytevector-comparison wchar)
+(mmec--define-bytevector-comparison sshrt)
+(mmec--define-bytevector-comparison ushrt)
+(mmec--define-bytevector-comparison sint)
+(mmec--define-bytevector-comparison uint)
+(mmec--define-bytevector-comparison slong)
+(mmec--define-bytevector-comparison ulong)
+(mmec--define-bytevector-comparison sllong)
+(mmec--define-bytevector-comparison ullong)
+(mmec--define-bytevector-comparison sintmax)
+(mmec--define-bytevector-comparison uintmax)
+(mmec--define-bytevector-comparison ssize)
+(mmec--define-bytevector-comparison usize)
+(mmec--define-bytevector-comparison ptrdiff)
+(mmec--define-bytevector-comparison sint8)
+(mmec--define-bytevector-comparison uint8)
+(mmec--define-bytevector-comparison sint16)
+(mmec--define-bytevector-comparison uint16)
+(mmec--define-bytevector-comparison sint32)
+(mmec--define-bytevector-comparison uint32)
+(mmec--define-bytevector-comparison sint64)
+(mmec--define-bytevector-comparison uint64)
+(mmec--define-bytevector-comparison float)
+(mmec--define-bytevector-comparison double)
+(mmec--define-bytevector-comparison ldouble)
 
 
 ;;;; done

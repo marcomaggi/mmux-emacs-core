@@ -28,6 +28,7 @@
 
 #include "mmux-emacs-core-internals.h"
 #include <errno.h>
+#include <string.h>
 
 
 /** --------------------------------------------------------------------
@@ -153,6 +154,24 @@ Fmmec_make_bytevector (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void
 
 
 /** --------------------------------------------------------------------
+ ** Bytevector user-pointer objects: inspection.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmec_bytevector_valid_slot_index (mmec_intrep_bytevector_t const * const bv, intmax_t const idx)
+{
+  return ((0 <= idx) && (idx < bv->number_of_slots))? true : false;
+}
+
+bool
+mmec_intrep_bytevector_valid_start_and_past (mmec_intrep_bytevector_t const * const bv, intmax_t const start, intmax_t const past)
+{
+  return ((mmec_bytevector_valid_slot_index(bv, start) && \
+	   ((start == past) || mmec_bytevector_valid_slot_index(bv, past-1)))? true : false);
+}
+
+
+/** --------------------------------------------------------------------
  ** Bytevector user-pointer objects: Emacs value getters and setters.
  ** ----------------------------------------------------------------- */
 
@@ -226,29 +245,333 @@ MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(ldouble)
 
 
 /** --------------------------------------------------------------------
+ ** Bytevector user-pointer objects: comparison.
+ ** ----------------------------------------------------------------- */
+
+static int
+mmec_intrep_bytevector_check_comparion_spans (mmec_intrep_bytevector_t const * const src, intmax_t const src_start, intmax_t const src_past,
+					      mmec_intrep_bytevector_t const * const dst, intmax_t const dst_start, intmax_t const dst_past)
+{
+  assert(src->slot_size          == dst->slot_size);
+  assert(src->hold_signed_values == dst->hold_signed_values);
+  intmax_t	src_span = src_past - src_start;
+  intmax_t	dst_span = dst_past - dst_start;
+
+  if (src_span == dst_span) {
+    return 0;
+  } else if (src_span > dst_span) {
+    return +1;
+  } else {
+    assert(src_span == dst_span);
+    return -1;
+  }
+}
+
+static emacs_value
+mmec_execute_bytevector_compare (emacs_env *env, ptrdiff_t nargs, emacs_value args[], mmec_intrep_bytevector_compare_fun_t * compare)
+{
+  assert(6 == nargs);
+  mmec_intrep_bytevector_t	*bv1	= mmec_get_intrep_bytevector_from_emacs_value(env, args[0]);
+  intmax_t			start1	= mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
+  intmax_t			past1	= mmec_extract_elisp_integer_from_emacs_value(env, args[2]);
+  mmec_intrep_bytevector_t	*bv2	= mmec_get_intrep_bytevector_from_emacs_value(env, args[3]);
+  intmax_t			start2	= mmec_extract_elisp_integer_from_emacs_value(env, args[4]);
+  intmax_t			past2	= mmec_extract_elisp_integer_from_emacs_value(env, args[5]);
+
+  if (mmec_intrep_bytevector_valid_start_and_past(bv1, start1, past1) &&
+      mmec_intrep_bytevector_valid_start_and_past(bv2, start2, past2)) {
+    return mmec_new_emacs_value_integer(env, compare(bv1, start1, past1, bv2, start2, past2));
+  } else {
+    return mmec_error_bytevector_index_out_of_range(env);
+  }
+}
+
+static emacs_value
+mmec_execute_bytevector_comparison (emacs_env *env, ptrdiff_t nargs, emacs_value args[], mmec_intrep_bytevector_comparison_fun_t * comparison)
+{
+  assert(6 == nargs);
+  mmec_intrep_bytevector_t	*bv1	= mmec_get_intrep_bytevector_from_emacs_value(env, args[0]);
+  intmax_t			start1	= mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
+  intmax_t			past1	= mmec_extract_elisp_integer_from_emacs_value(env, args[2]);
+  mmec_intrep_bytevector_t	*bv2	= mmec_get_intrep_bytevector_from_emacs_value(env, args[3]);
+  intmax_t			start2	= mmec_extract_elisp_integer_from_emacs_value(env, args[4]);
+  intmax_t			past2	= mmec_extract_elisp_integer_from_emacs_value(env, args[5]);
+
+  if (mmec_intrep_bytevector_valid_start_and_past(bv1, start1, past1) &&
+      mmec_intrep_bytevector_valid_start_and_past(bv2, start2, past2)) {
+    return mmec_new_emacs_value_boolean(env, comparison(bv1, start1, past1, bv2, start2, past2));
+  } else {
+    return mmec_error_bytevector_index_out_of_range(env);
+  }
+}
+
+#undef  MMEC_ELISP_BYTEVECTOR_COMPARE_FUNCTION
+#define MMEC_ELISP_BYTEVECTOR_COMPARE_FUNCTION(TYPESTEM)		\
+  emacs_value								\
+  Fmmec_c_ ## TYPESTEM ## _intrep_bytevector_compare			\
+  (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED) \
+  {									\
+    return mmec_execute_bytevector_compare(env, nargs, args, mmec_ ## TYPESTEM ## _intrep_bytevector_compare); \
+  }
+
+#undef  MMEC_ELISP_BYTEVECTOR_COMPARISON_FUNCTION
+#define MMEC_ELISP_BYTEVECTOR_COMPARISON_FUNCTION(TYPESTEM, FUNCSTEM)	\
+  emacs_value								\
+  Fmmec_c_ ## TYPESTEM ## _intrep_bytevector_ ## FUNCSTEM			\
+  (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED) \
+  {									\
+    return mmec_execute_bytevector_comparison(env, nargs, args, mmec_ ## TYPESTEM ## _intrep_bytevector_ ## FUNCSTEM); \
+  }
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_BYTEVECTOR_COMPARISON
+#define MMEC_DEFINE_BYTEVECTOR_COMPARISON(TYPESTEM)			\
+  int									\
+  mmec_ ## TYPESTEM ## _intrep_bytevector_compare			\
+  (mmec_intrep_bytevector_t const * const src, intmax_t const src_start, intmax_t const src_past, \
+   mmec_intrep_bytevector_t const * const dst, intmax_t const dst_start, intmax_t const dst_past) \
+  {									\
+    int rv = mmec_intrep_bytevector_check_comparion_spans(src, src_start, src_past, \
+							  dst, dst_start, dst_past); \
+    if (0 == rv) {							\
+      MMEC_PC(mmec_clang_ ## TYPESTEM ## _t, src_ptr, src->ptr);	\
+      MMEC_PC(mmec_clang_ ## TYPESTEM ## _t, dst_ptr, dst->ptr);	\
+									\
+      for (intmax_t i=src_start, j=dst_start; i<src_past; ++i, ++j) {	\
+	if (src_ptr[i] > dst_ptr[i]) {					\
+	  return +1;							\
+	} else if (src_ptr[i] < dst_ptr[i]) {				\
+	  return -1;							\
+	}								\
+      }									\
+      return 0;								\
+    } else {								\
+      return rv;							\
+    }									\
+  }									\
+									\
+  bool									\
+  mmec_ ## TYPESTEM ## _intrep_bytevector_equal				\
+  (mmec_intrep_bytevector_t const * const src, intmax_t const src_start, intmax_t const src_past, \
+   mmec_intrep_bytevector_t const * const dst, intmax_t const dst_start, intmax_t const dst_past) \
+  {									\
+    return ((0 == mmec_ ## TYPESTEM ## _intrep_bytevector_compare(src, src_start, src_past, dst, dst_start, dst_past))? true : false); \
+  }									\
+									\
+  bool									\
+  mmec_ ## TYPESTEM ## _intrep_bytevector_less				\
+  (mmec_intrep_bytevector_t const * const src, intmax_t const src_start, intmax_t const src_past, \
+   mmec_intrep_bytevector_t const * const dst, intmax_t const dst_start, intmax_t const dst_past) \
+  {									\
+    return ((-1 == mmec_ ## TYPESTEM ## _intrep_bytevector_compare(src, src_start, src_past, dst, dst_start, dst_past))? true : false); \
+  }									\
+									\
+  bool									\
+  mmec_ ## TYPESTEM ## _intrep_bytevector_greater			\
+  (mmec_intrep_bytevector_t const * const src, intmax_t const src_start, intmax_t const src_past, \
+   mmec_intrep_bytevector_t const * const dst, intmax_t const dst_start, intmax_t const dst_past) \
+  {									\
+    return ((+1 == mmec_ ## TYPESTEM ## _intrep_bytevector_compare(src, src_start, src_past, dst, dst_start, dst_past))? true : false); \
+  }									\
+									\
+  bool									\
+  mmec_ ## TYPESTEM ## _intrep_bytevector_leq				\
+  (mmec_intrep_bytevector_t const * const src, intmax_t const src_start, intmax_t const src_past, \
+   mmec_intrep_bytevector_t const * const dst, intmax_t const dst_start, intmax_t const dst_past) \
+  {									\
+    return ((+1 > mmec_ ## TYPESTEM ## _intrep_bytevector_compare(src, src_start, src_past, dst, dst_start, dst_past))? true : false); \
+  }									\
+									\
+  bool									\
+  mmec_ ## TYPESTEM ## _intrep_bytevector_geq				\
+  (mmec_intrep_bytevector_t const * const src, intmax_t const src_start, intmax_t const src_past, \
+   mmec_intrep_bytevector_t const * const dst, intmax_t const dst_start, intmax_t const dst_past) \
+  {									\
+    return ((-1 < mmec_ ## TYPESTEM ## _intrep_bytevector_compare(src, src_start, src_past, dst, dst_start, dst_past))? true : false); \
+  }									\
+									\
+  MMEC_ELISP_BYTEVECTOR_COMPARE_FUNCTION(TYPESTEM)			\
+  MMEC_ELISP_BYTEVECTOR_COMPARISON_FUNCTION(TYPESTEM, equal)		\
+  MMEC_ELISP_BYTEVECTOR_COMPARISON_FUNCTION(TYPESTEM, less)		\
+  MMEC_ELISP_BYTEVECTOR_COMPARISON_FUNCTION(TYPESTEM, greater)		\
+  MMEC_ELISP_BYTEVECTOR_COMPARISON_FUNCTION(TYPESTEM, leq)		\
+  MMEC_ELISP_BYTEVECTOR_COMPARISON_FUNCTION(TYPESTEM, geq)
+
+/* ------------------------------------------------------------------ */
+
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(char)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(schar)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(uchar)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(wchar)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(sshrt)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(ushrt)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(sint)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(uint)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(slong)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(ulong)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(sllong)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(ullong)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(sintmax)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(uintmax)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(ssize)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(usize)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(ptrdiff)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(sint8)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(uint8)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(sint16)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(uint16)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(sint32)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(uint32)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(sint64)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(uint64)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(float)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(double)
+MMEC_DEFINE_BYTEVECTOR_COMPARISON(ldouble)
+
+
+/** --------------------------------------------------------------------
  ** Bytevector user-pointer objects: operations.
  ** ----------------------------------------------------------------- */
 
-/* static emacs_value */
-/* Fmmec_subbytevector (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED) */
-/* { */
-/*   assert((2 == nargs) || (3 == nargs)); */
-/*   mmec_intrep_bytevector_t	*bv	= mmec_get_intrep_bytevector_from_emacs_value(env, args[0]); */
-/*   intmax_t			idx	= mmec_extract_elisp_integer_from_emacs_value(env, args[1]); */
+mmec_intrep_bytevector_t *
+mmec_new_intrep_bytevector_subsequence (mmec_intrep_bytevector_t const * const src, intmax_t const start, intmax_t const past)
+{
+  assert(mmec_bytevector_valid_slot_index(src, start));
+  assert((start == past) || mmec_bytevector_valid_slot_index(src, past-1));
+  {
+    mmec_intrep_bytevector_t	* dst = mmec_new_intrep_bytevector(src->number_of_slots, src->slot_size, src->hold_signed_values);
 
-/*   if (mmec_bytevector_valid_slot_index(bv, idx)) { */
-/*     return mmec_new_emacs_value_from_clang_ (env, mmec_bytevector_ ## TYPESTEM ## _ref(bv, idx)); */
-/*   } else { */
-/*     return mmec_error_bytevector_index_out_of_range(env); */
-/*   } */
-/* } */
+    if (dst) {
+      memcpy(dst->ptr, src->ptr, src->number_of_slots * src->slot_size);
+      return dst;
+    } else {
+      return NULL;
+    }
+  }
+}
+
+static emacs_value
+Fmmec_subbytevector (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
+{
+  assert((2 == nargs) || (3 == nargs));
+  mmec_intrep_bytevector_t	*src	= mmec_get_intrep_bytevector_from_emacs_value(env, args[0]);
+  intmax_t			start	= mmec_extract_elisp_integer_from_emacs_value(env, args[1]);
+  intmax_t			past;
+  mmec_intrep_bytevector_t	*dst;
+
+  if (2 == nargs) {
+    if (mmec_bytevector_valid_slot_index(src, start)) {
+      past = src->number_of_slots;
+      dst  = mmec_new_intrep_bytevector_subsequence(src, start, past);
+    } else {
+      return mmec_error_bytevector_index_out_of_range(env);
+    }
+  } else {
+    past = mmec_extract_elisp_integer_from_emacs_value(env, args[2]);
+    if (mmec_bytevector_valid_slot_index(src, start) && ((start == past) || mmec_bytevector_valid_slot_index(src, past-1))) {
+      dst  = mmec_new_intrep_bytevector_subsequence(src, start, past);
+    } else {
+      return mmec_error_bytevector_index_out_of_range(env);
+    }
+  }
+
+  if (dst) {
+    return mmec_new_emacs_value_from_intrep_bytevector(env, dst);
+  } else {
+    return mmec_error_memory_allocation(env);
+  }
+}
+
+
+/** --------------------------------------------------------------------
+ ** Elisp functions table: entries for bytevector comparison.
+ ** ----------------------------------------------------------------- */
+
+/* There are 6 entries for each type stem. */
+#undef  MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES
+#define MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(TYPESTEM)	\
+  {									\
+    .name		= "mmec-c-" #TYPESTEM "-bytevector-compare",	\
+      .implementation	= Fmmec_c_ ## TYPESTEM ## _intrep_bytevector_compare,	\
+      .min_arity		= 6,					\
+      .max_arity		= 6,					\
+      .documentation	= "Compare two bytevectors.",			\
+      },								\
+  {									\
+    .name		= "mmec-c-" #TYPESTEM "-bytevector-equal",	\
+      .implementation	= Fmmec_c_ ## TYPESTEM ## _intrep_bytevector_equal,	\
+      .min_arity		= 6,					\
+      .max_arity		= 6,					\
+      .documentation	= "Compare two bytevectors.",			\
+      },								\
+  {									\
+    .name		= "mmec-c-" #TYPESTEM "-bytevector-less",	\
+      .implementation	= Fmmec_c_ ## TYPESTEM ## _intrep_bytevector_less,	\
+      .min_arity		= 6,					\
+      .max_arity		= 6,					\
+      .documentation	= "Compare two bytevectors.",			\
+      },								\
+  {									\
+    .name		= "mmec-c-" #TYPESTEM "-bytevector-greater",	\
+      .implementation	= Fmmec_c_ ## TYPESTEM ## _intrep_bytevector_greater,	\
+      .min_arity		= 6,					\
+      .max_arity		= 6,					\
+      .documentation	= "Compare two bytevectors.",			\
+      },								\
+  {									\
+    .name		= "mmec-c-" #TYPESTEM "-bytevector-leq",	\
+      .implementation	= Fmmec_c_ ## TYPESTEM ## _intrep_bytevector_leq,	\
+      .min_arity		= 6,					\
+      .max_arity		= 6,					\
+      .documentation	= "Compare two bytevectors.",			\
+      },								\
+  {									\
+    .name		= "mmec-c-" #TYPESTEM "-bytevector-geq",	\
+      .implementation	= Fmmec_c_ ## TYPESTEM ## _intrep_bytevector_geq,	\
+      .min_arity		= 6,					\
+      .max_arity		= 6,					\
+      .documentation	= "Compare two bytevectors.",			\
+      },
+
+/* There are 28 type stems.  In total 28 * 6 = 168 entries. */
+#undef  MMEC_INTREP_BYTEVECTOR_COMPARISON_TABLE_ENTRIES
+#define MMEC_BYTEVECTOR_COMPARISON_TABLE_ENTRIES			\
+      MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(char)		\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(schar)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(uchar)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(wchar)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(sshrt)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(ushrt)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(sint)		\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(uint)		\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(slong)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(ulong)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(sllong)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(ullong)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(sintmax)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(uintmax)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(ssize)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(usize)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(ptrdiff)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(sint8)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(uint8)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(sint16)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(uint16)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(sint32)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(uint32)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(sint64)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(uint64)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(float)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(double)	\
+	MMEC_BYTEVECTOR_COMPARISON_TYPESTEM_TABLE_ENTRIES(ldouble)
 
 
 /** --------------------------------------------------------------------
  ** Elisp functions table.
  ** ----------------------------------------------------------------- */
 
-#define NUMBER_OF_MODULE_FUNCTIONS	(1+28+28)
+#define NUMBER_OF_MODULE_FUNCTIONS	(1+28+28+1 + 168)
 static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNCTIONS] = {
   /* Constructors. */
   {
@@ -659,6 +982,20 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
     .min_arity		= 3,
     .max_arity		= 3,
     .documentation	= "Extract a value of type `long double' from a number of type `mmec-ldouble' and store it into the binary array in an object of type `mmec-ldouble-bytevector'."
+  },
+
+  /* ------------------------------------------------------------------ */
+
+  MMEC_BYTEVECTOR_COMPARISON_TABLE_ENTRIES
+
+  /* ------------------------------------------------------------------ */
+  /* Bytevector operations. */
+  {
+    .name		= "mmec-subtytevector",
+    .implementation	= Fmmec_subbytevector,
+    .min_arity		= 2,
+    .max_arity		= 3,
+    .documentation	= "Build and return a new user-pointer object of type `bytevector' representing a subsequence of another `bytevector'.",
   },
 };
 

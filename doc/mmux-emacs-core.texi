@@ -1766,6 +1766,7 @@ Return true if @vari{OP} \OPERATOR\ @varii{OP}; otherwise return false.
 * bytevec float::               Bytevector of @code{float} values.
 * bytevec double::              Bytevector of @code{double} values.
 * bytevec ldouble::             Bytevector of @code{ldouble} values.
+* bytevec comparison::          Comparing bytevectors.
 @end menu
 
 @c ------------------------------------------------------------------------
@@ -2140,6 +2141,116 @@ return false.
 
 
 @ElispBytevectorTypeDefinition{ldouble, floating-point, long double}
+
+@c page
+@node bytevec comparison
+@section Comparing bytevectors
+
+
+For all the comparison functions, the arguments @var{START} and @var{PAST} must be valid slot
+indexes satisfying the conditions:
+
+@example
+0 <= @var{START} <= @var{PAST} <= number of slots
+@end example
+
+@noindent
+otherwise the behaviour of the functions is undefined.  The functions compare a span in the data
+area of the bytevectors starting at slot index @var{START}, included, and ending at slot index
+@var{PAST}, excluded.
+
+
+@deffn {Generic Function} mmec-bytevector-compare @vari{BV} @vari{START} @vari{PAST} @vari{BV} @varii{START} @varii{PAST})
+Compare the selected spans in the bytevectors @vari{BV} and @varii{BV}, return the following code:
+
+@table @code
+@item 0
+If the following condition is true:
+
+@example
+(@vari{PAST} - @vari{START}) == (@varii{PAST} - @varii{START})
+@end example
+
+@noindent
+@strong{and} all the values in the slots are equal slot by slot.
+
+@item +1
+If the following condition is true:
+
+@example
+(@vari{PAST} - @vari{START}) > (@varii{PAST} - @varii{START})
+@end example
+
+@noindent
+@strong{or}, while visiting the slots from @var{START} to @var{PAST}, @vari{BV} holds a slot value
+that is greater than the corresponding slot value in @varii{BV}.
+
+@item -1
+If the following condition is true:
+
+@example
+(@vari{PAST} - @vari{START}) < (@varii{PAST} - @varii{START})
+@end example
+
+@noindent
+@strong{or}, while visiting the slots from @var{START} to @var{PAST}, @vari{BV} holds a slot value
+that is less than the corresponding slot value in @varii{BV}.
+@end table
+@end deffn
+
+
+@deffn {Generic Function} mmec-bytevector-equal @vari{BV} @vari{START} @vari{PAST} @vari{BV} @varii{START} @varii{PAST}
+@deffnx {Generic Function} mmec-bytevector-less @vari{BV} @vari{START} @vari{PAST} @vari{BV} @varii{START} @varii{PAST}
+@deffnx {Generic Function} mmec-bytevector-greater @vari{BV} @vari{START} @vari{PAST} @vari{BV} @varii{START} @varii{PAST}
+@deffnx {Generic Function} mmec-bytevector-leq @vari{BV} @vari{START} @vari{PAST} @vari{BV} @varii{START} @varii{PAST}
+@deffnx {Generic Function} mmec-bytevector-geq @vari{BV} @vari{START} @vari{PAST} @vari{BV} @varii{START} @varii{PAST}
+Compare the selected spans in the bytevectors @vari{BV} and @varii{BV}: return @ctrue{} if the
+comparison condition is true; otherwise return @cfalse{}.
+@end deffn
+
+@c ------------------------------------------------------------------------
+
+@macro ElispDefineBytevectorComparison{TYPESTEM}
+@deffn {Method} mmec-\TYPESTEM\-bytevector-equal (@vari{BV} mmec-\TYPESTEM\-bytevector) (@vari{START} integer) (@vari{PAST} integer) (@vari{BV} mmec-\TYPESTEM\-bytevector) (@varii{START} integer) (@varii{PAST} integer)
+@deffnx {Method} mmec-\TYPESTEM\-bytevector-less (@vari{BV} mmec-\TYPESTEM\-bytevector) (@vari{START} integer) (@vari{PAST} integer) (@vari{BV} mmec-\TYPESTEM\-bytevector) (@varii{START} integer) (@varii{PAST} integer)
+@deffnx {Method} mmec-\TYPESTEM\-bytevector-greater (@vari{BV} mmec-\TYPESTEM\-bytevector) (@vari{START} integer) (@vari{PAST} integer) (@vari{BV} mmec-\TYPESTEM\-bytevector) (@varii{START} integer) (@varii{PAST} integer)
+@deffnx {Method} mmec-\TYPESTEM\-bytevector-leq (@vari{BV} mmec-\TYPESTEM\-bytevector) (@vari{START} integer) (@vari{PAST} integer) (@vari{BV} mmec-\TYPESTEM\-bytevector) (@varii{START} integer) (@varii{PAST} integer)
+@deffnx {Method} mmec-\TYPESTEM\-bytevector-geq (@vari{BV} mmec-\TYPESTEM\-bytevector) (@vari{START} integer) (@vari{PAST} integer) (@vari{BV} mmec-\TYPESTEM\-bytevector) (@varii{START} integer) (@varii{PAST} integer)
+Compare the selected spans in the bytevectors @vari{BV} and @varii{BV}: return @ctrue{} if the
+comparison condition is true; otherwise return @cfalse{}.
+@end deffn
+
+@end macro
+
+
+@ElispDefineBytevectorComparison{char}
+@ElispDefineBytevectorComparison{schar}
+@ElispDefineBytevectorComparison{uchar}
+@ElispDefineBytevectorComparison{wchar}
+@ElispDefineBytevectorComparison{sshrt}
+@ElispDefineBytevectorComparison{ushrt}
+@ElispDefineBytevectorComparison{sint}
+@ElispDefineBytevectorComparison{uint}
+@ElispDefineBytevectorComparison{slong}
+@ElispDefineBytevectorComparison{ulong}
+@ElispDefineBytevectorComparison{sllong}
+@ElispDefineBytevectorComparison{ullong}
+@ElispDefineBytevectorComparison{sintmax}
+@ElispDefineBytevectorComparison{uintmax}
+@ElispDefineBytevectorComparison{ssize}
+@ElispDefineBytevectorComparison{usize}
+@ElispDefineBytevectorComparison{ptrdiff}
+@ElispDefineBytevectorComparison{sint8}
+@ElispDefineBytevectorComparison{uint8}
+@ElispDefineBytevectorComparison{sint16}
+@ElispDefineBytevectorComparison{uint16}
+@ElispDefineBytevectorComparison{sint32}
+@ElispDefineBytevectorComparison{uint32}
+@ElispDefineBytevectorComparison{sint64}
+@ElispDefineBytevectorComparison{uint64}
+@ElispDefineBytevectorComparison{float}
+@ElispDefineBytevectorComparison{double}
+@ElispDefineBytevectorComparison{ldouble}
 
 @c page
 @node errors
@@ -3077,6 +3188,8 @@ is @nil{}.
 * capi bytevec inspect::        Inspecting bytevector objects.
 * capi bytevec getters::        Getters for bytevector objects.
 * capi bytevec setters::        Setters for bytevector objects.
+* capi bytevec comparison::     Comparing bytevector objects.
+* capi bytevec operations::     Operations on bytevector objects.
 @end menu
 
 @c page
@@ -3181,8 +3294,18 @@ Emacs value: mutating the structure mutates the Emacs value.
 @subsection Inspecting bytevector objects
 
 
-@deftypefun bool mmec_bytevector_valid_slot_index (mmec_intrep_bytevector_t * @var{BV}, intmax_t @var{idx})
+@deftypefun bool mmec_bytevector_valid_slot_index (mmec_intrep_bytevector_t const * @var{BV}, intmax_t @var{idx})
 Return true if @var{IDX} is a valid slot index for the bytevector @var{BV}; otherwise return false.
+@end deftypefun
+
+
+@deftypefun bool mmec_intrep_bytevector_valid_start_and_past (mmec_intrep_bytevector_t const * @var{BV}, intmax_t @var{START}, intmax_t @var{PAST})
+Return true if @var{START} and @var{PAST} are valid slot indexes for @var{BV}, that is if the
+following condition is true:
+
+@example
+0 <= @var{START} <= @var{PAST} <= number of slots
+@end example
 @end deftypefun
 
 @c page
@@ -3191,7 +3314,7 @@ Return true if @var{IDX} is a valid slot index for the bytevector @var{BV}; othe
 
 
 @macro CapiBytevectorGetter{TYPESTEM}
-@deftypefun {mmec_clang_\TYPESTEM\_t} mmec_bytevector_\TYPESTEM\_ref (mmec_intrep_bytevector_t * @var{BV}, intmax_t @var{IDX})
+@deftypefun {mmec_clang_\TYPESTEM\_t} mmec_bytevector_\TYPESTEM\_ref (mmec_intrep_bytevector_t const * @var{BV}, intmax_t @var{IDX})
 Extract a value of type @code{mmec_clang_\TYPESTEM\_t} from the data area of the bytevector @var{BV}
 at slot index @var{IDX}.
 @end deftypefun
@@ -3270,6 +3393,133 @@ slot index @var{IDX}.
 @CapiBytevectorSetter{float}
 @CapiBytevectorSetter{double}
 @CapiBytevectorSetter{ldouble}
+
+@c page
+@node capi bytevec comparison
+@subsection Comparing bytevector objects
+
+
+For all the comparison functions, the arguments @var{START} and @var{PAST} must be valid slot
+indexes satisfying the conditions:
+
+@example
+0 <= @var{START} <= @var{PAST} <= number of slots
+@end example
+
+@noindent
+otherwise the behaviour of the functions is undefined.  The functions compare a span in the data
+area of the bytevectors starting at slot index @var{START}, included, and ending at slot index
+@var{PAST}, excluded.
+
+
+@deftypefn {Function Prototype} int mmec_intrep_bytevector_compare_fun_t (mmec_intrep_bytevector_t const * @vari{BV}, intmax_t @vari{START}, intmax_t @vari{PAST}, mmec_intrep_bytevector_t const * @vari{BV}, intmax_t @varii{START}, intmax_t @varii{PAST})
+Compare the selected spans in the bytevectors @vari{BV} and @varii{BV}, return the following code:
+
+@table @code
+@item 0
+If the following condition is true:
+
+@example
+(@vari{PAST} - @vari{START}) == (@varii{PAST} - @varii{START})
+@end example
+
+@noindent
+@strong{and} all the values in the slots are equal slot by slot.
+
+@item +1
+If the following condition is true:
+
+@example
+(@vari{PAST} - @vari{START}) > (@varii{PAST} - @varii{START})
+@end example
+
+@noindent
+@strong{or}, while visiting the slots from @var{START} to @var{PAST}, @vari{BV} holds a slot value
+that is greater than the corresponding slot value in @varii{BV}.
+
+@item -1
+If the following condition is true:
+
+@example
+(@vari{PAST} - @vari{START}) < (@varii{PAST} - @varii{START})
+@end example
+
+@noindent
+@strong{or}, while visiting the slots from @var{START} to @var{PAST}, @vari{BV} holds a slot value
+that is less than the corresponding slot value in @varii{BV}.
+@end table
+@end deftypefn
+
+
+@deftypefn {Function Prototype} bool mmec_intrep_bytevector_comparison_fun_t (mmec_intrep_bytevector_t const * @vari{BV}, intmax_t @vari{START}, intmax_t @vari{PAST}, mmec_intrep_bytevector_t const * @vari{BV}, intmax_t @varii{START}, intmax_t @varii{PAST})
+Compare the selected spans in the bytevectors @vari{BV} and @varii{BV}: return @ctrue{} if the
+comparison condition is true; otherwise return @cfalse{}.
+@end deftypefn
+
+@c ------------------------------------------------------------------------
+
+@macro ClangDefineBytevectorComparison{TYPESTEM}
+@deftypefun mmec_intrep_bytevector_compare_fun_t mmec_\TYPESTEM\_intrep_bytevector_compare
+@deftypefunx mmec_intrep_bytevector_comparison_fun_t mmec_\TYPESTEM\_intrep_bytevector_equal
+@deftypefunx mmec_intrep_bytevector_comparison_fun_t mmec_\TYPESTEM\_intrep_bytevector_less
+@deftypefunx mmec_intrep_bytevector_comparison_fun_t mmec_\TYPESTEM\_intrep_bytevector_greater
+@deftypefunx mmec_intrep_bytevector_comparison_fun_t mmec_\TYPESTEM\_intrep_bytevector_leq
+@deftypefunx mmec_intrep_bytevector_comparison_fun_t mmec_\TYPESTEM\_intrep_bytevector_geq
+Comparison function for bytevector user--pointer objects holding values of type
+@code{mmec_clang_\TYPESTEM\_t}.
+@end deftypefun
+
+@end macro
+
+
+@ClangDefineBytevectorComparison{char}
+@ClangDefineBytevectorComparison{schar}
+@ClangDefineBytevectorComparison{uchar}
+@ClangDefineBytevectorComparison{wchar}
+@ClangDefineBytevectorComparison{sshrt}
+@ClangDefineBytevectorComparison{ushrt}
+@ClangDefineBytevectorComparison{sint}
+@ClangDefineBytevectorComparison{uint}
+@ClangDefineBytevectorComparison{slong}
+@ClangDefineBytevectorComparison{ulong}
+@ClangDefineBytevectorComparison{sllong}
+@ClangDefineBytevectorComparison{ullong}
+@ClangDefineBytevectorComparison{sintmax}
+@ClangDefineBytevectorComparison{uintmax}
+@ClangDefineBytevectorComparison{ssize}
+@ClangDefineBytevectorComparison{usize}
+@ClangDefineBytevectorComparison{ptrdiff}
+@ClangDefineBytevectorComparison{sint8}
+@ClangDefineBytevectorComparison{uint8}
+@ClangDefineBytevectorComparison{sint16}
+@ClangDefineBytevectorComparison{uint16}
+@ClangDefineBytevectorComparison{sint32}
+@ClangDefineBytevectorComparison{uint32}
+@ClangDefineBytevectorComparison{sint64}
+@ClangDefineBytevectorComparison{uint64}
+@ClangDefineBytevectorComparison{float}
+@ClangDefineBytevectorComparison{double}
+@ClangDefineBytevectorComparison{ldouble}
+
+@c page
+@node capi bytevec operations
+@subsection Operations on bytevector objects
+
+
+@deftypefun {mmec_intrep_bytevector_t *} mmec_new_intrep_bytevector_subsequence (mmec_intrep_bytevector_t const * @var{SRC}, intmax_t @var{START}, intmax_t @var{PAST})
+Build and return a new bytevector user--pointer object holding a subsequence of the bytevector
+referenced by @var{SRC}; the duplicated slots are the ones between index @var{START}, included, and
+index @var{PAST}, excluded.  If an error occurs allocating memory: the return value is @cnull{}.
+
+The arguments @var{START} and @var{PAST} must satisfy the conditions:
+
+@example
+0 <= @var{START} <= @var{PAST} <= number of slots
+@end example
+
+@noindent
+otherwise the behaviour of this function is undefined.
+@end deftypefun
 
 @c page
 @c ------------------------------------------------------------

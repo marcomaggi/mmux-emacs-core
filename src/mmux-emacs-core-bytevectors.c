@@ -31,20 +31,11 @@
 
 
 /** --------------------------------------------------------------------
- ** User-pointer objects: bytevectors.
+ ** Bytevector user-pointer objects: constructors and destructors.
  ** ----------------------------------------------------------------- */
 
-static void
-mmec_bytevector_finalizer (void * _obj)
-{
-  MMEC_PC(mmec_intrep_bytevector_t, obj, _obj);
-
-  free(obj->ptr);
-  free(obj);
-}
-
 mmec_intrep_bytevector_t *
-mmec_make_bytevector (intmax_t number_of_slots, intmax_t slot_size, bool hold_signed_values)
+mmec_new_intrep_bytevector (intmax_t number_of_slots, intmax_t slot_size, bool hold_signed_values)
 {
   mmec_intrep_bytevector_t	* obj;
 
@@ -67,6 +58,78 @@ mmec_make_bytevector (intmax_t number_of_slots, intmax_t slot_size, bool hold_si
   }
 }
 
+void
+mmec_delete_intrep_bytevector (mmec_intrep_bytevector_t * bv)
+{
+  /* let's check the pointer just to be sure. */
+  if (bv->ptr) {
+    free(bv->ptr);
+  }
+  free(bv);
+}
+
+#undef  MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR
+#define MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(TYPESTEM, HOLD_SIGNED_VALUES) \
+  mmec_intrep_bytevector_t *						\
+  mmec_make_ ## TYPESTEM ## _bytevector (intmax_t number_of_slots)	\
+  {									\
+    return mmec_new_intrep_bytevector(number_of_slots, sizeof(mmec_clang_ ## TYPESTEM ## _t), HOLD_SIGNED_VALUES); \
+  }
+
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(char,	true)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(schar,	true)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(uchar,	false)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(wchar,	false)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(sshrt,	true)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(ushrt,	false)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(sint,	true)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(uint,	false)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(slong,	true)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(ulong,	false)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(sllong,	true)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(ullong,	false)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(sintmax,	true)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(uintmax,	false)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(ssize,	true)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(usize,	false)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(ptrdiff,	true)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(sint8,	true)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(uint8,	false)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(sint16,	true)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(uint16,	false)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(sint32,	true)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(uint32,	false)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(sint64,	true)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(uint64,	false)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(float,	true)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(double,	false)
+MMEC_DEFINE_BYTEVECTOR_CONSTRUCTOR(ldouble,	false)
+
+
+/** --------------------------------------------------------------------
+ ** Bytevector user-pointer objects: Emacs value constructors and getters.
+ ** ----------------------------------------------------------------- */
+
+static void
+mmec_bytevector_finalizer (void * obj)
+{
+  MMEC_PC(mmec_intrep_bytevector_t, bv, obj);
+
+  mmec_delete_intrep_bytevector(bv);
+}
+
+emacs_value
+mmec_new_emacs_value_from_intrep_bytevector (emacs_env * env, mmec_intrep_bytevector_t * bv)
+{
+  return mmec_new_emacs_value_from_usrptr_object(env, mmec_bytevector_finalizer, bv);
+}
+
+mmec_intrep_bytevector_t *
+mmec_get_intrep_bytevector_from_emacs_value (emacs_env * env, emacs_value arg)
+{
+  return ((mmec_intrep_bytevector_t *)mmec_get_usrptr_object_from_emacs_value(env, arg));
+}
+
 static emacs_value
 Fmmec_make_bytevector (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
 {
@@ -78,10 +141,10 @@ Fmmec_make_bytevector (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void
   if ((number_of_slots < 0) || (slot_size < 0)) {
     return mmec_error_constructor(env);
   } else {
-    mmec_intrep_bytevector_t	* obj = mmec_make_bytevector(number_of_slots, slot_size, hold_signed_values);
+    mmec_intrep_bytevector_t	* bv = mmec_new_intrep_bytevector(number_of_slots, slot_size, hold_signed_values);
 
-    if (obj) {
-      return mmec_new_emacs_value_from_usrptr_object(env, mmec_bytevector_finalizer, obj);
+    if (bv) {
+      return mmec_new_emacs_value_from_intrep_bytevector(env, bv);
     } else {
       return mmec_error_memory_allocation(env);
     }
@@ -90,7 +153,7 @@ Fmmec_make_bytevector (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void
 
 
 /** --------------------------------------------------------------------
- ** Bytevector objects: getters and setters.
+ ** Bytevector user-pointer objects: Emacs value getters and setters.
  ** ----------------------------------------------------------------- */
 
 #undef  MMEC_DEFINE_ELISP_BYTEVECTOR_GETTER
@@ -163,7 +226,7 @@ MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(ldouble)
 
 
 /** --------------------------------------------------------------------
- ** Bytevector objects: operations.
+ ** Bytevector user-pointer objects: operations.
  ** ----------------------------------------------------------------- */
 
 /* static emacs_value */

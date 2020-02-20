@@ -3071,7 +3071,10 @@ is @nil{}.
 
 @menu
 * capi bytevec typedefs::       Bytevector type definitions.
-* capi bytevec ctors::          Bytevector constructors.
+* capi bytevec ctors::          Bytevector constructors and destructors.
+* capi bytevec values::         Constructors and getters for bytevector
+                                Emacs values.
+* capi bytevec inspect::        Inspecting bytevector objects.
 * capi bytevec getters::        Getters for bytevector objects.
 * capi bytevec setters::        Setters for bytevector objects.
 @end menu
@@ -3100,6 +3103,72 @@ Pointer to the binary data area.
 @end table
 @end deftp
 
+@c page
+@node capi bytevec ctors
+@subsection Bytevector constructors and destructors
+
+
+@deftypefun {mmec_interp_bytevector_t *} mmec_new_intrep_bytevector (intmax_t @var{number_of_slots}, intmax_t @var{slot_size}, bool @var{hold_signed_values})
+Allocate, initialise and return a new bytevector user--pointer object.  If memory allocation fails:
+return @cnull{}.
+@end deftypefun
+
+
+@deftypefun void mmec_delete_intrep_bytevector (mmec_intrep_bytevecor_t * @var{bv})
+Destructor for user--pointer objects being the internal representation of bytevector objects.  Emacs
+Lisp values of type @objtype{mmec-bytevector} are correctly garbage collected, so we must use this
+destructor only on user--pointer objects that are not embedded into an Emacs value.
+@end deftypefun
+
+
+@macro ClangDefineBytevectorConstructor{TYPESTEM}
+@deftypefun mmec_intrep_bytevector_t * mmec_new_\TYPESTEM\_intrep_bytevector (intmax_t @var{number_of_slots})
+Allocate, initialise and return a new bytevector user--pointer object whose binary data area holds
+slots of type @code{mmec_clang_\TYPESTEM\_t}.  If memory allocation fails: return @cnull{}.
+@end deftypefun
+
+@end macro
+
+@ClangDefineBytevectorConstructor{char}
+@ClangDefineBytevectorConstructor{schar}
+@ClangDefineBytevectorConstructor{uchar}
+@ClangDefineBytevectorConstructor{wchar}
+@ClangDefineBytevectorConstructor{sshrt}
+@ClangDefineBytevectorConstructor{ushrt}
+@ClangDefineBytevectorConstructor{sint}
+@ClangDefineBytevectorConstructor{uint}
+@ClangDefineBytevectorConstructor{slong}
+@ClangDefineBytevectorConstructor{ulong}
+@ClangDefineBytevectorConstructor{sllong}
+@ClangDefineBytevectorConstructor{ullong}
+@ClangDefineBytevectorConstructor{sintmax}
+@ClangDefineBytevectorConstructor{uintmax}
+@ClangDefineBytevectorConstructor{ssize}
+@ClangDefineBytevectorConstructor{usize}
+@ClangDefineBytevectorConstructor{ptrdiff}
+@ClangDefineBytevectorConstructor{sint8}
+@ClangDefineBytevectorConstructor{uint8}
+@ClangDefineBytevectorConstructor{sint16}
+@ClangDefineBytevectorConstructor{uint16}
+@ClangDefineBytevectorConstructor{sint32}
+@ClangDefineBytevectorConstructor{uint32}
+@ClangDefineBytevectorConstructor{sint64}
+@ClangDefineBytevectorConstructor{uint64}
+@ClangDefineBytevectorConstructor{float}
+@ClangDefineBytevectorConstructor{double}
+@ClangDefineBytevectorConstructor{ldouble}
+
+@c page
+@node capi bytevec values
+@subsection Constructors and getters for bytevector Emacs values
+
+
+@deftypefun emacs_value mmec_new_emacs_value_from_intrep_bytevector (emacs_env * @var{ENV}, mmec_intrep_bytevector_t * @var{BV})
+Build and return a new Emacs user--pointer object representing a bytevector.  The object will have
+@var{BV} as its internal representation; mutating @var{BV} will mutate the Emacs user--pointer
+object.
+@end deftypefun
+
 
 @deftypefun {mmec_intrep_bytevector_t *} mmec_get_intrep_bytevector_from_emacs_value (emacs_env * @var{ENV}, emacs_value @var{ARG})
 Given an Emacs user--pointer object of type @objtype{bytevector} retrieve a pointer to its internal
@@ -3107,20 +3176,13 @@ representation.  The structure referenced by the returned pointer is the actual 
 Emacs value: mutating the structure mutates the Emacs value.
 @end deftypefun
 
+@c page
+@node capi bytevec inspect
+@subsection Inspecting bytevector objects
+
 
 @deftypefun bool mmec_bytevector_valid_slot_index (mmec_intrep_bytevector_t * @var{BV}, intmax_t @var{idx})
 Return true if @var{IDX} is a valid slot index for the bytevector @var{BV}; otherwise return false.
-@end deftypefun
-
-
-@c page
-@node capi bytevec ctors
-@subsection Bytevector constructors
-
-
-@deftypefun {mmec_interp_bytevector_t *} mmec_make_bytevector (intmax_t @var{number_of_slots}, intmax_t @var{slot_size}, bool @var{hold_signed_values})
-Allocate, initialise and return a new bytevector user--pointer object.  If memory allocation fails:
-return @cnull{}.
 @end deftypefun
 
 @c page

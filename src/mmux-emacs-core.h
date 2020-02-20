@@ -460,7 +460,7 @@ MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP(ldouble)
 
 
 /** --------------------------------------------------------------------
- ** User-pointer objects: bytevectors.
+ ** Bytevector user-pointer objects: type definitions.
  ** ----------------------------------------------------------------- */
 
 typedef struct mmec_intrep_bytevector_t	mmec_intrep_bytevector_t;
@@ -472,13 +472,57 @@ struct mmec_intrep_bytevector_t {
   void		* ptr;
 };
 
-static inline mmec_intrep_bytevector_t *
-mmec_get_intrep_bytevector_from_emacs_value (emacs_env * env, emacs_value arg)
-{
-  return ((mmec_intrep_bytevector_t *)mmec_get_usrptr_object_from_emacs_value(env, arg));
-}
+mmec_decl emacs_value mmec_new_emacs_value_from_intrep_bytevector (emacs_env * env, mmec_intrep_bytevector_t * bv)
+  __attribute__((__nonnull__(1,2)));
 
-mmec_decl mmec_intrep_bytevector_t * mmec_make_bytevector (intmax_t number_of_slots, intmax_t slot_size, bool hold_signed_values);
+mmec_decl mmec_intrep_bytevector_t * mmec_get_intrep_bytevector_from_emacs_value (emacs_env * env, emacs_value arg)
+  __attribute__((__nonnull__(1)));
+
+
+/** --------------------------------------------------------------------
+ ** Bytevector user-pointer objects: constructors and destructors.
+ ** ----------------------------------------------------------------- */
+
+mmec_decl mmec_intrep_bytevector_t * mmec_new_intrep_bytevector (intmax_t number_of_slots, intmax_t slot_size, bool hold_signed_values);
+mmec_decl void mmec_delete_intrep_bytevector (mmec_intrep_bytevector_t * bv)
+  __attribute__((__nonnull__(1)));
+
+
+typedef mmec_intrep_bytevector_t * mmec_new_intrep_bytevector_fun_t (intmax_t number_of_slots);
+
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_char_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_schar_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_uchar_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_wchar_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_sshrt_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_ushrt_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_sint_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_uint_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_slong_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_ulong_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_sllong_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_ullong_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_sintmax_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_uintmax_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_ssize_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_usize_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_ptrdiff_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_sint8_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_uint8_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_sint16_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_uint16_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_sint32_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_uint32_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_sint64_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_uint64_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_float_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_double_intrep_bytevector;
+mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_ldouble_intrep_bytevector;
+
+
+/** --------------------------------------------------------------------
+ ** Bytevector user-pointer objects: inspection.
+ ** ----------------------------------------------------------------- */
 
 static inline bool
 mmec_bytevector_valid_slot_index (mmec_intrep_bytevector_t * bv, intmax_t idx)
@@ -486,7 +530,10 @@ mmec_bytevector_valid_slot_index (mmec_intrep_bytevector_t * bv, intmax_t idx)
   return ((0 <= idx) && (idx < bv->number_of_slots))? true : false;
 }
 
-/* ------------------------------------------------------------------ */
+
+/** --------------------------------------------------------------------
+ ** Bytevector user-pointer objects: getters and setters.
+ ** ----------------------------------------------------------------- */
 
 #undef  MMEC_DEFINE_BYTEVECTOR_GETTER
 #define MMEC_DEFINE_BYTEVECTOR_GETTER(TYPESTEM)				\

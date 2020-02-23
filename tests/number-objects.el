@@ -1,4 +1,4 @@
-;;; ctypes-comparison.el --- dynamic module test
+;;; number-objects.el --- dynamic module test
 
 ;; Copyright (C) 2020 by Marco Maggi
 
@@ -19,8 +19,26 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'ert)
 (require 'mmec)
+
+
+;;;; helpers
+
+(defmacro my--unsupported-type-error (TYPE UNSUPPORTED-TYPE INIT)
+  `(should (condition-case nil
+	       (,TYPE (,UNSUPPORTED-TYPE ,INIT))
+	     ((mmec-error-unsupported-init-type)
+	      t)
+	     (t nil))))
+
+(defmacro my--init-argument-does-not-fit (TYPE INIT)
+  `(should (condition-case nil
+	       (,TYPE ,INIT)
+	     ((mmec-error-value-out-of-range)
+	      t)
+	     (t nil))))
 
 
 ;;;; equality tests
@@ -848,9 +866,112 @@
 (mmux-core-test--mixed--equal-tests mmec-uint	mmec-ldouble)
 
 
+;;;; number objects makers: mmec-char
+
+(ert-deftest mmec-number-char ()
+  "Build a `mmec-char' object."
+  (should	(mmec-fits-char-p	123))
+  (should (not	(mmec-fits-char-p	123000)))
+  ;;
+  (should	(mmec-char-p	(mmec-char 123)))
+  (should	(mmec-char-p	(mmec-char 123.0)))
+  (should	(mmec-char-p	(mmec-char (mmec-char		123))))
+  (should	(mmec-char-p	(mmec-char (mmec-schar		123))))
+  (should	(mmec-char-p	(mmec-char (mmec-sshrt		123))))
+  (should	(mmec-char-p	(mmec-char (mmec-sint		123))))
+  (should	(mmec-char-p	(mmec-char (mmec-slong		123))))
+  (should	(mmec-char-p	(mmec-char (mmec-sllong		123))))
+  (should	(mmec-char-p	(mmec-char (mmec-sintmax	123))))
+  (should	(mmec-char-p	(mmec-char (mmec-ssize		123))))
+  (should	(mmec-char-p	(mmec-char (mmec-ptrdiff	123))))
+  ;;
+  (my--unsupported-type-error mmec-char mmec-uchar	123)
+  (my--unsupported-type-error mmec-char mmec-wchar	123)
+  (my--unsupported-type-error mmec-char mmec-ushrt	123)
+  (my--unsupported-type-error mmec-char mmec-uint	123)
+  (my--unsupported-type-error mmec-char mmec-ulong	123)
+  (my--unsupported-type-error mmec-char mmec-ullong	123)
+  (my--unsupported-type-error mmec-char mmec-uintmax	123)
+  (my--unsupported-type-error mmec-char mmec-usize	123)
+  ;;
+  (my--init-argument-does-not-fit mmec-char 1230)
+  nil)
+
+;;; --------------------------------------------------------------------
+
+(ert-deftest mmec-number-float ()
+  "Build a `mmec-float' object."
+  (should	(mmec-fits-float-p	123))
+  (should	(mmec-fits-float-p	12.3))
+  ;;
+  (should	(mmec-float-p	(mmec-float 123)))
+  (should	(mmec-float-p	(mmec-float 12.3)))
+  ;;
+  (should	(mmec-float-p	(mmec-float (mmec-char		123))))
+  (should	(mmec-float-p	(mmec-float (mmec-schar		123))))
+  (should	(mmec-float-p	(mmec-float (mmec-uchar		123))))
+  (should	(mmec-float-p	(mmec-float (mmec-sshrt		123))))
+  (should	(mmec-float-p	(mmec-float (mmec-ushrt		123))))
+  (should	(mmec-float-p	(mmec-float (mmec-sint		123))))
+  (should	(mmec-float-p	(mmec-float (mmec-uint		123))))
+  (should	(mmec-float-p	(mmec-float (mmec-slong		123))))
+  (should	(mmec-float-p	(mmec-float (mmec-ulong		123))))
+  (should	(mmec-float-p	(mmec-float (mmec-sllong	123))))
+  (should	(mmec-float-p	(mmec-float (mmec-ullong	123))))
+  (should	(mmec-float-p	(mmec-float (mmec-sintmax	123))))
+  (should	(mmec-float-p	(mmec-float (mmec-uintmax	123))))
+  (should	(mmec-float-p	(mmec-float (mmec-ssize		123))))
+  (should	(mmec-float-p	(mmec-float (mmec-usize		123))))
+  (should	(mmec-float-p	(mmec-float (mmec-ptrdiff	123))))
+  ;;
+  (my--init-argument-does-not-fit mmec-float 12.30)
+  t)
+
+
+;;;; number objects: printing
+
+(cl-macrolet
+    ((mmec--def (TYPESTEM)
+		(let* ((TESTNAME	(mmec-sformat "mmec-%s-print-test"	TYPESTEM))
+		       (NUMTYPE		(mmec-sformat "mmec-%s"			TYPESTEM))
+		       (DOCSTRING	(format "Test printing numbers of type `%s'." NUMTYPE))
+		       (RESULT		(format "#s(%s 123)" NUMTYPE)))
+		  `(ert-deftest ,TESTNAME ()
+		     ,DOCSTRING
+		     (should (equal ,RESULT (prin1-to-string (,NUMTYPE 123))))))))
+  (mmec--def char)
+  (mmec--def schar)
+  (mmec--def uchar)
+  (mmec--def wchar)
+  (mmec--def sshrt)
+  (mmec--def ushrt)
+  (mmec--def sint)
+  (mmec--def uint)
+  (mmec--def slong)
+  (mmec--def ulong)
+  (mmec--def sllong)
+  (mmec--def ullong)
+  (mmec--def ssize)
+  (mmec--def usize)
+  (mmec--def sintmax)
+  (mmec--def uintmax)
+  (mmec--def ptrdiff)
+  (mmec--def sint8)
+  (mmec--def uint8)
+  (mmec--def sint16)
+  (mmec--def uint16)
+  (mmec--def sint32)
+  (mmec--def uint32)
+  (mmec--def sint64)
+  (mmec--def uint64)
+  (mmec--def float)
+  (mmec--def double)
+  (mmec--def ldouble))
+
+
 ;;;; done
 
 (ert-run-tests-batch-and-exit)
 (garbage-collect)
 
-;;; ctypes-comparison.el ends here
+;;; number-objects.el ends here

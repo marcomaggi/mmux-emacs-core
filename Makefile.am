@@ -135,14 +135,12 @@ src/mmec.elc: \
 
 MMUX_EMACS_CORE_TESTS_SRC = \
 	tests/version.el		\
-	tests/user-pointer-objects.el	\
-	tests/ctypes-comparison.el	\
+	tests/number-objects.el		\
 	tests/bytevector-objects.el
 
 MMUX_EMACS_CORE_TESTS = \
 	tests/version.elc		\
-	tests/user-pointer-objects.elc	\
-	tests/ctypes-comparison.elc	\
+	tests/number-objects.elc	\
 	tests/bytevector-objects.elc
 
 EXTRA_DIST	+= $(MMUX_EMACS_CORE_TESTS_SRC)

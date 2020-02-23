@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-18 18:18:07 marco>
+;; Time-stamp: <2020-02-23 15:07:40 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -2125,68 +2125,71 @@ argument is invalid."
 ;;;; range inclusion
 
 (cl-macrolet
-    ((mmec--define-fits-function
-      (TYPE-OR-STEM USRPTR-ARGTYPE NORMALISED-TYPE-OR-STEM)
-      (let* ((TYPE-STEM.str		(mmec--strip-prefix-from-symbol-name TYPE-OR-STEM))
-	     (TYPE			(intern (mmec--prepend-prefix-to-symbol-name TYPE-OR-STEM)))
-	     (NORMALISED-STEM.str	(mmec--strip-prefix-from-symbol-name NORMALISED-TYPE-OR-STEM))
-	     (NORMALISED-TYPE	(intern (mmec--prepend-prefix-to-symbol-name NORMALISED-TYPE-OR-STEM)))
-	     (FUNCNAME		(intern (format "mmec-fits-%s-p" TYPE-STEM.str)))
-	     (CLANG-FUNCNAME	(intern (format "mmec-c-%s-fits-%s-p" NORMALISED-STEM.str TYPE-STEM.str)))
-	     (DOCSTRING		(format "Return true if the argument fits an object of type `%s'." TYPE)))
-	`(progn
-	   (cl-defgeneric ,FUNCNAME (op)
-	     ,DOCSTRING)
-	   (cl-defmethod  ,FUNCNAME ((op ,USRPTR-ARGTYPE))
-	     ,DOCSTRING
-	     (,CLANG-FUNCNAME (mmec--extract-obj ,NORMALISED-TYPE (,NORMALISED-TYPE op))))
-	   (cl-defmethod  ,FUNCNAME ((op integer))
-	     ,DOCSTRING
-	     (,CLANG-FUNCNAME (mmec--extract-obj ,NORMALISED-TYPE (,NORMALISED-TYPE op))))
-	   (cl-defmethod  ,FUNCNAME ((op float))
-	     ,DOCSTRING
-	     (,CLANG-FUNCNAME (mmec--extract-obj ,NORMALISED-TYPE (,NORMALISED-TYPE op))))
-	   ))))
+    ((mmec--def (TYPE-OR-STEM USRPTR-ARGTYPE NORMALISED-TYPE-OR-STEM)
+		(let* ((TYPE-STEM.str		(mmec--strip-prefix-from-symbol-name TYPE-OR-STEM))
+		       (TYPE			(intern (mmec--prepend-prefix-to-symbol-name TYPE-OR-STEM)))
+		       (NORMALISED-STEM.str	(mmec--strip-prefix-from-symbol-name NORMALISED-TYPE-OR-STEM))
+		       (NORMALISED-TYPE		(intern (mmec--prepend-prefix-to-symbol-name NORMALISED-TYPE-OR-STEM)))
+		       (FUNCNAME		(intern (format "mmec-fits-%s-p" TYPE-STEM.str)))
+		       (CLANG-FUNCNAME		(intern (format "mmec-c-%s-fits-%s-p" NORMALISED-STEM.str TYPE-STEM.str)))
+		       (DOCSTRING		(format "Return true if the argument fits an object of type `%s'." TYPE)))
+		  `(progn
+		     (cl-defgeneric ,FUNCNAME (op)
+		       ,DOCSTRING)
+		     (cl-defmethod  ,FUNCNAME ((op ,USRPTR-ARGTYPE))
+		       ,DOCSTRING
+		       (,CLANG-FUNCNAME (mmec--extract-obj ,NORMALISED-TYPE (,NORMALISED-TYPE op))))
+		     (cl-defmethod  ,FUNCNAME ((op integer))
+		       ,DOCSTRING
+		       (,CLANG-FUNCNAME (mmec--extract-obj ,NORMALISED-TYPE (,NORMALISED-TYPE op))))
+		     (cl-defmethod  ,FUNCNAME ((op float))
+		       ,DOCSTRING
+		       (,CLANG-FUNCNAME (mmec--extract-obj ,NORMALISED-TYPE (,NORMALISED-TYPE op))))
+		     )))
+     (mmec--def/signed-integer (TYPE-OR-STEM)
+			       `(mmec--def ,TYPE-OR-STEM mmec-signed-integer   mmec-sint64))
+     (mmec--def/unsigned-integer (TYPE-OR-STEM)
+				 `(mmec--def ,TYPE-OR-STEM mmec-unsigned-integer mmec-uint64))
+     (mmec--def/floating-point (TYPE-OR-STEM)
+			       `(mmec--def ,TYPE-OR-STEM mmec-floating-point   mmec-ldouble)))
 
-  (cl-macrolet
-      ((mmec--define-fits-function/signed-integer
-	(TYPE-OR-STEM)
-	`(mmec--define-fits-function ,TYPE-OR-STEM mmec-signed-integer   mmec-sint64))
-       (mmec--define-fits-function/unsigned-integer
-	(TYPE-OR-STEM)
-	`(mmec--define-fits-function ,TYPE-OR-STEM mmec-unsigned-integer mmec-uint64))
-       (mmec--define-fits-function/floating-point
-	(TYPE-OR-STEM)
-	`(mmec--define-fits-function ,TYPE-OR-STEM mmec-floating-point   mmec-ldouble)))
+  (mmec--def/signed-integer	char)
+  (mmec--def/signed-integer	schar)
+  (mmec--def/unsigned-integer	uchar)
+  (mmec--def/unsigned-integer	wchar)
+  (mmec--def/signed-integer	sshrt)
+  (mmec--def/unsigned-integer	ushrt)
+  (mmec--def/signed-integer	sint)
+  (mmec--def/unsigned-integer	uint)
+  (mmec--def/signed-integer	slong)
+  (mmec--def/unsigned-integer	ulong)
+  (mmec--def/signed-integer	sllong)
+  (mmec--def/unsigned-integer	ullong)
+  (mmec--def/signed-integer	ssize)
+  (mmec--def/unsigned-integer	usize)
+  (mmec--def/signed-integer	sintmax)
+  (mmec--def/unsigned-integer	uintmax)
+  (mmec--def/signed-integer	ptrdiff)
+  (mmec--def/signed-integer	sint8)
+  (mmec--def/unsigned-integer	uint8)
+  (mmec--def/signed-integer	sint16)
+  (mmec--def/unsigned-integer	uint16)
+  (mmec--def/signed-integer	sint32)
+  (mmec--def/unsigned-integer	uint32)
+  (mmec--def/signed-integer	sint64)
+  (mmec--def/unsigned-integer	uint64)
+  (mmec--def/floating-point	float)
+  (mmec--def/floating-point	double)
+  (mmec--def/floating-point	ldouble))
 
-    (mmec--define-fits-function/signed-integer		char)
-    (mmec--define-fits-function/signed-integer		schar)
-    (mmec--define-fits-function/unsigned-integer	uchar)
-    (mmec--define-fits-function/unsigned-integer	wchar)
-    (mmec--define-fits-function/signed-integer		sshrt)
-    (mmec--define-fits-function/unsigned-integer	ushrt)
-    (mmec--define-fits-function/signed-integer		sint)
-    (mmec--define-fits-function/unsigned-integer	uint)
-    (mmec--define-fits-function/signed-integer		slong)
-    (mmec--define-fits-function/unsigned-integer	ulong)
-    (mmec--define-fits-function/signed-integer		sllong)
-    (mmec--define-fits-function/unsigned-integer	ullong)
-    (mmec--define-fits-function/signed-integer		ssize)
-    (mmec--define-fits-function/unsigned-integer	usize)
-    (mmec--define-fits-function/signed-integer		sintmax)
-    (mmec--define-fits-function/unsigned-integer	uintmax)
-    (mmec--define-fits-function/signed-integer		ptrdiff)
-    (mmec--define-fits-function/signed-integer		sint8)
-    (mmec--define-fits-function/unsigned-integer	uint8)
-    (mmec--define-fits-function/signed-integer		sint16)
-    (mmec--define-fits-function/unsigned-integer	uint16)
-    (mmec--define-fits-function/signed-integer		sint32)
-    (mmec--define-fits-function/unsigned-integer	uint32)
-    (mmec--define-fits-function/signed-integer		sint64)
-    (mmec--define-fits-function/unsigned-integer	uint64)
-    (mmec--define-fits-function/floating-point		float)
-    (mmec--define-fits-function/floating-point		double)
-    (mmec--define-fits-function/floating-point		ldouble)))
+
+;;;; printing
+
+(cl-defmethod cl-print-object ((obj mmec-char) stream)
+  (cl-print-object (format "#(mmec-char %d)" (mmec-char-obj obj))
+		   stream))
+
+
 
 
 ;;;; numeric comparison operations

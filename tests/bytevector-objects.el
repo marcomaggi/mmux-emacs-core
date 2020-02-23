@@ -24,6 +24,221 @@
 (require 'mmec)
 
 
+;;;; helpers
+
+(defmacro my--unsupported-type-error (TYPE UNSUPPORTED-TYPE INIT)
+  `(should (condition-case nil
+	       (,TYPE (,UNSUPPORTED-TYPE ,INIT))
+	     ((mmec-error-unsupported-init-type)
+	      t)
+	     (t nil))))
+
+(defmacro my--init-argument-does-not-fit (TYPE INIT)
+  `(should (condition-case nil
+	       (,TYPE ,INIT)
+	     ((mmec-error-value-out-of-range)
+	      t)
+	     (t nil))))
+
+
+;;;; bytevector makers
+
+(ert-deftest mmec-uint8-bytevector ()
+  "Build a `mmec-uint8-bytevector' object."
+  (should	(mmec-bytevector-p			(mmec-uint8-bytevector 123)))
+  (should	(mmec-integer-bytevector-p		(mmec-uint8-bytevector 123)))
+  (should (not	(mmec-floating-point-bytevector-p	(mmec-uint8-bytevector 123))))
+  (should	(mmec-uint8-bytevector-p		(mmec-uint8-bytevector 123)))
+  (should (not	(mmec-uint16-bytevector-p		(mmec-uint8-bytevector 123))))
+  (should (not	(mmec-uint32-bytevector-p		(mmec-uint8-bytevector 123))))
+  (should (not	(mmec-uint64-bytevector-p		(mmec-uint8-bytevector 123))))
+  (should (not	(mmec-sint8-bytevector-p		(mmec-uint8-bytevector 123))))
+  (should (not	(mmec-sint16-bytevector-p		(mmec-uint8-bytevector 123))))
+  (should (not	(mmec-sint32-bytevector-p		(mmec-uint8-bytevector 123))))
+  (should (not	(mmec-sint64-bytevector-p		(mmec-uint8-bytevector 123))))
+  (should (not	(mmec-float-bytevector-p		(mmec-uint8-bytevector 123))))
+  (should (not	(mmec-double-bytevector-p		(mmec-uint8-bytevector 123))))
+  (should (not	(mmec-ldouble-bytevector-p		(mmec-uint8-bytevector 123)))))
+
+(ert-deftest mmec-sint8-bytevector ()
+  "Build a `mmec-sint8-bytevector' object."
+  (should	(mmec-bytevector-p			(mmec-sint8-bytevector 123)))
+  (should	(mmec-integer-bytevector-p		(mmec-sint8-bytevector 123)))
+  (should (not	(mmec-floating-point-bytevector-p	(mmec-sint8-bytevector 123))))
+  (should (not	(mmec-uint8-bytevector-p		(mmec-sint8-bytevector 123))))
+  (should (not	(mmec-uint16-bytevector-p		(mmec-sint8-bytevector 123))))
+  (should (not	(mmec-uint32-bytevector-p		(mmec-sint8-bytevector 123))))
+  (should (not	(mmec-uint64-bytevector-p		(mmec-sint8-bytevector 123))))
+  (should 	(mmec-sint8-bytevector-p		(mmec-sint8-bytevector 123)))
+  (should (not	(mmec-sint16-bytevector-p		(mmec-sint8-bytevector 123))))
+  (should (not	(mmec-sint32-bytevector-p		(mmec-sint8-bytevector 123))))
+  (should (not	(mmec-sint64-bytevector-p		(mmec-sint8-bytevector 123))))
+  (should (not	(mmec-float-bytevector-p		(mmec-sint8-bytevector 123))))
+  (should (not	(mmec-double-bytevector-p		(mmec-sint8-bytevector 123))))
+  (should (not	(mmec-ldouble-bytevector-p		(mmec-sint8-bytevector 123)))))
+
+;;; --------------------------------------------------------------------
+
+(ert-deftest mmec-uint16-bytevector ()
+  "Build a `mmec-uint16-bytevector' object."
+  (should	(mmec-bytevector-p			(mmec-uint16-bytevector 123)))
+  (should	(mmec-integer-bytevector-p		(mmec-uint16-bytevector 123)))
+  (should (not	(mmec-floating-point-bytevector-p	(mmec-uint16-bytevector 123))))
+  (should (not	(mmec-uint8-bytevector-p		(mmec-uint16-bytevector 123))))
+  (should 	(mmec-uint16-bytevector-p		(mmec-uint16-bytevector 123)))
+  (should (not	(mmec-uint32-bytevector-p		(mmec-uint16-bytevector 123))))
+  (should (not	(mmec-uint64-bytevector-p		(mmec-uint16-bytevector 123))))
+  (should (not	(mmec-sint8-bytevector-p		(mmec-uint16-bytevector 123))))
+  (should (not	(mmec-sint16-bytevector-p		(mmec-uint16-bytevector 123))))
+  (should (not	(mmec-sint32-bytevector-p		(mmec-uint16-bytevector 123))))
+  (should (not	(mmec-sint64-bytevector-p		(mmec-uint16-bytevector 123))))
+  (should (not	(mmec-float-bytevector-p		(mmec-uint16-bytevector 123))))
+  (should (not	(mmec-double-bytevector-p		(mmec-uint16-bytevector 123))))
+  (should (not	(mmec-ldouble-bytevector-p		(mmec-uint16-bytevector 123)))))
+
+(ert-deftest mmec-sint16-bytevector ()
+  "Build a `mmec-sint16-bytevector' object."
+  (should	(mmec-bytevector-p			(mmec-sint16-bytevector 123)))
+  (should	(mmec-integer-bytevector-p		(mmec-sint16-bytevector 123)))
+  (should (not	(mmec-floating-point-bytevector-p	(mmec-sint16-bytevector 123))))
+  (should (not	(mmec-uint8-bytevector-p		(mmec-sint16-bytevector 123))))
+  (should (not	(mmec-uint16-bytevector-p		(mmec-sint16-bytevector 123))))
+  (should (not	(mmec-uint32-bytevector-p		(mmec-sint16-bytevector 123))))
+  (should (not	(mmec-uint64-bytevector-p		(mmec-sint16-bytevector 123))))
+  (should (not	(mmec-sint8-bytevector-p		(mmec-sint16-bytevector 123))))
+  (should 	(mmec-sint16-bytevector-p		(mmec-sint16-bytevector 123)))
+  (should (not	(mmec-sint32-bytevector-p		(mmec-sint16-bytevector 123))))
+  (should (not	(mmec-sint64-bytevector-p		(mmec-sint16-bytevector 123))))
+  (should (not	(mmec-float-bytevector-p		(mmec-sint16-bytevector 123))))
+  (should (not	(mmec-double-bytevector-p		(mmec-sint16-bytevector 123))))
+  (should (not	(mmec-ldouble-bytevector-p		(mmec-sint16-bytevector 123)))))
+
+;;; --------------------------------------------------------------------
+
+(ert-deftest mmec-uint32-bytevector ()
+  "Build a `mmec-uint32-bytevector' object."
+  (should	(mmec-bytevector-p			(mmec-uint32-bytevector 123)))
+  (should	(mmec-integer-bytevector-p		(mmec-uint32-bytevector 123)))
+  (should (not	(mmec-floating-point-bytevector-p	(mmec-uint32-bytevector 123))))
+  (should (not	(mmec-uint8-bytevector-p		(mmec-uint32-bytevector 123))))
+  (should (not	(mmec-uint16-bytevector-p		(mmec-uint32-bytevector 123))))
+  (should 	(mmec-uint32-bytevector-p		(mmec-uint32-bytevector 123)))
+  (should (not	(mmec-uint64-bytevector-p		(mmec-uint32-bytevector 123))))
+  (should (not	(mmec-sint8-bytevector-p		(mmec-uint32-bytevector 123))))
+  (should (not	(mmec-sint16-bytevector-p		(mmec-uint32-bytevector 123))))
+  (should (not	(mmec-sint32-bytevector-p		(mmec-uint32-bytevector 123))))
+  (should (not	(mmec-sint64-bytevector-p		(mmec-uint32-bytevector 123))))
+  (should (not	(mmec-float-bytevector-p		(mmec-uint32-bytevector 123))))
+  (should (not	(mmec-double-bytevector-p		(mmec-uint32-bytevector 123))))
+  (should (not	(mmec-ldouble-bytevector-p		(mmec-uint32-bytevector 123)))))
+
+(ert-deftest mmec-sint32-bytevector ()
+  "Build a `mmec-sint32-bytevector' object."
+  (should	(mmec-bytevector-p			(mmec-sint32-bytevector 123)))
+  (should	(mmec-integer-bytevector-p		(mmec-sint32-bytevector 123)))
+  (should (not	(mmec-floating-point-bytevector-p	(mmec-sint32-bytevector 123))))
+  (should (not	(mmec-uint8-bytevector-p		(mmec-sint32-bytevector 123))))
+  (should (not	(mmec-uint16-bytevector-p		(mmec-sint32-bytevector 123))))
+  (should (not	(mmec-uint32-bytevector-p		(mmec-sint32-bytevector 123))))
+  (should (not	(mmec-uint64-bytevector-p		(mmec-sint32-bytevector 123))))
+  (should (not 	(mmec-sint8-bytevector-p		(mmec-sint32-bytevector 123))))
+  (should (not	(mmec-sint16-bytevector-p		(mmec-sint32-bytevector 123))))
+  (should 	(mmec-sint32-bytevector-p		(mmec-sint32-bytevector 123)))
+  (should (not	(mmec-sint64-bytevector-p		(mmec-sint32-bytevector 123))))
+  (should (not	(mmec-float-bytevector-p		(mmec-sint32-bytevector 123))))
+  (should (not	(mmec-double-bytevector-p		(mmec-sint32-bytevector 123))))
+  (should (not	(mmec-ldouble-bytevector-p		(mmec-sint32-bytevector 123)))))
+
+;;; --------------------------------------------------------------------
+
+(ert-deftest mmec-uint64-bytevector ()
+  "Build a `mmec-uint64-bytevector' object."
+  (should	(mmec-bytevector-p			(mmec-uint64-bytevector 123)))
+  (should	(mmec-integer-bytevector-p		(mmec-uint64-bytevector 123)))
+  (should (not	(mmec-floating-point-bytevector-p	(mmec-uint64-bytevector 123))))
+  (should (not	(mmec-uint8-bytevector-p		(mmec-uint64-bytevector 123))))
+  (should (not	(mmec-uint16-bytevector-p		(mmec-uint64-bytevector 123))))
+  (should (not 	(mmec-uint32-bytevector-p		(mmec-uint64-bytevector 123))))
+  (should 	(mmec-uint64-bytevector-p		(mmec-uint64-bytevector 123)))
+  (should (not	(mmec-sint8-bytevector-p		(mmec-uint64-bytevector 123))))
+  (should (not	(mmec-sint16-bytevector-p		(mmec-uint64-bytevector 123))))
+  (should (not	(mmec-sint32-bytevector-p		(mmec-uint64-bytevector 123))))
+  (should (not	(mmec-sint64-bytevector-p		(mmec-uint64-bytevector 123))))
+  (should (not	(mmec-float-bytevector-p		(mmec-uint64-bytevector 123))))
+  (should (not	(mmec-double-bytevector-p		(mmec-uint64-bytevector 123))))
+  (should (not	(mmec-ldouble-bytevector-p		(mmec-uint64-bytevector 123)))))
+
+(ert-deftest mmec-sint64-bytevector ()
+  "Build a `mmec-642-bytevector' object."
+  (should	(mmec-bytevector-p			(mmec-sint64-bytevector 123)))
+  (should	(mmec-integer-bytevector-p		(mmec-sint64-bytevector 123)))
+  (should (not	(mmec-floating-point-bytevector-p	(mmec-sint64-bytevector 123))))
+  (should (not	(mmec-uint8-bytevector-p		(mmec-sint64-bytevector 123))))
+  (should (not	(mmec-uint16-bytevector-p		(mmec-sint64-bytevector 123))))
+  (should (not	(mmec-uint32-bytevector-p		(mmec-sint64-bytevector 123))))
+  (should (not	(mmec-uint64-bytevector-p		(mmec-sint64-bytevector 123))))
+  (should (not 	(mmec-sint8-bytevector-p		(mmec-sint64-bytevector 123))))
+  (should (not	(mmec-sint16-bytevector-p		(mmec-sint64-bytevector 123))))
+  (should (not 	(mmec-sint32-bytevector-p		(mmec-sint64-bytevector 123))))
+  (should 	(mmec-sint64-bytevector-p		(mmec-sint64-bytevector 123))))
+  (should (not	(mmec-float-bytevector-p		(mmec-sint64-bytevector 123))))
+  (should (not	(mmec-double-bytevector-p		(mmec-sint64-bytevector 123))))
+  (should (not	(mmec-ldouble-bytevector-p		(mmec-sint64-bytevector 123))))
+
+;;; --------------------------------------------------------------------
+
+(ert-deftest mmec-floating-point-bytevector ()
+  "Build a `mmec-float-bytevector' object."
+  (should	(mmec-bytevector-p			(mmec-float-bytevector 123)))
+  (should (not	(mmec-integer-bytevector-p		(mmec-float-bytevector 123))))
+  (should 	(mmec-floating-point-bytevector-p	(mmec-float-bytevector 123)))
+  (should (not	(mmec-uint8-bytevector-p		(mmec-float-bytevector 123))))
+  (should (not	(mmec-uint16-bytevector-p		(mmec-float-bytevector 123))))
+  (should (not	(mmec-uint32-bytevector-p		(mmec-float-bytevector 123))))
+  (should (not	(mmec-uint64-bytevector-p		(mmec-float-bytevector 123))))
+  (should (not	(mmec-sint8-bytevector-p		(mmec-float-bytevector 123))))
+  (should (not	(mmec-sint16-bytevector-p		(mmec-float-bytevector 123))))
+  (should (not	(mmec-sint32-bytevector-p		(mmec-float-bytevector 123))))
+  (should (not	(mmec-sint64-bytevector-p		(mmec-float-bytevector 123))))
+  (should 	(mmec-float-bytevector-p		(mmec-float-bytevector 123)))
+  (should (not	(mmec-double-bytevector-p		(mmec-float-bytevector 123))))
+  (should (not	(mmec-ldouble-bytevector-p		(mmec-float-bytevector 123)))))
+
+(ert-deftest mmec-double-bytevector ()
+  "Build a `mmec-double-bytevector' object."
+  (should	(mmec-bytevector-p			(mmec-double-bytevector 123)))
+  (should (not	(mmec-integer-bytevector-p		(mmec-double-bytevector 123))))
+  (should 	(mmec-floating-point-bytevector-p	(mmec-double-bytevector 123)))
+  (should (not	(mmec-uint8-bytevector-p		(mmec-double-bytevector 123))))
+  (should (not	(mmec-uint16-bytevector-p		(mmec-double-bytevector 123))))
+  (should (not	(mmec-uint32-bytevector-p		(mmec-double-bytevector 123))))
+  (should (not	(mmec-uint64-bytevector-p		(mmec-double-bytevector 123))))
+  (should (not	(mmec-sint8-bytevector-p		(mmec-double-bytevector 123))))
+  (should (not	(mmec-sint16-bytevector-p		(mmec-double-bytevector 123))))
+  (should (not	(mmec-sint32-bytevector-p		(mmec-double-bytevector 123))))
+  (should (not	(mmec-sint64-bytevector-p		(mmec-double-bytevector 123))))
+  (should (not	(mmec-float-bytevector-p		(mmec-double-bytevector 123))))
+  (should 	(mmec-double-bytevector-p		(mmec-double-bytevector 123)))
+  (should (not	(mmec-ldouble-bytevector-p		(mmec-double-bytevector 123)))))
+
+(ert-deftest mmec-ldouble-bytevector ()
+  "Build a `mmec-ldouble-bytevector' object."
+  (should	(mmec-bytevector-p			(mmec-ldouble-bytevector 123)))
+  (should (not	(mmec-integer-bytevector-p		(mmec-ldouble-bytevector 123))))
+  (should 	(mmec-floating-point-bytevector-p	(mmec-ldouble-bytevector 123)))
+  (should (not	(mmec-uint8-bytevector-p		(mmec-ldouble-bytevector 123))))
+  (should (not	(mmec-uint16-bytevector-p		(mmec-ldouble-bytevector 123))))
+  (should (not	(mmec-uint32-bytevector-p		(mmec-ldouble-bytevector 123))))
+  (should (not	(mmec-uint64-bytevector-p		(mmec-ldouble-bytevector 123))))
+  (should (not	(mmec-sint8-bytevector-p		(mmec-ldouble-bytevector 123))))
+  (should (not	(mmec-sint16-bytevector-p		(mmec-ldouble-bytevector 123))))
+  (should (not	(mmec-sint32-bytevector-p		(mmec-ldouble-bytevector 123))))
+  (should (not	(mmec-sint64-bytevector-p		(mmec-ldouble-bytevector 123))))
+  (should (not	(mmec-float-bytevector-p		(mmec-ldouble-bytevector 123))))
+  (should (not	(mmec-double-bytevector-p		(mmec-ldouble-bytevector 123))))
+  (should 	(mmec-ldouble-bytevector-p		(mmec-ldouble-bytevector 123))))
+
+
 ;;;; bytevector objects: getters and setters
 
 (cl-macrolet

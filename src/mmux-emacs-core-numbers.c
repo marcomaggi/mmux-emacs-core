@@ -541,6 +541,7 @@ MMEC_COMPARISON_OPERATIONS2(uint64, sint64)
 									\
       required_len = snprintf(buffer, 64, TEMPLATE, CASTER val);	\
       if (64 > required_len) {						\
+	if (0) { fprintf(stderr, "%s: %s\n", __func__, buffer); }	\
 	return mmec_new_emacs_value_string(env, buffer, required_len);	\
       }									\
     }									\

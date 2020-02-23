@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-23 15:22:40 marco>
+;; Time-stamp: <2020-02-23 16:42:26 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -2223,7 +2223,7 @@ argument is invalid."
 		(let* ((NUMTYPE		(mmec-sformat "mmec-%s" TYPESTEM))
 		       (OBJ-EXTRACTOR	(mmec-sformat "mmec-%s-obj" TYPESTEM))
 		       (DOCSTRING	(format "Print to a stream the representation of a number object of type `%s'." NUMTYPE))
-		       (CLANG-PRINTER	(mmec-sformat "mmec-c-%s-print-to-string" NUMTYPE)))
+		       (CLANG-PRINTER	(mmec-sformat "mmec-c-%s-print-to-string" TYPESTEM)))
 		  `(cl-defmethod cl-print-object ((obj mmec-char) stream)
 		     ,DOCSTRING
 		     (cl-print-object (,CLANG-PRINTER (,OBJ-EXTRACTOR obj)) stream)))))

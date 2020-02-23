@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <math.h>
+#include <inttypes.h>
 
 
 /** --------------------------------------------------------------------
@@ -522,10 +523,64 @@ MMEC_COMPARISON_OPERATIONS2(uint64, sint64)
 
 
 /** --------------------------------------------------------------------
+ ** Printing functions.
+ ** ----------------------------------------------------------------- */
+
+#undef  MMEC_DEFINE_PRINT_FUNCTION
+#define MMEC_DEFINE_PRINT_FUNCTION(STEM, TEMPLATE, CASTER)		\
+  emacs_value								\
+  Fmmec_c_ ## STEM ## _print_to_string (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED) \
+  {									\
+    assert(1 == nargs);							\
+    mmec_clang_ ## STEM ## _t	val = mmec_extract_clang_ ## STEM ## _from_emacs_value(env, args[0]); \
+    int				required_len = 0;			\
+									\
+    /* First attempt at writing the output. */				\
+    {									\
+      char	buffer[64];						\
+									\
+      required_len = snprintf(buffer, 64, TEMPLATE, CASTER val);	\
+      if (64 > required_len) {						\
+	return mmec_new_emacs_value_string(env, buffer, required_len);	\
+      }									\
+    }									\
+									\
+    /* Second attempt at writing the output.  We assume that this will succeed.  */ \
+    {									\
+      char	buffer[required_len];					\
+      int	this_len;						\
+									\
+      this_len = snprintf(buffer, required_len, TEMPLATE, CASTER val);	\
+      assert(this_len <= required_len);					\
+      return mmec_new_emacs_value_string(env, buffer, this_len);	\
+    }									\
+  }
+
+MMEC_DEFINE_PRINT_FUNCTION(wchar,	"#s(mmec-wchar %lu)"		, (unsigned long int))
+MMEC_DEFINE_PRINT_FUNCTION(sint,	"#s(mmec-sint %d)"		,)
+MMEC_DEFINE_PRINT_FUNCTION(uint,	"#s(mmec-uint %u)"		,)
+MMEC_DEFINE_PRINT_FUNCTION(slong,	"#s(mmec-slong %ld)"		,)
+MMEC_DEFINE_PRINT_FUNCTION(ulong,	"#s(mmec-ulong %lu)"		,)
+MMEC_DEFINE_PRINT_FUNCTION(sllong,	"#s(mmec-sllong %lld)"		,)
+MMEC_DEFINE_PRINT_FUNCTION(ullong,	"#s(mmec-ullong %llu)"		,)
+MMEC_DEFINE_PRINT_FUNCTION(sintmax,	"#s(mmec-sintmax %" PRIdMAX ")"	,)
+MMEC_DEFINE_PRINT_FUNCTION(uintmax,	"#s(mmec-uintmax %" PRIuMAX")"	,)
+MMEC_DEFINE_PRINT_FUNCTION(ssize,	"#s(mmec-ssize %lld)"		, (signed long long int))
+MMEC_DEFINE_PRINT_FUNCTION(usize,	"#s(mmec-usize %llu)"		, (unsigned long long int))
+MMEC_DEFINE_PRINT_FUNCTION(ptrdiff,	"#s(mmec-ptrdiff %lld)"		, (signed long long int))
+MMEC_DEFINE_PRINT_FUNCTION(sint32,	"#s(mmec-sint32 %" PRId32 ")"	,)
+MMEC_DEFINE_PRINT_FUNCTION(uint32,	"#s(mmec-uint32 %" PRIu32 ")"	,)
+MMEC_DEFINE_PRINT_FUNCTION(sint64,	"#s(mmec-sint64 %" PRId64 ")"	,)
+MMEC_DEFINE_PRINT_FUNCTION(uint64,	"#s(mmec-uint64 %" PRIu64 ")"	,)
+MMEC_DEFINE_PRINT_FUNCTION(float,	"#s(mmec-float %f)"		, (double))
+MMEC_DEFINE_PRINT_FUNCTION(ldouble,	"#s(mmec-ldouble %Lf)"		,)
+
+
+/** --------------------------------------------------------------------
  ** Elisp functions table.
  ** ----------------------------------------------------------------- */
 
-#define NUMBER_OF_MODULE_FUNCTIONS	115
+#define NUMBER_OF_MODULE_FUNCTIONS	133
 static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNCTIONS] = {
   /* Constructors  for  custom number  objects  whose  internal representation  is  a
      built-in "integer" object. */
@@ -1357,6 +1412,135 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `ldouble'.",
+  },
+
+  /* Number  printers for  number  types  having a  user-pointer  object as  internal
+     representation. */
+  {
+    .name		= "mmec-c-wchar-print-to-string",
+    .implementation	= Fmmec_c_wchar_print_to_string,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Print to string a user-pointer object of type `wchar'.",
+  },
+  {
+    .name		= "mmec-c-sint-print-to-string",
+    .implementation	= Fmmec_c_sint_print_to_string,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Print to string a user-pointer object of type `sint'.",
+  },
+  {
+    .name		= "mmec-c-uint-print-to-string",
+    .implementation	= Fmmec_c_uint_print_to_string,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Print to string a user-pointer object of type `uint'.",
+  },
+  {
+    .name		= "mmec-c-slong-print-to-string",
+    .implementation	= Fmmec_c_slong_print_to_string,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Print to string a user-pointer object of type `slong'.",
+  },
+  {
+    .name		= "mmec-c-ulong-print-to-string",
+    .implementation	= Fmmec_c_ulong_print_to_string,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Print to string a user-pointer object of type `ulong'.",
+  },
+  {
+    .name		= "mmec-c-sllong-print-to-string",
+    .implementation	= Fmmec_c_sllong_print_to_string,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Print to string a user-pointer object of type `sllong'.",
+  },
+  {
+    .name		= "mmec-c-ullong-print-to-string",
+    .implementation	= Fmmec_c_ullong_print_to_string,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Print to string a user-pointer object of type `ullong'.",
+  },
+  {
+    .name		= "mmec-c-sintmax-print-to-string",
+    .implementation	= Fmmec_c_sintmax_print_to_string,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Print to string a user-pointer object of type `sintmax'.",
+  },
+  {
+    .name		= "mmec-c-uintmax-print-to-string",
+    .implementation	= Fmmec_c_uintmax_print_to_string,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Print to string a user-pointer object of type `uintmax'.",
+  },
+  {
+    .name		= "mmec-c-ssize-print-to-string",
+    .implementation	= Fmmec_c_ssize_print_to_string,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Print to string a user-pointer object of type `ssize'.",
+  },
+  {
+    .name		= "mmec-c-usize-print-to-string",
+    .implementation	= Fmmec_c_usize_print_to_string,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Print to string a user-pointer object of type `usize'.",
+  },
+  {
+    .name		= "mmec-c-ptrdiff-print-to-string",
+    .implementation	= Fmmec_c_ptrdiff_print_to_string,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Print to string a user-pointer object of type `ptrdiff'.",
+  },
+  {
+    .name		= "mmec-c-sint32-print-to-string",
+    .implementation	= Fmmec_c_sint32_print_to_string,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Print to string a user-pointer object of type `sint32'.",
+  },
+  {
+    .name		= "mmec-c-uint32-print-to-string",
+    .implementation	= Fmmec_c_uint32_print_to_string,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Print to string a user-pointer object of type `uint32'.",
+  },
+  {
+    .name		= "mmec-c-sint64-print-to-string",
+    .implementation	= Fmmec_c_sint64_print_to_string,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Print to string a user-pointer object of type `sint64'.",
+  },
+  {
+    .name		= "mmec-c-uint64-print-to-string",
+    .implementation	= Fmmec_c_uint64_print_to_string,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Print to string a user-pointer object of type `uint64'.",
+  },
+  {
+    .name		= "mmec-c-float-print-to-string",
+    .implementation	= Fmmec_c_float_print_to_string,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Print to string a user-pointer object of type `float'.",
+  },
+  {
+    .name		= "mmec-c-ldouble-print-to-string",
+    .implementation	= Fmmec_c_ldouble_print_to_string,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Print to string a user-pointer object of type `ldouble'.",
   },
 };
 

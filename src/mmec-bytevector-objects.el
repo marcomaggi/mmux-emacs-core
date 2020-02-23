@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-23 07:43:14 marco>
+;; Time-stamp: <2020-02-23 12:36:50 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -91,10 +91,10 @@
 ;;;; bytevector type definitions
 
 (defmacro mmec--define-bytevector-type (TYPESTEM PARENT-STEM)
-  (let* ((BYTEVECTOR-TYPE		(intern (format "mmec-%s-bytevector" TYPESTEM)))
-	 (BYTEVECTOR-TYPE-MAKER	(intern (format "mmec-%s-bytevector--make" TYPESTEM)))
-	 (PARENT-BYTEVECTOR-TYPE	(intern (format "mmec-%s-bytevector" PARENT-STEM)))
-	 (SIZEOF-SLOT		(intern (format "mmec-sizeof-%s" TYPESTEM)))
+  (let* ((BYTEVECTOR-TYPE		(mmec-sformat "mmec-%s-bytevector"		TYPESTEM))
+	 (BYTEVECTOR-TYPE-MAKER		(mmec-sformat "mmec-%s-bytevector--make"	TYPESTEM))
+	 (PARENT-BYTEVECTOR-TYPE	(mmec-sformat "mmec-%s-bytevector"		PARENT-STEM))
+	 (SIZEOF-SLOT			(mmec-sformat "mmec-sizeof-%s"			TYPESTEM))
 	 (SIGNED-BOOL		(cl-case PARENT-STEM
 				  (signed-integer	't)
 				  (unsigned-integer	'nil)
@@ -189,8 +189,8 @@ slots in the bytevector BV.")
 
 (cl-macrolet
     ((mmec--defgetter (TYPESTEM CTYPE)
-		      (let* ((TYPESTEM.str		(symbol-name TYPESTEM))
-			     (NUMTYPE.str		(concat "mmec-" TYPESTEM.str))
+		      (let* ((TYPESTEM.str	(symbol-name TYPESTEM))
+			     (NUMTYPE.str	(concat "mmec-" TYPESTEM.str))
 			     (NUMTYPE		(intern NUMTYPE.str))
 			     (BYTEVECTOR-TYPE	(intern (concat "mmec-" TYPESTEM.str "-bytevector")))
 			     (DOCSTRING		(concat "Extract a value of type `" CTYPE "' from the bytevector BV at index IDX."))
@@ -201,8 +201,8 @@ slots in the bytevector BV.")
 			   (mmec--make ,NUMTYPE :obj (,C-FUNC (mmec-bytevector-obj bv) idx)))))
 
      (mmec--defsetter (TYPESTEM CTYPE)
-		      (let* ((TYPESTEM.str		(symbol-name TYPESTEM))
-			     (NUMTYPE.str		(concat "mmec-" TYPESTEM.str))
+		      (let* ((TYPESTEM.str	(symbol-name TYPESTEM))
+			     (NUMTYPE.str	(concat "mmec-" TYPESTEM.str))
 			     (NUMTYPE		(intern NUMTYPE.str))
 			     (BYTEVECTOR-TYPE	(intern (concat "mmec-" TYPESTEM.str "-bytevector")))
 			     (DOCSTRING		(concat "Store a value VAL of type `" CTYPE "' into the bytevector BV at index IDX."))
@@ -217,14 +217,14 @@ slots in the bytevector BV.")
 				    (mmec--defgetter ,TYPESTEM ,CTYPE)
 				    (mmec--defsetter ,TYPESTEM ,CTYPE))))
 
-  (mmec--defgetter-and-setter char		"char")
+  (mmec--defgetter-and-setter char	"char")
   (mmec--defgetter-and-setter schar	"signed char")
   (mmec--defgetter-and-setter uchar	"unsigned char")
   (mmec--defgetter-and-setter wchar	"wchar_t")
   (mmec--defgetter-and-setter sshrt	"signed shrt int")
   (mmec--defgetter-and-setter ushrt	"unsigned shrt int")
-  (mmec--defgetter-and-setter sint		"signed int")
-  (mmec--defgetter-and-setter uint		"unsigned int")
+  (mmec--defgetter-and-setter sint	"signed int")
+  (mmec--defgetter-and-setter uint	"unsigned int")
   (mmec--defgetter-and-setter slong	"signed long int")
   (mmec--defgetter-and-setter ulong	"unsigned long int")
   (mmec--defgetter-and-setter sllong	"signed long long int")
@@ -252,8 +252,8 @@ slots in the bytevector BV.")
 ;;; API functions
 (cl-macrolet
     ((mmec--def (FUNCSTEM RESULT-DOCSTRING)
-		(let* ((FUNCNAME	(intern (format "mmec-bytevector-%s"   FUNCSTEM)))
-		       (FUNCNAME-6	(intern (format "mmec-bytevector-%s-6" FUNCSTEM)))
+		(let* ((FUNCNAME	(mmec-sformat "mmec-bytevector-%s"   FUNCSTEM))
+		       (FUNCNAME-6	(mmec-sformat "mmec-bytevector-%s-6" FUNCSTEM))
 		       (DOCSTRING	(format "Compare the two bytevectors BV1 and BV2.
 
 This function is an adapter for the generic function `%s' and return its
@@ -361,7 +361,7 @@ index START, included, and ending at slot index PAST, excluded.
 
 (cl-macrolet
     ((mmec--def (FUNCSTEM)
-		(let* ((FUNCNAME (intern (format "mmec-bytevector-%s-6" FUNCSTEM))))
+		(let* ((FUNCNAME (mmec-sformat "mmec-bytevector-%s-6" FUNCSTEM)))
 		  `(cl-defgeneric ,FUNCNAME (bv1 start1 past1 bv2 start2 past2)
 		     "Compare the selected spans in the bytevectors BV1 and BV2: return true or false.
 
@@ -380,13 +380,13 @@ the    same    as   in    the    call    to   the    generic    function
 
 (cl-macrolet
     ((mmec--def (TYPESTEM)
-		(let* ((BV-TYPE		(intern (format "mmec-%s-bytevector" TYPESTEM)))
-		       (CFUNC-COMPARE		(intern (format "mmec-c-%s-bytevector-compare"	TYPESTEM)))
-		       (CFUNC-EQUAL		(intern (format "mmec-c-%s-bytevector-equal"	TYPESTEM)))
-		       (CFUNC-LESS		(intern (format "mmec-c-%s-bytevector-less"	TYPESTEM)))
-		       (CFUNC-GREATER		(intern (format "mmec-c-%s-bytevector-greater"	TYPESTEM)))
-		       (CFUNC-LEQ		(intern (format "mmec-c-%s-bytevector-leq"	TYPESTEM)))
-		       (CFUNC-GEQ		(intern (format "mmec-c-%s-bytevector-geq"	TYPESTEM))))
+		(let* ((BV-TYPE		(mmec-sformat "mmec-%s-bytevector"		TYPESTEM))
+		       (CFUNC-COMPARE	(mmec-sformat "mmec-c-%s-bytevector-compare"	TYPESTEM))
+		       (CFUNC-EQUAL	(mmec-sformat "mmec-c-%s-bytevector-equal"	TYPESTEM))
+		       (CFUNC-LESS	(mmec-sformat "mmec-c-%s-bytevector-less"	TYPESTEM))
+		       (CFUNC-GREATER	(mmec-sformat "mmec-c-%s-bytevector-greater"	TYPESTEM))
+		       (CFUNC-LEQ	(mmec-sformat "mmec-c-%s-bytevector-leq"	TYPESTEM))
+		       (CFUNC-GEQ	(mmec-sformat "mmec-c-%s-bytevector-geq"	TYPESTEM)))
 		  `(progn
 		     (cl-defmethod mmec-bytevector-compare-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
 							      (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
@@ -500,7 +500,7 @@ Return the following code:
 
 ;;;; bytevector objects: conversion to/from list
 
-(cl-defgeneric mmec-bytevector-to-list (LIST)
+(cl-defgeneric mmec-bytevector-to-list (bv)
   "Convert a bytevector object into a list of its elements.")
 
 (cl-defmethod mmec-bytevector-to-list ((bv mmec-bytevector))
@@ -508,47 +508,110 @@ Return the following code:
 	   collect (mmec-bytevector-ref bv i)))
 
 (cl-macrolet
-    ((mmec--define-bytevector-from-list
-      (TYPESTEM)
-      (let* ((TYPE		(intern (format "mmec-%s" TYPESTEM)))
-	     (CONSTRUCTOR	(intern (format "mmec-%s-bytevector" TYPESTEM)))
-	     (FUNC		(intern (format "mmec-%s-bytevector-from-list" TYPESTEM))))
-	`(cl-defmethod ,FUNC ((ELL list))
-	   "Build a bytevector object taking elements from a list."
-	   (let ((bv (,CONSTRUCTOR (length ELL))))
-	     (cl-loop for elt in ELL
-		      for i from 0
-		      do (mmec-bytevector-set bv i (,TYPE elt)))
-	     bv)))))
+    ((mmec--def (TYPESTEM)
+		(let* ((NUMTYPE		(mmec-sformat "mmec-%s" TYPESTEM))
+		       (BVTYPE		(mmec-sformat "mmec-%s-bytevector" TYPESTEM))
+		       (CONSTRUCTOR	BVTYPE)
+		       (FUNC		(mmec-sformat "mmec-%s-bytevector-from-list" TYPESTEM))
+		       (DOCSTRING	(format "Convert a list object into a bytevector object of type `%s'." BVTYPE)))
+		  `(progn
+		     (cl-defgeneric ,FUNC (ELL)
+		       ,DOCSTRING)
+		     (cl-defmethod  ,FUNC ((ELL list))
+		       ,DOCSTRING
+		       (cl-loop with bv = (,CONSTRUCTOR (length ELL))
+				for elt in ELL
+				for i from 0
+				do (mmec-bytevector-set bv i (,NUMTYPE elt))
+				finally (return bv)))
+		     ))))
+  (mmec--def char)
+  (mmec--def schar)
+  (mmec--def uchar)
+  (mmec--def wchar)
+  (mmec--def sshrt)
+  (mmec--def ushrt)
+  (mmec--def sint)
+  (mmec--def uint)
+  (mmec--def slong)
+  (mmec--def ulong)
+  (mmec--def sllong)
+  (mmec--def ullong)
+  (mmec--def sintmax)
+  (mmec--def uintmax)
+  (mmec--def ssize)
+  (mmec--def usize)
+  (mmec--def ptrdiff)
+  (mmec--def sint8)
+  (mmec--def uint8)
+  (mmec--def sint16)
+  (mmec--def uint16)
+  (mmec--def sint32)
+  (mmec--def uint32)
+  (mmec--def sint64)
+  (mmec--def uint64)
+  (mmec--def float)
+  (mmec--def double)
+  (mmec--def ldouble))
 
-  (mmec--define-bytevector-from-list char)
-  (mmec--define-bytevector-from-list schar)
-  (mmec--define-bytevector-from-list uchar)
-  (mmec--define-bytevector-from-list wchar)
-  (mmec--define-bytevector-from-list sshrt)
-  (mmec--define-bytevector-from-list ushrt)
-  (mmec--define-bytevector-from-list sint)
-  (mmec--define-bytevector-from-list uint)
-  (mmec--define-bytevector-from-list slong)
-  (mmec--define-bytevector-from-list ulong)
-  (mmec--define-bytevector-from-list sllong)
-  (mmec--define-bytevector-from-list ullong)
-  (mmec--define-bytevector-from-list sintmax)
-  (mmec--define-bytevector-from-list uintmax)
-  (mmec--define-bytevector-from-list ssize)
-  (mmec--define-bytevector-from-list usize)
-  (mmec--define-bytevector-from-list ptrdiff)
-  (mmec--define-bytevector-from-list sint8)
-  (mmec--define-bytevector-from-list uint8)
-  (mmec--define-bytevector-from-list sint16)
-  (mmec--define-bytevector-from-list uint16)
-  (mmec--define-bytevector-from-list sint32)
-  (mmec--define-bytevector-from-list uint32)
-  (mmec--define-bytevector-from-list sint64)
-  (mmec--define-bytevector-from-list uint64)
-  (mmec--define-bytevector-from-list float)
-  (mmec--define-bytevector-from-list double)
-  (mmec--define-bytevector-from-list ldouble))
+
+;;;; bytevector objects: conversion to/from vector
+
+(cl-defgeneric mmec-bytevector-to-vector (bv)
+  "Convert a bytevector object into a vector of its elements.")
+
+(cl-defmethod mmec-bytevector-to-vector ((bv mmec-bytevector))
+  (cl-loop with vec = (make-vector (mmec-bytevector-number-of-slots bv) nil)
+	   for i from 0 to (mmec-bytevector-last-slot-index bv)
+	   do (setf (elt vec i) (mmec-bytevector-ref bv i))
+	   finally (return vec)))
+
+(cl-macrolet
+    ((mmec--def (TYPESTEM)
+		(let* ((NUMTYPE		(mmec-sformat "mmec-%s"				TYPESTEM))
+		       (BVTYPE		(mmec-sformat "mmec-%s-bytevector"		TYPESTEM))
+		       (FUNC		(mmec-sformat "mmec-%s-bytevector-from-vector"	TYPESTEM))
+		       (CONSTRUCTOR	BVTYPE)
+		       (DOCSTRING	(format "Convert a vector object into a bytevector object of type `%s'." BVTYPE)))
+		  `(progn
+		     (cl-defgeneric ,FUNC (VEC)
+		       ,DOCSTRING)
+		     (cl-defmethod  ,FUNC ((VEC vector))
+		       ,DOCSTRING
+		       (cl-loop with bv = (,CONSTRUCTOR (length VEC))
+				for elt across VEC
+		     		for i from 0
+		     		do (mmec-bytevector-set bv i (,NUMTYPE elt))
+				finally (return bv)))
+		     ))))
+  (mmec--def char)
+  (mmec--def schar)
+  (mmec--def uchar)
+  (mmec--def wchar)
+  (mmec--def sshrt)
+  (mmec--def ushrt)
+  (mmec--def sint)
+  (mmec--def uint)
+  (mmec--def slong)
+  (mmec--def ulong)
+  (mmec--def sllong)
+  (mmec--def ullong)
+  (mmec--def sintmax)
+  (mmec--def uintmax)
+  (mmec--def ssize)
+  (mmec--def usize)
+  (mmec--def ptrdiff)
+  (mmec--def sint8)
+  (mmec--def uint8)
+  (mmec--def sint16)
+  (mmec--def uint16)
+  (mmec--def sint32)
+  (mmec--def uint32)
+  (mmec--def sint64)
+  (mmec--def uint64)
+  (mmec--def float)
+  (mmec--def double)
+  (mmec--def ldouble))
 
 
 ;;;; done

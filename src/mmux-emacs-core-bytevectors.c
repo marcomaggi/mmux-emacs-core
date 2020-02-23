@@ -249,7 +249,7 @@ MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(ldouble)
  ** ----------------------------------------------------------------- */
 
 static int
-mmec_intrep_bytevector_check_comparion_spans (mmec_intrep_bytevector_t const * const src, intmax_t const src_start, intmax_t const src_past,
+mmec_intrep_bytevector_check_comparison_spans (mmec_intrep_bytevector_t const * const src, intmax_t const src_start, intmax_t const src_past,
 					      mmec_intrep_bytevector_t const * const dst, intmax_t const dst_start, intmax_t const dst_past)
 {
   assert(src->slot_size          == dst->slot_size);
@@ -332,16 +332,21 @@ mmec_execute_bytevector_comparison (emacs_env *env, ptrdiff_t nargs, emacs_value
   (mmec_intrep_bytevector_t const * const src, intmax_t const src_start, intmax_t const src_past, \
    mmec_intrep_bytevector_t const * const dst, intmax_t const dst_start, intmax_t const dst_past) \
   {									\
-    int rv = mmec_intrep_bytevector_check_comparion_spans(src, src_start, src_past, \
-							  dst, dst_start, dst_past); \
+    int rv = mmec_intrep_bytevector_check_comparison_spans(src, src_start, src_past, \
+							   dst, dst_start, dst_past); \
     if (0 == rv) {							\
       MMEC_PC(mmec_clang_ ## TYPESTEM ## _t, src_ptr, src->ptr);	\
       MMEC_PC(mmec_clang_ ## TYPESTEM ## _t, dst_ptr, dst->ptr);	\
 									\
       for (intmax_t i=src_start, j=dst_start; i<src_past; ++i, ++j) {	\
-	if (src_ptr[i] > dst_ptr[i]) {					\
+	if (0) {							\
+	  fprintf(stderr, "%s: src[%ld]=%ld, dst[%ld]=%ld\n", __func__,	\
+		  i, (long)(src_ptr[i]),				\
+		  j, (long)(dst_ptr[j]));				\
+	}								\
+	if (src_ptr[i] > dst_ptr[j]) {					\
 	  return +1;							\
-	} else if (src_ptr[i] < dst_ptr[i]) {				\
+	} else if (src_ptr[i] < dst_ptr[j]) {				\
 	  return -1;							\
 	}								\
       }									\

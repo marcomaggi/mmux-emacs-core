@@ -2390,6 +2390,16 @@ comparison condition is true; otherwise return @cfalse{}.
 @section Converting bytevectors to/from other sequence objects
 
 
+@menu
+* bytevec conversion list::     Converting bytevectors to/from lists.
+* bytevec conversion vector::   Converting bytevectors to/from vectors.
+@end menu
+
+@c page
+@node bytevec conversion list
+@subsection Converting bytevectors to/from lists
+
+
 @deffn {Generic Function} mmec-bytevector-to-list @var{BV}
 Convert an object of type @objtype{mmec-bytevector} to or from a list of its elements.
 @end deffn
@@ -2434,6 +2444,56 @@ elements.
 @ElispConvertBytevectorToFromList{float}
 @ElispConvertBytevectorToFromList{double}
 @ElispConvertBytevectorToFromList{ldouble}
+
+@c page
+@node bytevec conversion vector
+@subsection Converting bytevectors to/from vectors
+
+
+@deffn {Generic Function} mmec-bytevector-to-vector @var{BV}
+Convert an object of type @objtype{mmec-bytevector} to or from a vector of its elements.
+@end deffn
+
+
+@macro ElispConvertBytevectorToFromVector{TYPESTEM}
+@deffn {Generic Function} mmec-\TYPESTEM\-bytevector-from-vector @var{VECTOR}
+@deffnx {Method} mmec-\TYPESTEM\-bytevector-from-vector (@var{VECTOR} vector)
+@deffnx {Method} mmec-bytevector-to-vector (@var{BV} mmec-\TYPESTEM\-bytevector)
+Convert a bytevector object of type @objtype{mmec-\TYPESTEM\-bytevector} to/from a vector of its
+elements.
+@end deffn
+
+@end macro
+
+
+@ElispConvertBytevectorToFromVector{char}
+@ElispConvertBytevectorToFromVector{schar}
+@ElispConvertBytevectorToFromVector{uchar}
+@ElispConvertBytevectorToFromVector{wchar}
+@ElispConvertBytevectorToFromVector{sshrt}
+@ElispConvertBytevectorToFromVector{ushrt}
+@ElispConvertBytevectorToFromVector{sint}
+@ElispConvertBytevectorToFromVector{uint}
+@ElispConvertBytevectorToFromVector{slong}
+@ElispConvertBytevectorToFromVector{ulong}
+@ElispConvertBytevectorToFromVector{sllong}
+@ElispConvertBytevectorToFromVector{ullong}
+@ElispConvertBytevectorToFromVector{sintmax}
+@ElispConvertBytevectorToFromVector{uintmax}
+@ElispConvertBytevectorToFromVector{ssize}
+@ElispConvertBytevectorToFromVector{usize}
+@ElispConvertBytevectorToFromVector{ptrdiff}
+@ElispConvertBytevectorToFromVector{sint8}
+@ElispConvertBytevectorToFromVector{uint8}
+@ElispConvertBytevectorToFromVector{sint16}
+@ElispConvertBytevectorToFromVector{uint16}
+@ElispConvertBytevectorToFromVector{sint32}
+@ElispConvertBytevectorToFromVector{uint32}
+@ElispConvertBytevectorToFromVector{sint64}
+@ElispConvertBytevectorToFromVector{uint64}
+@ElispConvertBytevectorToFromVector{float}
+@ElispConvertBytevectorToFromVector{double}
+@ElispConvertBytevectorToFromVector{ldouble}
 
 @c page
 @node errors

@@ -19,182 +19,123 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'ert)
 (require 'mmec)
 
 
 ;;;; bytevector objects: getters and setters
 
-(ert-deftest mmec-uint8-bytevector ()
-  "Setters and getters for a `mmec-uint8-bytevector' object."
-  (let ((bv	(mmec-uint8-bytevector 10)))
-    (dotimes (i 10)
-      (mmec-bytevector-set bv i (mmec-uint8 (+ 10 i))))
-    (dotimes (i 10)
-      (should (mmec= (mmec-uint8 (+ 10 i))
-		     (mmec-bytevector-ref bv i))))))
-
-(ert-deftest mmec-sint8-bytevector ()
-  "Setters and getters for a `mmec-sint8-bytevector' object."
-  (let ((bv	(mmec-sint8-bytevector 10)))
-    (dotimes (i 10)
-      (mmec-bytevector-set bv i (mmec-sint8 (+ -10 i))))
-    (dotimes (i 10)
-      (should (mmec= (mmec-sint8 (+ -10 i))
-		     (mmec-bytevector-ref bv i))))))
-
-;;; --------------------------------------------------------------------
-
-(ert-deftest mmec-uint16-bytevector ()
-  "Setters and getters for a `mmec-uint16-bytevector' object."
-  (let ((bv	(mmec-uint16-bytevector 10)))
-    (dotimes (i 10)
-      (mmec-bytevector-set bv i (mmec-uint16 (+ 10 i))))
-    (dotimes (i 10)
-      (should (mmec= (mmec-uint16 (+ 10 i))
-		     (mmec-bytevector-ref bv i))))))
-
-(ert-deftest mmec-sint16-bytevector ()
-  "Setters and getters for a `mmec-sint16-bytevector' object."
-  (let ((bv	(mmec-sint16-bytevector 10)))
-    (dotimes (i 10)
-      (mmec-bytevector-set bv i (mmec-sint16 (+ -10 i))))
-    (dotimes (i 10)
-      (should (mmec= (mmec-sint16 (+ -10 i))
-		     (mmec-bytevector-ref bv i))))))
-
-;;; --------------------------------------------------------------------
-
-(ert-deftest mmec-uint32-bytevector ()
-  "Setters and getters for a `mmec-uint32-bytevector' object."
-  (let ((bv	(mmec-uint32-bytevector 10)))
-    (dotimes (i 10)
-      (mmec-bytevector-set bv i (mmec-uint32 (+ 10 i))))
-    (dotimes (i 10)
-      (should (mmec= (mmec-uint32 (+ 10 i))
-		     (mmec-bytevector-ref bv i))))
-    nil))
-
-(ert-deftest mmec-sint32-bytevector ()
-  "Setters and getters for a `mmec-sint32-bytevector' object."
-  (let ((bv	(mmec-sint32-bytevector 10)))
-    (dotimes (i 10)
-      (mmec-bytevector-set bv i (mmec-sint32 (+ -10 i))))
-    (dotimes (i 10)
-      (should (mmec= (mmec-sint32 (+ -10 i))
-		     (mmec-bytevector-ref bv i))))))
-
-;;; --------------------------------------------------------------------
-
-(ert-deftest mmec-uint64-bytevector ()
-  "Setters and getters for a `mmec-uint64-bytevector' object."
-  (let ((bv	(mmec-uint64-bytevector 10)))
-    (dotimes (i 10)
-      (mmec-bytevector-set bv i (mmec-uint64 (+ 10 i))))
-    (dotimes (i 10)
-      (should (mmec= (mmec-uint64 (+ 10 i))
-		     (mmec-bytevector-ref bv i))))))
-
-(ert-deftest mmec-sint64-bytevector ()
-  "Setters and getters for a `mmec-sint64-bytevector' object."
-  (let ((bv	(mmec-sint64-bytevector 10)))
-    (dotimes (i 10)
-      (mmec-bytevector-set bv i (mmec-sint64 (+ -10 i))))
-    (dotimes (i 10)
-      (should (mmec= (mmec-sint64 (+ -10 i))
-		     (mmec-bytevector-ref bv i))))))
+(cl-macrolet
+    ((mmec--def (TYPESTEM)
+		(let* ((TESTNAME	(mmec-sformat "mmec-%s-bytevector-test" TYPESTEM))
+		       (NUMTYPE		(mmec-sformat "mmec-%s" TYPESTEM))
+		       (BVTYPE		(mmec-sformat "mmec-%s-bytevector" TYPESTEM))
+		       (DOCSTRING	(format "Test setters and getters for a `%s' object." BVTYPE)))
+		  `(ert-deftest ,TESTNAME ()
+		     ,DOCSTRING
+		     (let ((bv	(,BVTYPE 10)))
+		       (dotimes (i 10)
+			 (mmec-bytevector-set bv i (,NUMTYPE (+ 10 i))))
+		       (dotimes (i 10)
+			 (should (mmec= (,NUMTYPE (+ 10 i))
+					(mmec-bytevector-ref bv i)))))))))
+  (mmec--def char)
+  (mmec--def schar)
+  (mmec--def uchar)
+  (mmec--def wchar)
+  (mmec--def sshrt)
+  (mmec--def ushrt)
+  (mmec--def sint)
+  (mmec--def uint)
+  (mmec--def slong)
+  (mmec--def ulong)
+  (mmec--def sllong)
+  (mmec--def ullong)
+  (mmec--def sintmax)
+  (mmec--def uintmax)
+  (mmec--def ssize)
+  (mmec--def usize)
+  (mmec--def ptrdiff)
+  (mmec--def sint8)
+  (mmec--def uint8)
+  (mmec--def sint16)
+  (mmec--def uint16)
+  (mmec--def sint32)
+  (mmec--def uint32)
+  (mmec--def sint64)
+  (mmec--def uint64)
+  (mmec--def float)
+  (mmec--def double)
+  (mmec--def ldouble))
 
 
 ;;;; slots inspection
 
-(ert-deftest mmec-uint8-bytevector-slots ()
-  "Inspect the slots of a `mmec-uint8-bytevector' object."
-  (let ((bv	(mmec-uint8-bytevector 10)))
-    (should (= 10 (mmec-bytevector-number-of-slots bv)))
-    (should (= 1 (mmec-bytevector-slot-size bv)))
-    (should (= (* 10 1) (mmec-bytevector-number-of-allocated-bytes bv)))
-    (should (not (mmec-integer-bytevector-signed bv)))))
+(cl-macrolet
+    ((mmec--def (TYPESTEM)
+		(let* ((TESTNAME	(mmec-sformat "mmec-%s-bytevector-slots-test" TYPESTEM))
+		       (NUMTYPE		(mmec-sformat "mmec-%s" TYPESTEM))
+		       (BVTYPE		(mmec-sformat "mmec-%s-bytevector" TYPESTEM))
+		       (SLOTSIZE	(mmec-sformat "mmec-sizeof-%s" TYPESTEM))
+		       (ISSIGNED	(mmec-sformat "mmec-%s-is-signed" TYPESTEM))
+		       (DOCSTRING	(format "Test inspecting the slots number and size of a `%s' object." BVTYPE)))
+		  `(ert-deftest ,TESTNAME ()
+		     ,DOCSTRING
+		     (let ((bv	(,BVTYPE 10)))
+		       (should (= 10 (mmec-bytevector-number-of-slots bv)))
+		       (should (= ,SLOTSIZE (mmec-bytevector-slot-size bv)))
+		       (should (= (* 10 ,SLOTSIZE) (mmec-bytevector-number-of-allocated-bytes bv)))
+		       (should (equal ,ISSIGNED (mmec-bytevector-signed-p bv))))))))
+  (mmec--def char)
+  (mmec--def schar)
+  (mmec--def uchar)
+  (mmec--def wchar)
+  (mmec--def sshrt)
+  (mmec--def ushrt)
+  (mmec--def sint)
+  (mmec--def uint)
+  (mmec--def slong)
+  (mmec--def ulong)
+  (mmec--def sllong)
+  (mmec--def ullong)
+  (mmec--def sintmax)
+  (mmec--def uintmax)
+  (mmec--def ssize)
+  (mmec--def usize)
+  (mmec--def ptrdiff)
+  (mmec--def sint8)
+  (mmec--def uint8)
+  (mmec--def sint16)
+  (mmec--def uint16)
+  (mmec--def sint32)
+  (mmec--def uint32)
+  (mmec--def sint64)
+  (mmec--def uint64)
+  (mmec--def float)
+  (mmec--def double)
+  (mmec--def ldouble))
 
-(ert-deftest mmec-uint16-bytevector-slots ()
-  "Inspect the slots of a `mmec-uint16-bytevector' object."
-  (let ((bv	(mmec-uint16-bytevector 10)))
-    (should (= 10 (mmec-bytevector-number-of-slots bv)))
-    (should (= 2 (mmec-bytevector-slot-size bv)))
-    (should (= (* 10 2) (mmec-bytevector-number-of-allocated-bytes bv)))
-    (should (not (mmec-integer-bytevector-signed bv)))))
+
+;;;; conversion to/from list
 
-(ert-deftest mmec-uint32-bytevector-slots ()
-  "Inspect the slots of a `mmec-uint32-bytevector' object."
-  (let ((bv	(mmec-uint32-bytevector 10)))
-    (should (= 10 (mmec-bytevector-number-of-slots bv)))
-    (should (= 4 (mmec-bytevector-slot-size bv)))
-    (should (= (* 10 4) (mmec-bytevector-number-of-allocated-bytes bv)))
-    (should (not (mmec-integer-bytevector-signed bv)))))
-
-(ert-deftest mmec-uint64-bytevector-slots ()
-  "Inspect the slots of a `mmec-uint64-bytevector' object."
-  (let ((bv	(mmec-uint64-bytevector 10)))
-    (should (= 10 (mmec-bytevector-number-of-slots bv)))
-    (should (= 8 (mmec-bytevector-slot-size bv)))
-    (should (= (* 10 8) (mmec-bytevector-number-of-allocated-bytes bv)))
-    (should (not (mmec-integer-bytevector-signed bv)))))
-
-;;; --------------------------------------------------------------------
-
-(ert-deftest mmec-sint8-bytevector-slots ()
-  "Inspect the slots of a `mmec-sint8-bytevector' object."
-  (let ((bv	(mmec-sint8-bytevector 10)))
-    (should (= 10 (mmec-bytevector-number-of-slots bv)))
-    (should (= 1 (mmec-bytevector-slot-size bv)))
-    (should (= (* 10 1) (mmec-bytevector-number-of-allocated-bytes bv)))
-    (should (mmec-integer-bytevector-signed bv))))
-
-(ert-deftest mmec-sint16-bytevector-slots ()
-  "Inspect the slots of a `mmec-sint16-bytevector' object."
-  (let ((bv	(mmec-sint16-bytevector 10)))
-    (should (= 10 (mmec-bytevector-number-of-slots bv)))
-    (should (= 2 (mmec-bytevector-slot-size bv)))
-    (should (= (* 10 2) (mmec-bytevector-number-of-allocated-bytes bv)))
-    (should (mmec-integer-bytevector-signed bv))))
-
-(ert-deftest mmec-sint32-bytevector-slots ()
-  "Inspect the slots of a `mmec-sint32-bytevector' object."
-  (let ((bv	(mmec-sint32-bytevector 10)))
-    (should (= 10 (mmec-bytevector-number-of-slots bv)))
-    (should (= 4 (mmec-bytevector-slot-size bv)))
-    (should (= (* 10 4) (mmec-bytevector-number-of-allocated-bytes bv)))
-    (should (mmec-integer-bytevector-signed bv))))
-
-(ert-deftest mmec-sint64-bytevector-slots ()
-  "Inspect the slots of a `mmec-sint64-bytevector' object."
-  (let ((bv	(mmec-sint64-bytevector 10)))
-    (should (= 10 (mmec-bytevector-number-of-slots bv)))
-    (should (= 8 (mmec-bytevector-slot-size bv)))
-    (should (= (* 10 8) (mmec-bytevector-number-of-allocated-bytes bv)))
-    (should (mmec-integer-bytevector-signed bv))))
-
-;;; --------------------------------------------------------------------
-
-(ert-deftest mmec-float-bytevector-slots ()
-  "Inspect the slots of a `mmec-float-bytevector' object."
-  (let ((bv	(mmec-float-bytevector 10)))
-    (should (= 10 (mmec-bytevector-number-of-slots bv)))
-    (should (= mmec-SIZEOF_FLOAT (mmec-bytevector-slot-size bv)))
-    (should (= (* 10 mmec-SIZEOF_FLOAT) (mmec-bytevector-number-of-allocated-bytes bv)))))
-
-(ert-deftest mmec-double-bytevector-slots ()
-  "Inspect the slots of a `mmec-double-bytevector' object."
-  (let ((bv	(mmec-double-bytevector 10)))
-    (should (= 10 (mmec-bytevector-number-of-slots bv)))
-    (should (= mmec-SIZEOF_DOUBLE (mmec-bytevector-slot-size bv)))
-    (should (= (* 10 mmec-SIZEOF_DOUBLE) (mmec-bytevector-number-of-allocated-bytes bv)))))
-
-(ert-deftest mmec-ldouble-bytevector-slots ()
-  "Inspect the slots of a `mmec-ldouble-bytevector' object."
-  (let ((bv	(mmec-ldouble-bytevector 10)))
-    (should (= 10 (mmec-bytevector-number-of-slots bv)))
-    (should (= mmec-SIZEOF_LONG_DOUBLE (mmec-bytevector-slot-size bv)))
-    (should (= (* 10 mmec-SIZEOF_LONG_DOUBLE) (mmec-bytevector-number-of-allocated-bytes bv)))))
+(ert-deftest mmec-char-bytevector-to/from-list ()
+  "Conversion bytevector to/from a list."
+  ;;Convert a bytevector to a list.
+  (should (let ((bv (mmec-char-bytevector 6)))
+	    (cl-loop for i from 0 to (mmec-bytevector-last-slot-index bv)
+		     do (mmec-bytevector-set bv i (mmec-char i)))
+	    (cl-loop for i in '(0 1 2 3 4 5)
+		     for j in (mmec-bytevector-to-list bv)
+		     always (mmec= (mmec-char i) j))))
+  ;;Build a bytevector from a list.
+  (mmec-debug-print (mmec-char-bytevector-from-list '(0 1 2 3 4 5)))
+  (should (mmec-bytevector-equal (let ((result.bv (mmec-char-bytevector 6)))
+				   (cl-loop for i from 0 to (mmec-bytevector-last-slot-index result.bv)
+				   	    do (mmec-bytevector-set result.bv i (mmec-char i)))
+				   result.bv)
+				 (mmec-char-bytevector-from-list '(0 1 2 3 4 5))))
+  nil)
 
 
 ;;;; done

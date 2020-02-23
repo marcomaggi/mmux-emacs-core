@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-19 14:58:23 marco>
+;; Time-stamp: <2020-02-23 07:36:53 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -911,6 +911,44 @@
 (defconst mmec-LDBL_EPSILON
   (mmec--make mmec-ldouble :obj (mmec-c-constant-ldbl-epsilon))
   "Value of type `mmec-ldouble' the system constant `LDBL_EPSILON'.")
+
+
+;;;; signedness contants
+
+(cl-macrolet
+    ((mmec--def (TYPESTEM VARVALUE)
+		(let* ((VARNAME		(mmec-sformat "mmec-%s-is-signed" TYPESTEM))
+		       (DOCSTRING	(format "Constant set to true if the number type `mmec-%s' is signed; false if it is unsigned."
+						TYPESTEM)))
+		  `(defconst ,VARNAME ,VARVALUE ,DOCSTRING))))
+  (mmec--def char	t)
+  (mmec--def schar	t)
+  (mmec--def uchar	nil)
+  (mmec--def wchar	nil)
+  (mmec--def sshrt	t)
+  (mmec--def ushrt	nil)
+  (mmec--def sint	t)
+  (mmec--def uint	nil)
+  (mmec--def slong	t)
+  (mmec--def ulong	nil)
+  (mmec--def sllong	t)
+  (mmec--def ullong	nil)
+  (mmec--def sintmax	t)
+  (mmec--def uintmax	nil)
+  (mmec--def ssize	t)
+  (mmec--def usize	nil)
+  (mmec--def ptrdiff	t)
+  (mmec--def sint8	t)
+  (mmec--def uint8	nil)
+  (mmec--def sint16	t)
+  (mmec--def uint16	nil)
+  (mmec--def sint32	t)
+  (mmec--def uint32	nil)
+  (mmec--def sint64	t)
+  (mmec--def uint64	nil)
+  (mmec--def float	t)
+  (mmec--def double	t)
+  (mmec--def ldouble	t))
 
 
 ;;;; done

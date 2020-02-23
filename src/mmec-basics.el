@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-18 07:17:09 marco>
+;; Time-stamp: <2020-02-23 07:45:26 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -61,6 +61,14 @@
   "An argument given to an object constructor has an unsupported type."
   'mmec-error-constructor)
 
+(define-error 'mmec-error-bytevector-constructor
+  "An error occurred while building a bytevector object."
+  'mmec-error-constructor)
+
+(define-error 'mmec-error-bytevector-constructor-invalid-number-of-slots
+  "An invalid number of slots was given as argument to a bytevector constructor."
+  'mmec-error-bytevector-constructor)
+
 ;;; --------------------------------------------------------------------
 ;;; range errors
 
@@ -76,6 +84,10 @@
   "Attempt to access the internal represenation of a bytevector object with an index out of range."
   'mmec-error-index-out-of-range)
 
+(define-error 'mmec-error-bytevector-is-empty
+  "Used to signal that a bytevector operand is empty.."
+  'mmec-error-value-out-of-range)
+
 ;;; --------------------------------------------------------------------
 ;;; operations errors
 
@@ -88,6 +100,9 @@
 
 (defun mmec-debug-print (&rest args)
   (pp args 'external-debugging-output))
+
+(defun mmec-sformat (STRING &rest ARGS)
+  (intern (apply 'format STRING ARGS)))
 
 (eval-and-compile
   (defun mmec--prefixed-string-p (STRING)

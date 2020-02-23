@@ -63,6 +63,14 @@ MMEC_DEFINE_ERROR_SIGNALLER(mmec, unsupported_init_type,
 			    "mmec-error-unsupported-init-type",
 			    "An argument given to an object constructor has an unsupported type.")
 
+MMEC_DEFINE_ERROR_SIGNALLER(mmec, bytevector_constructor,
+			    "mmec-error-bytevector-constructor",
+			    "An error occurred while building a bytevector object.")
+
+MMEC_DEFINE_ERROR_SIGNALLER(mmec, bytevector_constructor_invalid_number_of_slots,
+			    "mmec-error-bytevector-constructor-invalid-number-of-slots",
+			    "An invalid number of slots was given as argument to a bytevector constructor.")
+
 
 /** --------------------------------------------------------------------
  ** Range errors.
@@ -79,6 +87,10 @@ MMEC_DEFINE_ERROR_SIGNALLER(mmec, index_out_of_range,
 MMEC_DEFINE_ERROR_SIGNALLER(mmec, bytevector_index_out_of_range,
 			    "mmec-error-bytevector-index-out-of-range",
 			    "Attempt to access a bytevector obect with an index out of range.")
+
+MMEC_DEFINE_ERROR_SIGNALLER(mmec, error_bytevector_is_empty,
+			    "mmec-error-bytevector-is-empty",
+			    "Used to signal that a bytevector operand is empty.")
 
 
 /** --------------------------------------------------------------------

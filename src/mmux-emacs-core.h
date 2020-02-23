@@ -163,11 +163,15 @@ MMEC_SIGNALLER_PROTOTYPE(mmec, memory_allocation);
 MMEC_SIGNALLER_PROTOTYPE(mmec, instantiating_abstract_type);
 MMEC_SIGNALLER_PROTOTYPE(mmec, unsupported_init_type);
 
+MMEC_SIGNALLER_PROTOTYPE(mmec, bytevector_constructor);
+MMEC_SIGNALLER_PROTOTYPE(mmec, bytevector_constructor_invalid_number_of_slots);
+
 /* ------------------------------------------------------------------ */
 
 MMEC_SIGNALLER_PROTOTYPE(mmec, value_out_of_range);
 MMEC_SIGNALLER_PROTOTYPE(mmec, index_out_of_range);
 MMEC_SIGNALLER_PROTOTYPE(mmec, bytevector_index_out_of_range);
+MMEC_SIGNALLER_PROTOTYPE(mmec, error_bytevector_is_empty);
 
 /* ------------------------------------------------------------------ */
 
@@ -551,7 +555,7 @@ mmec_decl bool mmec_intrep_bytevector_valid_start_and_past (mmec_intrep_bytevect
   {									\
     MMEC_PC(mmec_clang_ ## TYPESTEM ## _t, data, bv->ptr);		\
     data[idx] = val;							\
-  }									\
+  }
 
 #undef  MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER
 #define MMEC_DEFINE_BYTEVECTOR_SETTER_GETTER(TYPESTEM)			\

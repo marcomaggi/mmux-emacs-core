@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-20 15:45:53 marco>
+;; Time-stamp: <2020-02-23 07:43:14 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -58,7 +58,7 @@
   number-of-slots
   slot-size
   number-of-allocated-bytes
-  signed
+  signed-p
   obj)
 
 (cl-defstruct (mmec-integer-bytevector
@@ -111,10 +111,12 @@
 	 ,DOCSTRING)
        (cl-defmethod  ,BYTEVECTOR-TYPE ((number-of-slots integer))
 	 ,DOCSTRING
+	 (when (> 0 number-of-slots)
+	   (signal 'mmec-error-bytevector-constructor-invalid-number-of-slots (list (quote ,BYTEVECTOR-TYPE) number-of-slots)))
 	 (mmec--make ,BYTEVECTOR-TYPE
 		     :number-of-slots		number-of-slots
 		     :slot-size			,SIZEOF-SLOT
-		     :signed			,SIGNED-BOOL
+		     :signed-p			,SIGNED-BOOL
 		     :obj			(mmec-c-make-bytevector number-of-slots ,SIZEOF-SLOT ,SIGNED-BOOL)
 		     :number-of-allocated-bytes	(* number-of-slots ,SIZEOF-SLOT)))
        )))
@@ -149,6 +151,19 @@
 (mmec--define-bytevector-type ldouble	floating-point)
 
 
+;;;; bytevector objects: inspection functions
+
+(defun mmec-bytevector-last-slot-index (bv)
+  "Return a value of type `integer' representing the slot index of the last slot.
+
+If the bytevector is empty: signal the condition `mmec-error-bytevector-is-empty'."
+  (cl-assert (mmec-bytevector-p bv))
+  (let ((N (mmec-bytevector-number-of-slots bv)))
+    (if (zerop N)
+	(signal 'mmec-error-bytevector-is-empty (list 'mmec-bytevector-last-slot-index bv))
+      (1- N))))
+
+
 ;;;; bytevector objects: getters and setters
 
 (cl-defgeneric mmec-bytevector-ref (bv idx)
@@ -172,68 +187,145 @@ of a slot into the bytevector BV.
 The argument  VAL must be  a numeric value  compatible with the  type of
 slots in the bytevector BV.")
 
-(defmacro mmec--define-bytevector-getter (TYPESTEM CTYPE)
-  (let* ((TYPESTEM.str		(symbol-name TYPESTEM))
-	 (NUMTYPE.str		(concat "mmec-" TYPESTEM.str))
-	 (NUMTYPE		(intern NUMTYPE.str))
-	 (BYTEVECTOR-TYPE	(intern (concat "mmec-" TYPESTEM.str "-bytevector")))
-	 (DOCSTRING		(concat "Extract a value of type `" CTYPE "' from the bytevector BV at index IDX."))
-	 (C-FUNC		(intern (concat "mmec-c-bytevector-" TYPESTEM.str "-ref"))))
-    `(cl-defmethod mmec-bytevector-ref ((bv ,BYTEVECTOR-TYPE) (idx integer))
-       ,DOCSTRING
-       (cl-assert (mmec-fits-usize-p idx))
-       (mmec--make ,NUMTYPE :obj (,C-FUNC (mmec-bytevector-obj bv) idx)))))
+(cl-macrolet
+    ((mmec--defgetter (TYPESTEM CTYPE)
+		      (let* ((TYPESTEM.str		(symbol-name TYPESTEM))
+			     (NUMTYPE.str		(concat "mmec-" TYPESTEM.str))
+			     (NUMTYPE		(intern NUMTYPE.str))
+			     (BYTEVECTOR-TYPE	(intern (concat "mmec-" TYPESTEM.str "-bytevector")))
+			     (DOCSTRING		(concat "Extract a value of type `" CTYPE "' from the bytevector BV at index IDX."))
+			     (C-FUNC		(intern (concat "mmec-c-bytevector-" TYPESTEM.str "-ref"))))
+			`(cl-defmethod mmec-bytevector-ref ((bv ,BYTEVECTOR-TYPE) (idx integer))
+			   ,DOCSTRING
+			   (cl-assert (mmec-fits-usize-p idx))
+			   (mmec--make ,NUMTYPE :obj (,C-FUNC (mmec-bytevector-obj bv) idx)))))
 
-(defmacro mmec--define-bytevector-setter (TYPESTEM CTYPE)
-  (let* ((TYPESTEM.str		(symbol-name TYPESTEM))
-	 (NUMTYPE.str		(concat "mmec-" TYPESTEM.str))
-	 (NUMTYPE		(intern NUMTYPE.str))
-	 (BYTEVECTOR-TYPE	(intern (concat "mmec-" TYPESTEM.str "-bytevector")))
-	 (DOCSTRING		(concat "Store a value VAL of type `" CTYPE "' into the bytevector BV at index IDX."))
-	 (C-FUNC		(intern (concat "mmec-c-bytevector-" TYPESTEM.str "-set"))))
-    `(cl-defmethod mmec-bytevector-set ((bv ,BYTEVECTOR-TYPE) (idx integer) (val ,NUMTYPE))
-       ,DOCSTRING
-       (cl-assert (mmec-fits-usize-p idx))
-       (,C-FUNC (mmec-bytevector-obj bv) idx (mmec--extract-obj ,NUMTYPE val)))))
+     (mmec--defsetter (TYPESTEM CTYPE)
+		      (let* ((TYPESTEM.str		(symbol-name TYPESTEM))
+			     (NUMTYPE.str		(concat "mmec-" TYPESTEM.str))
+			     (NUMTYPE		(intern NUMTYPE.str))
+			     (BYTEVECTOR-TYPE	(intern (concat "mmec-" TYPESTEM.str "-bytevector")))
+			     (DOCSTRING		(concat "Store a value VAL of type `" CTYPE "' into the bytevector BV at index IDX."))
+			     (C-FUNC		(intern (concat "mmec-c-bytevector-" TYPESTEM.str "-set"))))
+			`(cl-defmethod mmec-bytevector-set ((bv ,BYTEVECTOR-TYPE) (idx integer) (val ,NUMTYPE))
+			   ,DOCSTRING
+			   (cl-assert (mmec-fits-usize-p idx))
+			   (,C-FUNC (mmec-bytevector-obj bv) idx (mmec--extract-obj ,NUMTYPE val)))))
 
-(defmacro mmec--define-bytevector-getter-and-setter (TYPESTEM CTYPE)
-  `(progn
-     (mmec--define-bytevector-getter ,TYPESTEM ,CTYPE)
-     (mmec--define-bytevector-setter ,TYPESTEM ,CTYPE)))
+     (mmec--defgetter-and-setter (TYPESTEM CTYPE)
+				 `(progn
+				    (mmec--defgetter ,TYPESTEM ,CTYPE)
+				    (mmec--defsetter ,TYPESTEM ,CTYPE))))
 
-(mmec--define-bytevector-getter-and-setter char		"char")
-(mmec--define-bytevector-getter-and-setter schar	"signed char")
-(mmec--define-bytevector-getter-and-setter uchar	"unsigned char")
-(mmec--define-bytevector-getter-and-setter wchar	"wchar_t")
-(mmec--define-bytevector-getter-and-setter sshrt	"signed shrt int")
-(mmec--define-bytevector-getter-and-setter ushrt	"unsigned shrt int")
-(mmec--define-bytevector-getter-and-setter sint		"signed int")
-(mmec--define-bytevector-getter-and-setter uint		"unsigned int")
-(mmec--define-bytevector-getter-and-setter slong	"signed long int")
-(mmec--define-bytevector-getter-and-setter ulong	"unsigned long int")
-(mmec--define-bytevector-getter-and-setter sllong	"signed long long int")
-(mmec--define-bytevector-getter-and-setter ullong	"unsigned long long int")
-(mmec--define-bytevector-getter-and-setter sintmax	"intmax_t")
-(mmec--define-bytevector-getter-and-setter uintmax	"uintmax_t")
-(mmec--define-bytevector-getter-and-setter ssize	"ssize_t")
-(mmec--define-bytevector-getter-and-setter usize	"size_t")
-(mmec--define-bytevector-getter-and-setter ptrdiff	"ptrdiff_t")
-(mmec--define-bytevector-getter-and-setter sint8	"int8_t")
-(mmec--define-bytevector-getter-and-setter uint8	"uint8_t")
-(mmec--define-bytevector-getter-and-setter sint16	"int16_t")
-(mmec--define-bytevector-getter-and-setter uint16	"uint16_t")
-(mmec--define-bytevector-getter-and-setter sint32	"int32_t")
-(mmec--define-bytevector-getter-and-setter uint32	"uint32_t")
-(mmec--define-bytevector-getter-and-setter sint64	"int64_t")
-(mmec--define-bytevector-getter-and-setter uint64	"uint64_t")
-(mmec--define-bytevector-getter-and-setter float	"float")
-(mmec--define-bytevector-getter-and-setter double	"double")
-(mmec--define-bytevector-getter-and-setter ldouble	"ldouble")
+  (mmec--defgetter-and-setter char		"char")
+  (mmec--defgetter-and-setter schar	"signed char")
+  (mmec--defgetter-and-setter uchar	"unsigned char")
+  (mmec--defgetter-and-setter wchar	"wchar_t")
+  (mmec--defgetter-and-setter sshrt	"signed shrt int")
+  (mmec--defgetter-and-setter ushrt	"unsigned shrt int")
+  (mmec--defgetter-and-setter sint		"signed int")
+  (mmec--defgetter-and-setter uint		"unsigned int")
+  (mmec--defgetter-and-setter slong	"signed long int")
+  (mmec--defgetter-and-setter ulong	"unsigned long int")
+  (mmec--defgetter-and-setter sllong	"signed long long int")
+  (mmec--defgetter-and-setter ullong	"unsigned long long int")
+  (mmec--defgetter-and-setter sintmax	"intmax_t")
+  (mmec--defgetter-and-setter uintmax	"uintmax_t")
+  (mmec--defgetter-and-setter ssize	"ssize_t")
+  (mmec--defgetter-and-setter usize	"size_t")
+  (mmec--defgetter-and-setter ptrdiff	"ptrdiff_t")
+  (mmec--defgetter-and-setter sint8	"int8_t")
+  (mmec--defgetter-and-setter uint8	"uint8_t")
+  (mmec--defgetter-and-setter sint16	"int16_t")
+  (mmec--defgetter-and-setter uint16	"uint16_t")
+  (mmec--defgetter-and-setter sint32	"int32_t")
+  (mmec--defgetter-and-setter uint32	"uint32_t")
+  (mmec--defgetter-and-setter sint64	"int64_t")
+  (mmec--defgetter-and-setter uint64	"uint64_t")
+  (mmec--defgetter-and-setter float	"float")
+  (mmec--defgetter-and-setter double	"double")
+  (mmec--defgetter-and-setter ldouble	"ldouble"))
 
 
-;;;; bytevector objects: comparison generic functions
+;;;; bytevector objects: comparison functions
 
-(cl-defgeneric mmec-bytevector-compare (bv1 start1 past1 bv2 start2 past2)
+;;; API functions
+(cl-macrolet
+    ((mmec--def (FUNCSTEM RESULT-DOCSTRING)
+		(let* ((FUNCNAME	(intern (format "mmec-bytevector-%s"   FUNCSTEM)))
+		       (FUNCNAME-6	(intern (format "mmec-bytevector-%s-6" FUNCSTEM)))
+		       (DOCSTRING	(format "Compare the two bytevectors BV1 and BV2.
+
+This function is an adapter for the generic function `%s' and return its
+return value.
+
+This function  accepts the  following keys  that specify  a span  in the
+bytevectors to use in the comparison:
+
+:start1
+   Select  the inclusive  slot  index in  BV1 from  which  to start  the
+   comparison.  Defaults to 0.
+
+:start2
+   Select  the inclusive  slot  index in  BV2 from  which  to start  the
+   comparison.  Defaults to 0.
+
+:past1
+   Select  the  exclusive  slot  index  in  BV1  at  which  to  end  the
+   comparison.  Defaults to the number of slots in BV1.
+
+:past2
+   Select  the  exclusive  slot  index  in  BV2  at  which  to  end  the
+   comparison.  Defaults to the number of slots in BV2.
+
+The arguments START  and PAST must be valid slot  indexes satisfying the
+conditions:
+
+  0 <= START <= PAST <= number of slots
+
+otherwise the  behaviour of the  functions is undefined.   The functions
+compare a  span in  the data  area of the  bytevectors starting  at slot
+index START, included, and ending at slot index PAST, excluded.
+
+%s" FUNCNAME-6 RESULT-DOCSTRING)))
+		  `(cl-defun ,FUNCNAME (bv1 bv2 &key (start1 0) (start2 0)
+					    (past1 (mmec-bytevector-number-of-slots bv1))
+					    (past2 (mmec-bytevector-number-of-slots bv2)))
+		     ,DOCSTRING
+		     (cl-assert (<= 0 start1 past2 (mmec-bytevector-number-of-slots bv1)))
+		     (cl-assert (<= 0 start2 past2 (mmec-bytevector-number-of-slots bv2)))
+		     (,FUNCNAME-6 bv1 start1 past2 bv2 start2 past2)))))
+  (mmec--def compare "Return the following code:
+
+ 0, if the following condition is true:
+
+    (PAST1 - START1) == (PAST2 - START2)
+
+  and all the values in the slots are equal slot by slot.
+
++1, if the following condition is true:
+
+    (PAST1 - START1) > (PAST2 - START2)
+
+  or, while  visiting the  slots from  START to PAST,  BV1 holds  a slot
+  value that is greater than the corresponding slot value in BV2.
+
+-1, if the following condition is true:
+
+   (PAST1 - START1) < (PAST2 - START2)
+
+  or, while  visiting the  slots from  START to PAST,  BV1 holds  a slot
+  value that is less than the corresponding slot value in BV2.")
+  (mmec--def equal	"Return true if BV1 = BV2 according to `mmec-bytevector-compare'; otherwise return false.")
+  (mmec--def less	"Return true if BV1 < BV2 according to `mmec-bytevector-compare'; otherwise return false.")
+  (mmec--def greater	"Return true if BV1 > BV2 according to `mmec-bytevector-compare'; otherwise return false.")
+  (mmec--def leq	"Return true if BV1 <= BV2 according to `mmec-bytevector-compare'; otherwise return false.")
+  (mmec--def geq	"Return true if BV1 >= BV2 according to `mmec-bytevector-compare'; otherwise return false."))
+
+;;; --------------------------------------------------------------------
+;;; bytevector span comparison generic functions
+
+(cl-defgeneric mmec-bytevector-compare-6 (bv1 start1 past1 bv2 start2 past2)
   "Compare the selected spans in the bytevectors BV1 and BV2, return -1, 0 or +1.
 
 The arguments START  and PAST must be valid slot  indexes satisfying the
@@ -267,36 +359,38 @@ index START, included, and ending at slot index PAST, excluded.
   or, while  visiting the  slots from  START to PAST,  BV1 holds  a slot
   value that is less than the corresponding slot value in BV2.")
 
-(cl-defgeneric mmec-bytevector-equal (bv1 start1 past1 bv2 start2 past2)
-  "Compare the selected spans in the bytevectors BV1 and BV2: return true or false.")
+(cl-macrolet
+    ((mmec--def (FUNCSTEM)
+		(let* ((FUNCNAME (intern (format "mmec-bytevector-%s-6" FUNCSTEM))))
+		  `(cl-defgeneric ,FUNCNAME (bv1 start1 past1 bv2 start2 past2)
+		     "Compare the selected spans in the bytevectors BV1 and BV2: return true or false.
 
-(cl-defgeneric mmec-bytevector-less (bv1 start1 past1 bv2 start2 past2)
-  "Compare the selected spans in the bytevectors BV1 and BV2: return true or false.")
+The meaning of  the arguments BV1, START1, PAST1, BV2,  START2, PAST2 is
+the    same    as   in    the    call    to   the    generic    function
+`mmec-bytevector-compare-6'."))))
 
-(cl-defgeneric mmec-bytevector-greater (bv1 start1 past1 bv2 start2 past2)
-  "Compare the selected spans in the bytevectors BV1 and BV2: return true or false.")
-
-(cl-defgeneric mmec-bytevector-leq (bv1 start1 past1 bv2 start2 past2)
-  "Compare the selected spans in the bytevectors BV1 and BV2: return true or false.")
-
-(cl-defgeneric mmec-bytevector-geq (bv1 start1 past1 bv2 start2 past2)
-  "Compare the selected spans in the bytevectors BV1 and BV2: return true or false.")
+  (mmec--def equal)
+  (mmec--def less)
+  (mmec--def greater)
+  (mmec--def leq)
+  (mmec--def geq))
 
 
 ;;;; bytevector objects: comparison specialised methods
 
-(defmacro mmec--define-bytevector-comparison (TYPESTEM)
-  (let* ((BV-TYPE		(intern (format "mmec-%s-bytevector" TYPESTEM)))
-	 (CFUNC-COMPARE		(intern (format "mmec-c-%s-bytevector-compare"	TYPESTEM)))
-	 (CFUNC-EQUAL		(intern (format "mmec-c-%s-bytevector-equal"	TYPESTEM)))
-	 (CFUNC-LESS		(intern (format "mmec-c-%s-bytevector-less"	TYPESTEM)))
-	 (CFUNC-GREATER		(intern (format "mmec-c-%s-bytevector-greater"	TYPESTEM)))
-	 (CFUNC-LEQ		(intern (format "mmec-c-%s-bytevector-leq"	TYPESTEM)))
-	 (CFUNC-GEQ		(intern (format "mmec-c-%s-bytevector-geq"	TYPESTEM))))
-    `(progn
-       (cl-defmethod mmec-bytevector-compare ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
-					      (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
-	 "Compare the selected spans in the bytevectors BV1 and BV2, return -1, 0 or +1.
+(cl-macrolet
+    ((mmec--def (TYPESTEM)
+		(let* ((BV-TYPE		(intern (format "mmec-%s-bytevector" TYPESTEM)))
+		       (CFUNC-COMPARE		(intern (format "mmec-c-%s-bytevector-compare"	TYPESTEM)))
+		       (CFUNC-EQUAL		(intern (format "mmec-c-%s-bytevector-equal"	TYPESTEM)))
+		       (CFUNC-LESS		(intern (format "mmec-c-%s-bytevector-less"	TYPESTEM)))
+		       (CFUNC-GREATER		(intern (format "mmec-c-%s-bytevector-greater"	TYPESTEM)))
+		       (CFUNC-LEQ		(intern (format "mmec-c-%s-bytevector-leq"	TYPESTEM)))
+		       (CFUNC-GEQ		(intern (format "mmec-c-%s-bytevector-geq"	TYPESTEM))))
+		  `(progn
+		     (cl-defmethod mmec-bytevector-compare-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
+							      (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
+		       "Compare the selected spans in the bytevectors BV1 and BV2, return -1, 0 or +1.
 
 The arguments START  and PAST must be valid slot  indexes satisfying the
 conditions:
@@ -307,7 +401,7 @@ otherwise the  behaviour of the  functions is undefined.   The functions
 compare a  span in  the data  area of the  bytevectors starting  at slot
 index START, included, and ending at slot index PAST, excluded.
 
- return the following code:
+Return the following code:
 
  0, if the following condition is true:
 
@@ -327,68 +421,134 @@ index START, included, and ending at slot index PAST, excluded.
    (PAST1 - START1) < (PAST2 - START2)
 
   or, while  visiting the  slots from  START to PAST,  BV1 holds  a slot
-  value that is less than the corresponding slot value in BV2."	 (,CFUNC-COMPARE (mmec--extract-obj ,BV-TYPE bv1) start1 past1
-										 (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
+  value that is less than the corresponding slot value in BV2."
+		       (cl-assert (<= 0 start1 past2 (mmec-bytevector-number-of-slots bv1)))
+		       (cl-assert (<= 0 start2 past2 (mmec-bytevector-number-of-slots bv2)))
+		       (,CFUNC-COMPARE (mmec--extract-obj ,BV-TYPE bv1) start1 past1
+				       (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
 
-       (cl-defmethod mmec-bytevector-equal ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
-					    (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
-	 "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
-	 (,CFUNC-EQUAL (mmec--extract-obj ,BV-TYPE bv1) start1 past1
-		       (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
+		     (cl-defmethod mmec-bytevector-equal-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
+							    (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
+		       "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
+		       (cl-assert (<= 0 start1 past2 (mmec-bytevector-number-of-slots bv1)))
+		       (cl-assert (<= 0 start2 past2 (mmec-bytevector-number-of-slots bv2)))
+		       (,CFUNC-EQUAL (mmec--extract-obj ,BV-TYPE bv1) start1 past1
+				     (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
 
-       (cl-defmethod mmec-bytevector-less ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
-					   (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
-	 "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
-	 (,CFUNC-LESS (mmec--extract-obj ,BV-TYPE bv1) start1 past1
-		      (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
+		     (cl-defmethod mmec-bytevector-less-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
+							   (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
+		       "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
+		       (cl-assert (<= 0 start1 past2 (mmec-bytevector-number-of-slots bv1)))
+		       (cl-assert (<= 0 start2 past2 (mmec-bytevector-number-of-slots bv2)))
+		       (,CFUNC-LESS (mmec--extract-obj ,BV-TYPE bv1) start1 past1
+				    (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
 
-       (cl-defmethod mmec-bytevector-greater ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
-					      (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
-	 "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
-	 (,CFUNC-GREATER (mmec--extract-obj ,BV-TYPE bv1) start1 past1
-			 (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
+		     (cl-defmethod mmec-bytevector-greater-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
+							      (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
+		       "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
+		       (cl-assert (<= 0 start1 past2 (mmec-bytevector-number-of-slots bv1)))
+		       (cl-assert (<= 0 start2 past2 (mmec-bytevector-number-of-slots bv2)))
+		       (,CFUNC-GREATER (mmec--extract-obj ,BV-TYPE bv1) start1 past1
+				       (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
 
-       (cl-defmethod mmec-bytevector-leq ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
-					  (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
-	 "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
-	 (,CFUNC-LEQ (mmec--extract-obj ,BV-TYPE bv1) start1 past1
-		     (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
+		     (cl-defmethod mmec-bytevector-leq-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
+							  (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
+		       "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
+		       (cl-assert (<= 0 start1 past2 (mmec-bytevector-number-of-slots bv1)))
+		       (cl-assert (<= 0 start2 past2 (mmec-bytevector-number-of-slots bv2)))
+		       (,CFUNC-LEQ (mmec--extract-obj ,BV-TYPE bv1) start1 past1
+				   (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
 
-       (cl-defmethod mmec-bytevector-geq ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
-					  (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
-	 "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
-	 (,CFUNC-GEQ (mmec--extract-obj ,BV-TYPE bv1) start1 past1
-		     (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
-       )))
+		     (cl-defmethod mmec-bytevector-geq-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
+							  (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
+		       "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
+		       (cl-assert (<= 0 start1 past2 (mmec-bytevector-number-of-slots bv1)))
+		       (cl-assert (<= 0 start2 past2 (mmec-bytevector-number-of-slots bv2)))
+		       (,CFUNC-GEQ (mmec--extract-obj ,BV-TYPE bv1) start1 past1
+				   (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
+		     ))))
 
-(mmec--define-bytevector-comparison char)
-(mmec--define-bytevector-comparison schar)
-(mmec--define-bytevector-comparison uchar)
-(mmec--define-bytevector-comparison wchar)
-(mmec--define-bytevector-comparison sshrt)
-(mmec--define-bytevector-comparison ushrt)
-(mmec--define-bytevector-comparison sint)
-(mmec--define-bytevector-comparison uint)
-(mmec--define-bytevector-comparison slong)
-(mmec--define-bytevector-comparison ulong)
-(mmec--define-bytevector-comparison sllong)
-(mmec--define-bytevector-comparison ullong)
-(mmec--define-bytevector-comparison sintmax)
-(mmec--define-bytevector-comparison uintmax)
-(mmec--define-bytevector-comparison ssize)
-(mmec--define-bytevector-comparison usize)
-(mmec--define-bytevector-comparison ptrdiff)
-(mmec--define-bytevector-comparison sint8)
-(mmec--define-bytevector-comparison uint8)
-(mmec--define-bytevector-comparison sint16)
-(mmec--define-bytevector-comparison uint16)
-(mmec--define-bytevector-comparison sint32)
-(mmec--define-bytevector-comparison uint32)
-(mmec--define-bytevector-comparison sint64)
-(mmec--define-bytevector-comparison uint64)
-(mmec--define-bytevector-comparison float)
-(mmec--define-bytevector-comparison double)
-(mmec--define-bytevector-comparison ldouble)
+  (mmec--def char)
+  (mmec--def schar)
+  (mmec--def uchar)
+  (mmec--def wchar)
+  (mmec--def sshrt)
+  (mmec--def ushrt)
+  (mmec--def sint)
+  (mmec--def uint)
+  (mmec--def slong)
+  (mmec--def ulong)
+  (mmec--def sllong)
+  (mmec--def ullong)
+  (mmec--def sintmax)
+  (mmec--def uintmax)
+  (mmec--def ssize)
+  (mmec--def usize)
+  (mmec--def ptrdiff)
+  (mmec--def sint8)
+  (mmec--def uint8)
+  (mmec--def sint16)
+  (mmec--def uint16)
+  (mmec--def sint32)
+  (mmec--def uint32)
+  (mmec--def sint64)
+  (mmec--def uint64)
+  (mmec--def float)
+  (mmec--def double)
+  (mmec--def ldouble))
+
+
+;;;; bytevector objects: conversion to/from list
+
+(cl-defgeneric mmec-bytevector-to-list (LIST)
+  "Convert a bytevector object into a list of its elements.")
+
+(cl-defmethod mmec-bytevector-to-list ((bv mmec-bytevector))
+  (cl-loop for i from 0 to (mmec-bytevector-last-slot-index bv)
+	   collect (mmec-bytevector-ref bv i)))
+
+(cl-macrolet
+    ((mmec--define-bytevector-from-list
+      (TYPESTEM)
+      (let* ((TYPE		(intern (format "mmec-%s" TYPESTEM)))
+	     (CONSTRUCTOR	(intern (format "mmec-%s-bytevector" TYPESTEM)))
+	     (FUNC		(intern (format "mmec-%s-bytevector-from-list" TYPESTEM))))
+	`(cl-defmethod ,FUNC ((ELL list))
+	   "Build a bytevector object taking elements from a list."
+	   (let ((bv (,CONSTRUCTOR (length ELL))))
+	     (cl-loop for elt in ELL
+		      for i from 0
+		      do (mmec-bytevector-set bv i (,TYPE elt)))
+	     bv)))))
+
+  (mmec--define-bytevector-from-list char)
+  (mmec--define-bytevector-from-list schar)
+  (mmec--define-bytevector-from-list uchar)
+  (mmec--define-bytevector-from-list wchar)
+  (mmec--define-bytevector-from-list sshrt)
+  (mmec--define-bytevector-from-list ushrt)
+  (mmec--define-bytevector-from-list sint)
+  (mmec--define-bytevector-from-list uint)
+  (mmec--define-bytevector-from-list slong)
+  (mmec--define-bytevector-from-list ulong)
+  (mmec--define-bytevector-from-list sllong)
+  (mmec--define-bytevector-from-list ullong)
+  (mmec--define-bytevector-from-list sintmax)
+  (mmec--define-bytevector-from-list uintmax)
+  (mmec--define-bytevector-from-list ssize)
+  (mmec--define-bytevector-from-list usize)
+  (mmec--define-bytevector-from-list ptrdiff)
+  (mmec--define-bytevector-from-list sint8)
+  (mmec--define-bytevector-from-list uint8)
+  (mmec--define-bytevector-from-list sint16)
+  (mmec--define-bytevector-from-list uint16)
+  (mmec--define-bytevector-from-list sint32)
+  (mmec--define-bytevector-from-list uint32)
+  (mmec--define-bytevector-from-list sint64)
+  (mmec--define-bytevector-from-list uint64)
+  (mmec--define-bytevector-from-list float)
+  (mmec--define-bytevector-from-list double)
+  (mmec--define-bytevector-from-list ldouble))
 
 
 ;;;; done

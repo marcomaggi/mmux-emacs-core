@@ -1,7 +1,9 @@
 ﻿-*- coding: utf-8-with-signature-unix; fill-column: 200 -*-
 
 * Test the bytevector comparison functions.
-* Add printer functions for all the number types.
+* Implement the subbytevector functions.
+* Test the subbytevector functions.
+* Document the subbytevector functions.
 * Add printer functions for the bytevector types.
 * Read the elisp docs node Sequence Functions to understand how to interface bytevectors with sequence functions.
 * Local Variables

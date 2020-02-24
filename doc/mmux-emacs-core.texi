@@ -1040,6 +1040,15 @@ This is the copy constructor implemented as method.  This method creates a dupli
 @var{INIT} value, but it reuses the internal representation (which is immutable).
 @end deffn
 
+
+@deffn {Method} cl-print-object (@var{OBJ} mmec-\ETYPESTEM\) @var{STREAM}
+@cindex @func{cl-prin1}, printing @objtype{mmec-\ETYPESTEM\} to a stream
+@cindex @func{cl-prin1-to-string}, printing @objtype{mmec-\ETYPESTEM\} to a string
+Specialised method that prints a representation of @var{OBJ} to @var{STREAM}.  We can print
+instances of @objtype{mmec-\ETYPESTEM\} with the generic functions @func{cl-prin1} and
+@func{cl-prin1-to-string}.
+@end deffn
+
 @end macro
 
 @c ------------------------------------------------------------------------

@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-23 12:36:50 marco>
+;; Time-stamp: <2020-02-24 06:37:10 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -153,7 +153,23 @@
 
 ;;;; bytevector objects: inspection functions
 
-(defun mmec-bytevector-last-slot-index (bv)
+(cl-defgeneric mmec-bytevector-empty-p (bv)
+  "Return true if the bytevector BV is empty; otherwise return false.")
+(cl-defmethod  mmec-bytevector-empty-p ((bv mmec-bytevector))
+  "Return true if the bytevector BV is empty; otherwise return false."
+  (cl-assert (mmec-bytevector-p bv))
+  (zerop (mmec-bytevector-number-of-slots bv)))
+
+(cl-defgeneric mmec-bytevector-not-empty-p (bv)
+  "Return true if the bytevector BV is not empty; otherwise return false.")
+(cl-defmethod  mmec-bytevector-not-empty-p ((bv mmec-bytevector))
+  "Return true if the bytevector BV is not empty; otherwise return false."
+  (cl-assert (mmec-bytevector-p bv))
+  (not (zerop (mmec-bytevector-number-of-slots bv))))
+
+(cl-defgeneric mmec-bytevector-last-slot-index (bv)
+  "Return a value of type `integer' representing the slot index of the last slot.")
+(cl-defmethod  mmec-bytevector-last-slot-index ((bv mmec-bytevector))
   "Return a value of type `integer' representing the slot index of the last slot.
 
 If the bytevector is empty: signal the condition `mmec-error-bytevector-is-empty'."
@@ -162,6 +178,25 @@ If the bytevector is empty: signal the condition `mmec-error-bytevector-is-empty
     (if (zerop N)
 	(signal 'mmec-error-bytevector-is-empty (list 'mmec-bytevector-last-slot-index bv))
       (1- N))))
+
+(cl-defgeneric mmec-bytevector-valid-slot-index-p (bv idx)
+  "Return true if IDX is a valid slot index for the bytevector BV; otherwise return false.")
+(cl-defmethod  mmec-bytevector-valid-slot-index-p ((bv mmec-bytevector) (idx integer))
+  "Return true if IDX is a valid slot index for the bytevector BV; otherwise return false."
+  (and (<= 0 idx) (< idx (mmec-bytevector-number-of-slots bv))))
+
+(cl-defgeneric mmec-bytevector-valid-past-slot-index-p (bv idx)
+  "Return true if IDX is a valid end-of-span slot index for the bytevector BV; otherwise return false.")
+(cl-defmethod  mmec-bytevector-valid-past-slot-index-p ((bv mmec-bytevector) (idx integer))
+  "Return true if IDX is a valid end-of-span slot index for the bytevector BV; otherwise return false."
+  (and (<= 0 idx) (<= idx (mmec-bytevector-number-of-slots bv))))
+
+(cl-defgeneric mmec-bytevector-valid-start-and-past-p (bv start past)
+  "Return true if START and PAST are valid slot span selectorsfor the bytevector BV; otherwise return false.")
+(cl-defmethod  mmec-bytevector-valid-start-and-past-p ((bv mmec-bytevector) (start integer) (past integer))
+  "Return true if START and PAST are valid slot span selectors for the bytevector BV; otherwise return false."
+  (and (mmec-bytevector-valid-slot-index-p bv start)
+       (mmec-bytevector-valid-past-slot-index-p bv past)))
 
 
 ;;;; bytevector objects: getters and setters
@@ -198,7 +233,9 @@ slots in the bytevector BV.")
 			`(cl-defmethod mmec-bytevector-ref ((bv ,BYTEVECTOR-TYPE) (idx integer))
 			   ,DOCSTRING
 			   (cl-assert (mmec-fits-usize-p idx))
-			   (mmec--make ,NUMTYPE :obj (,C-FUNC (mmec-bytevector-obj bv) idx)))))
+			   (if (mmec-bytevector-not-empty-p bv)
+			       (mmec--make ,NUMTYPE :obj (,C-FUNC (mmec-bytevector-obj bv) idx))
+			     (signal 'mmec-error-bytevector-is-empty (list bv idx))))))
 
      (mmec--defsetter (TYPESTEM CTYPE)
 		      (let* ((TYPESTEM.str	(symbol-name TYPESTEM))
@@ -210,7 +247,9 @@ slots in the bytevector BV.")
 			`(cl-defmethod mmec-bytevector-set ((bv ,BYTEVECTOR-TYPE) (idx integer) (val ,NUMTYPE))
 			   ,DOCSTRING
 			   (cl-assert (mmec-fits-usize-p idx))
-			   (,C-FUNC (mmec-bytevector-obj bv) idx (mmec--extract-obj ,NUMTYPE val)))))
+			   (if (mmec-bytevector-not-empty-p bv)
+			       (,C-FUNC (mmec-bytevector-obj bv) idx (mmec--extract-obj ,NUMTYPE val))
+			     (signal 'mmec-error-bytevector-is-empty (list bv idx))))))
 
      (mmec--defgetter-and-setter (TYPESTEM CTYPE)
 				 `(progn

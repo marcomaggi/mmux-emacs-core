@@ -2190,10 +2190,43 @@ number object of type compatible with @var{BV}.
 @section Bytevector inspection function
 
 
-@defun mmec-bytevector-last-slot-index @var{BV}
+@deffn {Generic Function} mmec-bytevector-empty-p @var{BV}
+@deffnx {Method} mmec-bytevector-empty-p (@var{BV} mmec-bytevector)
+Return true if the bytevector @var{BV} is empty; otherwise return false.
+@end deffn
+
+
+@deffn {Generic Function} mmec-bytevector-not-empty-p @var{BV}
+@deffnx {Method} mmec-bytevector-not-empty-p @var{BV}
+Return true if the bytevector @var{BV} is not empty; otherwise return false.
+@end deffn
+
+
+@deffn {Generic Function} mmec-bytevector-last-slot-index @var{BV}
+@deffnx {Method} mmec-bytevector-last-slot-index (@var{BV} mmec-bytevector)
 Return a value of type @objtype{integer} representing the slot index of the last slot.  If the
 bytevector is empty: signal the condition @code{mmec-error-bytevector-is-empty}.
-@end defun
+@end deffn
+
+
+@deffn {Generic Function} mmec-bytevector-valid-slot-index-p @var{BV} @var{IDX}
+@deffnx {Method} mmec-bytevector-valid-slot-index-p (@var{BV} mmec-bytevector) (@var{IDX} integer)
+Returnx true if @var{IDX} is a valid slot index for the bytevector @var{BV}; otherwise return false.
+@end deffn
+
+
+@deffn {Generic Function} mmec-bytevector-valid-past-slot-index-p (@var{BV} mmec-bytevector) (@var{IDX} integer)
+Return true if @var{IDX} is a valid end--of--span slot index for the bytevector @var{BV}; otherwise
+Returnx tMethod @var{IDX} is a valid end--of--span slot index for the bytevector @var{BV}; otherwise
+return false.
+@end deffn
+
+
+@deffn {Generic Function} mmec-bytevector-valid-start-and-past-p @var{BV} @var{START} @var{PAST}
+@deffnx {Method} mmec-bytevector-valid-start-and-past-p (@var{BV} mmec-bytevector) (@var{START} integer) (@var{PAST} integer)
+Return true if @var{START} and @var{PAST} are valid slot span selectors for the bytevector @var{BV};
+otherwise return false.
+@end deffn
 
 @c page
 @node bytevec comparison
@@ -3488,16 +3521,16 @@ Structure type for the internal representation of bytevectors as Emacs Lisp valu
 
 @table @code
 @item intmax_t number_of_slots
-Number of slots allocated in the binary data area.
+Non--negative number of slots allocated in the binary data area.
 
 @item intmax_t slot_size
-Size in bytes of a slot in the binary data area.
+Strictly positive number representing the size in bytes of a slot in the binary data area.
 
 @item bool hold_signed_values
 True if the slots hold signed numeric values.
 
 @item void * ptr
-Pointer to the binary data area.
+Pointer to the binary data area.  Set to @cnull{} if the number of slots is zero.
 @end table
 @end deftp
 
@@ -3579,8 +3612,25 @@ Emacs value: mutating the structure mutates the Emacs value.
 @subsection Inspecting bytevector objects
 
 
+@deftypefun bool mmec_intrep_bytevector_is_empty (mmec_intrep_bytevector_t const * @var{BV})
+Return true if the number of slots in the bytevector is zero; otherwise return false.
+@end deftypefun
+
+
+@deftypefun bool mmec_intrep_bytevector_is_not_empty (mmec_intrep_bytevector_t const * @var{BV})
+Return true if the number of slots in the bytevector is not zero; otherwise return false.
+@end deftypefun
+
+
 @deftypefun bool mmec_bytevector_valid_slot_index (mmec_intrep_bytevector_t const * @var{BV}, intmax_t @var{idx})
 Return true if @var{IDX} is a valid slot index for the bytevector @var{BV}; otherwise return false.
+@end deftypefun
+
+
+@deftypefun bool mmec_bytevector_valid_past_slot_index (mmec_intrep_bytevector_t const * @var{BV}, intmax_t @var{idx})
+Return true if @var{IDX} is a valid ``past'' slot index for the bytevector @var{BV}; otherwise
+return false.  We can use this function to validate the argument @var{PAST} in the bytevector span
+selection.
 @end deftypefun
 
 

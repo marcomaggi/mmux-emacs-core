@@ -38,31 +38,42 @@
 mmec_intrep_bytevector_t *
 mmec_new_intrep_bytevector (intmax_t number_of_slots, intmax_t slot_size, bool hold_signed_values)
 {
-  mmec_intrep_bytevector_t	* obj;
+  mmec_intrep_bytevector_t	* bv = NULL;
 
   errno = 0;
-  obj   = (mmec_intrep_bytevector_t *)malloc(sizeof(mmec_intrep_bytevector_t));
-  if (obj) {
-    errno	= 0;
-    obj->ptr	= calloc(number_of_slots, slot_size);
-    if (obj->ptr) {
-      obj->number_of_slots	= number_of_slots;
-      obj->slot_size		= slot_size;
-      obj->hold_signed_values	= hold_signed_values;
-      return obj;
+  bv = (mmec_intrep_bytevector_t *)malloc(sizeof(mmec_intrep_bytevector_t));
+  if (bv) {
+    if (number_of_slots) {
+      errno	= 0;
+      bv->ptr	= calloc(number_of_slots, slot_size);
+      if (NULL == bv->ptr) {
+	goto error_allocating_memory;
+      }
     } else {
-      free(obj);
-      return NULL;
+      bv->ptr	= NULL;
     }
+    bv->number_of_slots		= number_of_slots;
+    bv->slot_size		= slot_size;
+    bv->hold_signed_values	= hold_signed_values;
+    return bv;
   } else {
-    return NULL;
+    goto error_allocating_memory;
   }
+  return bv;
+
+ error_allocating_memory:
+  if (bv) {
+    if (bv->ptr) {
+      free(bv->ptr);
+    }
+    free(bv);
+  }
+  return NULL;
 }
 
 void
 mmec_delete_intrep_bytevector (mmec_intrep_bytevector_t * bv)
 {
-  /* let's check the pointer just to be sure. */
   if (bv->ptr) {
     free(bv->ptr);
   }
@@ -164,10 +175,27 @@ mmec_bytevector_valid_slot_index (mmec_intrep_bytevector_t const * const bv, int
 }
 
 bool
+mmec_bytevector_valid_past_slot_index (mmec_intrep_bytevector_t const * const bv, intmax_t const idx)
+{
+  return ((0 <= idx) && (idx <= bv->number_of_slots))? true : false;
+}
+
+bool
 mmec_intrep_bytevector_valid_start_and_past (mmec_intrep_bytevector_t const * const bv, intmax_t const start, intmax_t const past)
 {
-  return ((mmec_bytevector_valid_slot_index(bv, start) && \
-	   ((start == past) || mmec_bytevector_valid_slot_index(bv, past-1)))? true : false);
+  return ((mmec_bytevector_valid_slot_index(bv, start) && mmec_bytevector_valid_past_slot_index(bv, past))? true : false);
+}
+
+bool
+mmec_intrep_bytevector_is_empty (mmec_intrep_bytevector_t const * const bv)
+{
+  return ((0 == bv->number_of_slots)? true : false);
+}
+
+bool
+mmec_intrep_bytevector_is_not_empty (mmec_intrep_bytevector_t const * const bv)
+{
+  return ((0 != bv->number_of_slots)? true : false);
 }
 
 
@@ -250,7 +278,7 @@ MMEC_DEFINE_ELISP_BYTEVECTOR_SETTER_GETTER(ldouble)
 
 static int
 mmec_intrep_bytevector_check_comparison_spans (mmec_intrep_bytevector_t const * const src, intmax_t const src_start, intmax_t const src_past,
-					      mmec_intrep_bytevector_t const * const dst, intmax_t const dst_start, intmax_t const dst_past)
+					       mmec_intrep_bytevector_t const * const dst, intmax_t const dst_start, intmax_t const dst_past)
 {
   assert(src->slot_size          == dst->slot_size);
   assert(src->hold_signed_values == dst->hold_signed_values);
@@ -443,12 +471,14 @@ mmec_intrep_bytevector_t *
 mmec_new_intrep_bytevector_subsequence (mmec_intrep_bytevector_t const * const src, intmax_t const start, intmax_t const past)
 {
   assert(mmec_bytevector_valid_slot_index(src, start));
-  assert((start == past) || mmec_bytevector_valid_slot_index(src, past-1));
+  assert(mmec_intrep_bytevector_valid_start_and_past(src, start, past));
   {
     mmec_intrep_bytevector_t	* dst = mmec_new_intrep_bytevector(src->number_of_slots, src->slot_size, src->hold_signed_values);
 
     if (dst) {
-      memcpy(dst->ptr, src->ptr, src->number_of_slots * src->slot_size);
+      if (dst->ptr) {
+	memcpy(dst->ptr, src->ptr, src->number_of_slots * src->slot_size);
+      }
       return dst;
     } else {
       return NULL;

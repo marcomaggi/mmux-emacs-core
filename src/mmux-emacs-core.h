@@ -470,9 +470,14 @@ MMEC_DEFINE_WRAPPER_TYPE_USRPTR_REP(ldouble)
 typedef struct mmec_intrep_bytevector_t	mmec_intrep_bytevector_t;
 
 struct mmec_intrep_bytevector_t {
+  /* Non-negative number representing the number of slots in the bytevector. */
   intmax_t	number_of_slots;
+  /* Strictly positive number representing the slot size. */
   intmax_t	slot_size;
+  /* True  if  the numbers  stored  in  the slots  are  meant  to be  interpreted  as
+     signed. */
   bool		hold_signed_values;
+  /* Pointer to the data area.  Set to NULL if the number of slots is zero. */
   void		* ptr;
 };
 
@@ -531,7 +536,16 @@ mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_ldouble_intrep_bytevector;
 mmec_decl bool mmec_bytevector_valid_slot_index (mmec_intrep_bytevector_t const * const bv, intmax_t const idx)
   __attribute__((__nonnull__(1)));
 
+mmec_decl bool mmec_bytevector_valid_past_slot_index (mmec_intrep_bytevector_t const * const bv, intmax_t const idx)
+  __attribute__((__nonnull__(1)));
+
 mmec_decl bool mmec_intrep_bytevector_valid_start_and_past (mmec_intrep_bytevector_t const * bv, intmax_t start, intmax_t past)
+  __attribute__((__nonnull__(1)));
+
+mmec_decl bool mmec_intrep_bytevector_is_empty (mmec_intrep_bytevector_t const * const bv)
+  __attribute__((__nonnull__(1)));
+
+mmec_decl bool mmec_intrep_bytevector_is_not_empty (mmec_intrep_bytevector_t const * const bv)
   __attribute__((__nonnull__(1)));
 
 

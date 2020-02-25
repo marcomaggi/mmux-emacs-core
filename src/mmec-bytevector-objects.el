@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-25 06:49:39 marco>
+;; Time-stamp: <2020-02-25 09:35:46 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -423,9 +423,9 @@ index START, included, and ending at slot index PAST, excluded.
 					    (past1 (mmec-bytevector-number-of-slots bv1))
 					    (past2 (mmec-bytevector-number-of-slots bv2)))
 		     ,DOCSTRING
-		     (cl-assert (<= 0 start1 past2 (mmec-bytevector-number-of-slots bv1)))
+		     (cl-assert (<= 0 start1 past1 (mmec-bytevector-number-of-slots bv1)))
 		     (cl-assert (<= 0 start2 past2 (mmec-bytevector-number-of-slots bv2)))
-		     (,FUNCNAME-6 bv1 start1 past2 bv2 start2 past2)))))
+		     (,FUNCNAME-6 bv1 start1 past1 bv2 start2 past2)))))
   (mmec--def compare "Return the following code:
 
  0, if the following condition is true:
@@ -553,7 +553,7 @@ Return the following code:
 
   or, while  visiting the  slots from  START to PAST,  BV1 holds  a slot
   value that is less than the corresponding slot value in BV2."
-		       (cl-assert (<= 0 start1 past2 (mmec-bytevector-number-of-slots bv1)))
+		       (cl-assert (<= 0 start1 past1 (mmec-bytevector-number-of-slots bv1)))
 		       (cl-assert (<= 0 start2 past2 (mmec-bytevector-number-of-slots bv2)))
 		       (,CFUNC-COMPARE (mmec--extract-obj ,BV-TYPE bv1) start1 past1
 				       (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
@@ -561,7 +561,7 @@ Return the following code:
 		     (cl-defmethod mmec-bytevector-equal-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
 							    (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
 		       "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
-		       (cl-assert (<= 0 start1 past2 (mmec-bytevector-number-of-slots bv1)))
+		       (cl-assert (<= 0 start1 past1 (mmec-bytevector-number-of-slots bv1)))
 		       (cl-assert (<= 0 start2 past2 (mmec-bytevector-number-of-slots bv2)))
 		       (,CFUNC-EQUAL (mmec--extract-obj ,BV-TYPE bv1) start1 past1
 				     (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
@@ -569,7 +569,7 @@ Return the following code:
 		     (cl-defmethod mmec-bytevector-less-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
 							   (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
 		       "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
-		       (cl-assert (<= 0 start1 past2 (mmec-bytevector-number-of-slots bv1)))
+		       (cl-assert (<= 0 start1 past1 (mmec-bytevector-number-of-slots bv1)))
 		       (cl-assert (<= 0 start2 past2 (mmec-bytevector-number-of-slots bv2)))
 		       (,CFUNC-LESS (mmec--extract-obj ,BV-TYPE bv1) start1 past1
 				    (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
@@ -577,7 +577,7 @@ Return the following code:
 		     (cl-defmethod mmec-bytevector-greater-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
 							      (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
 		       "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
-		       (cl-assert (<= 0 start1 past2 (mmec-bytevector-number-of-slots bv1)))
+		       (cl-assert (<= 0 start1 past1 (mmec-bytevector-number-of-slots bv1)))
 		       (cl-assert (<= 0 start2 past2 (mmec-bytevector-number-of-slots bv2)))
 		       (,CFUNC-GREATER (mmec--extract-obj ,BV-TYPE bv1) start1 past1
 				       (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
@@ -585,7 +585,7 @@ Return the following code:
 		     (cl-defmethod mmec-bytevector-leq-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
 							  (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
 		       "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
-		       (cl-assert (<= 0 start1 past2 (mmec-bytevector-number-of-slots bv1)))
+		       (cl-assert (<= 0 start1 past1 (mmec-bytevector-number-of-slots bv1)))
 		       (cl-assert (<= 0 start2 past2 (mmec-bytevector-number-of-slots bv2)))
 		       (,CFUNC-LEQ (mmec--extract-obj ,BV-TYPE bv1) start1 past1
 				   (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
@@ -593,7 +593,7 @@ Return the following code:
 		     (cl-defmethod mmec-bytevector-geq-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
 							  (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
 		       "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
-		       (cl-assert (<= 0 start1 past2 (mmec-bytevector-number-of-slots bv1)))
+		       (cl-assert (<= 0 start1 past1 (mmec-bytevector-number-of-slots bv1)))
 		       (cl-assert (<= 0 start2 past2 (mmec-bytevector-number-of-slots bv2)))
 		       (,CFUNC-GEQ (mmec--extract-obj ,BV-TYPE bv1) start1 past1
 				   (mmec--extract-obj ,BV-TYPE bv2) start2 past2))

@@ -290,7 +290,7 @@ mmec_intrep_bytevector_check_comparison_spans (mmec_intrep_bytevector_t const * 
   } else if (src_span > dst_span) {
     return +1;
   } else {
-    assert(src_span == dst_span);
+    assert(src_span < dst_span);
     return -1;
   }
 }

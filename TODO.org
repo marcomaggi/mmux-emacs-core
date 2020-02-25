@@ -1,6 +1,5 @@
 ﻿-*- coding: utf-8-with-signature-unix; fill-column: 200 -*-
 
-* Test the bytevector comparison functions.
 * Implement the subbytevector functions.
 * Test the subbytevector functions.
 * Document the subbytevector functions.

@@ -568,6 +568,121 @@
   (mmec--def ldouble))
 
 
+;;;; comparison functions
+
+(cl-macrolet
+    ((mmec--compare	(TYPESTEM RV VEC1 VEC2)
+			(let* ((FUNC		(mmec-sformat "mmec-bytevector-compare" TYPESTEM))
+			       (BVFROMVECTOR	(mmec-sformat "mmec-%s-bytevector-from-vector" TYPESTEM)))
+			  `(should (equal ,RV (,FUNC (,BVFROMVECTOR ,VEC1) (,BVFROMVECTOR ,VEC2))))))
+
+     (mmec--equal	(TYPESTEM RV VEC1 VEC2)
+			(let* ((FUNC		(mmec-sformat "mmec-bytevector-equal" TYPESTEM))
+			       (BVFROMVECTOR	(mmec-sformat "mmec-%s-bytevector-from-vector" TYPESTEM)))
+			  `(should (equal ,RV (,FUNC (,BVFROMVECTOR ,VEC1) (,BVFROMVECTOR ,VEC2))))))
+
+     (mmec--less	(TYPESTEM RV VEC1 VEC2)
+			(let* ((FUNC		(mmec-sformat "mmec-bytevector-less" TYPESTEM))
+			       (BVFROMVECTOR	(mmec-sformat "mmec-%s-bytevector-from-vector" TYPESTEM)))
+			  `(should (equal ,RV (,FUNC (,BVFROMVECTOR ,VEC1) (,BVFROMVECTOR ,VEC2))))))
+
+     (mmec--greater	(TYPESTEM RV VEC1 VEC2)
+			(let* ((FUNC		(mmec-sformat "mmec-bytevector-greater" TYPESTEM))
+			       (BVFROMVECTOR	(mmec-sformat "mmec-%s-bytevector-from-vector" TYPESTEM)))
+			  `(should (equal ,RV (,FUNC (,BVFROMVECTOR ,VEC1) (,BVFROMVECTOR ,VEC2))))))
+
+     (mmec--leq		(TYPESTEM RV VEC1 VEC2)
+			(let* ((FUNC		(mmec-sformat "mmec-bytevector-leq" TYPESTEM))
+			       (BVFROMVECTOR	(mmec-sformat "mmec-%s-bytevector-from-vector" TYPESTEM)))
+			  `(should (equal ,RV (,FUNC (,BVFROMVECTOR ,VEC1) (,BVFROMVECTOR ,VEC2))))))
+
+     (mmec--geq		(TYPESTEM RV VEC1 VEC2)
+			(let* ((FUNC		(mmec-sformat "mmec-bytevector-geq" TYPESTEM))
+			       (BVFROMVECTOR	(mmec-sformat "mmec-%s-bytevector-from-vector" TYPESTEM)))
+			  `(should (equal ,RV (,FUNC (,BVFROMVECTOR ,VEC1) (,BVFROMVECTOR ,VEC2))))))
+
+     (mmec--def		(TYPESTEM)
+			(let* ((TSTNAME-COMPARE	(mmec-sformat "mmec-%s-bytevector-comparison/compare" TYPESTEM))
+			       (TESTNAME-EQUAL	(mmec-sformat "mmec-%s-bytevector-comparison/equal" TYPESTEM))
+			       (TESTNAME-LESS	(mmec-sformat "mmec-%s-bytevector-comparison/less" TYPESTEM))
+			       (TSTNAME-GREATER	(mmec-sformat "mmec-%s-bytevector-comparison/greater" TYPESTEM))
+			       (TESTNAME-LEQ	(mmec-sformat "mmec-%s-bytevector-comparison/leq" TYPESTEM))
+			       (TESTNAME-GEQ	(mmec-sformat "mmec-%s-bytevector-comparison/geq" TYPESTEM))
+			       (DOCSTRING	(format "Test comparison between `mmec-%s-bytevector' objects." TYPESTEM)))
+			  `(progn
+			     (ert-deftest ,TSTNAME-COMPARE ()
+			       ,DOCSTRING
+			       (mmec--compare	,TYPESTEM  0 [0 1 2] [0 1 2])
+			       (mmec--compare	,TYPESTEM -1 [0 1]   [0 1 2]) ;shorter first
+			       (mmec--compare	,TYPESTEM +1 [0 1 2] [0 1])   ;shorter second
+			       (mmec--compare	,TYPESTEM -1 [0 1 2] [0 9 2])
+			       (mmec--compare	,TYPESTEM +1 [0 9 2] [0 1 2]))
+			     (ert-deftest ,TESTNAME-EQUAL ()
+			       ,DOCSTRING
+			       (mmec--equal	,TYPESTEM   t [0 1 2] [0 1 2])
+			       (mmec--equal	,TYPESTEM nil [0 1]   [0 1 2]) ;shorter first
+			       (mmec--equal	,TYPESTEM nil [0 1 2] [0 1])   ;shorter second
+			       (mmec--equal	,TYPESTEM nil [0 1 2] [0 9 2])
+			       (mmec--equal	,TYPESTEM nil [0 9 2] [0 1 2]))
+			     (ert-deftest ,TESTNAME-LESS ()
+			       ,DOCSTRING
+			       (mmec--less	,TYPESTEM nil [0 1 2] [0 1 2])
+			       (mmec--less	,TYPESTEM   t [0 1]   [0 1 2]) ;shorter first
+			       (mmec--less	,TYPESTEM nil [0 1 2] [0 1])   ;shorter second
+			       (mmec--less	,TYPESTEM   t [0 1 2] [0 9 2])
+			       (mmec--less	,TYPESTEM nil [0 9 2] [0 1 2]))
+			     (ert-deftest ,TSTNAME-GREATER ()
+			       ,DOCSTRING
+			       (mmec--greater	,TYPESTEM nil [0 1 2] [0 1 2])
+			       (mmec--greater	,TYPESTEM nil [0 1]   [0 1 2]) ;shorter first
+			       (mmec--greater	,TYPESTEM   t [0 1 2] [0 1])   ;shorter second
+			       (mmec--greater	,TYPESTEM nil [0 1 2] [0 9 2])
+			       (mmec--greater	,TYPESTEM   t [0 9 2] [0 1 2]))
+			     (ert-deftest ,TESTNAME-LEQ ()
+			       ,DOCSTRING
+			       (mmec--leq	,TYPESTEM   t [0 1 2] [0 1 2])
+			       (mmec--leq	,TYPESTEM   t [0 1]   [0 1 2]) ;shorter first
+			       (mmec--leq	,TYPESTEM nil [0 1 2] [0 1])   ;shorter second
+			       (mmec--leq	,TYPESTEM   t [0 1 2] [0 9 2])
+			       (mmec--leq	,TYPESTEM nil [0 9 2] [0 1 2]))
+			     (ert-deftest ,TESTNAME-GEQ ()
+			       ,DOCSTRING
+			       (mmec--geq	,TYPESTEM   t [0 1 2] [0 1 2])
+			       (mmec--geq	,TYPESTEM nil [0 1]   [0 1 2]) ;shorter first
+			       (mmec--geq	,TYPESTEM   t [0 1 2] [0 1])   ;shorter second
+			       (mmec--geq	,TYPESTEM nil [0 1 2] [0 9 2])
+			       (mmec--geq	,TYPESTEM   t [0 9 2] [0 1 2])))
+			  )))
+  (mmec--def char)
+  (mmec--def schar)
+  (mmec--def uchar)
+  (mmec--def wchar)
+  (mmec--def sshrt)
+  (mmec--def ushrt)
+  (mmec--def sint)
+  (mmec--def uint)
+  (mmec--def slong)
+  (mmec--def ulong)
+  (mmec--def sllong)
+  (mmec--def ullong)
+  (mmec--def sintmax)
+  (mmec--def uintmax)
+  (mmec--def ssize)
+  (mmec--def usize)
+  (mmec--def ptrdiff)
+  (mmec--def sint8)
+  (mmec--def uint8)
+  (mmec--def sint16)
+  (mmec--def uint16)
+  (mmec--def sint32)
+  (mmec--def uint32)
+  (mmec--def sint64)
+  (mmec--def uint64)
+  (mmec--def float)
+  (mmec--def double)
+  (mmec--def ldouble))
+
+
 ;;;; done
 
 (ert-run-tests-batch-and-exit)

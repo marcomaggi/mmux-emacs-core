@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-23 07:45:26 marco>
+;; Time-stamp: <2020-02-25 05:58:03 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -34,6 +34,7 @@
 (eval-and-compile
   (load "libmmux-emacs-core"))
 (require 'cl-lib)
+(require 'cl-print)
 
 
 ;;;; error symbols

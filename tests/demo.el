@@ -31,7 +31,7 @@
 		(let* ((TESTNAME	(mmec-sformat "mmec-%s-print-test"	TYPESTEM))
 		       (NUMTYPE		(mmec-sformat "mmec-%s"			TYPESTEM))
 		       (DOCSTRING	(format "Test printing numbers of type `%s'." NUMTYPE))
-		       (RESULT		(format "\"#s(%s 123)\"" NUMTYPE)))
+		       (RESULT		(format "#s(%s 123)" NUMTYPE)))
 		  `(ert-deftest ,TESTNAME ()
 		     ,DOCSTRING
 		     (should (equal ,RESULT (cl-prin1-to-string (,NUMTYPE 123))))))))
@@ -61,7 +61,7 @@
   ;; (mmec--def sint64)
   ;; (mmec--def uint64)
   ;; (mmec--def float)
-  (mmec--def double)
+  ;;(mmec--def double)
   ;; (mmec--def ldouble)
   )
 

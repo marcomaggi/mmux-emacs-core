@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-23 21:27:50 marco>
+;; Time-stamp: <2020-02-25 06:51:13 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -2183,7 +2183,7 @@ argument is invalid."
   (mmec--def/floating-point	ldouble))
 
 
-;;;; printing
+;;;; printing objects
 
 (cl-macrolet
     ((mmec--def (TYPESTEM)
@@ -2194,7 +2194,7 @@ argument is invalid."
 		       (TEMPLATE	(format "#s(%s %%d)" NUMTYPE)))
 		  `(cl-defmethod cl-print-object ((obj ,NUMTYPE) stream)
 		     ,DOCSTRING
-		     (cl-print-object (format ,TEMPLATE (,OBJ-EXTRACTOR obj)) stream)))))
+		     (princ (format ,TEMPLATE (,OBJ-EXTRACTOR obj)) stream)))))
   (mmec--def char)
   (mmec--def schar)
   (mmec--def uchar)
@@ -2211,10 +2211,10 @@ argument is invalid."
 		(let* ((NUMTYPE		(mmec-sformat "mmec-%s" TYPESTEM))
 		       (OBJ-EXTRACTOR	(mmec-sformat "mmec-%s-obj" TYPESTEM))
 		       (DOCSTRING	(format "Print to a stream the representation of a number object of type `%s'." NUMTYPE))
-		       (TEMPLATE	(format "#s(%s %%f)" NUMTYPE)))
+		       (TEMPLATE	(format "#s(%s %%g)" NUMTYPE)))
 		  `(cl-defmethod cl-print-object ((obj ,NUMTYPE) stream)
 		     ,DOCSTRING
-		     (cl-print-object (format ,TEMPLATE (,OBJ-EXTRACTOR obj)) stream)))))
+		     (princ (format ,TEMPLATE (,OBJ-EXTRACTOR obj)) stream)))))
   (mmec--def double))
 
 (cl-macrolet
@@ -2223,10 +2223,11 @@ argument is invalid."
 		(let* ((NUMTYPE		(mmec-sformat "mmec-%s" TYPESTEM))
 		       (OBJ-EXTRACTOR	(mmec-sformat "mmec-%s-obj" TYPESTEM))
 		       (DOCSTRING	(format "Print to a stream the representation of a number object of type `%s'." NUMTYPE))
+		       (TEMPLATE	(format "#s(%s %%s)" NUMTYPE))
 		       (CLANG-PRINTER	(mmec-sformat "mmec-c-%s-print-to-string" TYPESTEM)))
 		  `(cl-defmethod cl-print-object ((obj ,NUMTYPE) stream)
 		     ,DOCSTRING
-		     (cl-print-object (,CLANG-PRINTER (,OBJ-EXTRACTOR obj)) stream)))))
+		     (princ (format ,TEMPLATE (,CLANG-PRINTER (,OBJ-EXTRACTOR obj))) stream)))))
   (mmec--def wchar)
   (mmec--def sint)
   (mmec--def uint)

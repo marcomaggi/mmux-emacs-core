@@ -935,7 +935,7 @@
 		(let* ((TESTNAME	(mmec-sformat "mmec-%s-print-test"	TYPESTEM))
 		       (NUMTYPE		(mmec-sformat "mmec-%s"			TYPESTEM))
 		       (DOCSTRING	(format "Test printing numbers of type `%s'." NUMTYPE))
-		       (RESULT		(format "\"#s(%s 123)\"" NUMTYPE)))
+		       (RESULT		(format "#s(%s 123)" NUMTYPE)))
 		  `(ert-deftest ,TESTNAME ()
 		     ,DOCSTRING
 		     (should (equal ,RESULT (cl-prin1-to-string (,NUMTYPE 123))))))))
@@ -970,7 +970,7 @@
 		(let* ((TESTNAME	(mmec-sformat "mmec-%s-print-test"	TYPESTEM))
 		       (NUMTYPE		(mmec-sformat "mmec-%s"			TYPESTEM))
 		       (DOCSTRING	(format "Test printing numbers of type `%s'." NUMTYPE))
-		       (RESULT		(format "\"#s(%s 123.000000)\"" NUMTYPE)))
+		       (RESULT		(format "#s(%s 123)" NUMTYPE)))
 		  `(ert-deftest ,TESTNAME ()
 		     ,DOCSTRING
 		     (should (equal ,RESULT (cl-prin1-to-string (,NUMTYPE 123.0))))))))

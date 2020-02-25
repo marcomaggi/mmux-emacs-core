@@ -395,6 +395,65 @@
   (mmec--def ldouble))
 
 
+;;;; printing
+
+(cl-macrolet
+    ((mmec--def (TYPESTEM)
+		(let* ((TESTNAME		(mmec-sformat "mmec-%s-print-test" TYPESTEM))
+		       (BVTYPE			(mmec-sformat "mmec-%s-bytevector" TYPESTEM))
+		       (NUMTYPE			(mmec-sformat "mmec-%s" TYPESTEM))
+		       (DOCSTRING		(format "Test printing bytevectors of type `%s'." NUMTYPE))
+		       (RESULT			(format "#s(%s 0 1 2 3 4 5)" BVTYPE)))
+		  `(ert-deftest ,TESTNAME ()
+		     ,DOCSTRING
+		     (let ((bv (,BVTYPE 6)))
+		       (cl-loop for i from 0 to (mmec-bytevector-last-slot-index bv)
+				do (mmec-bytevector-set bv i (,NUMTYPE i)))
+		       (should (equal ,RESULT (cl-prin1-to-string bv))))))))
+  (mmec--def char)
+  (mmec--def schar)
+  (mmec--def uchar)
+  (mmec--def wchar)
+  (mmec--def sshrt)
+  (mmec--def ushrt)
+  (mmec--def sint)
+  (mmec--def uint)
+  (mmec--def slong)
+  (mmec--def ulong)
+  (mmec--def sllong)
+  (mmec--def ullong)
+  (mmec--def ssize)
+  (mmec--def usize)
+  (mmec--def sintmax)
+  (mmec--def uintmax)
+  (mmec--def ptrdiff)
+  (mmec--def sint8)
+  (mmec--def uint8)
+  (mmec--def sint16)
+  (mmec--def uint16)
+  (mmec--def sint32)
+  (mmec--def uint32)
+  (mmec--def sint64)
+  (mmec--def uint64))
+
+(cl-macrolet
+    ((mmec--def (TYPESTEM)
+		(let* ((TESTNAME		(mmec-sformat "mmec-%s-print-test" TYPESTEM))
+		       (BVTYPE			(mmec-sformat "mmec-%s-bytevector" TYPESTEM))
+		       (NUMTYPE			(mmec-sformat "mmec-%s" TYPESTEM))
+		       (DOCSTRING		(format "Test printing bytevectors of type `%s'." NUMTYPE))
+		       (RESULT			(format "#s(%s 0 1 2 3 4 5)" BVTYPE)))
+		  `(ert-deftest ,TESTNAME ()
+		     ,DOCSTRING
+		     (let ((bv (,BVTYPE 6)))
+		       (cl-loop for i from 0 to (mmec-bytevector-last-slot-index bv)
+				do (mmec-bytevector-set bv i (,NUMTYPE i)))
+		       (should (equal ,RESULT (cl-prin1-to-string bv))))))))
+  (mmec--def float)
+  (mmec--def double)
+  (mmec--def ldouble))
+
+
 ;;;; conversion to/from list
 
 (cl-macrolet

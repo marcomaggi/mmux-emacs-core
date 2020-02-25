@@ -1046,7 +1046,8 @@ This is the copy constructor implemented as method.  This method creates a dupli
 @cindex @func{cl-prin1-to-string}, printing @objtype{mmec-\ETYPESTEM\} to a string
 Specialised method that prints a representation of @var{OBJ} to @var{STREAM}.  We can print
 instances of @objtype{mmec-\ETYPESTEM\} with the generic functions @func{cl-prin1} and
-@func{cl-prin1-to-string}.
+@func{cl-prin1-to-string}.  Notice that the generic function @func{cl-print-object} is used by the
+printing facilities only when the variable @code{cl-print-readably} is set to false.
 @end deffn
 
 @end macro
@@ -1794,6 +1795,16 @@ index @var{IDX}, and return it as value of type @objtype{mmec-\TYPESTEM\}.  If t
 Extract a value of C language type @code{\CTYPE\} from the value @var{VAL} and store it in the
 binary data area of @var{BV}, at slot index @var{IDX}; return @nil{}.  If the slot index @var{IDX}
 is invalid: raise the condition @code{mmec-error-bytevector-index-out-of-range}.
+@end deffn
+
+
+@deffn {Method} cl-print-object (@var{BV} mmec-\TYPESTEM\-bytevector) @var{STREAM}
+@cindex @func{cl-prin1}, printing @objtype{mmec-\TYPESTEM\-bytevector} to a stream
+@cindex @func{cl-prin1-to-string}, printing @objtype{mmec-\TYPESTEM\-bytevector} to a string
+Specialised method that prints a representation of @var{BV} to @var{STREAM}.  We can print instances
+of @objtype{mmec-\TYPESTEM\-bytevector} with the generic functions @func{cl-prin1} and
+@func{cl-prin1-to-string}.  Notice that the generic function @func{cl-print-object} is used by the
+printing facilities only when the variable @code{cl-print-readably} is set to false.
 @end deffn
 
 @end macro

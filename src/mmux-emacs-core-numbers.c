@@ -533,26 +533,26 @@ MMEC_COMPARISON_OPERATIONS2(uint64, sint64)
   {									\
     assert(1 == nargs);							\
     mmec_clang_ ## STEM ## _t	val = mmec_extract_clang_ ## STEM ## _from_emacs_value(env, args[0]); \
-    int				required_len = 0;			\
+    int				required_len_minus_termzero = 0;	\
 									\
     /* First attempt at writing the output. */				\
     {									\
       char	buffer[64];						\
 									\
-      required_len = snprintf(buffer, 64, TEMPLATE, CASTER val);	\
-      if (64 > required_len) {						\
+      required_len_minus_termzero = snprintf(buffer, 64, TEMPLATE, CASTER val);	\
+      if (64 > required_len_minus_termzero) {				\
 	if (0) { fprintf(stderr, "%s: %s\n", __func__, buffer); }	\
-	return mmec_new_emacs_value_string(env, buffer, required_len);	\
+	return mmec_new_emacs_value_string(env, buffer, required_len_minus_termzero); \
       }									\
     }									\
 									\
     /* Second attempt at writing the output.  We assume that this will succeed.  */ \
     {									\
-      char	buffer[required_len];					\
+      char	buffer[required_len_minus_termzero];			\
       int	this_len;						\
 									\
-      this_len = snprintf(buffer, required_len, TEMPLATE, CASTER val);	\
-      assert(this_len <= required_len);					\
+      this_len = snprintf(buffer, required_len_minus_termzero, TEMPLATE, CASTER val); \
+      assert(this_len <= required_len_minus_termzero);			\
       return mmec_new_emacs_value_string(env, buffer, this_len);	\
     }									\
   }

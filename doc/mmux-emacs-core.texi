@@ -2566,6 +2566,7 @@ The base type of all the error symbols.
 * errors constructor::          Constructor errors.
 * errors range::                Range errors.
 * errors operations::           Operation errors.
+* errors mathematics::          Mathematics errors.
 @end menu
 
 @c page
@@ -2573,79 +2574,122 @@ The base type of all the error symbols.
 @section Constructor errors
 
 
-@defvr {Error Symbol} mmec-error-constructor
-@defvrx {Parent Error Symbol} mmec-error
+@menu
+* errors constructor generic::     Generic constructor errors.
+* errors constructor bytevector::  Bytevector constructor errors.
+@end menu
+
+@c page
+@node errors constructor generic
+@subsection Generic constructor errors
+
+
+@deftypevr {Error Symbol} symbol mmec-error-constructor
+@deftypevrx {Parent Error Symbol} symbol mmec-error
 An error occurred while constructing an object.
-@end defvr
+@end deftypevr
 
 
-@defvr {Error Symbol} mmec-error-no-memory
-@defvrx {Parent Error Symbol} mmec-error-constructor
+@deftypevr {Error Symbol} symbol mmec-error-no-memory
+@deftypevrx {Parent Error Symbol} symbol mmec-error-constructor
 Used to signal that there was not enough memory to allocate an object.
-@end defvr
+@end deftypevr
 
 
-@defvr {Error Symbol} mmec-error-instantiating-abstract-type
-@defvrx {Parent Error Symbol} mmec-error-constructor
+@deftypevr {Error Symbol} symbol mmec-error-instantiating-abstract-type
+@deftypevrx {Parent Error Symbol} symbol mmec-error-constructor
 An attempt was performed to instantiate an abstract data type.
-@end defvr
+@end deftypevr
 
 
-@defvr {Error Symbol} mmec-error-unsupported-init-type
-@defvrx {Parent Error Symbol} mmec-error-constructor
+@deftypevr {Error Symbol} symbol mmec-error-unsupported-init-type
+@deftypevrx {Parent Error Symbol} symbol mmec-error-constructor
 An argument given to an object constructor has an unsupported type.
-@end defvr
+@end deftypevr
 
 
-@defvr {Error Symbol} mmec-error-bytevector-constructor
-@defvrx {Parent Error Symbol} mmec-error-constructor
+@c page
+@node errors constructor bytevector
+@subsection Bytevector constructor errors
+
+
+@deftypevr {Error Symbol} symbol mmec-error-bytevector-constructor
+@deftypevrx {Parent Error Symbol} symbol mmec-error-constructor
 An error occurred while building a bytevector object.
-@end defvr
+@end deftypevr
 
 
-@defvr {Error Symbol} mmec-error-bytevector-constructor-invalid-number-of-slots
-@defvrx {Parent Error Symbol} mmec-error-bytevector-constructor
+@deftypevr {Error Symbol} symbol mmec-error-bytevector-constructor-invalid-number-of-slots
+@deftypevrx {Parent Error Symbol} symbol mmec-error-bytevector-constructor
 An invalid number of slots was given as argument to a bytevector constructor.
-@end defvr
+@end deftypevr
+
+
+@deftypevr {Error Symbol} symbol mmec-error-bytevector-constructor-invalid-slot-size
+@deftypevrx {Parent Error Symbol} symbol mmec-error-bytevector-constructor
+An invalid slot size was given as argument to a bytevector constructor.
+@end deftypevr
 
 @c page
 @node errors range
 @section Range errors
 
 
-@defvr {Error Symbol} mmec-error-value-out-of-range
-@defvrx {Parent Error Symbol} mmec-error
+@deftypevr {Error Symbol} symbol mmec-error-value-out-of-range
+@deftypevrx {Parent Error Symbol} symbol mmec-error
 A numeric object is out of range.
-@end defvr
+@end deftypevr
 
 
-@defvr {Error Symbol} mmec-error-index-out-of-range
-@defvrx {Parent Error Symbol} mmec-error-value-out-of-range
+@deftypevr {Error Symbol} symbol mmec-error-index-out-of-range
+@deftypevrx {Parent Error Symbol} symbol mmec-error-value-out-of-range
 Used to signal an attempt to access the internal represenation of an object with an index out of
 range.
-@end defvr
+@end deftypevr
 
 
-@defvr {Error Symbol} mmec-error-bytevector-index-out-of-range
-@defvrx {Parent Error Symbol} mmec-error-index-out-of-range
+@deftypevr {Error Symbol} symbol mmec-error-bytevector-index-out-of-range
+@deftypevrx {Parent Error Symbol} symbol mmec-error-index-out-of-range
 Attempt to access the internal represenation of a bytevector object with an index out of range.
-@end defvr
+@end deftypevr
 
 
-@defvr {Error Symbol} mmec-error-bytevector-is-empty
-@defvrx {Parent Error Symbol} mmec-error-value-out-of-range
+@deftypevr {Error Symbol} symbol mmec-error-bytevector-is-empty
+@deftypevrx {Parent Error Symbol} symbol mmec-error-value-out-of-range
 Used to signal that a bytevector operand is empty.
-@end defvr
+@end deftypevr
 
 @c page
 @node errors operations
 @section Operation errors
 
 
-@defvr {Error Symbol} mmec-error-signed/unsigned-integer-comparison
-@defvrx {Parent Error Symbol} mmec-error
+@deftypevr {Error Symbol} symbol mmec-error-signed/unsigned-integer-comparison
+@deftypevrx {Parent Error Symbol} symbol mmec-error
 Cannot compare a signed integer with an unsigned integer.
-@end defvr
+@end deftypevr
+
+@c page
+@node errors mathematics
+@section Mathematics errors
+
+
+@deftypevr {Error Symbol} symbol mmec-error-mathematics
+@deftypevrx {Parent Error Symbol} symbol mmec-error
+Error while performing a mathematics operation.
+@end deftypevr
+
+
+@deftypevr {Error Symbol} symbol mmec-error-mathematics-overflow
+@deftypevrx {Parent Error Symbol} symbol mmec-error-mathematics
+Overflow while performing a mathematics operation.
+@end deftypevr
+
+
+@deftypevr {Error Symbol} symbol mmec-error-mathematics-underflow
+@deftypevrx {Parent Error Symbol} symbol mmec-error-mathematics
+Underflow while performing a mathematics operation.
+@end deftypevr
 
 @c page
 @node capi
@@ -2863,22 +2907,15 @@ An alias for the C language type @code{long double}.
 
 
 @menu
-* capi errors typedefs::        Error signalling type definitions.
 * capi errors macros::          Error signalling preprocessor macros.
+* capi errors detect::          Detecting errors.
+* capi errors typedefs::        Error--signalling type definitions.
 * capi errors base::            Signalling base errors.
 * capi errors constructor::     Signalling constructor errors.
 * capi errors range::           Signalling range errors.
 * capi errors operations::      Signalling operation errors.
+* capi errors mathematics::     Mathematics errors.
 @end menu
-
-@c page
-@node capi errors typedefs
-@subsection Error signalling type definitions
-
-
-@deftypefn {Function Protoype} emacs_value mmec_error_signaller_fun_t (emacs_env * @var{env})
-Prototype of functions signalling an error.
-@end deftypefn
 
 @c page
 @node capi errors macros
@@ -2919,11 +2956,59 @@ MMEC_DEFINE_ERROR_SIGNALLER(mmec, memory_alloction,
 @end defmac
 
 @c page
+@node capi errors detect
+@subsection Detecting errors
+
+
+@deftypefn {Function Prototype} bool mmec_funcall_error_detection_fun_t (emacs_env * @var{env})
+Prototype of functions used to detect if a function, either C language or Emacs Lisp, returned with
+an error condition.
+@end deftypefn
+
+
+@deftypefun mmec_funcall_error_detection_fun_t mmec_funcall_returned_with_success
+Return @ctrue{} if the environment @var{ENV} reports that a function call has successfully returned,
+with no errors; otherwise return @cfalse{}.
+@end deftypefun
+
+
+@deftypefun mmec_funcall_error_detection_fun_t mmec_funcall_returned_with_error
+Return @ctrue{} if the environment @var{ENV} reports that a function call has returned with an
+error; otherwise return @cfalse{}.
+@end deftypefun
+
+
+@deftypefun mmec_funcall_error_detection_fun_t mmec_funcall_returned_with_signal
+Return @ctrue{} if the environment @var{ENV} reports that a function call has signalled an error;
+otherwise return @cfalse{}.
+@end deftypefun
+
+
+@deftypefun mmec_funcall_error_detection_fun_t mmec_funcall_returned_with_throw
+Return @ctrue{} if the environment @var{ENV} reports that a function call has thrown an error;
+otherwise return @cfalse{}.
+@end deftypefun
+
+
+@deftypefun void mmec_clear_environment_error (emacs_env * @var{ENV})
+Clear any error signalled in the environment @var{ENV}.
+@end deftypefun
+
+@c page
+@node capi errors typedefs
+@subsection Error signalling type definitions
+
+
+@deftypefn {Function Protoype} emacs_value mmec_error_signaller_fun_t (emacs_env * @var{env})
+Prototype of functions signalling an error.
+@end deftypefn
+
+@c page
 @node capi errors base
 @subsection Signalling base errors
 
 
-@deftypefun emacs_value mmec_error_base (emacs_env * @var{env})
+@deftypefun mmec_error_signaller_fun_t mmec_error_base
 Signal an error with error symbol @code{mmec-error} then return @nil{}.
 @end deftypefun
 
@@ -2932,33 +3017,54 @@ Signal an error with error symbol @code{mmec-error} then return @nil{}.
 @subsection Signalling constructor errors
 
 
-@deftypefun emacs_value mmec_error_constructor (emacs_env * @var{env})
+@menu
+* capi errors constructor generic::     Generic constructor errors.
+* capi errors constructor bytevector::  Bytevector constructor errors.
+@end menu
+
+@c page
+@node capi errors constructor generic
+@subsubsection Generic constructor errors
+
+
+@deftypefun mmec_error_signaller_fun_t mmec_error_constructor
 Signal an error with symbol @code{mmec-error-constructor} then return @nil{}.
 @end deftypefun
 
 
-@deftypefun emacs_value mmec_error_memory_allocation (emacs_env * @var{env})
+@deftypefun mmec_error_signaller_fun_t mmec_error_memory_allocation
 Signal an error with symbol @code{mmec-error-no-memory} then return @nil{}.
 @end deftypefun
 
 
-@deftypefun emacs_value mmec_error_instantiating_abstract_type (emacs_env * @var{env})
+@deftypefun mmec_error_signaller_fun_t mmec_error_instantiating_abstract_type
 Signal an error with symbol @code{mmec-error-instantiating-abstract-type} then return @nil{}.
 @end deftypefun
 
 
-@deftypefun emacs_value mmec_error_unsupported_init_type (emacs_env * @var{env})
+@deftypefun mmec_error_signaller_fun_t mmec_error_unsupported_init_type
 Signal an error with symbol @code{mmec-error-unsupported-init-type} then return @nil{}.
 @end deftypefun
 
+@c page
+@node capi errors constructor bytevector
+@subsubsection Bytevector constructor errors
 
-@deftypefun emacs_value mmec_error_bytevector_constructor (emacs_env * @var{env})
-An error occurred while building a bytevector object.
+
+@deftypefun mmec_error_signaller_fun_t mmec_error_bytevector_constructor
+Signal an error with symbol @code{mmec-error-bytevector-constructor} then return @nil{}.
 @end deftypefun
 
 
-@deftypefun emacs_value mmec_error_bytevector_constructor_invalid_number_of_slots (emacs_env * @var{env})
-An invalid number of slots was given as argument to a bytevector constructor.
+@deftypefun mmec_error_signaller_fun_t mmec_error_bytevector_constructor_invalid_number_of_slots
+Signal an error with symbol @code{mmec-error-bytevector-constructor-invalid-number-of-slots} then
+return @nil{}.
+@end deftypefun
+
+
+@deftypefun mmec_error_signaller_fun_t mmec_error_bytevector_constructor_invalid_slot_size
+Signal an error with symbol @code{mmec-error-bytevector-constructor-invalid-slot-size} then return
+@nil{}.
 @end deftypefun
 
 @c page
@@ -2966,22 +3072,22 @@ An invalid number of slots was given as argument to a bytevector constructor.
 @subsection Signalling range errors
 
 
-@deftypefun emacs_value mmec_error_value_out_of_range (emacs_env * @var{env})
+@deftypefun mmec_error_signaller_fun_t mmec_error_value_out_of_range
 Signal an error with symbol @code{mmec-error-value-out-of-range} then return @nil{}.
 @end deftypefun
 
 
-@deftypefun emacs_value mmec_error_index_out_of_range (emacs_env * @var{env})
+@deftypefun mmec_error_signaller_fun_t mmec_error_index_out_of_range
 Signal an error with symbol @code{mmec-error-index-out-of-range} then return @nil{}.
 @end deftypefun
 
 
-@deftypefun emacs_value mmec_error_bytevector_index_out_of_range (emacs_env * @var{env})
+@deftypefun mmec_error_signaller_fun_t mmec_error_bytevector_index_out_of_range
 Signal an error with symbol @code{mmec-error-bytevector-index-out-of-range} then return @nil{}.
 @end deftypefun
 
 
-@deftypefun emacs_value mmec_error_error_bytevector_is_empty (emacs_env * @var{env})
+@deftypefun mmec_error_signaller_fun_t mmec_error_error_bytevector_is_empty
 Signal an error with symbol @code{mmec-error-bytevector-is-empty} then return @nil{}.
 @end deftypefun
 
@@ -2990,8 +3096,27 @@ Signal an error with symbol @code{mmec-error-bytevector-is-empty} then return @n
 @subsection Signalling operation errors
 
 
-@deftypefun emacs_value mmec_error_signed_unsigned_integer_comparison (emacs_env * @var{env})
+@deftypefun mmec_error_signaller_fun_t mmec_error_signed_unsigned_integer_comparison
 Signal an error with symbol @code{mmec-error-signed/unsigned-integer-comparison} then return @nil{}.
+@end deftypefun
+
+@c page
+@node capi errors mathematics
+@subsection Mathematics errors
+
+
+@deftypefun mmec_error_signaller_fun_t mmec_error_mathematics
+Signal an error with symbol @code{mmec-error-mathematics} then return @nil{}.
+@end deftypefun
+
+
+@deftypefun mmec_error_signaller_fun_t mmec_error_mathematics_overflow
+Signal an error with symbol @code{mmec-error-mathematics-overflow} then return @nil{}.
+@end deftypefun
+
+
+@deftypefun mmec_error_signaller_fun_t mmec_error_mathematics_underflow
+Signal an error with symbol @code{mmec-error-mathematics-underflow} then return @nil{}.
 @end deftypefun
 
 @c page
@@ -3550,23 +3675,60 @@ Pointer to the binary data area.  Set to @cnull{} if the number of slots is zero
 @subsection Bytevector constructors and destructors
 
 
-@deftypefun {mmec_interp_bytevector_t *} mmec_new_intrep_bytevector (intmax_t @var{number_of_slots}, intmax_t @var{slot_size}, bool @var{hold_signed_values})
-Allocate, initialise and return a new bytevector user--pointer object.  If memory allocation fails:
-return @cnull{}.
+@deftypefun {mmec_interp_bytevector_t *} mmec_new_intrep_bytevector (emacs_env * @var{env}, intmax_t @var{number_of_slots}, intmax_t @var{slot_size}, bool @var{hold_signed_values})
+Allocate, initialise and return a new bytevector user--pointer object.
+
+Upon entering: this function clears any error condition in the environment @var{env}.  If an error
+occurs: this function signals an error and returns @cnull{}; we can test this condition with
+@cfunc{mmec_funcall_returned_with_success} and similar functions.
+
+We can use this function as follows:
+
+@example
+intmax_t  number_of_slots    = 13;
+intmax_t  slot_size          = sizeof(double);
+bool      hold_signed_values = 1;
+mmec_intrep_bytevector_t * bv;
+
+bv = mmec_new_intrep_bytevector(env,
+       number_of_slots, slot_size, hold_signed_values);
+if (mmec_funcall_returned_with_success(env)) @{
+  /* do something with BV */
+@} else @{
+  return mmec_new_emacs_value_nil(env);
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun void mmec_delete_intrep_bytevector (mmec_intrep_bytevecor_t * @var{bv})
 Destructor for user--pointer objects being the internal representation of bytevector objects.  Emacs
 Lisp values of type @objtype{mmec-bytevector} are correctly garbage collected, so we must use this
-destructor only on user--pointer objects that are not embedded into an Emacs value.
+destructor only on user--pointer objects that are @strong{not} embedded into an Emacs value.
 @end deftypefun
 
 
 @macro ClangDefineBytevectorConstructor{TYPESTEM}
-@deftypefun mmec_intrep_bytevector_t * mmec_new_\TYPESTEM\_intrep_bytevector (intmax_t @var{number_of_slots})
+@deftypefun mmec_intrep_bytevector_t * mmec_new_\TYPESTEM\_intrep_bytevector (emacs_env * @var{env}, intmax_t @var{number_of_slots})
 Allocate, initialise and return a new bytevector user--pointer object whose binary data area holds
-slots of type @code{mmec_clang_\TYPESTEM\_t}.  If memory allocation fails: return @cnull{}.
+slots of type @code{mmec_clang_\TYPESTEM\_t}.
+
+Upon entering: this function clears any error condition in the environment @var{env}.  If an error
+occurs: this function signals an error and returns @cnull{}; we can test this condition with
+@cfunc{mmec_funcall_returned_with_success} and similar functions.
+
+We can use this function as follows:
+
+@example
+mmec_intrep_bytevector_t * bv;
+
+bv = mmec_new_\TYPESTEM\_intrep_bytevector(env, 13);
+if (mmec_funcall_returned_with_success(env)) @{
+  /* do something with BV */
+@} else @{
+  return mmec_new_emacs_value_nil(env);
+@}
+@end example
 @end deftypefun
 
 @end macro
@@ -3645,7 +3807,7 @@ selection.
 @end deftypefun
 
 
-@deftypefun bool mmec_intrep_bytevector_valid_start_and_past (mmec_intrep_bytevector_t const * @var{BV}, intmax_t @var{START}, intmax_t @var{PAST})
+@deftypefun bool mmec_bytevector_valid_start_and_past_slot_index (mmec_intrep_bytevector_t const * @var{BV}, intmax_t @var{START}, intmax_t @var{PAST})
 Return true if @var{START} and @var{PAST} are valid slot indexes for @var{BV}, that is if the
 following condition is true:
 
@@ -3758,7 +3920,7 @@ area of the bytevectors starting at slot index @var{START}, included, and ending
 @var{PAST}, excluded.
 
 
-@deftypefn {Function Prototype} int mmec_intrep_bytevector_compare_fun_t (mmec_intrep_bytevector_t const * @vari{BV}, intmax_t @vari{START}, intmax_t @vari{PAST}, mmec_intrep_bytevector_t const * @vari{BV}, intmax_t @varii{START}, intmax_t @varii{PAST})
+@deftypefn {Function Prototype} int mmec_intrep_bytevector_compare_fun_t (mmec_intrep_bytevector_t const * @vari{BV}, intmax_t @vari{START}, intmax_t @vari{PAST}, mmec_intrep_bytevector_t const * @varii{BV}, intmax_t @varii{START}, intmax_t @varii{PAST})
 Compare the selected spans in the bytevectors @vari{BV} and @varii{BV}, return the following code:
 
 @table @code
@@ -3797,7 +3959,7 @@ that is less than the corresponding slot value in @varii{BV}.
 @end deftypefn
 
 
-@deftypefn {Function Prototype} bool mmec_intrep_bytevector_comparison_fun_t (mmec_intrep_bytevector_t const * @vari{BV}, intmax_t @vari{START}, intmax_t @vari{PAST}, mmec_intrep_bytevector_t const * @vari{BV}, intmax_t @varii{START}, intmax_t @varii{PAST})
+@deftypefn {Function Prototype} bool mmec_intrep_bytevector_comparison_fun_t (mmec_intrep_bytevector_t const * @vari{BV}, intmax_t @vari{START}, intmax_t @vari{PAST}, mmec_intrep_bytevector_t const * @varii{BV}, intmax_t @varii{START}, intmax_t @varii{PAST})
 Compare the selected spans in the bytevectors @vari{BV} and @varii{BV}: return @ctrue{} if the
 comparison condition is true; otherwise return @cfalse{}.
 @end deftypefn

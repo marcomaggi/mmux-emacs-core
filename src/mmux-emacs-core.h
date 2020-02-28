@@ -150,32 +150,61 @@ mmec_decl int		mmec_version_interface_age	(void);
 
 typedef emacs_value mmec_error_signaller_fun_t (emacs_env * env);
 
-#undef  MMEC_SIGNALLER_PROTOTYPE
-#define MMEC_SIGNALLER_PROTOTYPE(PREFIX, FUNCNAME)	\
+#undef  MMEC_ERROR_SIGNALLER_PROTOTYPE
+#define MMEC_ERROR_SIGNALLER_PROTOTYPE(PREFIX, FUNCNAME)	\
   mmec_decl mmec_error_signaller_fun_t PREFIX ## _error_ ## FUNCNAME __attribute__((__nonnull__(1)))
 
-MMEC_SIGNALLER_PROTOTYPE(mmec, base);
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, base);
 
 /* ------------------------------------------------------------------ */
 
-MMEC_SIGNALLER_PROTOTYPE(mmec, constructor);
-MMEC_SIGNALLER_PROTOTYPE(mmec, memory_allocation);
-MMEC_SIGNALLER_PROTOTYPE(mmec, instantiating_abstract_type);
-MMEC_SIGNALLER_PROTOTYPE(mmec, unsupported_init_type);
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, constructor);
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, memory_allocation);
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, instantiating_abstract_type);
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, unsupported_init_type);
 
-MMEC_SIGNALLER_PROTOTYPE(mmec, bytevector_constructor);
-MMEC_SIGNALLER_PROTOTYPE(mmec, bytevector_constructor_invalid_number_of_slots);
-
-/* ------------------------------------------------------------------ */
-
-MMEC_SIGNALLER_PROTOTYPE(mmec, value_out_of_range);
-MMEC_SIGNALLER_PROTOTYPE(mmec, index_out_of_range);
-MMEC_SIGNALLER_PROTOTYPE(mmec, bytevector_index_out_of_range);
-MMEC_SIGNALLER_PROTOTYPE(mmec, error_bytevector_is_empty);
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, bytevector_constructor);
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, bytevector_constructor_invalid_number_of_slots);
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, bytevector_constructor_invalid_slot_size);
 
 /* ------------------------------------------------------------------ */
 
-MMEC_SIGNALLER_PROTOTYPE(mmec, signed_unsigned_integer_comparison);
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, value_out_of_range);
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, index_out_of_range);
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, bytevector_index_out_of_range);
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, error_bytevector_is_empty);
+
+/* ------------------------------------------------------------------ */
+
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, signed_unsigned_integer_comparison);
+
+/* ------------------------------------------------------------------ */
+
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, mathematics);
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, mathematics_overflow);
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, mathematics_underflow);
+
+
+/** --------------------------------------------------------------------
+ ** Error detection functions.
+ ** ----------------------------------------------------------------- */
+
+typedef bool mmec_funcall_error_detection_fun_t (emacs_env * env);
+
+mmec_decl mmec_funcall_error_detection_fun_t mmec_funcall_returned_with_success
+  __attribute__((__nonnull__(1)));
+
+mmec_decl mmec_funcall_error_detection_fun_t mmec_funcall_returned_with_error
+  __attribute__((__nonnull__(1)));
+
+mmec_decl mmec_funcall_error_detection_fun_t mmec_funcall_returned_with_signal
+  __attribute__((__nonnull__(1)));
+
+mmec_decl mmec_funcall_error_detection_fun_t mmec_funcall_returned_with_throw
+  __attribute__((__nonnull__(1)));
+
+mmec_decl void mmec_clear_environment_error (emacs_env * env)
+  __attribute__((__nonnull__(1)));
 
 
 /** --------------------------------------------------------------------
@@ -492,12 +521,13 @@ mmec_decl mmec_intrep_bytevector_t * mmec_get_intrep_bytevector_from_emacs_value
  ** Bytevector user-pointer objects: constructors and destructors.
  ** ----------------------------------------------------------------- */
 
-mmec_decl mmec_intrep_bytevector_t * mmec_new_intrep_bytevector (intmax_t number_of_slots, intmax_t slot_size, bool hold_signed_values);
+mmec_decl mmec_intrep_bytevector_t * mmec_new_intrep_bytevector (emacs_env * env, intmax_t number_of_slots,
+								 intmax_t slot_size, bool hold_signed_values);
 mmec_decl void mmec_delete_intrep_bytevector (mmec_intrep_bytevector_t * bv)
   __attribute__((__nonnull__(1)));
 
 
-typedef mmec_intrep_bytevector_t * mmec_new_intrep_bytevector_fun_t (intmax_t number_of_slots);
+typedef mmec_intrep_bytevector_t * mmec_new_intrep_bytevector_fun_t (emacs_env * env, intmax_t number_of_slots);
 
 mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_char_intrep_bytevector;
 mmec_decl mmec_new_intrep_bytevector_fun_t mmec_new_schar_intrep_bytevector;
@@ -539,7 +569,8 @@ mmec_decl bool mmec_bytevector_valid_slot_index (mmec_intrep_bytevector_t const 
 mmec_decl bool mmec_bytevector_valid_past_slot_index (mmec_intrep_bytevector_t const * const bv, intmax_t const idx)
   __attribute__((__nonnull__(1)));
 
-mmec_decl bool mmec_intrep_bytevector_valid_start_and_past (mmec_intrep_bytevector_t const * bv, intmax_t start, intmax_t past)
+mmec_decl bool mmec_bytevector_valid_start_and_past_slot_index (mmec_intrep_bytevector_t const * bv,
+								intmax_t start, intmax_t past)
   __attribute__((__nonnull__(1)));
 
 mmec_decl bool mmec_intrep_bytevector_is_empty (mmec_intrep_bytevector_t const * const bv)
@@ -661,9 +692,9 @@ MMEC_DECLARE_BYTEVECTOR_COMPARISON(ldouble)
  ** Bytevector user-pointer objects: operations.
  ** ----------------------------------------------------------------- */
 
-mmec_decl mmec_intrep_bytevector_t * mmec_new_intrep_bytevector_subsequence (mmec_intrep_bytevector_t const * src,
+mmec_decl mmec_intrep_bytevector_t * mmec_new_intrep_bytevector_subsequence (emacs_env * env, mmec_intrep_bytevector_t const * src,
 									     intmax_t start, intmax_t past)
-  __attribute__((__nonnull__(1)));
+  __attribute__((__nonnull__(2)));
 
 
 /** --------------------------------------------------------------------

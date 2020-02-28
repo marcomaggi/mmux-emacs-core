@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-25 05:58:03 marco>
+;; Time-stamp: <2020-02-28 06:21:57 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -62,12 +62,18 @@
   "An argument given to an object constructor has an unsupported type."
   'mmec-error-constructor)
 
+;; bytevector errors
+
 (define-error 'mmec-error-bytevector-constructor
   "An error occurred while building a bytevector object."
   'mmec-error-constructor)
 
 (define-error 'mmec-error-bytevector-constructor-invalid-number-of-slots
   "An invalid number of slots was given as argument to a bytevector constructor."
+  'mmec-error-bytevector-constructor)
+
+(define-error 'mmec-error-bytevector-constructor-invalid-slot-size
+  "An invalid slot size was given as argument to a bytevector constructor."
   'mmec-error-bytevector-constructor)
 
 ;;; --------------------------------------------------------------------
@@ -94,6 +100,17 @@
 
 (define-error 'mmec-error-signed/unsigned-integer-comparison
   "Cannot compare a signed integer with an unsigned integer."
+  'mmec-error)
+
+;;; --------------------------------------------------------------------
+;;; mathematics errors
+
+(define-error 'mmec-error-overflow
+  "Overflow while performing a mathematic operation."
+  'mmec-error)
+
+(define-error 'mmec-error-underflow
+  "Underflow while performing a mathematic operation."
   'mmec-error)
 
 

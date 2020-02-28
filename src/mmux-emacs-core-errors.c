@@ -37,6 +37,41 @@
 
 
 /** --------------------------------------------------------------------
+ ** Non-local exits.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmec_funcall_returned_with_success (emacs_env * env)
+{
+  return ((emacs_funcall_exit_return == env->non_local_exit_check(env))? true : false);
+}
+
+bool
+mmec_funcall_returned_with_error (emacs_env * env)
+{
+  return ((emacs_funcall_exit_return != env->non_local_exit_check(env))? true : false);
+}
+
+bool
+mmec_funcall_returned_with_signal (emacs_env * env)
+{
+  return ((emacs_funcall_exit_signal == env->non_local_exit_check(env))? true : false);
+}
+
+bool
+mmec_funcall_returned_with_throw (emacs_env * env)
+{
+  return ((emacs_funcall_exit_throw == env->non_local_exit_check(env))? true : false);
+}
+
+void
+mmec_clear_environment_error (emacs_env * env)
+{
+  env->non_local_exit_clear(env);
+}
+
+
+/** --------------------------------------------------------------------
  ** Base errors.
  ** ----------------------------------------------------------------- */
 
@@ -63,6 +98,8 @@ MMEC_DEFINE_ERROR_SIGNALLER(mmec, unsupported_init_type,
 			    "mmec-error-unsupported-init-type",
 			    "An argument given to an object constructor has an unsupported type.")
 
+/* ------------------------------------------------------------------ */
+
 MMEC_DEFINE_ERROR_SIGNALLER(mmec, bytevector_constructor,
 			    "mmec-error-bytevector-constructor",
 			    "An error occurred while building a bytevector object.")
@@ -70,6 +107,10 @@ MMEC_DEFINE_ERROR_SIGNALLER(mmec, bytevector_constructor,
 MMEC_DEFINE_ERROR_SIGNALLER(mmec, bytevector_constructor_invalid_number_of_slots,
 			    "mmec-error-bytevector-constructor-invalid-number-of-slots",
 			    "An invalid number of slots was given as argument to a bytevector constructor.")
+
+MMEC_DEFINE_ERROR_SIGNALLER(mmec, bytevector_constructor_invalid_slot_size,
+			    "mmec-error-bytevector-constructor-invalid-slot-size",
+			    "An invalid slot size was given as argument to a bytevector constructor.")
 
 
 /** --------------------------------------------------------------------
@@ -100,5 +141,22 @@ MMEC_DEFINE_ERROR_SIGNALLER(mmec, error_bytevector_is_empty,
 MMEC_DEFINE_ERROR_SIGNALLER(mmec, signed_unsigned_integer_comparison,
 			    "mmec-error-signed/unsigned-integer-comparison",
 			    "Cannot compare a signed integer with an unsigned integer.")
+
+
+/** --------------------------------------------------------------------
+ ** Mathematics errors.
+ ** ----------------------------------------------------------------- */
+
+MMEC_DEFINE_ERROR_SIGNALLER(mmec, mathematics,
+			    "mmec-error-mathematics",
+			    "Error while performing a mathematics operation.")
+
+MMEC_DEFINE_ERROR_SIGNALLER(mmec, mathematics_overflow,
+			    "mmec-error-mathematics-overflow",
+			    "Overflow while performing a mathematics operation.")
+
+MMEC_DEFINE_ERROR_SIGNALLER(mmec, mathematics_underflow,
+			    "mmec-error-mathematics-underflow",
+			    "Underflow while performing a mathematics operation.")
 
 /* end of file */

@@ -1,8 +1,8 @@
 ﻿-*- coding: utf-8-with-signature-unix; fill-column: 200 -*-
 
-* Implement the subbytevector functions.
 * Test the subbytevector functions.
 * Document the subbytevector functions.
+* Review the ctypes implementation to make the constructor signal errors, add the env argument
 * Read the elisp docs node Sequence Functions to understand how to interface bytevectors with sequence functions.
 * Local Variables
 

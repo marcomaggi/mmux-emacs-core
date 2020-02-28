@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-25 09:35:46 marco>
+;; Time-stamp: <2020-02-28 10:36:04 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -715,6 +715,72 @@ Return the following code:
 		     		do (mmec-bytevector-set bv i (,NUMTYPE elt))
 				finally (return bv)))
 		     ))))
+  (mmec--def char)
+  (mmec--def schar)
+  (mmec--def uchar)
+  (mmec--def wchar)
+  (mmec--def sshrt)
+  (mmec--def ushrt)
+  (mmec--def sint)
+  (mmec--def uint)
+  (mmec--def slong)
+  (mmec--def ulong)
+  (mmec--def sllong)
+  (mmec--def ullong)
+  (mmec--def sintmax)
+  (mmec--def uintmax)
+  (mmec--def ssize)
+  (mmec--def usize)
+  (mmec--def ptrdiff)
+  (mmec--def sint8)
+  (mmec--def uint8)
+  (mmec--def sint16)
+  (mmec--def uint16)
+  (mmec--def sint32)
+  (mmec--def uint32)
+  (mmec--def sint64)
+  (mmec--def uint64)
+  (mmec--def float)
+  (mmec--def double)
+  (mmec--def ldouble))
+
+
+;;;; bytevector objects: subsequence
+
+(cl-defun mmec-subbytevector (bv &key (start 0) (past (mmec-bytevector-number-of-slots bv)))
+  "Extract a subsequence from the bytevector object BV.
+
+The arguments START and PAST must be integers satisfying the conditions:
+
+  0 <= start <= past <= number of slots
+"
+  (mmec-subbytevector-3 bv start past))
+
+(cl-defgeneric mmec-subbytevector-3 (bv start past)
+  "Extract a subsequence from the bytevector object BV.
+
+The arguments START and PAST must be integers satisfying the conditions:
+
+  0 <= start <= past <= number of slots
+")
+
+(cl-macrolet
+    ((mmec--def (TYPESTEM)
+		(let* ((BVTYPE (mmec-sformat "mmec-%s-bytevector" TYPESTEM)))
+		  `(cl-defmethod mmec-subbytevector-3 ((bv ,BVTYPE) (start integer) (past integer))
+		     "Extract a subsequence from the bytevector object BV.
+
+The arguments START and PAST must be integers satisfying the conditions:
+
+  0 <= start <= past <= number of slots
+"
+		     (cl-assert (<= 0 start past (mmec-bytevector-number-of-slots bv)))
+		     (mmec--make ,BVTYPE
+				 :number-of-slots	(- past start)
+				 :slot-size		(mmec-bytevector-slot-size       bv)
+				 :signed-p		(mmec-bytevector-signed-p        bv)
+				 :obj			(mmec-c-subbytevector (mmec-bytevector-obj bv) start past)
+				 :number-of-allocated-bytes (* (mmec-bytevector-slot-size bv) (- past start)))))))
   (mmec--def char)
   (mmec--def schar)
   (mmec--def uchar)

@@ -475,7 +475,7 @@ MMEC_DEFINE_BYTEVECTOR_COMPARISON(ldouble)
 
 
 /** --------------------------------------------------------------------
- ** Bytevector user-pointer objects: operations.
+ ** Bytevector user-pointer objects: subsequence.
  ** ----------------------------------------------------------------- */
 
 mmec_intrep_bytevector_t *
@@ -501,7 +501,9 @@ mmec_new_intrep_bytevector_subsequence (emacs_env * env, mmec_intrep_bytevector_
 	 division. */
       if ((number_of_bytes / src->slot_size) == src->number_of_slots) {
 	/* Good: no overflow in the multiplication. */
-	memcpy(dst->ptr, src->ptr, number_of_bytes);
+	memcpy(dst->ptr,
+	       ((int8_t *)src->ptr) + (start * src->slot_size),
+	       number_of_bytes);
 	return dst;
       } else {
 	mmec_delete_intrep_bytevector(dst);
@@ -513,7 +515,7 @@ mmec_new_intrep_bytevector_subsequence (emacs_env * env, mmec_intrep_bytevector_
 }
 
 static emacs_value
-Fmmec_subbytevector (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
+Fmmec_c_subbytevector (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
 {
   assert((2 == nargs) || (3 == nargs));
   mmec_intrep_bytevector_t	*src	= mmec_get_intrep_bytevector_from_emacs_value(env, args[0]);
@@ -1048,8 +1050,8 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
   /* ------------------------------------------------------------------ */
   /* Bytevector operations. */
   {
-    .name		= "mmec-subtytevector",
-    .implementation	= Fmmec_subbytevector,
+    .name		= "mmec-c-subbytevector",
+    .implementation	= Fmmec_c_subbytevector,
     .min_arity		= 2,
     .max_arity		= 3,
     .documentation	= "Build and return a new user-pointer object of type `bytevector' representing a subsequence of another `bytevector'.",

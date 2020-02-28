@@ -683,6 +683,67 @@
   (mmec--def ldouble))
 
 
+;;;; subbytevectors
+
+(cl-macrolet
+    ((mmec--def (TYPESTEM)
+		(let* ((TESTNAME	(mmec-sformat "mmec-%s-subbytevector" TYPESTEM))
+		       (BVTYPE		(mmec-sformat "mmec-%s-bytevector" TYPESTEM))
+		       (DOCSTRING	(format "Extract subsequences from a `%s' object." BVTYPE))
+		       (BVFROMVECTOR	(mmec-sformat "mmec-%s-bytevector-from-vector" TYPESTEM)))
+		  `(ert-deftest ,TESTNAME ()
+		     ,DOCSTRING
+		     (should (mmec-bytevector-equal
+			      (mmec-subbytevector (,BVFROMVECTOR [1 2 3 4 5 6]))
+			      (,BVFROMVECTOR [1 2 3 4 5 6])))
+		     (should (mmec-bytevector-equal
+			      (let ((bv		(,BVFROMVECTOR [1 2 3 4 5 6]))
+				    (start	0)
+				    (past	6))
+				(let ((sbv (mmec-subbytevector bv :start start :past past)))
+				  ;;(cl-prin1 sbv)
+				  sbv))
+			      (,BVFROMVECTOR [1 2 3 4 5 6])))
+		     (should (mmec-bytevector-equal
+			      (let ((bv		(,BVFROMVECTOR [1 2 3 4 5 6]))
+				    (start	2)
+				    (past	5))
+				(let ((sbv (mmec-subbytevector bv :start start :past past)))
+				  ;;(cl-prin1 sbv)
+				  sbv))
+			      (,BVFROMVECTOR [3 4 5])))
+
+		     ))))
+  (mmec--def char)
+  (mmec--def schar)
+  (mmec--def uchar)
+  (mmec--def wchar)
+  (mmec--def sshrt)
+  (mmec--def ushrt)
+  (mmec--def sint)
+  (mmec--def uint)
+  (mmec--def slong)
+  (mmec--def ulong)
+  (mmec--def sllong)
+  (mmec--def ullong)
+  (mmec--def sintmax)
+  (mmec--def uintmax)
+  (mmec--def ssize)
+  (mmec--def usize)
+  (mmec--def ptrdiff)
+  (mmec--def sint8)
+  (mmec--def uint8)
+  (mmec--def sint16)
+  (mmec--def uint16)
+  (mmec--def sint32)
+  (mmec--def uint32)
+  (mmec--def sint64)
+  (mmec--def uint64)
+  (mmec--def float)
+  (mmec--def double)
+  (mmec--def ldouble))
+
+
 ;;;; done
 
 (ert-run-tests-batch-and-exit)

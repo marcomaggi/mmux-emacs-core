@@ -1,5 +1,10 @@
 ﻿-*- coding: utf-8-with-signature-unix; fill-column: 200 -*-
 
+* Overflow test in subbytevector
+  See the solution including gnulib modules as described in:
+
+  https://www.gnu.org/software/gnulib/manual/html_node/Integer-Type-Overflow.html#Integer-Type-Overflow
+
 * Test the subbytevector functions.
 * Document the subbytevector functions.
 * Review the ctypes implementation to make the constructor signal errors, add the env argument

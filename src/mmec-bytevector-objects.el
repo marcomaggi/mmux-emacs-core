@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-29 06:47:57 marco>
+;; Time-stamp: <2020-02-29 07:16:21 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -157,14 +157,12 @@
   "Return true if the bytevector BV is empty; otherwise return false.")
 (cl-defmethod  mmec-bytevector-empty-p ((bv mmec-bytevector))
   "Return true if the bytevector BV is empty; otherwise return false."
-  (cl-assert (mmec-bytevector-p bv))
   (zerop (mmec-bytevector-number-of-slots bv)))
 
 (cl-defgeneric mmec-bytevector-not-empty-p (bv)
   "Return true if the bytevector BV is not empty; otherwise return false.")
 (cl-defmethod  mmec-bytevector-not-empty-p ((bv mmec-bytevector))
   "Return true if the bytevector BV is not empty; otherwise return false."
-  (cl-assert (mmec-bytevector-p bv))
   (not (zerop (mmec-bytevector-number-of-slots bv))))
 
 (cl-defgeneric mmec-bytevector-last-slot-index (bv)
@@ -173,7 +171,6 @@
   "Return a value of type `integer' representing the slot index of the last slot.
 
 If the bytevector is empty: signal the condition `mmec-error-bytevector-is-empty'."
-  (cl-assert (mmec-bytevector-p bv))
   (let ((N (mmec-bytevector-number-of-slots bv)))
     (if (zerop N)
 	(signal 'mmec-error-bytevector-is-empty (list 'mmec-bytevector-last-slot-index bv))
@@ -204,7 +201,8 @@ If the bytevector is empty: signal the condition `mmec-error-bytevector-is-empty
   (and (mmec-bytevector-valid-slot-index-p bv start)
        (mmec-bytevector-valid-past-slot-index-p bv past)))
 
-;;; --------------------------------------------------------------------
+
+;;;; bytevector objects: arguments validation functions
 
 (cl-defgeneric mmec-bytevector-validate-span (funcname bv start past)
   "Validate a slots span selection for a bytevector; signal an exception if the values are invalid.
@@ -222,6 +220,7 @@ The argument PAST must be a slot index selecting the end of the span.
 The values START and PAST are valid if they satisfy the condition:
 
   0 <= START <= PAST <= number of slots")
+
 (cl-defmethod mmec-bytevector-validate-span ((funcname symbol) (bv mmec-bytevector) (start integer) (past integer))
   "Validate a slots span selection for a bytevector; signal an exception if the values are invalid.
 
@@ -244,6 +243,51 @@ The values START and PAST are valid if they satisfy the condition:
     (signal 'mmec-error-bytevector-span-past-out-of-range (list 'mmec-subbytevector-3 bv past)))
   (unless (<= start past)
     (signal 'mmec-error-bytevector-invalid-span-limits (list 'mmec-subbytevector-3 bv start past))))
+
+;;; --------------------------------------------------------------------
+
+(cl-defgeneric mmec-bytevector-validate-not-empty (funcname bv)
+  "Validate a bytevector as not empty.
+
+The argument  FUNCNAME must  be a  symbol representing  the name  of the
+calling function.
+
+The argument BV must be an object of type `mmec-bytevector'.")
+
+(cl-defmethod mmec-bytevector-validate-not-empty ((funcname symbol) (bv mmec-bytevector))
+  "Validate a bytevector as not empty.
+
+The argument  FUNCNAME must  be a  symbol representing  the name  of the
+calling function.
+
+The argument BV must be an object of type `mmec-bytevector'."
+  (when (mmec-bytevector-empty-p bv)
+    (signal 'mmec-error-bytevector-is-empty (list funcname bv))))
+
+;;; --------------------------------------------------------------------
+
+(cl-defgeneric mmec-bytevector-validate-slot-index (funcname bv idx)
+  "Validate a slot index for a bytevector object.
+
+The argument  FUNCNAME must  be a  symbol representing  the name  of the
+calling function.
+
+The argument BV must be an object of type `mmec-bytevector'.
+
+The argument IDX must be a slot index.")
+
+(cl-defmethod mmec-bytevector-validate-slot-index ((funcname symbol) (bv mmec-bytevector) (idx integer))
+  "Validate a slot index for a bytevector object.
+
+The argument  FUNCNAME must  be a  symbol representing  the name  of the
+calling function.
+
+The argument BV must be an object of type `mmec-bytevector'.
+
+The argument IDX must be an Emacs Value of type `integer' representing a
+slot index."
+  (unless (mmec-bytevector-valid-slot-index-p bv idx)
+    (signal 'mmec-error-bytevector-index-out-of-range (list funcname bv idx))))
 
 
 ;;;; bytevector objects: getters and setters
@@ -279,10 +323,9 @@ slots in the bytevector BV.")
 			     (C-FUNC		(intern (concat "mmec-c-bytevector-" TYPESTEM.str "-ref"))))
 			`(cl-defmethod mmec-bytevector-ref ((bv ,BYTEVECTOR-TYPE) (idx integer))
 			   ,DOCSTRING
-			   (cl-assert (mmec-fits-usize-p idx))
-			   (if (mmec-bytevector-not-empty-p bv)
-			       (mmec--make ,NUMTYPE :obj (,C-FUNC (mmec-bytevector-obj bv) idx))
-			     (signal 'mmec-error-bytevector-is-empty (list bv idx))))))
+			   (mmec-bytevector-validate-not-empty 'mmec-bytevector-ref bv)
+			   (mmec-bytevector-validate-slot-index 'mmec-bytevector-ref bv idx)
+			   (mmec--make ,NUMTYPE :obj (,C-FUNC (mmec-bytevector-obj bv) idx)))))
 
      (mmec--defsetter (TYPESTEM CTYPE)
 		      (let* ((TYPESTEM.str	(symbol-name TYPESTEM))
@@ -293,10 +336,9 @@ slots in the bytevector BV.")
 			     (C-FUNC		(intern (concat "mmec-c-bytevector-" TYPESTEM.str "-set"))))
 			`(cl-defmethod mmec-bytevector-set ((bv ,BYTEVECTOR-TYPE) (idx integer) (val ,NUMTYPE))
 			   ,DOCSTRING
-			   (cl-assert (mmec-fits-usize-p idx))
-			   (if (mmec-bytevector-not-empty-p bv)
-			       (,C-FUNC (mmec-bytevector-obj bv) idx (mmec--extract-obj ,NUMTYPE val))
-			     (signal 'mmec-error-bytevector-is-empty (list bv idx))))))
+			   (mmec-bytevector-validate-not-empty 'mmec-bytevector-ref bv)
+			   (mmec-bytevector-validate-slot-index 'mmec-bytevector-ref bv idx)
+			   (,C-FUNC (mmec-bytevector-obj bv) idx (mmec--extract-obj ,NUMTYPE val)))))
 
      (mmec--defgetter-and-setter (TYPESTEM CTYPE)
 				 `(progn
@@ -467,8 +509,8 @@ index START, included, and ending at slot index PAST, excluded.
 					    (past1 (mmec-bytevector-number-of-slots bv1))
 					    (past2 (mmec-bytevector-number-of-slots bv2)))
 		     ,DOCSTRING
-		     (cl-assert (<= 0 start1 past1 (mmec-bytevector-number-of-slots bv1)))
-		     (cl-assert (<= 0 start2 past2 (mmec-bytevector-number-of-slots bv2)))
+		     (mmec-bytevector-validate-span (quote ,FUNCNAME) bv1 start1 past1)
+		     (mmec-bytevector-validate-span (quote ,FUNCNAME) bv2 start2 past2)
 		     (,FUNCNAME-6 bv1 start1 past1 bv2 start2 past2)))))
   (mmec--def compare "Return the following code:
 
@@ -597,48 +639,48 @@ Return the following code:
 
   or, while  visiting the  slots from  START to PAST,  BV1 holds  a slot
   value that is less than the corresponding slot value in BV2."
-		       (cl-assert (<= 0 start1 past1 (mmec-bytevector-number-of-slots bv1)))
-		       (cl-assert (<= 0 start2 past2 (mmec-bytevector-number-of-slots bv2)))
+		       (mmec-bytevector-validate-span (quote mmec-bytevector-compare-6) bv1 start1 past1)
+		       (mmec-bytevector-validate-span (quote mmec-bytevector-compare-6) bv2 start2 past2)
 		       (,CFUNC-COMPARE (mmec--extract-obj ,BV-TYPE bv1) start1 past1
 				       (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
 
 		     (cl-defmethod mmec-bytevector-equal-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
 							    (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
 		       "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
-		       (cl-assert (<= 0 start1 past1 (mmec-bytevector-number-of-slots bv1)))
-		       (cl-assert (<= 0 start2 past2 (mmec-bytevector-number-of-slots bv2)))
+		       (mmec-bytevector-validate-span (quote mmec-bytevector-equal-6) bv1 start1 past1)
+		       (mmec-bytevector-validate-span (quote mmec-bytevector-equal-6) bv2 start2 past2)
 		       (,CFUNC-EQUAL (mmec--extract-obj ,BV-TYPE bv1) start1 past1
 				     (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
 
 		     (cl-defmethod mmec-bytevector-less-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
 							   (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
 		       "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
-		       (cl-assert (<= 0 start1 past1 (mmec-bytevector-number-of-slots bv1)))
-		       (cl-assert (<= 0 start2 past2 (mmec-bytevector-number-of-slots bv2)))
+		       (mmec-bytevector-validate-span (quote mmec-bytevector-less-6) bv1 start1 past1)
+		       (mmec-bytevector-validate-span (quote mmec-bytevector-less-6) bv2 start2 past2)
 		       (,CFUNC-LESS (mmec--extract-obj ,BV-TYPE bv1) start1 past1
 				    (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
 
 		     (cl-defmethod mmec-bytevector-greater-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
 							      (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
 		       "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
-		       (cl-assert (<= 0 start1 past1 (mmec-bytevector-number-of-slots bv1)))
-		       (cl-assert (<= 0 start2 past2 (mmec-bytevector-number-of-slots bv2)))
+		       (mmec-bytevector-validate-span (quote mmec-bytevector-greater-6) bv1 start1 past1)
+		       (mmec-bytevector-validate-span (quote mmec-bytevector-greater-6) bv2 start2 past2)
 		       (,CFUNC-GREATER (mmec--extract-obj ,BV-TYPE bv1) start1 past1
 				       (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
 
 		     (cl-defmethod mmec-bytevector-leq-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
 							  (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
 		       "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
-		       (cl-assert (<= 0 start1 past1 (mmec-bytevector-number-of-slots bv1)))
-		       (cl-assert (<= 0 start2 past2 (mmec-bytevector-number-of-slots bv2)))
+		       (mmec-bytevector-validate-span (quote mmec-bytevector-leq-6) bv1 start1 past1)
+		       (mmec-bytevector-validate-span (quote mmec-bytevector-leq-6) bv2 start2 past2)
 		       (,CFUNC-LEQ (mmec--extract-obj ,BV-TYPE bv1) start1 past1
 				   (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
 
 		     (cl-defmethod mmec-bytevector-geq-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
 							  (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
 		       "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
-		       (cl-assert (<= 0 start1 past1 (mmec-bytevector-number-of-slots bv1)))
-		       (cl-assert (<= 0 start2 past2 (mmec-bytevector-number-of-slots bv2)))
+		       (mmec-bytevector-validate-span (quote mmec-bytevector-geq-6) bv1 start1 past1)
+		       (mmec-bytevector-validate-span (quote mmec-bytevector-geq-6) bv2 start2 past2)
 		       (,CFUNC-GEQ (mmec--extract-obj ,BV-TYPE bv1) start1 past1
 				   (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
 		     ))))

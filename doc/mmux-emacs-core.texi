@@ -2248,6 +2248,7 @@ otherwise return false.
 @deffn {Generic Function} mmec-bytevector-validate-span @var{FUNCNAME} @var{BV} @var{START} @var{PAST}
 @deffnx {Method} mmec-bytevector-validate-span (@var{FUNCNAME} symbol) (@var{BV} mmec-bytevector) (@var{START} integer) (@var{PAST} integer)
 Validate a slots span selection for a bytevector; signal an exception if the values are invalid.
+Return unspecified values.
 
 The argument @var{FUNCNAME} must be a symbol representing the name of the calling function.
 
@@ -2262,6 +2263,29 @@ The values @var{START} and @var{PAST} are valid if they satisfy the condition:
 @example
 0 <= @var{START} <= @var{PAST} <= number of slots
 @end example
+@end deffn
+
+
+@deffn {Generic Function} mmec-bytevector-validate-not-empty @var{FUNCNAME} @var{BV}
+@deffnx {Method} mmec-bytevector-validate-not-empty (@var{FUNCNAME} symbol) (@var{BV} mmec-bytevector)
+Validate a bytevector as not empty; signal an exception if the bytevector is empty.  Return
+unspecified values.
+
+The argument @var{FUNCNAME} must be a symbol representing the name of the calling function.
+
+The argument @var{BV} must be an object of type @objtype{mmec-bytevector}.
+@end deffn
+
+
+@deffn {Generic Function} mmec-bytevector-validate-slot-index @var{FUNCNAME} @var{BV} @var{IDX}
+@deffnx {Method} mmec-bytevector-validate-slot-index ((@var{FUNCNAME} symbol) (@var{BV} mmec-bytevector) (@var{IDX} integer))
+Validate a slot index for a bytevector object.  Return unspecified values.
+
+The argument @var{FUNCNAME} must be a symbol representing the name of the calling function.
+
+The argument @var{BV} must be an object of type @objtype{mmec-bytevector}.
+
+The argument @var{IDX} must be an Emacs Value of type @objtype{integer} representing a slot index.
 @end deffn
 
 @c page

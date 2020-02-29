@@ -2607,7 +2607,6 @@ An attempt was performed to instantiate an abstract data type.
 An argument given to an object constructor has an unsupported type.
 @end deftypevr
 
-
 @c page
 @node errors constructor bytevector
 @subsection Bytevector constructor errors
@@ -2628,6 +2627,12 @@ An invalid number of slots was given as argument to a bytevector constructor.
 @deftypevr {Error Symbol} symbol mmec-error-bytevector-constructor-invalid-slot-size
 @deftypevrx {Parent Error Symbol} symbol mmec-error-bytevector-constructor
 An invalid slot size was given as argument to a bytevector constructor.
+@end deftypevr
+
+
+@deftypevr {Error Symbol} symbol mmec-error-bytevector-constructor-size-too-big
+@deftypevrx {Parent Error Symbol} symbol mmec-error-bytevector-constructor
+The bytevector size resulting from the given slot size and number of slots is too big.
 @end deftypevr
 
 @c page
@@ -2703,6 +2708,7 @@ Underflow while performing a mathematics operation.
 * capi modules::                Modules related definitions.
 * capi objects::                Handling Emacs Lisp objects.
 * capi bytevec::                Bytevector objects.
+* capi misc::                   Miscellaneous functions.
 @end menu
 
 @c page
@@ -3064,6 +3070,12 @@ return @nil{}.
 
 @deftypefun mmec_error_signaller_fun_t mmec_error_bytevector_constructor_invalid_slot_size
 Signal an error with symbol @code{mmec-error-bytevector-constructor-invalid-slot-size} then return
+@nil{}.
+@end deftypefun
+
+
+@deftypefun mmec_error_signaller_fun_t mmec_error_bytevector_constructor_size_too_big
+Signal an error with symbol @code{mmec-error-bytevector-constructor-size-too-big} then return
 @nil{}.
 @end deftypefun
 
@@ -4027,6 +4039,18 @@ The arguments @var{START} and @var{PAST} must satisfy the conditions:
 
 @noindent
 otherwise the behaviour of this function is undefined.
+@end deftypefun
+
+@c page
+@node capi misc
+@section Miscellaneous functions
+
+
+
+@deftypefun intmax_t mmec_most_positive_fixnum (void)
+@deftypefunx intmax_t mmec_most_negative_fixnum (void)
+Return the most positive or negative integer number representable by an Emacs Lisp value of type
+@objtype{integer}.
 @end deftypefun
 
 @c page

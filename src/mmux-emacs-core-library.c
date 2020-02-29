@@ -32,11 +32,14 @@
 
 
 /** --------------------------------------------------------------------
- ** Global variables.
+ ** Global and local variables.
  ** ----------------------------------------------------------------- */
 
 /* This is required by GNU Emacs' API. */
 int  plugin_is_GPL_compatible;
+
+static intmax_t	most_positive_fixnum;
+static intmax_t	most_negative_fixnum;
 
 
 /** --------------------------------------------------------------------
@@ -93,6 +96,23 @@ Fmmec_version_interface_age (MMEC_ELISP_FUNCTION_UNUSED_ARGS)
   int	N = mmec_version_interface_age();
 
   return mmec_new_emacs_value_integer(env, (intmax_t)N);
+}
+
+
+/** --------------------------------------------------------------------
+ ** Special functions.
+ ** ----------------------------------------------------------------- */
+
+intmax_t
+mmec_most_positive_fixnum (void)
+{
+  return most_positive_fixnum;
+}
+
+intmax_t
+mmec_most_negative_fixnum (void)
+{
+  return most_negative_fixnum;
 }
 
 
@@ -175,8 +195,28 @@ emacs_module_init (struct emacs_runtime *ert)
       mmec_number_objects_init(env);
       mmec_number_constants_init(env);
       mmec_bytevector_objects_init(env);
-      return 0;
     }
+
+    {
+      emacs_value	Qsymbol_value		= env->intern(env, "symbol-value");
+      emacs_value	Qmost_positive_fixnum	= env->intern(env, "most-positive-fixnum");
+      emacs_value	Qmost_negative_fixnum	= env->intern(env, "most-negative-fixnum");
+
+      {
+	emacs_value	args[1] = { Qmost_positive_fixnum };
+	emacs_value	val	= env->funcall(env, Qsymbol_value, 1, args);
+
+	most_positive_fixnum = mmec_extract_elisp_integer_from_emacs_value(env, val);
+      }
+      {
+	emacs_value	args[1] = { Qmost_negative_fixnum };
+	emacs_value	val	= env->funcall(env, Qsymbol_value, 1, args);
+
+	most_negative_fixnum = mmec_extract_elisp_integer_from_emacs_value(env, val);
+      }
+    }
+
+    return 0;
   }
 }
 

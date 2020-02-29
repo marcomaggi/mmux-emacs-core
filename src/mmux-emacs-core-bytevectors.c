@@ -45,6 +45,15 @@ mmec_new_intrep_bytevector (emacs_env * env, intmax_t number_of_slots, intmax_t 
   if (slot_size <= 0) {
     mmec_error_bytevector_constructor_invalid_slot_size(env);
     return NULL;
+  } else if ((mmec_most_positive_fixnum() / slot_size) < number_of_slots) {
+    /* The number  of bytes overflows the  maximum integer representable by  an Emacs
+       Lisp value of type "integer". */
+    if (1) {
+      fprintf(stderr, "%s: slot_size=%ld, number_of_slots=%ld, maximum_fixnum=%ld\n", __func__,
+	      slot_size, number_of_slots, mmec_most_positive_fixnum());
+    }
+    mmec_error_bytevector_constructor_size_too_big(env);
+    return NULL;
   } else {
     errno = 0;
     bv = (mmec_intrep_bytevector_t *)malloc(sizeof(mmec_intrep_bytevector_t));
@@ -184,6 +193,12 @@ mmec_bytevector_valid_slot_index (mmec_intrep_bytevector_t const * const bv, int
 }
 
 bool
+mmec_bytevector_valid_start_slot_index (mmec_intrep_bytevector_t const * const bv, intmax_t const idx)
+{
+  return ((0 <= idx) && (idx <= bv->number_of_slots))? true : false;
+}
+
+bool
 mmec_bytevector_valid_past_slot_index (mmec_intrep_bytevector_t const * const bv, intmax_t const idx)
 {
   return ((0 <= idx) && (idx <= bv->number_of_slots))? true : false;
@@ -192,7 +207,7 @@ mmec_bytevector_valid_past_slot_index (mmec_intrep_bytevector_t const * const bv
 bool
 mmec_bytevector_valid_start_and_past_slot_index (mmec_intrep_bytevector_t const * const bv, intmax_t const start, intmax_t const past)
 {
-  return ((mmec_bytevector_valid_slot_index(bv, start) &&
+  return ((mmec_bytevector_valid_start_slot_index(bv, start) &&
 	   mmec_bytevector_valid_past_slot_index(bv, past) &&
 	   (start <= past))? true : false);
 }
@@ -340,6 +355,10 @@ mmec_execute_bytevector_comparison (emacs_env *env, ptrdiff_t nargs, emacs_value
       mmec_bytevector_valid_start_and_past_slot_index(bv2, start2, past2)) {
     return mmec_new_emacs_value_boolean(env, comparison(bv1, start1, past1, bv2, start2, past2));
   } else {
+    if (0) {
+      fprintf(stderr, "%s: here %ld, %ld, %ld, %ld, %ld, %ld\n", __func__,
+	      bv1->number_of_slots, bv2->number_of_slots, start1, past1, start1, past1);
+    }
     return mmec_error_bytevector_index_out_of_range(env);
   }
 }
@@ -486,30 +505,22 @@ mmec_new_intrep_bytevector_subsequence (emacs_env * env, mmec_intrep_bytevector_
     mmec_error_bytevector_index_out_of_range(env);
     return NULL;
   } else {
-    mmec_intrep_bytevector_t	* dst = mmec_new_intrep_bytevector(env, src->number_of_slots, src->slot_size, src->hold_signed_values);
+    mmec_intrep_bytevector_t	* dst = mmec_new_intrep_bytevector(env, past - start, src->slot_size, src->hold_signed_values);
 
     if (mmec_funcall_returned_with_error(env)) {
       /* Error building the new bytevector internal representation. */
       return NULL;
     } else if (mmec_intrep_bytevector_is_empty(dst)) {
-      /* The source bytevector is empty.  No need to copy anything. */
+      /* The  selected span  in the  source  bytevector is  empty.  No  need to  copy
+	 anything. */
       return dst;
     } else {
-      intmax_t	number_of_bytes = src->number_of_slots * src->slot_size;
+      intmax_t	number_of_bytes = (past - start) * src->slot_size;
 
-      /* We know that the field "slot_size" is not zero, so we can safely perform the
-	 division. */
-      if ((number_of_bytes / src->slot_size) == src->number_of_slots) {
-	/* Good: no overflow in the multiplication. */
-	memcpy(dst->ptr,
-	       ((int8_t *)src->ptr) + (start * src->slot_size),
-	       number_of_bytes);
-	return dst;
-      } else {
-	mmec_delete_intrep_bytevector(dst);
-	mmec_error_mathematics_overflow(env);
-	return NULL;
-      }
+      memcpy(dst->ptr,
+	     ((int8_t *)src->ptr) + (start * src->slot_size),
+	     number_of_bytes);
+      return dst;
     }
   }
 }

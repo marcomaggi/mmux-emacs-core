@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-28 06:21:57 marco>
+;; Time-stamp: <2020-02-29 05:23:31 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -74,6 +74,10 @@
 
 (define-error 'mmec-error-bytevector-constructor-invalid-slot-size
   "An invalid slot size was given as argument to a bytevector constructor."
+  'mmec-error-bytevector-constructor)
+
+(define-error 'mmec-error-bytevector-constructor-size-too-big
+  "The bytevector size resulting from the given slot size and number of slots is too big."
   'mmec-error-bytevector-constructor)
 
 ;;; --------------------------------------------------------------------

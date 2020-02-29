@@ -112,6 +112,10 @@ MMEC_DEFINE_ERROR_SIGNALLER(mmec, bytevector_constructor_invalid_slot_size,
 			    "mmec-error-bytevector-constructor-invalid-slot-size",
 			    "An invalid slot size was given as argument to a bytevector constructor.")
 
+MMEC_DEFINE_ERROR_SIGNALLER(mmec, bytevector_constructor_size_too_big,
+			    "mmec-error-bytevector-constructor-size-too-big",
+			    "The bytevector size resulting from the given slot size and number of slots is too big.")
+
 
 /** --------------------------------------------------------------------
  ** Range errors.

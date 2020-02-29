@@ -166,6 +166,7 @@ MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, unsupported_init_type);
 MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, bytevector_constructor);
 MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, bytevector_constructor_invalid_number_of_slots);
 MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, bytevector_constructor_invalid_slot_size);
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, bytevector_constructor_size_too_big);
 
 /* ------------------------------------------------------------------ */
 
@@ -695,6 +696,14 @@ MMEC_DECLARE_BYTEVECTOR_COMPARISON(ldouble)
 mmec_decl mmec_intrep_bytevector_t * mmec_new_intrep_bytevector_subsequence (emacs_env * env, mmec_intrep_bytevector_t const * src,
 									     intmax_t start, intmax_t past)
   __attribute__((__nonnull__(2)));
+
+
+/** --------------------------------------------------------------------
+ ** Miscellaneous functions.
+ ** ----------------------------------------------------------------- */
+
+mmec_decl intmax_t mmec_most_positive_fixnum (void);
+mmec_decl intmax_t mmec_most_negative_fixnum (void);
 
 
 /** --------------------------------------------------------------------

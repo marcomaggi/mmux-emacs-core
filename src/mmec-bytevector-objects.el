@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-28 10:36:04 marco>
+;; Time-stamp: <2020-02-28 14:51:28 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -296,17 +296,16 @@ slots in the bytevector BV.")
 		       (OBJ-EXTRACTOR	(mmec-sformat "mmec-bytevector-obj" TYPESTEM))
 		       (CLANG-GETTER	(mmec-sformat "mmec-c-bytevector-%s-ref" TYPESTEM))
 		       (DOCSTRING	(format "Print to a stream the representation of a bytevector object of type `%s'." BVTYPE))
-		       (PREFIX		(format "#s(%s " BVTYPE)))
+		       (PREFIX		(format "#s(%s" BVTYPE))
+		       (SUFFIX		"\)"))
 		  `(cl-defmethod cl-print-object ((bv ,BVTYPE) stream)
 		     ,DOCSTRING
-		     (princ (with-output-to-string
-			      (princ ,PREFIX)
-			      (let ((bv-intrep (,OBJ-EXTRACTOR bv)))
-				(dotimes (i (mmec-bytevector-number-of-slots bv))
-				  (unless (zerop i) (princ " "))
-				  (princ (,CLANG-GETTER bv-intrep i))))
-			      (princ "\)"))
-			    stream)))))
+		     (princ ,PREFIX stream)
+		     (let ((bv-intrep (,OBJ-EXTRACTOR bv)))
+		       (dotimes (i (mmec-bytevector-number-of-slots bv))
+			 (princ " " stream)
+			 (princ (,CLANG-GETTER bv-intrep i) stream)))
+		     (princ ,SUFFIX stream)))))
   (mmec--def char)
   (mmec--def schar)
   (mmec--def uchar)
@@ -325,17 +324,16 @@ slots in the bytevector BV.")
 		       (OBJ-EXTRACTOR	(mmec-sformat "mmec-bytevector-obj" TYPESTEM))
 		       (CLANG-GETTER	(mmec-sformat "mmec-c-bytevector-%s-ref" TYPESTEM))
 		       (DOCSTRING	(format "Print to a stream the representation of a bytevector object of type `%s'." BVTYPE))
-		       (PREFIX		(format "#s(%s " BVTYPE)))
+		       (PREFIX		(format "#s(%s" BVTYPE))
+		       (SUFFIX		"\)"))
 		  `(cl-defmethod cl-print-object ((bv ,BVTYPE) stream)
 		     ,DOCSTRING
-		     (princ (with-output-to-string
-			      (princ ,PREFIX)
-			      (let ((bv-intrep (,OBJ-EXTRACTOR bv)))
-				(dotimes (i (mmec-bytevector-number-of-slots bv))
-				  (unless (zerop i) (princ " "))
-				  (princ (format "%g" (,CLANG-GETTER bv-intrep i)))))
-			      (princ "\)"))
-			    stream)))))
+		     (princ ,PREFIX stream)
+		     (let ((bv-intrep (,OBJ-EXTRACTOR bv)))
+		       (dotimes (i (mmec-bytevector-number-of-slots bv))
+			 (princ " " stream)
+			 (princ (format "%g" (,CLANG-GETTER bv-intrep i)) stream)))
+		     (princ ,SUFFIX stream)))))
   (mmec--def double))
 
 (cl-macrolet
@@ -347,17 +345,16 @@ slots in the bytevector BV.")
 		       (CLANG-GETTER	(mmec-sformat "mmec-c-bytevector-%s-ref" TYPESTEM))
 		       (CLANG-PRINTER	(mmec-sformat "mmec-c-%s-print-to-string" TYPESTEM))
 		       (DOCSTRING	(format "Print to a stream the representation of a bytevector object of type `%s'." BVTYPE))
-		       (PREFIX		(format "#s(%s " BVTYPE)))
+		       (PREFIX		(format "#s(%s" BVTYPE))
+		       (SUFFIX		"\)"))
 		  `(cl-defmethod cl-print-object ((bv ,BVTYPE) stream)
 		     ,DOCSTRING
-		     (princ (with-output-to-string
-			      (princ ,PREFIX)
-			      (let ((bv-intrep (,OBJ-EXTRACTOR bv)))
-				(dotimes (i (mmec-bytevector-number-of-slots bv))
-				  (unless (zerop i) (princ " "))
-				  (princ (,CLANG-PRINTER (,CLANG-GETTER bv-intrep i)))))
-			      (princ "\)"))
-			    stream)))))
+		     (princ ,PREFIX stream)
+		     (let ((bv-intrep (,OBJ-EXTRACTOR bv)))
+		       (dotimes (i (mmec-bytevector-number-of-slots bv))
+			 (princ " " stream)
+			 (princ (,CLANG-PRINTER (,CLANG-GETTER bv-intrep i)) stream)))
+		     (princ ,SUFFIX stream)))))
   (mmec--def wchar)
   (mmec--def sint)
   (mmec--def uint)

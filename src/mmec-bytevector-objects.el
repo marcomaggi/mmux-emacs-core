@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-28 14:51:28 marco>
+;; Time-stamp: <2020-02-29 06:47:57 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -185,6 +185,12 @@ If the bytevector is empty: signal the condition `mmec-error-bytevector-is-empty
   "Return true if IDX is a valid slot index for the bytevector BV; otherwise return false."
   (and (<= 0 idx) (< idx (mmec-bytevector-number-of-slots bv))))
 
+(cl-defgeneric mmec-bytevector-valid-start-slot-index-p (bv idx)
+  "Return true if IDX is a valid beginning-of-span slot index for the bytevector BV; otherwise return false.")
+(cl-defmethod  mmec-bytevector-valid-start-slot-index-p ((bv mmec-bytevector) (idx integer))
+  "Return true if IDX is a valid beginning-of-span slot index for the bytevector BV; otherwise return false."
+  (and (<= 0 idx) (<= idx (mmec-bytevector-number-of-slots bv))))
+
 (cl-defgeneric mmec-bytevector-valid-past-slot-index-p (bv idx)
   "Return true if IDX is a valid end-of-span slot index for the bytevector BV; otherwise return false.")
 (cl-defmethod  mmec-bytevector-valid-past-slot-index-p ((bv mmec-bytevector) (idx integer))
@@ -197,6 +203,47 @@ If the bytevector is empty: signal the condition `mmec-error-bytevector-is-empty
   "Return true if START and PAST are valid slot span selectors for the bytevector BV; otherwise return false."
   (and (mmec-bytevector-valid-slot-index-p bv start)
        (mmec-bytevector-valid-past-slot-index-p bv past)))
+
+;;; --------------------------------------------------------------------
+
+(cl-defgeneric mmec-bytevector-validate-span (funcname bv start past)
+  "Validate a slots span selection for a bytevector; signal an exception if the values are invalid.
+
+The argument  FUNCNAME must  be a  symbol representing  the name  of the
+calling function.
+
+The argument BV must be an object of type `mmec-bytevector'.
+
+The argument START  must be a slot index selecting  the beginning of the
+span.
+
+The argument PAST must be a slot index selecting the end of the span.
+
+The values START and PAST are valid if they satisfy the condition:
+
+  0 <= START <= PAST <= number of slots")
+(cl-defmethod mmec-bytevector-validate-span ((funcname symbol) (bv mmec-bytevector) (start integer) (past integer))
+  "Validate a slots span selection for a bytevector; signal an exception if the values are invalid.
+
+The argument  FUNCNAME must  be a  symbol representing  the name  of the
+calling function.
+
+The argument BV must be an object of type `mmec-bytevector'.
+
+The argument START  must be a slot index selecting  the beginning of the
+span.
+
+The argument PAST must be a slot index selecting the end of the span.
+
+The values START and PAST are valid if they satisfy the condition:
+
+  0 <= START <= PAST <= number of slots"
+  (unless (mmec-bytevector-valid-start-slot-index-p bv start)
+    (signal 'mmec-error-bytevector-span-start-out-of-range (list 'mmec-subbytevector-3 bv start)))
+  (unless (mmec-bytevector-valid-past-slot-index-p bv past)
+    (signal 'mmec-error-bytevector-span-past-out-of-range (list 'mmec-subbytevector-3 bv past)))
+  (unless (<= start past)
+    (signal 'mmec-error-bytevector-invalid-span-limits (list 'mmec-subbytevector-3 bv start past))))
 
 
 ;;;; bytevector objects: getters and setters
@@ -771,7 +818,7 @@ The arguments START and PAST must be integers satisfying the conditions:
 
   0 <= start <= past <= number of slots
 "
-		     (cl-assert (<= 0 start past (mmec-bytevector-number-of-slots bv)))
+		     (mmec-bytevector-validate-span 'mmec-subbytevector-3 bv start past)
 		     (mmec--make ,BVTYPE
 				 :number-of-slots	(- past start)
 				 :slot-size		(mmec-bytevector-slot-size       bv)

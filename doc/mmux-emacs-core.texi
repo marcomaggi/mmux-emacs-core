@@ -2222,13 +2222,18 @@ bytevector is empty: signal the condition @code{mmec-error-bytevector-is-empty}.
 
 @deffn {Generic Function} mmec-bytevector-valid-slot-index-p @var{BV} @var{IDX}
 @deffnx {Method} mmec-bytevector-valid-slot-index-p (@var{BV} mmec-bytevector) (@var{IDX} integer)
-Returnx true if @var{IDX} is a valid slot index for the bytevector @var{BV}; otherwise return false.
+Return true if @var{IDX} is a valid slot index for the bytevector @var{BV}; otherwise return false.
+@end deffn
+
+
+@deffn {Generic Function} mmec-bytevector-valid-start-slot-index-p (@var{BV} mmec-bytevector) (@var{IDX} integer)
+Return true if @var{IDX} is a valid beginning--of--span slot index for the bytevector @var{BV};
+otherwise return false.
 @end deffn
 
 
 @deffn {Generic Function} mmec-bytevector-valid-past-slot-index-p (@var{BV} mmec-bytevector) (@var{IDX} integer)
 Return true if @var{IDX} is a valid end--of--span slot index for the bytevector @var{BV}; otherwise
-Returnx tMethod @var{IDX} is a valid end--of--span slot index for the bytevector @var{BV}; otherwise
 return false.
 @end deffn
 
@@ -2237,6 +2242,26 @@ return false.
 @deffnx {Method} mmec-bytevector-valid-start-and-past-p (@var{BV} mmec-bytevector) (@var{START} integer) (@var{PAST} integer)
 Return true if @var{START} and @var{PAST} are valid slot span selectors for the bytevector @var{BV};
 otherwise return false.
+@end deffn
+
+
+@deffn {Generic Function} mmec-bytevector-validate-span @var{FUNCNAME} @var{BV} @var{START} @var{PAST}
+@deffnx {Method} mmec-bytevector-validate-span (@var{FUNCNAME} symbol) (@var{BV} mmec-bytevector) (@var{START} integer) (@var{PAST} integer)
+Validate a slots span selection for a bytevector; signal an exception if the values are invalid.
+
+The argument @var{FUNCNAME} must be a symbol representing the name of the calling function.
+
+The argument @var{BV} must be an object of type @objtype{mmec-bytevector}.
+
+The argument @var{START} must be a slot index selecting the beginning of the span.
+
+The argument @var{PAST} must be a slot index selecting the end of the span.
+
+The values @var{START} and @var{PAST} are valid if they satisfy the condition:
+
+@example
+0 <= @var{START} <= @var{PAST} <= number of slots
+@end example
 @end deffn
 
 @c page
@@ -2640,6 +2665,16 @@ The bytevector size resulting from the given slot size and number of slots is to
 @section Range errors
 
 
+@menu
+* errors range generic::        Generic range errors.
+* errors range bytevector::     Bytevector range errors.
+@end menu
+
+@c page
+@node errors range generic
+@subsection Generic range errors
+
+
 @deftypevr {Error Symbol} symbol mmec-error-value-out-of-range
 @deftypevrx {Parent Error Symbol} symbol mmec-error
 A numeric object is out of range.
@@ -2652,6 +2687,16 @@ Used to signal an attempt to access the internal represenation of an object with
 range.
 @end deftypevr
 
+@c page
+@node errors range bytevector
+@subsection Bytevector range errors
+
+
+@deftypevr {Error Symbol} symbol mmec-error-bytevector-is-empty
+@deftypevrx {Parent Error Symbol} symbol mmec-error-value-out-of-range
+Used to signal that a bytevector operand is empty.
+@end deftypevr
+
 
 @deftypevr {Error Symbol} symbol mmec-error-bytevector-index-out-of-range
 @deftypevrx {Parent Error Symbol} symbol mmec-error-index-out-of-range
@@ -2659,9 +2704,21 @@ Attempt to access the internal represenation of a bytevector object with an inde
 @end deftypevr
 
 
-@deftypevr {Error Symbol} symbol mmec-error-bytevector-is-empty
-@deftypevrx {Parent Error Symbol} symbol mmec-error-value-out-of-range
-Used to signal that a bytevector operand is empty.
+@deftypevr {Error Symbol} symbol mmec-error-bytevector-span-start-out-of-range
+@deftypevrx {Parent Error Symbol} symbol mmec-error-bytevector-index-out-of-range
+The start index selected as slots span beginning in a bytevector is out of range.
+@end deftypevr
+
+
+@deftypevr {Error Symbol} symbol mmec-error-bytevector-span-past-out-of-range
+@deftypevrx {Parent Error Symbol} symbol mmec-error-bytevector-index-out-of-range
+The past index selected as slots span ending in a bytevector is out of range.
+@end deftypevr
+
+
+@deftypevr {Error Symbol} symbol mmec-error-bytevector-invalid-span-limits
+@deftypevrx {Parent Error Symbol} symbol mmec-error-bytevector-index-out-of-range
+The start and past indexes selected as slots span limits in a bytevector are invalid.
 @end deftypevr
 
 @c page
@@ -3084,6 +3141,16 @@ Signal an error with symbol @code{mmec-error-bytevector-constructor-size-too-big
 @subsection Signalling range errors
 
 
+@menu
+* capi errors range generic::     Generic range errors.
+* capi errors range bytevector::  Bytevector range errors.
+@end menu
+
+@c page
+@node capi errors range generic
+@subsubsection Generic range errors
+
+
 @deftypefun mmec_error_signaller_fun_t mmec_error_value_out_of_range
 Signal an error with symbol @code{mmec-error-value-out-of-range} then return @nil{}.
 @end deftypefun
@@ -3093,14 +3160,33 @@ Signal an error with symbol @code{mmec-error-value-out-of-range} then return @ni
 Signal an error with symbol @code{mmec-error-index-out-of-range} then return @nil{}.
 @end deftypefun
 
+@c page
+@node capi errors range bytevector
+@subsubsection Bytevector range errors
+
+
+@deftypefun mmec_error_signaller_fun_t mmec_error_bytevector_is_empty
+Signal an error with symbol @code{mmec-error-bytevector-is-empty} then return @nil{}.
+@end deftypefun
+
 
 @deftypefun mmec_error_signaller_fun_t mmec_error_bytevector_index_out_of_range
 Signal an error with symbol @code{mmec-error-bytevector-index-out-of-range} then return @nil{}.
 @end deftypefun
 
 
-@deftypefun mmec_error_signaller_fun_t mmec_error_error_bytevector_is_empty
-Signal an error with symbol @code{mmec-error-bytevector-is-empty} then return @nil{}.
+@deftypefun mmec_error_signaller_fun_t mmec_error_bytevector_span_start_out_of_range
+Signal an error with symbol @code{mmec-error-bytevector-span-start-out-of-range} then return @nil{}.
+@end deftypefun
+
+
+@deftypefun mmec_error_signaller_fun_t mmec_error_bytevector_span_past_out_of_range
+Signal an error with symbol @code{mmec-error-bytevector-span-past-out-of-range} then return @nil{}.
+@end deftypefun
+
+
+@deftypefun mmec_error_signaller_fun_t mmec_error_bytevector_invalid_span_limits
+Signal an error with symbol @code{mmec-error-bytevector-invalid-span-limits} then return @nil{}.
 @end deftypefun
 
 @c page

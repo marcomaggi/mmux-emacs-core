@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-29 05:23:31 marco>
+;; Time-stamp: <2020-02-29 06:25:57 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -91,13 +91,27 @@
   "Attempt to access the internal represenation of an object with an index out of range."
   'mmec-error-value-out-of-range)
 
-(define-error 'mmec-error-bytevector-index-out-of-range
-  "Attempt to access the internal represenation of a bytevector object with an index out of range."
-  'mmec-error-index-out-of-range)
+;; bytevectors
 
 (define-error 'mmec-error-bytevector-is-empty
   "Used to signal that a bytevector operand is empty.."
   'mmec-error-value-out-of-range)
+
+(define-error 'mmec-error-bytevector-index-out-of-range
+  "Attempt to access the internal represenation of a bytevector object with an index out of range."
+  'mmec-error-index-out-of-range)
+
+(define-error 'mmec-error-bytevector-span-start-out-of-range
+  "The start index selected as slots span beginning in a bytevector is out of range."
+  'mmec-error-bytevector-index-out-of-range)
+
+(define-error 'mmec-error-bytevector-span-past-out-of-range
+  "The past index selected as slots span ending in a bytevector is out of range."
+  'mmec-error-bytevector-index-out-of-range)
+
+(define-error 'mmec-error-bytevector-invalid-span-limits
+  "The start and past indexes selected as slots span limits in a bytevector are invalid."
+  'mmec-error-bytevector-index-out-of-range)
 
 ;;; --------------------------------------------------------------------
 ;;; operations errors

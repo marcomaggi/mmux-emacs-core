@@ -172,8 +172,11 @@ MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, bytevector_constructor_size_too_big);
 
 MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, value_out_of_range);
 MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, index_out_of_range);
-MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, bytevector_index_out_of_range);
 MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, error_bytevector_is_empty);
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, bytevector_index_out_of_range);
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, bytevector_span_start_out_of_range);
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, bytevector_span_past_out_of_range);
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, bytevector_invalid_span_limits);
 
 /* ------------------------------------------------------------------ */
 

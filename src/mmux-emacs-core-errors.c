@@ -129,13 +129,27 @@ MMEC_DEFINE_ERROR_SIGNALLER(mmec, index_out_of_range,
 			    "mmec-error-index-out-of-range",
 			    "Attempt to access the internal represenation of an object with an index out of range.")
 
-MMEC_DEFINE_ERROR_SIGNALLER(mmec, bytevector_index_out_of_range,
-			    "mmec-error-bytevector-index-out-of-range",
-			    "Attempt to access a bytevector obect with an index out of range.")
+/* ------------------------------------------------------------------ */
 
 MMEC_DEFINE_ERROR_SIGNALLER(mmec, error_bytevector_is_empty,
 			    "mmec-error-bytevector-is-empty",
 			    "Used to signal that a bytevector operand is empty.")
+
+MMEC_DEFINE_ERROR_SIGNALLER(mmec, bytevector_index_out_of_range,
+			    "mmec-error-bytevector-index-out-of-range",
+			    "Attempt to access a bytevector obect with an index out of range.")
+
+MMEC_DEFINE_ERROR_SIGNALLER(mmec, bytevector_span_start_out_of_range,
+			    "mmec-error-bytevector-span-start-out-of-range",
+			    "The start index selected as slots span beginning in a bytevector is out of range.")
+
+MMEC_DEFINE_ERROR_SIGNALLER(mmec, bytevector_span_past_out_of_range,
+			    "mmec-error-bytevector-span-past-out-of-range",
+			    "The past index selected as slots span ending in a bytevector is out of range.")
+
+MMEC_DEFINE_ERROR_SIGNALLER(mmec, bytevector_invalid_span_limits,
+			    "mmec-error-bytevector-invalid-span-limits",
+			    "The start and past indexes selected as slots span limits in a bytevector are invalid.")
 
 
 /** --------------------------------------------------------------------

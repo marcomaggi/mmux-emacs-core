@@ -5,8 +5,8 @@
 
   https://www.gnu.org/software/gnulib/manual/html_node/Integer-Type-Overflow.html#Integer-Type-Overflow
 
-* Test the subbytevector functions.
-* Document the subbytevector functions.
+* C language bytevector functions: more specific errors raised when validating indexes and spans.
+* Implement the built-in cl-defstruct API for bytevector copy constructors.
 * Review the ctypes implementation to make the constructor signal errors, add the env argument
 * Read the elisp docs node Sequence Functions to understand how to interface bytevectors with sequence functions.
 * Local Variables

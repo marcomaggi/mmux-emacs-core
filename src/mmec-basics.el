@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-03-01 07:51:51 marco>
+;; Time-stamp: <2020-03-01 10:53:36 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -214,7 +214,7 @@ quoted function name.
 Argument  FUNCNAME  must  be  a  symbol representing  the  name  of  the
 function.
 
-Optional argument STUFF must be the meat of the method definition."
+Optional argument STUFF must be the meat of the function definition."
   (declare (indent defun))
   `(cl-symbol-macrolet ((--func-- (quote ,FUNCNAME)))
      (cl-defun ,FUNCNAME ,@STUFF)))

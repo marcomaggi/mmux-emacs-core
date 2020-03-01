@@ -154,6 +154,7 @@ included in the section entitled ``@gnu{} Free Documentation License''.
 * ctypes::                      Object wrappers for C language types.
 * bytevec::                     Bytevector objects.
 * errors::                      How errors are signalled.
+* macros::                      Language extension macros.
 * capi::                        C language programming interface.
 
 Appendices
@@ -2776,6 +2777,49 @@ Overflow while performing a mathematics operation.
 @deftypevrx {Parent Error Symbol} symbol mmec-error-mathematics
 Underflow while performing a mathematics operation.
 @end deftypevr
+
+@c page
+@node macros
+@chapter Language extension macros
+
+
+@deffn {Macro} mmec-defun @var{FUNCNAME} &rest @var{STUFF}
+Wrapper for the macro @syntax{cl-defun}.
+
+Define a function like @syntax{cl-defun} does with the same arguments.  In addition: the whole
+definition is wrapped into a @syntax{cl-symbol-macrolet}' form defining the special constant
+@code{--func--} which expands to the quoted function name.
+
+Argument @var{FUNCNAME} must be a symbol representing the name of the function.
+
+Optional argument @var{STUFF} must be the meat of the function definition.
+@end deffn
+
+
+@deffn {Macro} mmec-defmethod @var{FUNCNAME} &rest @var{STUFF}
+Wrapper for the macro @syntax{cl-defmethod}.
+
+Define a function like @syntax{cl-defmethod} does with the same arguments.  In addition: the whole
+definition is wrapped into a @syntax{cl-symbol-macrolet}' form defining the special constant
+@code{--func--} which expands to the quoted function name.
+
+Argument @var{FUNCNAME} must be a symbol representing the name of the function.
+
+Optional argument @var{STUFF} must be the meat of the method definition.
+@end deffn
+
+
+@defvr {Symbol Macro} {--func--}
+Symbol macro defined by @func{mmec-defun} and @func{mmec-defmethod} to expand into the quoted
+function name.
+
+@lisp
+(mmec-defun doit ()
+  --func--)
+
+(doit)  @result{} doit
+@end lisp
+@end defvr
 
 @c page
 @node capi

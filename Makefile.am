@@ -102,6 +102,7 @@ dist_lisp_LISP	= \
 	src/mmec-basics.el				\
 	src/mmec-number-objects.el			\
 	src/mmec-constants.el				\
+	src/mmec-mathematics.el				\
 	src/mmec-bytevector-objects.el			\
 	src/mmec.el
 
@@ -113,6 +114,11 @@ src/mmec-number-objects.elc: \
 	libmmux-emacs-core.la
 
 src/mmec-constants.elc: \
+	src/mmec-number-objects.elc			\
+	src/mmec-basics.elc				\
+	libmmux-emacs-core.la
+
+src/mmec-mathematics.elc: \
 	src/mmec-number-objects.elc			\
 	src/mmec-basics.elc				\
 	libmmux-emacs-core.la

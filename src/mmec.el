@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-17 06:14:04 marco>
+;; Time-stamp: <2020-03-01 17:10:57 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -35,6 +35,7 @@
 (require 'mmec-number-objects)
 (require 'mmec-constants)
 (require 'mmec-bytevector-objects)
+(require 'mmec-mathematics)
 (provide 'mmec)
 
 ;;; mmec.el ends here

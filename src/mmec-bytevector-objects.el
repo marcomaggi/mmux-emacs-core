@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-03-01 07:51:57 marco>
+;; Time-stamp: <2020-03-01 10:34:14 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -77,15 +77,16 @@
 	       (:include	mmec-bytevector)
 	       (:constructor	mmec-floating-point-bytevector--make)))
 
-(cl-macrolet ((mmec--define-abstract-type-constructor
-	       (TYPE)
-	       `(defun ,TYPE (&rest args)
-		  (signal 'mmux-core-instantiating-abstract-type (quote ,TYPE)))))
-  (mmec--define-abstract-type-constructor mmec-bytevector)
-  (mmec--define-abstract-type-constructor mmec-integer-bytevector)
-  (mmec--define-abstract-type-constructor mmec-signed-integer-bytevector)
-  (mmec--define-abstract-type-constructor mmec-unsigned-integer-bytevector)
-  (mmec--define-abstract-type-constructor mmec-floating-point-bytevector))
+(cl-macrolet
+    ((mmec--def (TYPE)
+		(let ((FUNCNAME		TYPE))
+		  `(mmec-defun ,FUNCNAME (&rest args)
+		     (signal 'mmec-error-instantiating-abstract-type --func--)))))
+  (mmec--def mmec-bytevector)
+  (mmec--def mmec-integer-bytevector)
+  (mmec--def mmec-signed-integer-bytevector)
+  (mmec--def mmec-unsigned-integer-bytevector)
+  (mmec--def mmec-floating-point-bytevector))
 
 
 ;;;; bytevector type definitions
@@ -94,6 +95,7 @@
   (let* ((BYTEVECTOR-TYPE		(mmec-sformat "mmec-%s-bytevector"		TYPESTEM))
 	 (BYTEVECTOR-TYPE-MAKER		(mmec-sformat "mmec-%s-bytevector--make"	TYPESTEM))
 	 (PARENT-BYTEVECTOR-TYPE	(mmec-sformat "mmec-%s-bytevector"		PARENT-STEM))
+	 (CONSTRUCTOR			BYTEVECTOR-TYPE)
 	 (SIZEOF-SLOT			(mmec-sformat "mmec-sizeof-%s"			TYPESTEM))
 	 (SIGNED-BOOL		(cl-case PARENT-STEM
 				  (signed-integer	't)
@@ -107,12 +109,12 @@
 		      (:constructor	,BYTEVECTOR-TYPE-MAKER)
 		      (:include		,PARENT-BYTEVECTOR-TYPE)))
 
-       (cl-defgeneric ,BYTEVECTOR-TYPE (number-of-slots)
+       (cl-defgeneric ,CONSTRUCTOR (number-of-slots)
 	 ,DOCSTRING)
-       (cl-defmethod  ,BYTEVECTOR-TYPE ((number-of-slots integer))
+       (mmec-defmethod ,CONSTRUCTOR ((number-of-slots integer))
 	 ,DOCSTRING
 	 (when (> 0 number-of-slots)
-	   (signal 'mmec-error-bytevector-constructor-invalid-number-of-slots (list (quote ,BYTEVECTOR-TYPE) number-of-slots)))
+	   (signal 'mmec-error-bytevector-constructor-invalid-number-of-slots (list --func-- number-of-slots)))
 	 (mmec--make ,BYTEVECTOR-TYPE
 		     :number-of-slots		number-of-slots
 		     :slot-size			,SIZEOF-SLOT
@@ -605,8 +607,8 @@ the    same    as   in    the    call    to   the    generic    function
 		       (CFUNC-LEQ	(mmec-sformat "mmec-c-%s-bytevector-leq"	TYPESTEM))
 		       (CFUNC-GEQ	(mmec-sformat "mmec-c-%s-bytevector-geq"	TYPESTEM)))
 		  `(progn
-		     (cl-defmethod mmec-bytevector-compare-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
-							      (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
+		     (mmec-defmethod mmec-bytevector-compare-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
+								(bv2 ,BV-TYPE) (start2 integer) (past2 integer))
 		       "Compare the selected spans in the bytevectors BV1 and BV2, return -1, 0 or +1.
 
 The arguments START  and PAST must be valid slot  indexes satisfying the
@@ -639,48 +641,48 @@ Return the following code:
 
   or, while  visiting the  slots from  START to PAST,  BV1 holds  a slot
   value that is less than the corresponding slot value in BV2."
-		       (mmec-bytevector-validate-span (quote mmec-bytevector-compare-6) bv1 start1 past1)
-		       (mmec-bytevector-validate-span (quote mmec-bytevector-compare-6) bv2 start2 past2)
+		       (mmec-bytevector-validate-span --func-- bv1 start1 past1)
+		       (mmec-bytevector-validate-span --func-- bv2 start2 past2)
 		       (,CFUNC-COMPARE (mmec--extract-obj ,BV-TYPE bv1) start1 past1
 				       (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
 
-		     (cl-defmethod mmec-bytevector-equal-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
-							    (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
+		     (mmec-defmethod mmec-bytevector-equal-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
+							      (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
 		       "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
-		       (mmec-bytevector-validate-span (quote mmec-bytevector-equal-6) bv1 start1 past1)
-		       (mmec-bytevector-validate-span (quote mmec-bytevector-equal-6) bv2 start2 past2)
+		       (mmec-bytevector-validate-span --func-- bv1 start1 past1)
+		       (mmec-bytevector-validate-span --func-- bv2 start2 past2)
 		       (,CFUNC-EQUAL (mmec--extract-obj ,BV-TYPE bv1) start1 past1
 				     (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
 
-		     (cl-defmethod mmec-bytevector-less-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
-							   (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
+		     (mmec-defmethod mmec-bytevector-less-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
+							     (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
 		       "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
-		       (mmec-bytevector-validate-span (quote mmec-bytevector-less-6) bv1 start1 past1)
-		       (mmec-bytevector-validate-span (quote mmec-bytevector-less-6) bv2 start2 past2)
+		       (mmec-bytevector-validate-span --func-- bv1 start1 past1)
+		       (mmec-bytevector-validate-span --func-- bv2 start2 past2)
 		       (,CFUNC-LESS (mmec--extract-obj ,BV-TYPE bv1) start1 past1
 				    (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
 
-		     (cl-defmethod mmec-bytevector-greater-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
-							      (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
+		     (mmec-defmethod mmec-bytevector-greater-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
+								(bv2 ,BV-TYPE) (start2 integer) (past2 integer))
 		       "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
-		       (mmec-bytevector-validate-span (quote mmec-bytevector-greater-6) bv1 start1 past1)
-		       (mmec-bytevector-validate-span (quote mmec-bytevector-greater-6) bv2 start2 past2)
+		       (mmec-bytevector-validate-span --func-- bv1 start1 past1)
+		       (mmec-bytevector-validate-span --func-- bv2 start2 past2)
 		       (,CFUNC-GREATER (mmec--extract-obj ,BV-TYPE bv1) start1 past1
 				       (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
 
-		     (cl-defmethod mmec-bytevector-leq-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
-							  (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
+		     (mmec-defmethod mmec-bytevector-leq-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
+							    (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
 		       "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
-		       (mmec-bytevector-validate-span (quote mmec-bytevector-leq-6) bv1 start1 past1)
-		       (mmec-bytevector-validate-span (quote mmec-bytevector-leq-6) bv2 start2 past2)
+		       (mmec-bytevector-validate-span --func-- bv1 start1 past1)
+		       (mmec-bytevector-validate-span --func-- bv2 start2 past2)
 		       (,CFUNC-LEQ (mmec--extract-obj ,BV-TYPE bv1) start1 past1
 				   (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
 
-		     (cl-defmethod mmec-bytevector-geq-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
-							  (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
+		     (mmec-defmethod mmec-bytevector-geq-6 ((bv1 ,BV-TYPE) (start1 integer) (past1 integer)
+							    (bv2 ,BV-TYPE) (start2 integer) (past2 integer))
 		       "Compare the selected spans in the bytevectors BV1 and BV2: return true or false."
-		       (mmec-bytevector-validate-span (quote mmec-bytevector-geq-6) bv1 start1 past1)
-		       (mmec-bytevector-validate-span (quote mmec-bytevector-geq-6) bv2 start2 past2)
+		       (mmec-bytevector-validate-span --func-- bv1 start1 past1)
+		       (mmec-bytevector-validate-span --func-- bv2 start2 past2)
 		       (,CFUNC-GEQ (mmec--extract-obj ,BV-TYPE bv1) start1 past1
 				   (mmec--extract-obj ,BV-TYPE bv2) start2 past2))
 		     ))))

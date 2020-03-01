@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-29 06:25:57 marco>
+;; Time-stamp: <2020-03-01 07:51:51 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -199,6 +199,41 @@
   (let* ((TYPE.str	(mmec--prepend-prefix-to-symbol-name TYPE-OR-STEM))
 	 (EXTRACTOR	(intern (concat TYPE.str "-obj"))))
     `(,EXTRACTOR ,VALUE)))
+
+
+;;;; common macros enhancement
+
+(defmacro mmec-defun (FUNCNAME &rest STUFF)
+  "Wrapper for the macro `cl-defun' defined by MMUX Emacs Core.
+
+Define  a function  like `cl-defun'  does with  the same  arguments.  In
+addition: the  whole definition  is wrapped into  a `cl-symbol-macrolet'
+form  defining the  special  constant `--func--'  which  expands to  the
+quoted function name.
+
+Argument  FUNCNAME  must  be  a  symbol representing  the  name  of  the
+function.
+
+Optional argument STUFF must be the meat of the method definition."
+  (declare (indent defun))
+  `(cl-symbol-macrolet ((--func-- (quote ,FUNCNAME)))
+     (cl-defun ,FUNCNAME ,@STUFF)))
+
+(defmacro mmec-defmethod (FUNCNAME &rest STUFF)
+  "Wrapper for the macro `cl-defmethod' defined by MMUX Emacs Core.
+
+Define a function like `cl-defmethod'  does with the same arguments.  In
+addition: the  whole definition  is wrapped into  a `cl-symbol-macrolet'
+form  defining the  special  constant `--func--'  which  expands to  the
+quoted function name.
+
+Argument FUNCNAME must be a symbol  representing the name of the generic
+function.
+
+Optional argument STUFF must be the meat of the method definition."
+  (declare (indent defun))
+  `(cl-symbol-macrolet ((--func-- (quote ,FUNCNAME)))
+     (cl-defmethod ,FUNCNAME ,@STUFF)))
 
 
 ;;;; done

@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-29 07:16:21 marco>
+;; Time-stamp: <2020-03-01 07:51:57 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -505,12 +505,12 @@ compare a  span in  the data  area of the  bytevectors starting  at slot
 index START, included, and ending at slot index PAST, excluded.
 
 %s" FUNCNAME-6 RESULT-DOCSTRING)))
-		  `(cl-defun ,FUNCNAME (bv1 bv2 &key (start1 0) (start2 0)
-					    (past1 (mmec-bytevector-number-of-slots bv1))
-					    (past2 (mmec-bytevector-number-of-slots bv2)))
+		  `(mmec-defun ,FUNCNAME (bv1 bv2 &key (start1 0) (start2 0)
+					      (past1 (mmec-bytevector-number-of-slots bv1))
+					      (past2 (mmec-bytevector-number-of-slots bv2)))
 		     ,DOCSTRING
-		     (mmec-bytevector-validate-span (quote ,FUNCNAME) bv1 start1 past1)
-		     (mmec-bytevector-validate-span (quote ,FUNCNAME) bv2 start2 past2)
+		     (mmec-bytevector-validate-span --func-- bv1 start1 past1)
+		     (mmec-bytevector-validate-span --func-- bv2 start2 past2)
 		     (,FUNCNAME-6 bv1 start1 past1 bv2 start2 past2)))))
   (mmec--def compare "Return the following code:
 

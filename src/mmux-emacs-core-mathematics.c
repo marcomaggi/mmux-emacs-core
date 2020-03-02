@@ -33,80 +33,542 @@
 
 
 /** --------------------------------------------------------------------
- ** Helper functions.
+ ** Helper functions: arithmetics.
  ** ----------------------------------------------------------------- */
 
-static inline double
-square (double X)
+#undef  MMEC_DEFINE_CLANG_ADD
+#define MMEC_DEFINE_CLANG_ADD(TYPESTEM)					\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _add (mmec_clang_ ## TYPESTEM ## _t X,	\
+				   mmec_clang_ ## TYPESTEM ## _t Y)	\
+  {									\
+    return X + Y;							\
+  }
+
+MMEC_DEFINE_CLANG_ADD(sint64)
+MMEC_DEFINE_CLANG_ADD(uint64)
+MMEC_DEFINE_CLANG_ADD(float)
+MMEC_DEFINE_CLANG_ADD(double)
+MMEC_DEFINE_CLANG_ADD(ldouble)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_SUB
+#define MMEC_DEFINE_CLANG_SUB(TYPESTEM)					\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _sub (mmec_clang_ ## TYPESTEM ## _t X,	\
+				   mmec_clang_ ## TYPESTEM ## _t Y)	\
+  {									\
+    return X - Y;							\
+  }
+
+MMEC_DEFINE_CLANG_SUB(sint64)
+MMEC_DEFINE_CLANG_SUB(uint64)
+MMEC_DEFINE_CLANG_SUB(float)
+MMEC_DEFINE_CLANG_SUB(double)
+MMEC_DEFINE_CLANG_SUB(ldouble)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_MUL
+#define MMEC_DEFINE_CLANG_MUL(TYPESTEM)					\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _mul (mmec_clang_ ## TYPESTEM ## _t X,	\
+				   mmec_clang_ ## TYPESTEM ## _t Y)	\
+  {									\
+    return X * Y;							\
+  }
+
+MMEC_DEFINE_CLANG_MUL(sint64)
+MMEC_DEFINE_CLANG_MUL(uint64)
+MMEC_DEFINE_CLANG_MUL(float)
+MMEC_DEFINE_CLANG_MUL(double)
+MMEC_DEFINE_CLANG_MUL(ldouble)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_DIV
+#define MMEC_DEFINE_CLANG_DIV(TYPESTEM)					\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _div (mmec_clang_ ## TYPESTEM ## _t X,	\
+				   mmec_clang_ ## TYPESTEM ## _t Y)	\
+  {									\
+    return X + Y;							\
+  }
+
+MMEC_DEFINE_CLANG_DIV(sint64)
+MMEC_DEFINE_CLANG_DIV(uint64)
+MMEC_DEFINE_CLANG_DIV(float)
+MMEC_DEFINE_CLANG_DIV(double)
+MMEC_DEFINE_CLANG_DIV(ldouble)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_NEG
+#define MMEC_DEFINE_CLANG_NEG(TYPESTEM)					\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _neg (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return - X;								\
+  }
+
+MMEC_DEFINE_CLANG_NEG(sint64)
+MMEC_DEFINE_CLANG_NEG(uint64)
+MMEC_DEFINE_CLANG_NEG(float)
+MMEC_DEFINE_CLANG_NEG(double)
+MMEC_DEFINE_CLANG_NEG(ldouble)
+
+/* ------------------------------------------------------------------ */
+
+static inline mmec_clang_sint64_t
+mmec_clang_sint64_inv (mmec_clang_sint64_t X MMEC_UNUSED)
 {
-  return X * X;
+  return 0;
 }
-static inline float
-squaref (float X)
+
+static inline mmec_clang_uint64_t
+mmec_clang_uint64_inv (mmec_clang_uint64_t X MMEC_UNUSED)
 {
-  return X * X;
+  return 0;
+}
+
+#undef  MMEC_DEFINE_CLANG_INV
+#define MMEC_DEFINE_CLANG_INV(TYPESTEM)					\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _inv (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return ((mmec_clang_ ## TYPESTEM ## _t)1.0) / X;			\
+  }
+
+MMEC_DEFINE_CLANG_INV(float)
+MMEC_DEFINE_CLANG_INV(double)
+MMEC_DEFINE_CLANG_INV(ldouble)
+
+
+/** --------------------------------------------------------------------
+ ** Helper functions: exponentiation and logarithms.
+ ** ----------------------------------------------------------------- */
+
+#undef  MMEC_DEFINE_CLANG_SQUARE
+#define MMEC_DEFINE_CLANG_SQUARE(TYPESTEM)				\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _square (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return X * X;							\
+  }
+
+MMEC_DEFINE_CLANG_SQUARE(float)
+MMEC_DEFINE_CLANG_SQUARE(double)
+MMEC_DEFINE_CLANG_SQUARE(ldouble)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_CUBE
+#define MMEC_DEFINE_CLANG_CUBE(TYPESTEM)				\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _cube (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return X * X * X;							\
+  }
+
+MMEC_DEFINE_CLANG_CUBE(float)
+MMEC_DEFINE_CLANG_CUBE(double)
+MMEC_DEFINE_CLANG_CUBE(ldouble)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_SQRT
+#define MMEC_DEFINE_CLANG_SQRT(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _sqrt (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return sqrt ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_SQRT(float,   f)
+MMEC_DEFINE_CLANG_SQRT(double,   )
+MMEC_DEFINE_CLANG_SQRT(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_CBRT
+#define MMEC_DEFINE_CLANG_CBRT(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _cbrt (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return cbrt ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_CBRT(float,   f)
+MMEC_DEFINE_CLANG_CBRT(double,   )
+MMEC_DEFINE_CLANG_CBRT(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+static inline float
+mmec_clang_float_root (float X, float Y)
+{
+  return powf(X, ((float)1.0)/Y);
+}
+static inline double
+mmec_clang_double_root (double X, double Y)
+{
+  return pow(X, 1.0/Y);
 }
 static inline long double
-squarel (long double X)
+mmec_clang_ldouble_root (long double X, long double Y)
 {
-  return X * X;
+  return powl(X, ((long double)1.0)/Y);
 }
 
 /* ------------------------------------------------------------------ */
 
-static inline double
-cube (double X)
-{
-  return X * X * X;
-}
+#undef  MMEC_DEFINE_CLANG_HYPOT
+#define MMEC_DEFINE_CLANG_HYPOT(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _hypot (mmec_clang_ ## TYPESTEM ## _t X,	\
+				     mmec_clang_ ## TYPESTEM ## _t Y)	\
+  {									\
+    return hypot ## SUFFIX(X, Y);					\
+  }
 
-static inline float
-cubef (float X)
-{
-  return X * X * X;
-}
+MMEC_DEFINE_CLANG_HYPOT(float,   f)
+MMEC_DEFINE_CLANG_HYPOT(double,   )
+MMEC_DEFINE_CLANG_HYPOT(ldouble, l)
 
-static inline long double
-cubel (long double X)
-{
-  return X * X * X;
-}
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_POW
+#define MMEC_DEFINE_CLANG_POW(TYPESTEM, SUFFIX)				\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _pow (mmec_clang_ ## TYPESTEM ## _t X,	\
+				   mmec_clang_ ## TYPESTEM ## _t Y)	\
+  {									\
+    return pow ## SUFFIX(X, Y);						\
+  }
+
+MMEC_DEFINE_CLANG_POW(float,   f)
+MMEC_DEFINE_CLANG_POW(double,   )
+MMEC_DEFINE_CLANG_POW(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_EXPM1
+#define MMEC_DEFINE_CLANG_EXPM1(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _expm1 (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return expm1 ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_EXPM1(float,   f)
+MMEC_DEFINE_CLANG_EXPM1(double,   )
+MMEC_DEFINE_CLANG_EXPM1(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_LOG1P
+#define MMEC_DEFINE_CLANG_LOG1P(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _log1p (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return log1p ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_LOG1P(float,   f)
+MMEC_DEFINE_CLANG_LOG1P(double,   )
+MMEC_DEFINE_CLANG_LOG1P(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_EXP
+#define MMEC_DEFINE_CLANG_EXP(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _exp (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return exp ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_EXP(float,   f)
+MMEC_DEFINE_CLANG_EXP(double,   )
+MMEC_DEFINE_CLANG_EXP(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_EXP2
+#define MMEC_DEFINE_CLANG_EXP2(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _exp2 (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return exp2 ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_EXP2(float,   f)
+MMEC_DEFINE_CLANG_EXP2(double,   )
+MMEC_DEFINE_CLANG_EXP2(ldouble, l)
 
 /* ------------------------------------------------------------------ */
 
 static inline float
-exp10f (float X)
+mmec_clang_float_exp10 (float X)
 {
   return expf(X * logf(10.0));
 }
 static inline double
-exp10 (double X)
+mmec_clang_double_exp10 (double X)
 {
   return exp(X * log(10.0));
 }
 static inline long double
-exp10l (long double X)
+mmec_clang_ldouble_exp10 (long double X)
 {
   return expl(X * logl(10.0));
 }
 
 /* ------------------------------------------------------------------ */
 
-static inline double
-root (double X, double Y)
-{
-  return pow(X, 1.0/Y);
-}
-static inline float
-rootf (float X, float Y)
-{
-  return pow(X, ((float)1.0)/Y);
-}
-static inline long double
-rootl (long double X, long double Y)
-{
-  return pow(X, ((long double)1.0)/Y);
-}
+#undef  MMEC_DEFINE_CLANG_LOG
+#define MMEC_DEFINE_CLANG_LOG(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _log (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return log ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_LOG(float,   f)
+MMEC_DEFINE_CLANG_LOG(double,   )
+MMEC_DEFINE_CLANG_LOG(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_LOG2
+#define MMEC_DEFINE_CLANG_LOG2(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _log2 (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return log2 ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_LOG2(float,   f)
+MMEC_DEFINE_CLANG_LOG2(double,   )
+MMEC_DEFINE_CLANG_LOG2(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_LOG10
+#define MMEC_DEFINE_CLANG_LOG10(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _log10 (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return log10 ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_LOG10(float,   f)
+MMEC_DEFINE_CLANG_LOG10(double,   )
+MMEC_DEFINE_CLANG_LOG10(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_LOGB
+#define MMEC_DEFINE_CLANG_LOGB(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _logb (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return logb ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_LOGB(float,   f)
+MMEC_DEFINE_CLANG_LOGB(double,   )
+MMEC_DEFINE_CLANG_LOGB(ldouble, l)
+
+
+/** --------------------------------------------------------------------
+ ** Helper functions: trigonometric functions.
+ ** ----------------------------------------------------------------- */
+
+#undef  MMEC_DEFINE_CLANG_SIN
+#define MMEC_DEFINE_CLANG_SIN(TYPESTEM, SUFFIX)				\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _sin (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return sin ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_SIN(float,   f)
+MMEC_DEFINE_CLANG_SIN(double,   )
+MMEC_DEFINE_CLANG_SIN(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_COS
+#define MMEC_DEFINE_CLANG_COS(TYPESTEM, SUFFIX)				\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _cos (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return cos ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_COS(float,   f)
+MMEC_DEFINE_CLANG_COS(double,   )
+MMEC_DEFINE_CLANG_COS(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_TAN
+#define MMEC_DEFINE_CLANG_TAN(TYPESTEM, SUFFIX)				\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _tan (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return tan ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_TAN(float,   f)
+MMEC_DEFINE_CLANG_TAN(double,   )
+MMEC_DEFINE_CLANG_TAN(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_ASIN
+#define MMEC_DEFINE_CLANG_ASIN(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _asin (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return asin ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_ASIN(float,   f)
+MMEC_DEFINE_CLANG_ASIN(double,   )
+MMEC_DEFINE_CLANG_ASIN(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_ACOS
+#define MMEC_DEFINE_CLANG_ACOS(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _acos (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return acos ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_ACOS(float,   f)
+MMEC_DEFINE_CLANG_ACOS(double,   )
+MMEC_DEFINE_CLANG_ACOS(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_ATAN
+#define MMEC_DEFINE_CLANG_ATAN(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _atan (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return atan ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_ATAN(float,   f)
+MMEC_DEFINE_CLANG_ATAN(double,   )
+MMEC_DEFINE_CLANG_ATAN(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_ATAN2
+#define MMEC_DEFINE_CLANG_ATAN2(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _atan2 (mmec_clang_ ## TYPESTEM ## _t X,	\
+				     mmec_clang_ ## TYPESTEM ## _t Y)	\
+  {									\
+    return atan2 ## SUFFIX(X, Y);					\
+  }
+
+MMEC_DEFINE_CLANG_ATAN2(float,   f)
+MMEC_DEFINE_CLANG_ATAN2(double,   )
+MMEC_DEFINE_CLANG_ATAN2(ldouble, l)
+
+
+/** --------------------------------------------------------------------
+ ** Helper functions: hyperbolic functions.
+ ** ----------------------------------------------------------------- */
+
+#undef  MMEC_DEFINE_CLANG_SINH
+#define MMEC_DEFINE_CLANG_SINH(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _sinh (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return sinh ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_SINH(float,   f)
+MMEC_DEFINE_CLANG_SINH(double,   )
+MMEC_DEFINE_CLANG_SINH(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_COSH
+#define MMEC_DEFINE_CLANG_COSH(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _cosh (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return cosh ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_COSH(float,   f)
+MMEC_DEFINE_CLANG_COSH(double,   )
+MMEC_DEFINE_CLANG_COSH(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_TANH
+#define MMEC_DEFINE_CLANG_TANH(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _tanh (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return tanh ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_TANH(float,   f)
+MMEC_DEFINE_CLANG_TANH(double,   )
+MMEC_DEFINE_CLANG_TANH(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_ASINH
+#define MMEC_DEFINE_CLANG_ASINH(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _asinh (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return asinh ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_ASINH(float,   f)
+MMEC_DEFINE_CLANG_ASINH(double,   )
+MMEC_DEFINE_CLANG_ASINH(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_ACOSH
+#define MMEC_DEFINE_CLANG_ACOSH(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _acosh (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return acosh ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_ACOSH(float,   f)
+MMEC_DEFINE_CLANG_ACOSH(double,   )
+MMEC_DEFINE_CLANG_ACOSH(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_ATANH
+#define MMEC_DEFINE_CLANG_ATANH(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _atanh (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return atanh ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_ATANH(float,   f)
+MMEC_DEFINE_CLANG_ATANH(double,   )
+MMEC_DEFINE_CLANG_ATANH(ldouble, l)
 
 
 /** --------------------------------------------------------------------
@@ -114,29 +576,49 @@ rootl (long double X, long double Y)
  ** ----------------------------------------------------------------- */
 
 #undef  MMEC_DEFINE_FUNC1
-#define MMEC_DEFINE_FUNC1(FUNCSTEM, TYPESTEM, SUFFIX)			\
+#define MMEC_DEFINE_FUNC1(FUNCSTEM, TYPESTEM)				\
   static emacs_value							\
   Fmmec_c_ ## TYPESTEM ## _ ## FUNCSTEM (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED) \
   {									\
     assert(1 == nargs);							\
     mmec_clang_ ## TYPESTEM ## _t	op = mmec_extract_clang_ ## TYPESTEM ## _from_emacs_value(env, args[0]); \
-    mmec_clang_ ## TYPESTEM ## _t	rv = FUNCSTEM ## SUFFIX(op);	\
+    mmec_clang_ ## TYPESTEM ## _t	rv = mmec_clang_ ## TYPESTEM ## _ ## FUNCSTEM (op); \
 									\
     return mmec_new_emacs_value_from_clang_ ## TYPESTEM(env, rv);	\
   }
 
 #undef  MMEC_DEFINE_FUNC2
-#define MMEC_DEFINE_FUNC2(FUNCSTEM, TYPESTEM, SUFFIX)			\
+#define MMEC_DEFINE_FUNC2(FUNCSTEM, TYPESTEM)				\
   static emacs_value							\
   Fmmec_c_ ## TYPESTEM ## _ ## FUNCSTEM (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * data MMEC_UNUSED) \
   {									\
     assert(2 == nargs);							\
     mmec_clang_ ## TYPESTEM ## _t	op1 = mmec_extract_clang_ ## TYPESTEM ## _from_emacs_value(env, args[0]); \
     mmec_clang_ ## TYPESTEM ## _t	op2 = mmec_extract_clang_ ## TYPESTEM ## _from_emacs_value(env, args[0]); \
-    mmec_clang_ ## TYPESTEM ## _t	rv = FUNCSTEM ## SUFFIX(op1, op2); \
+    mmec_clang_ ## TYPESTEM ## _t	rv = mmec_clang_ ## TYPESTEM ## _ ## FUNCSTEM(op1, op2); \
 									\
     return mmec_new_emacs_value_from_clang_ ## TYPESTEM(env, rv);	\
   }
+
+
+/** --------------------------------------------------------------------
+ ** Arithmetics.
+ ** ----------------------------------------------------------------- */
+
+#undef  MMEC_DEFINE_ARITHMETICS_FUNCTIONS
+#define MMEC_DEFINE_ARITHMETICS_FUNCTIONS(TYPESTEM)	\
+  MMEC_DEFINE_FUNC2(add,	TYPESTEM)	\
+    MMEC_DEFINE_FUNC2(sub,	TYPESTEM)	\
+    MMEC_DEFINE_FUNC2(mul,	TYPESTEM)	\
+    MMEC_DEFINE_FUNC2(div,	TYPESTEM)	\
+    MMEC_DEFINE_FUNC1(neg,	TYPESTEM)	\
+    MMEC_DEFINE_FUNC1(inv,	TYPESTEM)
+
+MMEC_DEFINE_ARITHMETICS_FUNCTIONS(sint64)
+MMEC_DEFINE_ARITHMETICS_FUNCTIONS(uint64)
+MMEC_DEFINE_ARITHMETICS_FUNCTIONS(float)
+MMEC_DEFINE_ARITHMETICS_FUNCTIONS(double)
+MMEC_DEFINE_ARITHMETICS_FUNCTIONS(ldouble)
 
 
 /** --------------------------------------------------------------------
@@ -144,27 +626,27 @@ rootl (long double X, long double Y)
  ** ----------------------------------------------------------------- */
 
 #undef  MMEC_DEFINE_EXPONENTIATION_AND_LOGARITHMS_FUNCTIONS
-#define MMEC_DEFINE_EXPONENTIATION_AND_LOGARITHMS_FUNCTIONS(TYPESTEM, SUFFIX)	\
-  MMEC_DEFINE_FUNC1(square	,TYPESTEM, SUFFIX)		\
-    MMEC_DEFINE_FUNC1(cube	,TYPESTEM, SUFFIX)		\
-    MMEC_DEFINE_FUNC2(pow	,TYPESTEM, SUFFIX)		\
-    MMEC_DEFINE_FUNC1(sqrt	,TYPESTEM, SUFFIX)		\
-    MMEC_DEFINE_FUNC1(cbrt	,TYPESTEM, SUFFIX)		\
-    MMEC_DEFINE_FUNC2(root	,TYPESTEM, SUFFIX)		\
-    MMEC_DEFINE_FUNC2(hypot	,TYPESTEM, SUFFIX)		\
-    MMEC_DEFINE_FUNC1(expm1	,TYPESTEM, SUFFIX)		\
-    MMEC_DEFINE_FUNC1(log1p	,TYPESTEM, SUFFIX)		\
-    MMEC_DEFINE_FUNC1(exp	,TYPESTEM, SUFFIX)		\
-    MMEC_DEFINE_FUNC1(exp2	,TYPESTEM, SUFFIX)		\
-    MMEC_DEFINE_FUNC1(exp10	,TYPESTEM, SUFFIX)		\
-    MMEC_DEFINE_FUNC1(log	,TYPESTEM, SUFFIX)		\
-    MMEC_DEFINE_FUNC1(log2	,TYPESTEM, SUFFIX)		\
-    MMEC_DEFINE_FUNC1(log10	,TYPESTEM, SUFFIX)		\
-    MMEC_DEFINE_FUNC1(logb	,TYPESTEM, SUFFIX)
+#define MMEC_DEFINE_EXPONENTIATION_AND_LOGARITHMS_FUNCTIONS(TYPESTEM) \
+  MMEC_DEFINE_FUNC1(square	,TYPESTEM)		\
+    MMEC_DEFINE_FUNC1(cube	,TYPESTEM)		\
+    MMEC_DEFINE_FUNC2(pow	,TYPESTEM)		\
+    MMEC_DEFINE_FUNC1(sqrt	,TYPESTEM)		\
+    MMEC_DEFINE_FUNC1(cbrt	,TYPESTEM)		\
+    MMEC_DEFINE_FUNC2(root	,TYPESTEM)		\
+    MMEC_DEFINE_FUNC2(hypot	,TYPESTEM)		\
+    MMEC_DEFINE_FUNC1(expm1	,TYPESTEM)		\
+    MMEC_DEFINE_FUNC1(log1p	,TYPESTEM)		\
+    MMEC_DEFINE_FUNC1(exp	,TYPESTEM)		\
+    MMEC_DEFINE_FUNC1(exp2	,TYPESTEM)		\
+    MMEC_DEFINE_FUNC1(exp10	,TYPESTEM)		\
+    MMEC_DEFINE_FUNC1(log	,TYPESTEM)		\
+    MMEC_DEFINE_FUNC1(log2	,TYPESTEM)		\
+    MMEC_DEFINE_FUNC1(log10	,TYPESTEM)		\
+    MMEC_DEFINE_FUNC1(logb	,TYPESTEM)
 
-MMEC_DEFINE_EXPONENTIATION_AND_LOGARITHMS_FUNCTIONS(float,   f)
-MMEC_DEFINE_EXPONENTIATION_AND_LOGARITHMS_FUNCTIONS(double,   )
-MMEC_DEFINE_EXPONENTIATION_AND_LOGARITHMS_FUNCTIONS(ldouble, l)
+MMEC_DEFINE_EXPONENTIATION_AND_LOGARITHMS_FUNCTIONS(float)
+MMEC_DEFINE_EXPONENTIATION_AND_LOGARITHMS_FUNCTIONS(double)
+MMEC_DEFINE_EXPONENTIATION_AND_LOGARITHMS_FUNCTIONS(ldouble)
 
 
 /** --------------------------------------------------------------------
@@ -172,18 +654,18 @@ MMEC_DEFINE_EXPONENTIATION_AND_LOGARITHMS_FUNCTIONS(ldouble, l)
  ** ----------------------------------------------------------------- */
 
 #undef  MMEC_DEFINE_TRIGONOMETRIC_FUNCTIONS
-#define MMEC_DEFINE_TRIGONOMETRIC_FUNCTIONS(TYPESTEM, SUFFIX)	\
-  MMEC_DEFINE_FUNC1(sin,	TYPESTEM, SUFFIX)	\
-    MMEC_DEFINE_FUNC1(cos,	TYPESTEM, SUFFIX)	\
-    MMEC_DEFINE_FUNC1(tan,	TYPESTEM, SUFFIX)	\
-    MMEC_DEFINE_FUNC1(asin,	TYPESTEM, SUFFIX)	\
-    MMEC_DEFINE_FUNC1(acos,	TYPESTEM, SUFFIX)	\
-    MMEC_DEFINE_FUNC1(atan,	TYPESTEM, SUFFIX)	\
-    MMEC_DEFINE_FUNC2(atan2,	TYPESTEM, SUFFIX)
+#define MMEC_DEFINE_TRIGONOMETRIC_FUNCTIONS(TYPESTEM)	\
+  MMEC_DEFINE_FUNC1(sin,	TYPESTEM)	\
+    MMEC_DEFINE_FUNC1(cos,	TYPESTEM)	\
+    MMEC_DEFINE_FUNC1(tan,	TYPESTEM)	\
+    MMEC_DEFINE_FUNC1(asin,	TYPESTEM)	\
+    MMEC_DEFINE_FUNC1(acos,	TYPESTEM)	\
+    MMEC_DEFINE_FUNC1(atan,	TYPESTEM)	\
+    MMEC_DEFINE_FUNC2(atan2,	TYPESTEM)
 
-MMEC_DEFINE_TRIGONOMETRIC_FUNCTIONS(float,   f)
-MMEC_DEFINE_TRIGONOMETRIC_FUNCTIONS(double,   )
-MMEC_DEFINE_TRIGONOMETRIC_FUNCTIONS(ldouble, l)
+MMEC_DEFINE_TRIGONOMETRIC_FUNCTIONS(float)
+MMEC_DEFINE_TRIGONOMETRIC_FUNCTIONS(double)
+MMEC_DEFINE_TRIGONOMETRIC_FUNCTIONS(ldouble)
 
 
 /** --------------------------------------------------------------------
@@ -191,28 +673,262 @@ MMEC_DEFINE_TRIGONOMETRIC_FUNCTIONS(ldouble, l)
  ** ----------------------------------------------------------------- */
 
 #undef  MMEC_DEFINE_HYPERBOLIC_FUNCTIONS
-#define MMEC_DEFINE_HYPERBOLIC_FUNCTIONS(TYPESTEM, SUFFIX)	\
-  MMEC_DEFINE_FUNC1(sinh,	TYPESTEM, SUFFIX)		\
-    MMEC_DEFINE_FUNC1(cosh,	TYPESTEM, SUFFIX)		\
-    MMEC_DEFINE_FUNC1(tanh,	TYPESTEM, SUFFIX)		\
-    MMEC_DEFINE_FUNC1(asinh,	TYPESTEM, SUFFIX)		\
-    MMEC_DEFINE_FUNC1(acosh,	TYPESTEM, SUFFIX)		\
-    MMEC_DEFINE_FUNC1(atanh,	TYPESTEM, SUFFIX)
+#define MMEC_DEFINE_HYPERBOLIC_FUNCTIONS(TYPESTEM)	\
+  MMEC_DEFINE_FUNC1(sinh,	TYPESTEM)		\
+    MMEC_DEFINE_FUNC1(cosh,	TYPESTEM)		\
+    MMEC_DEFINE_FUNC1(tanh,	TYPESTEM)		\
+    MMEC_DEFINE_FUNC1(asinh,	TYPESTEM)		\
+    MMEC_DEFINE_FUNC1(acosh,	TYPESTEM)		\
+    MMEC_DEFINE_FUNC1(atanh,	TYPESTEM)
 
-MMEC_DEFINE_HYPERBOLIC_FUNCTIONS(float,   f)
-MMEC_DEFINE_HYPERBOLIC_FUNCTIONS(double,   )
-MMEC_DEFINE_HYPERBOLIC_FUNCTIONS(ldouble, l)
+MMEC_DEFINE_HYPERBOLIC_FUNCTIONS(float)
+MMEC_DEFINE_HYPERBOLIC_FUNCTIONS(double)
+MMEC_DEFINE_HYPERBOLIC_FUNCTIONS(ldouble)
 
 
 /** --------------------------------------------------------------------
- ** Elisp functions table.
+ ** Elisp functions table: arithmetics.
+ ** ----------------------------------------------------------------- */
+
+#define NUMBER_OF_MODULE_ARITHMETICS_FUNCTIONS	(6 * 5)
+static mmec_module_function_t const
+  module_arithmetics_functions_table[NUMBER_OF_MODULE_ARITHMETICS_FUNCTIONS] = {
+  /* Functions for  MMEC numbers whose  internal representation is an  Emacs built-in
+     value of type `float'. */
+  {
+    .name		= "mmec-c-double-add",
+    .implementation	= Fmmec_c_double_add,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute OP1 + OP2, where the operands are number values of type `float'.",
+  },
+  {
+    .name		= "mmec-c-double-sub",
+    .implementation	= Fmmec_c_double_sub,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute OP1 - OP2, where the operands are number values of type `float'.",
+  },
+  {
+    .name		= "mmec-c-double-mul",
+    .implementation	= Fmmec_c_double_mul,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute OP1 * OP2, where the operands are number values of type `float'.",
+  },
+  {
+    .name		= "mmec-c-double-div",
+    .implementation	= Fmmec_c_double_div,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute OP1 / OP2, where the operands are number values of type `float'.",
+  },
+  {
+    .name		= "mmec-c-double-neg",
+    .implementation	= Fmmec_c_double_neg,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute - OP, where the operand is a number value of type `float'.",
+  },
+  {
+    .name		= "mmec-c-double-inv",
+    .implementation	= Fmmec_c_double_inv,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute 1 / OP, where the operand is a number value of type `float'.",
+  },
+
+  /* Functions  for   MMEC  numbers  whose   internal  representation  is   an  Emacs
+     user-pointer object of type `float'. */
+  {
+    .name		= "mmec-c-float-add",
+    .implementation	= Fmmec_c_float_add,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute OP1 + OP2, where the operands are user-pointer objects of type `float'.",
+  },
+  {
+    .name		= "mmec-c-float-sub",
+    .implementation	= Fmmec_c_float_sub,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute OP1 - OP2, where the operands are user-pointer objects of type `float'.",
+  },
+  {
+    .name		= "mmec-c-float-mul",
+    .implementation	= Fmmec_c_float_mul,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute OP1 * OP2, where the operands are user-pointer objects of type `float'.",
+  },
+  {
+    .name		= "mmec-c-float-div",
+    .implementation	= Fmmec_c_float_div,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute OP1 / OP2, where the operands are user-pointer objects of type `float'.",
+  },
+  {
+    .name		= "mmec-c-float-neg",
+    .implementation	= Fmmec_c_float_neg,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute - OP, where the operand is a user-pointer object of type `float'.",
+  },
+  {
+    .name		= "mmec-c-float-inv",
+    .implementation	= Fmmec_c_float_inv,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute 1 / OP, where the operand is a user-pointer object of type `float'.",
+  },
+
+  /* Functions  for   MMEC  numbers  whose   internal  representation  is   an  Emacs
+     user-pointer object of type `ldouble'. */
+  {
+    .name		= "mmec-c-ldouble-add",
+    .implementation	= Fmmec_c_ldouble_add,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute OP1 + OP2, where the operands are user-pointer objects of type `ldouble'.",
+  },
+  {
+    .name		= "mmec-c-ldouble-sub",
+    .implementation	= Fmmec_c_ldouble_sub,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute OP1 - OP2, where the operands are user-pointer objects of type `ldouble'.",
+  },
+  {
+    .name		= "mmec-c-ldouble-mul",
+    .implementation	= Fmmec_c_ldouble_mul,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute OP1 * OP2, where the operands are user-pointer objects of type `ldouble'.",
+  },
+  {
+    .name		= "mmec-c-ldouble-div",
+    .implementation	= Fmmec_c_ldouble_div,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute OP1 / OP2, where the operands are user-pointer objects of type `ldouble'.",
+  },
+  {
+    .name		= "mmec-c-ldouble-neg",
+    .implementation	= Fmmec_c_ldouble_neg,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute - OP, where the operand is a user-pointer object of type `ldouble'.",
+  },
+  {
+    .name		= "mmec-c-ldouble-inv",
+    .implementation	= Fmmec_c_ldouble_inv,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute 1 / OP, where the operand is a user-pointer object of type `ldouble'.",
+  },
+
+  /* Functions  for   MMEC  numbers  whose   internal  representation  is   an  Emacs
+     user-pointer object of type `sint64'. */
+  {
+    .name		= "mmec-c-sint64-add",
+    .implementation	= Fmmec_c_sint64_add,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute OP1 + OP2, where the operands are user-pointer objects of type `sint64'.",
+  },
+  {
+    .name		= "mmec-c-sint64-sub",
+    .implementation	= Fmmec_c_sint64_sub,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute OP1 - OP2, where the operands are user-pointer objects of type `sint64'.",
+  },
+  {
+    .name		= "mmec-c-sint64-mul",
+    .implementation	= Fmmec_c_sint64_mul,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute OP1 * OP2, where the operands are user-pointer objects of type `sint64'.",
+  },
+  {
+    .name		= "mmec-c-sint64-div",
+    .implementation	= Fmmec_c_sint64_div,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute OP1 / OP2, where the operands are user-pointer objects of type `sint64'.",
+  },
+  {
+    .name		= "mmec-c-sint64-neg",
+    .implementation	= Fmmec_c_sint64_neg,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute - OP, where the operand is a user-pointer object of type `sint64'.",
+  },
+  {
+    .name		= "mmec-c-sint64-inv",
+    .implementation	= Fmmec_c_sint64_inv,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute 1 / OP, where the operand is a user-pointer object of type `sint64'.",
+  },
+
+  /* Functions  for   MMEC  numbers  whose   internal  representation  is   an  Emacs
+     user-pointer object of type `uint64'. */
+  {
+    .name		= "mmec-c-uint64-add",
+    .implementation	= Fmmec_c_uint64_add,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute OP1 + OP2, where the operands are user-pointer objects of type `uint64'.",
+  },
+  {
+    .name		= "mmec-c-uint64-sub",
+    .implementation	= Fmmec_c_uint64_sub,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute OP1 - OP2, where the operands are user-pointer objects of type `uint64'.",
+  },
+  {
+    .name		= "mmec-c-uint64-mul",
+    .implementation	= Fmmec_c_uint64_mul,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute OP1 * OP2, where the operands are user-pointer objects of type `uint64'.",
+  },
+  {
+    .name		= "mmec-c-uint64-div",
+    .implementation	= Fmmec_c_uint64_div,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute OP1 / OP2, where the operands are user-pointer objects of type `uint64'.",
+  },
+  {
+    .name		= "mmec-c-uint64-neg",
+    .implementation	= Fmmec_c_uint64_neg,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute - OP, where the operand is a user-pointer object of type `uint64'.",
+  },
+  {
+    .name		= "mmec-c-uint64-inv",
+    .implementation	= Fmmec_c_uint64_inv,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute 1 / OP, where the operand is a user-pointer object of type `uint64'.",
+  },
+};
+
+
+/** --------------------------------------------------------------------
+ ** Elisp functions table: exponentiation and logarithms.
  ** ----------------------------------------------------------------- */
 
 #define NUMBER_OF_MODULE_EXPONENTIATION_AND_LOGARITHMS_FUNCTIONS	(17 * 3)
 static mmec_module_function_t const
   module_exponentiation_and_logarithms_functions_table[NUMBER_OF_MODULE_EXPONENTIATION_AND_LOGARITHMS_FUNCTIONS] = {
-  /* Exponentiation  and  Logarithms  functions   for  MMEC  numbers  whose  internal
-     representation is an Emacs built-in value of type `float'. */
+  /* Functions for  MMEC numbers whose  internal representation is an  Emacs built-in
+     value of type `float'. */
   {
     .name		= "mmec-c-double-square",
     .implementation	= Fmmec_c_double_square,
@@ -333,8 +1049,8 @@ static mmec_module_function_t const
     .documentation	= "Extract the exponent of X and return it, where the operand is a number value of type `float'.",
   },
 
-  /* Trigonometric functions  for MMEC  numbers whose  internal representation  is an
-     Emacs user-pointer object of type `float'. */
+  /* Functions  for   MMEC  numbers  whose   internal  representation  is   an  Emacs
+     user-pointer object of type `float'. */
   {
     .name		= "mmec-c-float-square",
     .implementation	= Fmmec_c_float_square,
@@ -455,8 +1171,8 @@ static mmec_module_function_t const
     .documentation	= "Extract the exponent of X and return it, where the operand is a user-pointer object of type `float'.",
   },
 
-  /* Trigonometric functions  for MMEC  numbers whose  internal representation  is an
-     Emacs user-pointer object of type `ldouble'. */
+  /* Functions  for   MMEC  numbers  whose   internal  representation  is   an  Emacs
+     user-pointer object of type `ldouble'. */
   {
     .name		= "mmec-c-ldouble-square",
     .implementation	= Fmmec_c_ldouble_square,
@@ -580,13 +1296,13 @@ static mmec_module_function_t const
 
 
 /** --------------------------------------------------------------------
- ** Elisp functions table.
+ ** Elisp functions table: trigonometric functions.
  ** ----------------------------------------------------------------- */
 
 #define NUMBER_OF_MODULE_TRIGONOMETRIC_FUNCTIONS	(7 * 3)
 static mmec_module_function_t const module_trigonometric_functions_table[NUMBER_OF_MODULE_TRIGONOMETRIC_FUNCTIONS] = {
-  /* Trigonometric functions  for MMEC  numbers whose  internal representation  is an
-     Emacs built-in value of type `float'. */
+  /* Functions for  MMEC numbers whose  internal representation is an  Emacs built-in
+     value of type `float'. */
   {
     .name		= "mmec-c-double-sin",
     .implementation	= Fmmec_c_double_sin,
@@ -637,8 +1353,8 @@ static mmec_module_function_t const module_trigonometric_functions_table[NUMBER_
     .documentation	= "Compute the trigonometric arc tangent of the division between two number values of type `float'.",
   },
 
-  /* Trigonometric functions  for MMEC  numbers whose  internal representation  is an
-     Emacs user-pointer object of type `float'. */
+  /* Functions  for   MMEC  numbers  whose   internal  representation  is   an  Emacs
+     user-pointer object of type `float'. */
   {
     .name		= "mmec-c-float-sin",
     .implementation	= Fmmec_c_float_sin,
@@ -689,8 +1405,8 @@ static mmec_module_function_t const module_trigonometric_functions_table[NUMBER_
     .documentation	= "Compute the trigonometric arc tangent of the division between two user-pointer object of type `float'.",
   },
 
-  /* Trigonometric functions  for MMEC  numbers whose  internal representation  is an
-     Emacs user-pointer object of type `ldouble'. */
+  /* Functions  for   MMEC  numbers  whose   internal  representation  is   an  Emacs
+     user-pointer object of type `ldouble'. */
   {
     .name		= "mmec-c-ldouble-sin",
     .implementation	= Fmmec_c_ldouble_sin,
@@ -744,13 +1460,13 @@ static mmec_module_function_t const module_trigonometric_functions_table[NUMBER_
 
 
 /** --------------------------------------------------------------------
- ** Elisp functions table.
+ ** Elisp functions table: hyperbolic functions.
  ** ----------------------------------------------------------------- */
 
 #define NUMBER_OF_MODULE_HYPERBOLIC_FUNCTIONS	(6 * 3)
 static mmec_module_function_t const module_hyperbolic_functions_table[NUMBER_OF_MODULE_HYPERBOLIC_FUNCTIONS] = {
-  /* Hyperbolic functions  for MMEC  numbers whose  internal representation  is an
-     Emacs built-in value of type `float'. */
+  /* Functions for  MMEC numbers whose  internal representation is an  Emacs built-in
+     value of type `float'. */
   {
     .name		= "mmec-c-double-sinh",
     .implementation	= Fmmec_c_double_sinh,
@@ -794,8 +1510,8 @@ static mmec_module_function_t const module_hyperbolic_functions_table[NUMBER_OF_
     .documentation	= "Compute the hyperbolic inverse tangent of a number value of type `float'.",
   },
 
-  /* Hyperbolic functions  for MMEC  numbers whose  internal representation  is an
-     Emacs user-pointer object of type `float'. */
+  /* Functions  for   MMEC  numbers  whose   internal  representation  is   an  Emacs
+     user-pointer object of type `float'. */
   {
     .name		= "mmec-c-float-sinh",
     .implementation	= Fmmec_c_float_sinh,
@@ -839,8 +1555,8 @@ static mmec_module_function_t const module_hyperbolic_functions_table[NUMBER_OF_
     .documentation	= "Compute the hyperbolic inverse tangent of a user-pointer object of type `float'.",
   },
 
-  /* Hyperbolic functions  for MMEC  numbers whose  internal representation  is an
-     Emacs user-pointer object of type `ldouble'. */
+  /* Functions  for   MMEC  numbers  whose   internal  representation  is   an  Emacs
+     user-pointer object of type `ldouble'. */
   {
     .name		= "mmec-c-ldouble-sinh",
     .implementation	= Fmmec_c_ldouble_sinh,
@@ -893,6 +1609,8 @@ static mmec_module_function_t const module_hyperbolic_functions_table[NUMBER_OF_
 void
 mmec_mathematics_init (emacs_env * env)
 {
+  mmec_define_elisp_functions_from_table(env, module_arithmetics_functions_table,
+					 NUMBER_OF_MODULE_ARITHMETICS_FUNCTIONS, 0);
   mmec_define_elisp_functions_from_table(env, module_exponentiation_and_logarithms_functions_table,
 					 NUMBER_OF_MODULE_EXPONENTIATION_AND_LOGARITHMS_FUNCTIONS, 0);
   mmec_define_elisp_functions_from_table(env, module_trigonometric_functions_table,

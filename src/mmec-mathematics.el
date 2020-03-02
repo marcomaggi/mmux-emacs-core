@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Sun Mar  1, 2020
-;; Time-stamp: <2020-03-02 08:09:57 marco>
+;; Time-stamp: <2020-03-02 12:22:11 marco>
 ;; Keywords: extensions, lisp
 
 ;; This file is part of MMUX Emacs Core.
@@ -34,39 +34,47 @@
 (require 'mmec-number-objects)
 
 
-;;;; arithmetics
+;;;; arithmetics generic functions
 
-(cl-defun mmec-add (op1 &rest ops)
-  (if (null ops)
-      op1
-    (cl-loop with rv = op1
-	     for op in ops
-	     do (setq rv (mmec-add-2 rv op))
-	     finally (return rv))))
+(cl-defun mmec-add (&rest ops)
+  (cond ((null ops)
+	 0)
+	((null (cdr ops))
+	 (car ops))
+	(t
+	 (cl-loop for rv =  (car ops) then (mmec-add-2 rv op)
+		  for op in (cdr ops)
+		  finally (return rv)))))
 
-(cl-defun mmec-sub (op1 &rest ops)
-  (if (null ops)
-      (mmec-neg op1)
-    (cl-loop with rv = op1
-	     for op in ops
-	     do (setq rv (mmec-sub-2 rv op))
-	     finally (return rv))))
+(cl-defun mmec-sub (&rest ops)
+  (cond ((null ops)
+	 0)
+	((null (cdr ops))
+	 (mmec-neg (car ops)))
+	(t
+	 (cl-loop for rv =  (car ops) then (mmec-sub-2 rv op)
+		  for op in (cdr ops)
+		  finally (return rv)))))
 
-(cl-defun mmec-mul (op1 &rest ops)
-  (if (null ops)
-      op1
-    (cl-loop with rv = op1
-	     for op in ops
-	     do (setq rv (mmec-mul-2 rv op))
-	     finally (return rv))))
+(cl-defun mmec-mul (&rest ops)
+  (cond ((null ops)
+	 1)
+	((null (cdr ops))
+	 (car ops))
+	(t
+	 (cl-loop for rv =  (car ops) then (mmec-mul-2 rv op)
+		  for op in (cdr ops)
+		  finally (return rv)))))
 
-(cl-defun mmec-div (op1 &rest ops)
-  (if (null ops)
-      (mmec-inv op1)
-    (cl-loop with rv = op1
-	     for op in ops
-	     do (setq rv (mmec-div-2 rv op))
-	     finally (return rv))))
+(cl-defun mmec-div (&rest ops)
+  (cond ((null ops)
+	 1)
+	((null (cdr ops))
+	 (mmec-inverse (car ops)))
+	(t
+	 (cl-loop for rv =  (car ops) then (mmec-div-2 rv op)
+		  for op in (cdr ops)
+		  finally (return rv)))))
 
 ;;; --------------------------------------------------------------------
 
@@ -85,14 +93,14 @@
 (cl-defgeneric mmec-neg (op)
   "Return the result of negating OP.")
 
-(cl-defgeneric mmec-inv (op)
+(cl-defgeneric mmec-inverse (op)
   "Return the result of 1/OP.")
 
 (cl-defgeneric mmec-mod (dividend divisor)
   "Return the value of DIVIDEND modulo DIVISOR.")
 
 
-;;;; exponentiation and logarithms
+;;;; exponentiation and logarithms generic functions
 
 (cl-defgeneric mmec-square (X)
   "Return the square of X.")
@@ -188,7 +196,142 @@
   "Return the hyperbolic inverse tangent of X.")
 
 
-;;;; methods
+;;;; arithmetics methods: addition
+
+(cl-macrolet
+    ((mmec--def (FUNCSTEM ELISPFUNC)
+		(let ((FUNCNAME		(mmec-sformat "mmec-%s-2" FUNCSTEM)))
+		  `(progn
+		     (cl-defmethod ,FUNCNAME ((op1 integer) (op2 integer))
+		       (,ELISPFUNC op1 op2))
+
+		     (cl-defmethod ,FUNCNAME ((op1 float) (op2 float))
+		       (,ELISPFUNC op1 op2))
+
+		     (cl-defmethod ,FUNCNAME ((op1 integer) (op2 float))
+		       (,ELISPFUNC op1 op2))
+
+		     (cl-defmethod ,FUNCNAME ((op1 float) (op2 integer))
+		       (,ELISPFUNC op1 op2))
+		     ))))
+  (mmec--def add	+)
+  (mmec--def sub	-)
+  (mmec--def mul	*)
+  (mmec--def div	/))
+
+(cl-macrolet
+    ((mmec--defop2 (FUNCSTEM TYPESTEM NORMSTEM)
+		   (let* ((NUMTYPE	(mmec-sformat "mmec-%s"   TYPESTEM))
+			  (FUNCNAME	(mmec-sformat "mmec-%s-2" FUNCSTEM))
+			  (NORMTYPE	(mmec-sformat "mmec-%s"   NORMSTEM)))
+		     `(progn
+			(cl-defmethod ,FUNCNAME ((op1 integer) (op2 ,NUMTYPE))
+			  (mmec--make ,NUMTYPE :obj (,FUNCNAME (,NORMTYPE op1) (,NORMTYPE op2))))
+			(cl-defmethod ,FUNCNAME ((op1 ,NUMTYPE) (op2 integer))
+			  (mmec--make ,NUMTYPE :obj (,FUNCNAME (,NORMTYPE op1) (,NORMTYPE op2))))
+			(cl-defmethod ,FUNCNAME ((op1 ,NUMTYPE) (op2 ,NUMTYPE))
+			  (mmec--make ,NUMTYPE :obj (,FUNCNAME (,NORMTYPE op1) (,NORMTYPE op2))))
+			)))
+
+     (mmec--defarith (TYPESTEM NORMSTEM)
+		     `(progn
+			(mmec--defop2 add ,TYPESTEM ,NORMSTEM)
+			(mmec--defop2 sub ,TYPESTEM ,NORMSTEM)
+			(mmec--defop2 mul ,TYPESTEM ,NORMSTEM)
+			(mmec--defop2 div ,TYPESTEM ,NORMSTEM)))
+
+     (mmec--defsint64 (TYPESTEM)
+		      `(mmec--defarith ,TYPESTEM sint64))
+     (mmec--defuint64 (TYPESTEM)
+		      `(mmec--defarith ,TYPESTEM uint64))
+     (mmec--defldouble (TYPESTEM)
+		       `(mmec--defarith ,TYPESTEM ldouble)))
+
+  (mmec--defsint64	char)
+  (mmec--defsint64	schar)
+  (mmec--defuint64	uchar)
+  (mmec--defuint64	wchar)
+  (mmec--defsint64	sshrt)
+  (mmec--defuint64	ushrt)
+  (mmec--defsint64	sint)
+  (mmec--defuint64	uint)
+  (mmec--defsint64	slong)
+  (mmec--defuint64	ulong)
+  (mmec--defsint64	sllong)
+  (mmec--defuint64	ullong)
+  (mmec--defsint64	ssize)
+  (mmec--defuint64	usize)
+  (mmec--defsint64	sintmax)
+  (mmec--defuint64	uintmax)
+  (mmec--defsint64	ptrdiff)
+  (mmec--defsint64	sint8)
+  (mmec--defuint64	uint8)
+  (mmec--defsint64	sint16)
+  (mmec--defuint64	uint16)
+  (mmec--defsint64	sint32)
+  (mmec--defuint64	uint32)
+  (mmec--defldouble	float)
+  (mmec--defldouble	double))
+
+;;; --------------------------------------------------------------------
+
+(cl-macrolet
+    ((mmec--defop2 (FUNCSTEM TYPESTEM)
+		   (let* ((NUMTYPE	(mmec-sformat "mmec-%s" TYPESTEM))
+			  (FUNCNAME	(mmec-sformat "mmec-%s-2" FUNCSTEM))
+			  (CFUNC	(mmec-sformat "mmec-c-%s-%s" TYPESTEM FUNCSTEM)))
+		     `(progn
+			(cl-defmethod ,FUNCNAME ((op1 integer) (op2 ,NUMTYPE))
+			  (mmec--make ,NUMTYPE
+				      :obj (,CFUNC (mmec--extract-obj ,NUMTYPE (,NUMTYPE op1))
+						   (mmec--extract-obj ,NUMTYPE op2))))
+
+			(cl-defmethod ,FUNCNAME ((op1 ,NUMTYPE) (op2 integer))
+			  (mmec--make ,NUMTYPE
+				      :obj (,CFUNC (mmec--extract-obj ,NUMTYPE op1)
+						   (mmec--extract-obj ,NUMTYPE (,NUMTYPE op2)))))
+
+			(cl-defmethod ,FUNCNAME ((op1 float) (op2 ,NUMTYPE))
+			  (mmec--make ,NUMTYPE
+				      :obj (,CFUNC (mmec--extract-obj ,NUMTYPE (,NUMTYPE op1))
+						   (mmec--extract-obj ,NUMTYPE op2))))
+
+			(cl-defmethod ,FUNCNAME ((op1 ,NUMTYPE) (op2 float))
+			  (mmec--make ,NUMTYPE
+				      :obj (,CFUNC (mmec--extract-obj ,NUMTYPE op1)
+						   (mmec--extract-obj ,NUMTYPE (,NUMTYPE op2)))))
+
+			(cl-defmethod ,FUNCNAME ((op1 ,NUMTYPE) (op2 ,NUMTYPE))
+			  (mmec--make ,NUMTYPE
+				      :obj (,CFUNC (mmec--extract-obj ,NUMTYPE op1)
+						   (mmec--extract-obj ,NUMTYPE op2))))
+			)))
+
+     (mmec--def (TYPESTEM)
+		`(progn
+		   (mmec--defop2 add ,TYPESTEM)
+		   (mmec--defop2 sub ,TYPESTEM)
+		   (mmec--defop2 mul ,TYPESTEM)
+		   (mmec--defop2 div ,TYPESTEM))))
+
+  (mmec--def sint64)
+  (mmec--def uint64)
+  (mmec--def ldouble))
+
+
+;;;; arithmetics methods:
+
+;; (cl-defgeneric mmec-neg (op)
+;;   "Return the result of negating OP.")
+
+;; (cl-defgeneric mmec-inverse (op)
+;;   "Return the result of 1/OP.")
+
+;; (cl-defgeneric mmec-mod (dividend divisor)
+;;   "Return the value of DIVIDEND modulo DIVISOR.")
+
+
+;;;; other methods
 
 (cl-macrolet
     ((mmec--func1 (FUNCSTEM TYPESTEM)
@@ -206,54 +349,54 @@
 							      (mmec--extract-obj ,TYPENAME op2)))))))
 
   (cl-macrolet
-      ((mmec-def (TYPESTEM)
-		 `(progn
-		    (mmec--func1 square	,TYPESTEM)
-		    (mmec--func1 cube	,TYPESTEM)
-		    (mmec--func2 pow	,TYPESTEM)
-		    (mmec--func1 sqrt	,TYPESTEM)
-		    (mmec--func1 cbrt	,TYPESTEM)
-		    (mmec--func2 root	,TYPESTEM)
-		    (mmec--func2 hypot	,TYPESTEM)
-		    (mmec--func1 expm1	,TYPESTEM)
-		    (mmec--func1 log1p	,TYPESTEM)
-		    (mmec--func1 exp	,TYPESTEM)
-		    (mmec--func1 exp2	,TYPESTEM)
-		    (mmec--func1 exp10	,TYPESTEM)
-		    (mmec--func1 log	,TYPESTEM)
-		    (mmec--func1 log2	,TYPESTEM)
-		    (mmec--func1 log10	,TYPESTEM)
-		    (mmec--func1 logb	,TYPESTEM))))
-    (mmec-def float)
-    (mmec-def double)
-    (mmec-def ldouble))
+      ((mmec--def (TYPESTEM)
+  		  `(progn
+  		     (mmec--func1 square	,TYPESTEM)
+  		     (mmec--func1 cube		,TYPESTEM)
+  		     (mmec--func2 pow		,TYPESTEM)
+  		     (mmec--func1 sqrt		,TYPESTEM)
+  		     (mmec--func1 cbrt		,TYPESTEM)
+  		     (mmec--func2 root		,TYPESTEM)
+  		     (mmec--func2 hypot		,TYPESTEM)
+  		     (mmec--func1 expm1		,TYPESTEM)
+  		     (mmec--func1 log1p		,TYPESTEM)
+  		     (mmec--func1 exp		,TYPESTEM)
+  		     (mmec--func1 exp2		,TYPESTEM)
+  		     (mmec--func1 exp10		,TYPESTEM)
+  		     (mmec--func1 log		,TYPESTEM)
+  		     (mmec--func1 log2		,TYPESTEM)
+  		     (mmec--func1 log10		,TYPESTEM)
+  		     (mmec--func1 logb		,TYPESTEM))))
+    (mmec--def float)
+    (mmec--def double)
+    (mmec--def ldouble))
 
   (cl-macrolet
-      ((mmec-def (TYPESTEM)
-		 `(progn
-		    (mmec--func1 sin	,TYPESTEM)
-		    (mmec--func1 cos	,TYPESTEM)
-		    (mmec--func1 tan	,TYPESTEM)
-		    (mmec--func1 asin	,TYPESTEM)
-		    (mmec--func1 acos	,TYPESTEM)
-		    (mmec--func1 atan	,TYPESTEM)
-		    (mmec--func2 atan2	,TYPESTEM))))
-    (mmec-def float)
-    (mmec-def double)
-    (mmec-def ldouble))
+      ((mmec--def (TYPESTEM)
+  		  `(progn
+  		     (mmec--func1 sin	,TYPESTEM)
+  		     (mmec--func1 cos	,TYPESTEM)
+  		     (mmec--func1 tan	,TYPESTEM)
+  		     (mmec--func1 asin	,TYPESTEM)
+  		     (mmec--func1 acos	,TYPESTEM)
+  		     (mmec--func1 atan	,TYPESTEM)
+  		     (mmec--func2 atan2	,TYPESTEM))))
+    (mmec--def float)
+    (mmec--def double)
+    (mmec--def ldouble))
 
   (cl-macrolet
-      ((mmec-def (TYPESTEM)
-		 `(progn
-		    (mmec--func1 sinh	,TYPESTEM)
-		    (mmec--func1 cosh	,TYPESTEM)
-		    (mmec--func1 tanh	,TYPESTEM)
-		    (mmec--func1 asin	,TYPESTEM)
-		    (mmec--func1 acosh	,TYPESTEM)
-		    (mmec--func1 atanh	,TYPESTEM))))
-    (mmec-def float)
-    (mmec-def double)
-    (mmec-def ldouble)))
+      ((mmec--def (TYPESTEM)
+		  `(progn
+		     (mmec--func1 sinh	,TYPESTEM)
+		     (mmec--func1 cosh	,TYPESTEM)
+		     (mmec--func1 tanh	,TYPESTEM)
+		     (mmec--func1 asin	,TYPESTEM)
+		     (mmec--func1 acosh	,TYPESTEM)
+		     (mmec--func1 atanh	,TYPESTEM))))
+    (mmec--def float)
+    (mmec--def double)
+    (mmec--def ldouble)))
 
 
 ;;;; done

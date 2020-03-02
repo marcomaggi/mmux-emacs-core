@@ -65,7 +65,18 @@ AM_PROG_AS
 AM_PROG_CC_C_O
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([assert.h stdint.h strings.h errno.h stddef.h limits.h unistd.h float.h])
+AC_CHECK_HEADERS([assert.h stdint.h strings.h errno.h stddef.h limits.h unistd.h float.h math.h])
+
+AC_CACHE_SAVE
+
+
+#### external libraries
+
+PKG_PREREQ([0.29])
+PKG_INSTALLDIR
+MMUX_CHECK_PKG_CONFIG_MACROS
+
+AC_CHECK_LIB(m,sin)
 
 AC_CACHE_SAVE
 
@@ -85,6 +96,9 @@ AC_INCLUDES_DEFAULT
 #endif
 #ifdef HAVE_FLOAT_H
 #  include <float.h>
+#endif
+#ifdef HAVE_MATH_H
+#  include <math.h>
 #endif
 ])
 
@@ -143,16 +157,17 @@ MMUX_EMACS_CONSTANT_TESTS([FLT_ROUNDS FLT_RADIX FLT_MANT_DIG DBL_MANT_DIG LDBL_M
 MMUX_EMACS_DOUBLE_CONSTANT_TESTS([FLT_MAX DBL_MAX FLT_MIN DBL_MIN FLT_EPSILON DBL_EPSILON])
 MMUX_EMACS_LDOUBLE_CONSTANT_TESTS([LDBL_MAX LDBL_MIN LDBL_EPSILON])
 
-dnl AC_CHECK_FUNCS([getenv])
+AC_CHECK_FUNCS([pow sqrt cbrt hypot expm1 log1p exp exp2 exp10 log log2 log10 logb])
+AC_CHECK_FUNCS([powf sqrtf cbrtf hypotf expm1f log1pf expf exp2f exp10f logf log2f log10f logbf])
+AC_CHECK_FUNCS([powl sqrtl cbrtl hypotl expm1l log1pl expl exp2l exp10l logl log2l log10l logbl])
 
-dnl AC_CACHE_SAVE
+AC_CHECK_FUNCS([sin cos tan asin acos atan atan2])
+AC_CHECK_FUNCS([sinf cosf tanf asinf acosf atanf atan2f])
+AC_CHECK_FUNCS([sinl cosl tanl asinl acosl atanl atan2l])
 
-
-#### external libraries
-
-PKG_PREREQ([0.29])
-PKG_INSTALLDIR
-MMUX_CHECK_PKG_CONFIG_MACROS
+AC_CHECK_FUNCS([sinh cosh tanh asinh acosh atanh])
+AC_CHECK_FUNCS([sinhf coshf tanhf asinhf acoshf atanhf])
+AC_CHECK_FUNCS([sinhl coshl tanhl asinhl acoshl atanhl])
 
 AC_CACHE_SAVE
 

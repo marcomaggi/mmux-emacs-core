@@ -195,28 +195,29 @@ emacs_module_init (struct emacs_runtime *ert)
       mmec_number_objects_init(env);
       mmec_number_constants_init(env);
       mmec_bytevector_objects_init(env);
-    }
-
-    {
-      emacs_value	Qsymbol_value		= env->intern(env, "symbol-value");
-      emacs_value	Qmost_positive_fixnum	= env->intern(env, "most-positive-fixnum");
-      emacs_value	Qmost_negative_fixnum	= env->intern(env, "most-negative-fixnum");
+      mmec_mathematics_init(env);
 
       {
-	emacs_value	args[1] = { Qmost_positive_fixnum };
-	emacs_value	val	= env->funcall(env, Qsymbol_value, 1, args);
+	emacs_value	Qsymbol_value		= env->intern(env, "symbol-value");
+	emacs_value	Qmost_positive_fixnum	= env->intern(env, "most-positive-fixnum");
+	emacs_value	Qmost_negative_fixnum	= env->intern(env, "most-negative-fixnum");
 
-	most_positive_fixnum = mmec_extract_elisp_integer_from_emacs_value(env, val);
-      }
-      {
-	emacs_value	args[1] = { Qmost_negative_fixnum };
-	emacs_value	val	= env->funcall(env, Qsymbol_value, 1, args);
+	{
+	  emacs_value	args[1] = { Qmost_positive_fixnum };
+	  emacs_value	val	= env->funcall(env, Qsymbol_value, 1, args);
 
-	most_negative_fixnum = mmec_extract_elisp_integer_from_emacs_value(env, val);
+	  most_positive_fixnum = mmec_extract_elisp_integer_from_emacs_value(env, val);
+	}
+	{
+	  emacs_value	args[1] = { Qmost_negative_fixnum };
+	  emacs_value	val	= env->funcall(env, Qsymbol_value, 1, args);
+
+	  most_negative_fixnum = mmec_extract_elisp_integer_from_emacs_value(env, val);
+	}
       }
+
+      return 0;
     }
-
-    return 0;
   }
 }
 

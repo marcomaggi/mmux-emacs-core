@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Sun Mar  1, 2020
-;; Time-stamp: <2020-03-01 17:18:26 marco>
+;; Time-stamp: <2020-03-02 08:09:57 marco>
 ;; Keywords: extensions, lisp
 
 ;; This file is part of MMUX Emacs Core.
@@ -100,8 +100,26 @@
 (cl-defgeneric mmec-cube (X)
   "Return the cube of X.")
 
-(cl-defgeneric mmec-expt (X Y)
+(cl-defgeneric mmec-pow (X Y)
   "Return the Yth power of X.")
+
+(cl-defgeneric mmec-sqrt (X)
+  "Return the square root X.")
+
+(cl-defgeneric mmec-cbrt (X)
+  "Return the cubic root X.")
+
+(cl-defgeneric mmec-root (X Y)
+  "Return the Yth root of X.")
+
+(cl-defgeneric mmec-hypot (X Y)
+  "Return sqrt(X*X + Y*Y).")
+
+(cl-defgeneric mmec-expm1 (X Y)
+  "Return exp(X - 1).")
+
+(cl-defgeneric mmec-log1p (X Y)
+  "Return log(1 + X).")
 
 (cl-defgeneric mmec-exp (X)
   "Return the base of logarithm numbers raised to the power of X.")
@@ -125,7 +143,7 @@
   "Extract the exponent of X and return it.")
 
 
-;;;; trigonometric functions
+;;;; trigonometric generic functions
 
 (cl-defgeneric mmec-sin (X)
   "Return the trigonometric sine of X.")
@@ -149,25 +167,93 @@
   "Return the trigonometric arc tangent of Y/X.")
 
 
-;;;; hyperbolic functions
+;;;; hyperbolic generic functions
 
-(cl-defgeneric mmec-sin (X)
+(cl-defgeneric mmec-sinh (X)
   "Return the hyperbolic sine of X.")
 
-(cl-defgeneric mmec-cos (X)
+(cl-defgeneric mmec-cosh (X)
   "Return the hyperbolic cosine of X.")
 
-(cl-defgeneric mmec-tan (X)
+(cl-defgeneric mmec-tanh (X)
   "Return the hyperbolic tangent of X.")
 
-(cl-defgeneric mmec-asin (X)
+(cl-defgeneric mmec-asinh (X)
   "Return the hyperbolic inverse sine of X.")
 
-(cl-defgeneric mmec-acos (X)
+(cl-defgeneric mmec-acosh (X)
   "Return the hyperbolic inverse cosine of X.")
 
-(cl-defgeneric mmec-atan (X)
+(cl-defgeneric mmec-atanh (X)
   "Return the hyperbolic inverse tangent of X.")
+
+
+;;;; methods
+
+(cl-macrolet
+    ((mmec--func1 (FUNCSTEM TYPESTEM)
+		  (let* ((TYPENAME	(mmec-sformat "mmec-%s" TYPESTEM))
+			 (EFUNCNAME	(mmec-sformat "mmec-%s" FUNCSTEM))
+			 (CFUNCNAME	(mmec-sformat "mmec-c-%s-%s" TYPESTEM FUNCSTEM)))
+		    `(cl-defmethod ,EFUNCNAME ((op1 ,TYPENAME))
+		       (mmec--make ,TYPENAME :obj (,CFUNCNAME (mmec--extract-obj ,TYPENAME op1))))))
+     (mmec--func2 (FUNCSTEM TYPESTEM)
+		  (let* ((TYPENAME	(mmec-sformat "mmec-%s" TYPESTEM))
+			 (EFUNCNAME	(mmec-sformat "mmec-%s" FUNCSTEM))
+			 (CFUNCNAME	(mmec-sformat "mmec-c-%s-%s" TYPESTEM FUNCSTEM)))
+		    `(cl-defmethod ,EFUNCNAME ((op1 ,TYPENAME) (op2 ,TYPENAME))
+		       (mmec--make ,TYPENAME :obj (,CFUNCNAME (mmec--extract-obj ,TYPENAME op1)
+							      (mmec--extract-obj ,TYPENAME op2)))))))
+
+  (cl-macrolet
+      ((mmec-def (TYPESTEM)
+		 `(progn
+		    (mmec--func1 square	,TYPESTEM)
+		    (mmec--func1 cube	,TYPESTEM)
+		    (mmec--func2 pow	,TYPESTEM)
+		    (mmec--func1 sqrt	,TYPESTEM)
+		    (mmec--func1 cbrt	,TYPESTEM)
+		    (mmec--func2 root	,TYPESTEM)
+		    (mmec--func2 hypot	,TYPESTEM)
+		    (mmec--func1 expm1	,TYPESTEM)
+		    (mmec--func1 log1p	,TYPESTEM)
+		    (mmec--func1 exp	,TYPESTEM)
+		    (mmec--func1 exp2	,TYPESTEM)
+		    (mmec--func1 exp10	,TYPESTEM)
+		    (mmec--func1 log	,TYPESTEM)
+		    (mmec--func1 log2	,TYPESTEM)
+		    (mmec--func1 log10	,TYPESTEM)
+		    (mmec--func1 logb	,TYPESTEM))))
+    (mmec-def float)
+    (mmec-def double)
+    (mmec-def ldouble))
+
+  (cl-macrolet
+      ((mmec-def (TYPESTEM)
+		 `(progn
+		    (mmec--func1 sin	,TYPESTEM)
+		    (mmec--func1 cos	,TYPESTEM)
+		    (mmec--func1 tan	,TYPESTEM)
+		    (mmec--func1 asin	,TYPESTEM)
+		    (mmec--func1 acos	,TYPESTEM)
+		    (mmec--func1 atan	,TYPESTEM)
+		    (mmec--func2 atan2	,TYPESTEM))))
+    (mmec-def float)
+    (mmec-def double)
+    (mmec-def ldouble))
+
+  (cl-macrolet
+      ((mmec-def (TYPESTEM)
+		 `(progn
+		    (mmec--func1 sinh	,TYPESTEM)
+		    (mmec--func1 cosh	,TYPESTEM)
+		    (mmec--func1 tanh	,TYPESTEM)
+		    (mmec--func1 asin	,TYPESTEM)
+		    (mmec--func1 acosh	,TYPESTEM)
+		    (mmec--func1 atanh	,TYPESTEM))))
+    (mmec-def float)
+    (mmec-def double)
+    (mmec-def ldouble)))
 
 
 ;;;; done

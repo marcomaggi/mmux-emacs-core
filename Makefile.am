@@ -74,6 +74,7 @@ libmmux_emacs_core_la_SOURCES	= \
 	src/mmux-emacs-core-numbers.c			\
 	src/mmux-emacs-core-constants.c			\
 	src/mmux-emacs-core-bytevectors.c		\
+	src/mmux-emacs-core-mathematics.c		\
 	src/mmux-emacs-core-errors.c
 
 MMUX_EMACS_CORE_OBJ_PREREQ	= \
@@ -86,6 +87,7 @@ src/mmux-emacs-core-library.$(OBJEXT):			$(MMUX_EMACS_CORE_OBJ_PREREQ)
 src/mmux-emacs-core-numbers.$(OBJEXT):			$(MMUX_EMACS_CORE_OBJ_PREREQ)
 src/mmux-emacs-core-constants.$(OBJEXT):		$(MMUX_EMACS_CORE_OBJ_PREREQ)
 src/mmux-emacs-core-bytevectors.$(OBJEXT):		$(MMUX_EMACS_CORE_OBJ_PREREQ)
+src/mmux-emacs-core-mathematics.$(OBJEXT):		$(MMUX_EMACS_CORE_OBJ_PREREQ)
 
 .PHONY: library
 

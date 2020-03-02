@@ -144,12 +144,14 @@ src/mmec.elc: \
 MMUX_EMACS_CORE_TESTS_SRC = \
 	tests/version.el		\
 	tests/number-objects.el		\
-	tests/bytevector-objects.el
+	tests/bytevector-objects.el	\
+	tests/mathematics.el
 
 MMUX_EMACS_CORE_TESTS = \
 	tests/version.elc		\
 	tests/number-objects.elc	\
-	tests/bytevector-objects.elc
+	tests/bytevector-objects.elc	\
+	tests/mathematics.elc
 
 EXTRA_DIST	+= $(MMUX_EMACS_CORE_TESTS_SRC)
 TESTS		 = $(MMUX_EMACS_CORE_TESTS)

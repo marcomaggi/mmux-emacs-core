@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Sun Mar  1, 2020
-;; Time-stamp: <2020-03-02 17:37:03 marco>
+;; Time-stamp: <2020-03-02 18:11:48 marco>
 ;; Keywords: extensions, lisp
 
 ;; This file is part of MMUX Emacs Core.
@@ -96,8 +96,10 @@
 (cl-defgeneric mmec-inverse (op)
   "Return the result of 1/OP.")
 
-(cl-defgeneric mmec-mod (dividend divisor)
+(cl-defgeneric mmec-mod-2 (dividend divisor)
   "Return mod(DIVIDEND, DIVISOR).")
+
+(defalias 'mmec-mod 'mmec-mod-2)
 
 (cl-defgeneric mmec-% (dividend divisor)
   "Return DIVIDEND % DIVISOR.")
@@ -205,35 +207,28 @@
     ((mmec--def (FUNCSTEM ELISPFUNC)
 		(let ((FUNCNAME		(mmec-sformat "mmec-%s-2" FUNCSTEM)))
 		  `(progn
-		     (cl-defmethod ,FUNCNAME ((op1 integer) (op2 integer))
-		       (,ELISPFUNC op1 op2))
-
-		     (cl-defmethod ,FUNCNAME ((op1 float) (op2 float))
-		       (,ELISPFUNC op1 op2))
-
-		     (cl-defmethod ,FUNCNAME ((op1 integer) (op2 float))
-		       (,ELISPFUNC op1 op2))
-
-		     (cl-defmethod ,FUNCNAME ((op1 float) (op2 integer))
-		       (,ELISPFUNC op1 op2))
-		     ))))
+		     (cl-defmethod ,FUNCNAME ((op1 integer) (op2 integer)) (,ELISPFUNC op1 op2))
+		     (cl-defmethod ,FUNCNAME ((op1 float)   (op2 float))   (,ELISPFUNC op1 op2))
+		     (cl-defmethod ,FUNCNAME ((op1 integer) (op2 float))   (,ELISPFUNC op1 op2))
+		     (cl-defmethod ,FUNCNAME ((op1 float) (op2 integer))   (,ELISPFUNC op1 op2))))))
   (mmec--def add	+)
   (mmec--def sub	-)
   (mmec--def mul	*)
-  (mmec--def div	/))
+  (mmec--def div	/)
+  (mmec--def mod	mod)
+  (mmec--def %		%))
 
 (cl-macrolet
     ((mmec--defop2 (FUNCSTEM TYPESTEM NORMSTEM)
 		   (let* ((NUMTYPE	(mmec-sformat "mmec-%s"   TYPESTEM))
-			  (FUNCNAME	(mmec-sformat "mmec-%s-2" FUNCSTEM))
-			  (NORMTYPE	(mmec-sformat "mmec-%s"   NORMSTEM)))
+			  (NORMTYPE	(mmec-sformat "mmec-%s"   NORMSTEM))
+			  (FUNCNAME	(mmec-sformat "mmec-%s-2" FUNCSTEM)))
 		     `(progn
-			(cl-defmethod ,FUNCNAME ((op1 integer) (op2 ,NUMTYPE))
-			  (mmec--make ,NUMTYPE :obj (,FUNCNAME (,NORMTYPE op1) (,NORMTYPE op2))))
-			(cl-defmethod ,FUNCNAME ((op1 ,NUMTYPE) (op2 integer))
-			  (mmec--make ,NUMTYPE :obj (,FUNCNAME (,NORMTYPE op1) (,NORMTYPE op2))))
-			(cl-defmethod ,FUNCNAME ((op1 ,NUMTYPE) (op2 ,NUMTYPE))
-			  (mmec--make ,NUMTYPE :obj (,FUNCNAME (,NORMTYPE op1) (,NORMTYPE op2))))
+			(cl-defmethod ,FUNCNAME ((op1 integer)  (op2 ,NUMTYPE)) (,NUMTYPE (,FUNCNAME (,NORMTYPE op1) (,NORMTYPE op2))))
+			(cl-defmethod ,FUNCNAME ((op1 ,NUMTYPE) (op2 integer))  (,NUMTYPE (,FUNCNAME (,NORMTYPE op1) (,NORMTYPE op2))))
+			(cl-defmethod ,FUNCNAME ((op1 float)    (op2 ,NUMTYPE)) (,NUMTYPE (,FUNCNAME (,NORMTYPE op1) (,NORMTYPE op2))))
+			(cl-defmethod ,FUNCNAME ((op1 ,NUMTYPE) (op2 float))    (,NUMTYPE (,FUNCNAME (,NORMTYPE op1) (,NORMTYPE op2))))
+			(cl-defmethod ,FUNCNAME ((op1 ,NUMTYPE) (op2 ,NUMTYPE)) (,NUMTYPE (,FUNCNAME (,NORMTYPE op1) (,NORMTYPE op2))))
 			)))
 
      (mmec--defarith (TYPESTEM NORMSTEM)
@@ -241,14 +236,12 @@
 			(mmec--defop2 add ,TYPESTEM ,NORMSTEM)
 			(mmec--defop2 sub ,TYPESTEM ,NORMSTEM)
 			(mmec--defop2 mul ,TYPESTEM ,NORMSTEM)
-			(mmec--defop2 div ,TYPESTEM ,NORMSTEM)))
+			(mmec--defop2 div ,TYPESTEM ,NORMSTEM)
+			(mmec--defop2 mod ,TYPESTEM ,NORMSTEM)))
 
-     (mmec--defsint64 (TYPESTEM)
-		      `(mmec--defarith ,TYPESTEM sint64))
-     (mmec--defuint64 (TYPESTEM)
-		      `(mmec--defarith ,TYPESTEM uint64))
-     (mmec--defldouble (TYPESTEM)
-		       `(mmec--defarith ,TYPESTEM ldouble)))
+     (mmec--defsint64  (TYPESTEM) `(mmec--defarith ,TYPESTEM sint64))
+     (mmec--defuint64  (TYPESTEM) `(mmec--defarith ,TYPESTEM uint64))
+     (mmec--defldouble (TYPESTEM) `(mmec--defarith ,TYPESTEM ldouble)))
 
   (mmec--defsint64	char)
   (mmec--defsint64	schar)
@@ -330,15 +323,13 @@
   (- op))
 
 (cl-macrolet
-    ((mmec--def (TYPESTEM NORMSTEM)
-		(let* ((NUMTYPE		(mmec-sformat "mmec-%s" TYPESTEM))
-		       (NORMTYPE	(mmec-sformat "mmec-%s" NORMSTEM)))
-		  `(cl-defmethod mmec-neg ((op ,NUMTYPE))
-		     (,NUMTYPE (mmec-neg (,NORMTYPE op))))))
-     (mmec--defsint64 (TYPESTEM)
-		      `(mmec--def ,TYPESTEM sint64))
-     (mmec--defuint64 (TYPESTEM)
-		      `(mmec--def ,TYPESTEM uint64)))
+    ((mmec--def       (TYPESTEM NORMSTEM)
+		      (let* ((NUMTYPE	(mmec-sformat "mmec-%s" TYPESTEM))
+			     (NORMTYPE	(mmec-sformat "mmec-%s" NORMSTEM)))
+			`(cl-defmethod mmec-neg ((op ,NUMTYPE))
+			   (,NUMTYPE (mmec-neg (,NORMTYPE op))))))
+     (mmec--defsint64 (TYPESTEM) `(mmec--def ,TYPESTEM sint64))
+     (mmec--defuint64 (TYPESTEM) `(mmec--def ,TYPESTEM uint64)))
   (mmec--defsint64	char)
   (mmec--defsint64	schar)
   (mmec--defuint64	uchar)
@@ -375,6 +366,46 @@
   (mmec--def double)
   (mmec--def ldouble))
 
+;;; --------------------------------------------------------------------
+
+(cl-defmethod mmec-inverse ((op float))
+  (/ 1.0 op))
+
+(cl-defmethod mmec-inverse ((op integer))
+  (/ 1 op))
+
+(cl-macrolet
+    ((mmec--def       (TYPESTEM NORMSTEM)
+		      (let* ((NUMTYPE	(mmec-sformat "mmec-%s" TYPESTEM))
+			     (NORMTYPE	(mmec-sformat "mmec-%s" NORMSTEM)))
+			`(cl-defmethod mmec-inverse ((op ,NUMTYPE))
+			   (,NUMTYPE (mmec-inverse (,NORMTYPE op))))))
+     (mmec--defsint64 (TYPESTEM) `(mmec--def ,TYPESTEM sint64))
+     (mmec--defuint64 (TYPESTEM) `(mmec--def ,TYPESTEM uint64)))
+  (mmec--defsint64	char)
+  (mmec--defsint64	schar)
+  (mmec--defuint64	uchar)
+  (mmec--defuint64	wchar)
+  (mmec--defsint64	sshrt)
+  (mmec--defuint64	ushrt)
+  (mmec--defsint64	sint)
+  (mmec--defuint64	uint)
+  (mmec--defsint64	slong)
+  (mmec--defuint64	ulong)
+  (mmec--defsint64	sllong)
+  (mmec--defuint64	ullong)
+  (mmec--defsint64	ssize)
+  (mmec--defuint64	usize)
+  (mmec--defsint64	sintmax)
+  (mmec--defuint64	uintmax)
+  (mmec--defsint64	ptrdiff)
+  (mmec--defsint64	sint8)
+  (mmec--defuint64	uint8)
+  (mmec--defsint64	sint16)
+  (mmec--defuint64	uint16)
+  (mmec--defsint64	sint32)
+  (mmec--defuint64	uint32))
+
 (cl-macrolet
     ((mmec--def (TYPESTEM)
 		(let* ((NUMTYPE		(mmec-sformat "mmec-%s"       TYPESTEM))
@@ -387,11 +418,13 @@
   (mmec--def double)
   (mmec--def ldouble))
 
+;;; --------------------------------------------------------------------
+
 (cl-macrolet
     ((mmec--def (TYPESTEM)
 		(let* ((NUMTYPE		(mmec-sformat "mmec-%s"       TYPESTEM))
 		       (CFUNC		(mmec-sformat "mmec-c-%s-mod" TYPESTEM)))
-		  `(cl-defmethod mmec-mod ((dividend ,NUMTYPE) (divisor ,NUMTYPE))
+		  `(cl-defmethod mmec-mod-2 ((dividend ,NUMTYPE) (divisor ,NUMTYPE))
 		     (mmec--make ,TYPESTEM :obj (,CFUNC (mmec--extract-obj ,TYPESTEM dividend)
 							(mmec--extract-obj ,TYPESTEM divisor)))))))
   (mmec--def sint64)
@@ -399,6 +432,43 @@
   (mmec--def float)
   (mmec--def double)
   (mmec--def ldouble))
+
+;;; --------------------------------------------------------------------
+
+(cl-macrolet
+    ((mmec--def       (TYPESTEM NORMSTEM)
+		      (let* ((NUMTYPE	(mmec-sformat "mmec-%s" TYPESTEM))
+			     (NORMTYPE	(mmec-sformat "mmec-%s" NORMSTEM)))
+			`(progn
+			   (cl-defmethod mmec-% ((op1 ,NUMTYPE) (op2 integer))  (,NUMTYPE (mmec-% (,NORMTYPE op1) (,NORMTYPE op2))))
+			   (cl-defmethod mmec-% ((op1 integer)  (op2 ,NUMTYPE)) (,NUMTYPE (mmec-% (,NORMTYPE op1) (,NORMTYPE op2))))
+			   (cl-defmethod mmec-% ((op1 ,NUMTYPE) (op2 ,NUMTYPE)) (,NUMTYPE (mmec-% (,NORMTYPE op1) (,NORMTYPE op2))))
+			   )))
+     (mmec--defsint64 (TYPESTEM) `(mmec--def ,TYPESTEM sint64))
+     (mmec--defuint64 (TYPESTEM) `(mmec--def ,TYPESTEM uint64)))
+  (mmec--defsint64	char)
+  (mmec--defsint64	schar)
+  (mmec--defuint64	uchar)
+  (mmec--defuint64	wchar)
+  (mmec--defsint64	sshrt)
+  (mmec--defuint64	ushrt)
+  (mmec--defsint64	sint)
+  (mmec--defuint64	uint)
+  (mmec--defsint64	slong)
+  (mmec--defuint64	ulong)
+  (mmec--defsint64	sllong)
+  (mmec--defuint64	ullong)
+  (mmec--defsint64	ssize)
+  (mmec--defuint64	usize)
+  (mmec--defsint64	sintmax)
+  (mmec--defuint64	uintmax)
+  (mmec--defsint64	ptrdiff)
+  (mmec--defsint64	sint8)
+  (mmec--defuint64	uint8)
+  (mmec--defsint64	sint16)
+  (mmec--defuint64	uint16)
+  (mmec--defsint64	sint32)
+  (mmec--defuint64	uint32))
 
 (cl-macrolet
     ((mmec--def (TYPESTEM)

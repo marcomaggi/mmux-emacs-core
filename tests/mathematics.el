@@ -26,14 +26,14 @@
 ;;;; helpers
 
 (defun quasi-equal (X Y)
-  (mmec-sub X Y))
+  (mmec< (mmec-sub X Y) 1e-3))
 
 
 ;;;; trigonometric functions
 
 (ert-deftest mmec-float-sin ()
   "Test the trigonometric sine function."
-  (should (mmec= (sin 0.23) (mmec-sin (mmec-double 0.23))))
+  (should (quasi-equal (sin 0.23) (mmec-sin (mmec-double 0.23))))
   )
 
 

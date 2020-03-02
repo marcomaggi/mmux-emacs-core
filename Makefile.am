@@ -133,6 +133,7 @@ src/mmec-bytevector-objects.elc: \
 
 src/mmec.elc: \
 	src/mmec-bytevector-objects.elc			\
+	src/mmec-mathematics.elc			\
 	src/mmec-constants.elc				\
 	src/mmec-number-objects.elc			\
 	src/mmec-basics.elc				\

@@ -25,6 +25,8 @@
 
 ;;;; helpers
 
+(defun quasi-equal (X Y)
+  (mmec-sub X Y))
 
 
 ;;;; trigonometric functions

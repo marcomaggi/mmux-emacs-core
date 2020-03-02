@@ -144,6 +144,151 @@ MMEC_DEFINE_CLANG_INV(float)
 MMEC_DEFINE_CLANG_INV(double)
 MMEC_DEFINE_CLANG_INV(ldouble)
 
+/* ------------------------------------------------------------------ */
+
+static inline mmec_clang_sint64_t
+mmec_clang_sint64_mod (mmec_clang_sint64_t X, mmec_clang_sint64_t Y)
+{
+  mmec_clang_sint64_t  rv = X % Y;
+
+  if ((Y < 0)? (rv > 0) : (rv < 0)) {
+    rv += Y;
+  }
+  return rv;
+}
+
+static inline mmec_clang_uint64_t
+mmec_clang_uint64_mod (mmec_clang_uint64_t X, mmec_clang_uint64_t Y)
+{
+  return X % Y;
+}
+
+#undef  MMEC_DEFINE_CLANG_MOD
+#define MMEC_DEFINE_CLANG_MOD(TYPESTEM, SUFFIX)				\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _mod (mmec_clang_ ## TYPESTEM ## _t X,	\
+				   mmec_clang_ ## TYPESTEM ## _t Y)	\
+  {									\
+    return fmod ## SUFFIX(X, Y);					\
+  }
+
+MMEC_DEFINE_CLANG_MOD(float,   f)
+MMEC_DEFINE_CLANG_MOD(double,   )
+MMEC_DEFINE_CLANG_MOD(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_PERCENT
+#define MMEC_DEFINE_CLANG_PERCENT(TYPESTEM)				\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _percent (mmec_clang_ ## TYPESTEM ## _t X,	\
+				       mmec_clang_ ## TYPESTEM ## _t Y)	\
+  {									\
+    return X % Y;							\
+  }
+
+MMEC_DEFINE_CLANG_PERCENT(sint64)
+MMEC_DEFINE_CLANG_PERCENT(uint64)
+
+
+/** --------------------------------------------------------------------
+ ** Helper functions: parts.
+ ** ----------------------------------------------------------------- */
+
+static inline mmec_clang_sint64_t
+mmec_clang_sint64_abs (mmec_clang_sint64_t X)
+{
+  return ((X < 0)? (- X) : X);
+}
+
+static inline mmec_clang_uint64_t
+mmec_clang_uint64_abs (mmec_clang_uint64_t X)
+{
+  return X;
+}
+
+#undef  MMEC_DEFINE_CLANG_ABS
+#define MMEC_DEFINE_CLANG_ABS(TYPESTEM, SUFFIX)				\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _abs (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return fabs ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_ABS(float,   f)
+MMEC_DEFINE_CLANG_ABS(double,   )
+MMEC_DEFINE_CLANG_ABS(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_CEIL
+#define MMEC_DEFINE_CLANG_CEIL(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _ceil (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return ceil ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_CEIL(float,   f)
+MMEC_DEFINE_CLANG_CEIL(double,   )
+MMEC_DEFINE_CLANG_CEIL(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_FLOOR
+#define MMEC_DEFINE_CLANG_FLOOR(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _floor (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return floor ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_FLOOR(float,   f)
+MMEC_DEFINE_CLANG_FLOOR(double,   )
+MMEC_DEFINE_CLANG_FLOOR(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_TRUNC
+#define MMEC_DEFINE_CLANG_TRUNC(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _trunc (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return trunc ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_TRUNC(float,   f)
+MMEC_DEFINE_CLANG_TRUNC(double,   )
+MMEC_DEFINE_CLANG_TRUNC(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_RINT
+#define MMEC_DEFINE_CLANG_RINT(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _rint (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return rint ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_RINT(float,   f)
+MMEC_DEFINE_CLANG_RINT(double,   )
+MMEC_DEFINE_CLANG_RINT(ldouble, l)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_CLANG_ROUND
+#define MMEC_DEFINE_CLANG_ROUND(TYPESTEM, SUFFIX)			\
+  static inline mmec_clang_ ## TYPESTEM ## _t				\
+  mmec_clang_ ## TYPESTEM ## _round (mmec_clang_ ## TYPESTEM ## _t X)	\
+  {									\
+    return round ## SUFFIX(X);						\
+  }
+
+MMEC_DEFINE_CLANG_ROUND(float,   f)
+MMEC_DEFINE_CLANG_ROUND(double,   )
+MMEC_DEFINE_CLANG_ROUND(ldouble, l)
+
 
 /** --------------------------------------------------------------------
  ** Helper functions: exponentiation and logarithms.
@@ -612,13 +757,50 @@ MMEC_DEFINE_CLANG_ATANH(ldouble, l)
     MMEC_DEFINE_FUNC2(mul,	TYPESTEM)	\
     MMEC_DEFINE_FUNC2(div,	TYPESTEM)	\
     MMEC_DEFINE_FUNC1(neg,	TYPESTEM)	\
-    MMEC_DEFINE_FUNC1(inv,	TYPESTEM)
+    MMEC_DEFINE_FUNC1(inv,	TYPESTEM)	\
+    MMEC_DEFINE_FUNC2(mod,	TYPESTEM)
 
 MMEC_DEFINE_ARITHMETICS_FUNCTIONS(sint64)
 MMEC_DEFINE_ARITHMETICS_FUNCTIONS(uint64)
 MMEC_DEFINE_ARITHMETICS_FUNCTIONS(float)
 MMEC_DEFINE_ARITHMETICS_FUNCTIONS(double)
 MMEC_DEFINE_ARITHMETICS_FUNCTIONS(ldouble)
+
+#undef  MMEC_DEFINE_ARITHMETICS_FUNCTIONS
+#define MMEC_DEFINE_ARITHMETICS_FUNCTIONS(TYPESTEM)	\
+  MMEC_DEFINE_FUNC2(percent,	TYPESTEM)
+
+MMEC_DEFINE_ARITHMETICS_FUNCTIONS(sint64)
+MMEC_DEFINE_ARITHMETICS_FUNCTIONS(uint64)
+
+
+/** --------------------------------------------------------------------
+ ** Parts.
+ ** ----------------------------------------------------------------- */
+
+#undef  MMEC_DEFINE_PARTS_FUNCTIONS
+#define MMEC_DEFINE_PARTS_FUNCTIONS(TYPESTEM)	\
+  MMEC_DEFINE_FUNC1(abs,	TYPESTEM)
+
+MMEC_DEFINE_PARTS_FUNCTIONS(sint64)
+MMEC_DEFINE_PARTS_FUNCTIONS(uint64)
+MMEC_DEFINE_PARTS_FUNCTIONS(float)
+MMEC_DEFINE_PARTS_FUNCTIONS(double)
+MMEC_DEFINE_PARTS_FUNCTIONS(ldouble)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_PARTS_FUNCTIONS
+#define MMEC_DEFINE_PARTS_FUNCTIONS(TYPESTEM)	\
+  MMEC_DEFINE_FUNC1(ceil,	TYPESTEM)	\
+    MMEC_DEFINE_FUNC1(floor,	TYPESTEM)	\
+    MMEC_DEFINE_FUNC1(trunc,	TYPESTEM)	\
+    MMEC_DEFINE_FUNC1(rint,	TYPESTEM)	\
+    MMEC_DEFINE_FUNC1(round,	TYPESTEM)
+
+MMEC_DEFINE_PARTS_FUNCTIONS(float)
+MMEC_DEFINE_PARTS_FUNCTIONS(double)
+MMEC_DEFINE_PARTS_FUNCTIONS(ldouble)
 
 
 /** --------------------------------------------------------------------
@@ -690,7 +872,8 @@ MMEC_DEFINE_HYPERBOLIC_FUNCTIONS(ldouble)
  ** Elisp functions table: arithmetics.
  ** ----------------------------------------------------------------- */
 
-#define NUMBER_OF_MODULE_ARITHMETICS_FUNCTIONS	(6 * 5)
+/* 5 type stems, 7 operations for each type stem, 2 percent operations */
+#define NUMBER_OF_MODULE_ARITHMETICS_FUNCTIONS	(7 * 5 + 2)
 static mmec_module_function_t const
   module_arithmetics_functions_table[NUMBER_OF_MODULE_ARITHMETICS_FUNCTIONS] = {
   /* Functions for  MMEC numbers whose  internal representation is an  Emacs built-in
@@ -722,6 +905,13 @@ static mmec_module_function_t const
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Compute OP1 / OP2, where the operands are number values of type `float'.",
+  },
+  {
+    .name		= "mmec-c-double-mod",
+    .implementation	= Fmmec_c_double_mod,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute mod(DIVIDEND, DIVISOR), where the operands are number values of type `float'.",
   },
   {
     .name		= "mmec-c-double-neg",
@@ -769,6 +959,13 @@ static mmec_module_function_t const
     .documentation	= "Compute OP1 / OP2, where the operands are user-pointer objects of type `float'.",
   },
   {
+    .name		= "mmec-c-float-mod",
+    .implementation	= Fmmec_c_float_mod,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute mod(DIVIDEND, DIVISOR), where the operands are user-pointer objects of type `float'.",
+  },
+  {
     .name		= "mmec-c-float-neg",
     .implementation	= Fmmec_c_float_neg,
     .min_arity		= 1,
@@ -812,6 +1009,13 @@ static mmec_module_function_t const
     .min_arity		= 2,
     .max_arity		= 2,
     .documentation	= "Compute OP1 / OP2, where the operands are user-pointer objects of type `ldouble'.",
+  },
+  {
+    .name		= "mmec-c-ldouble-mod",
+    .implementation	= Fmmec_c_ldouble_mod,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute mod(DIVIDEND, DIVISOR), where the operands are user-pointer objects of type `ldouble'.",
   },
   {
     .name		= "mmec-c-ldouble-neg",
@@ -859,6 +1063,20 @@ static mmec_module_function_t const
     .documentation	= "Compute OP1 / OP2, where the operands are user-pointer objects of type `sint64'.",
   },
   {
+    .name		= "mmec-c-sint64-mod",
+    .implementation	= Fmmec_c_sint64_mod,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute mod(DIVIDEND, DIVISOR), where the operands are user-pointer objects of type `sint64'.",
+  },
+  {
+    .name		= "mmec-c-sint64-percent",
+    .implementation	= Fmmec_c_sint64_percent,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute DIVIDEND %% DIVISOR, where the operands are user-pointer objects of type `sint64'.",
+  },
+  {
     .name		= "mmec-c-sint64-neg",
     .implementation	= Fmmec_c_sint64_neg,
     .min_arity		= 1,
@@ -904,6 +1122,20 @@ static mmec_module_function_t const
     .documentation	= "Compute OP1 / OP2, where the operands are user-pointer objects of type `uint64'.",
   },
   {
+    .name		= "mmec-c-uint64-mod",
+    .implementation	= Fmmec_c_uint64_mod,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute mod(DIVIDEND, DIVISOR), where the operands are user-pointer objects of type `uint64'.",
+  },
+  {
+    .name		= "mmec-c-uint64-percent",
+    .implementation	= Fmmec_c_uint64_percent,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Compute DIVIDEND %% DIVISOR, where the operands are user-pointer objects of type `uint64'.",
+  },
+  {
     .name		= "mmec-c-uint64-neg",
     .implementation	= Fmmec_c_uint64_neg,
     .min_arity		= 1,
@@ -916,6 +1148,172 @@ static mmec_module_function_t const
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Compute 1 / OP, where the operand is a user-pointer object of type `uint64'.",
+  },
+};
+
+
+/** --------------------------------------------------------------------
+ ** Elisp functions table: parts.
+ ** ----------------------------------------------------------------- */
+
+/* 6 operations for each  stem in: float, double, ldouble; 1  operation for each stem
+   in: sint64, uint64. */
+#define NUMBER_OF_MODULE_PARTS_FUNCTIONS	(6 * 3 + 2)
+static mmec_module_function_t const
+  module_parts_functions_table[NUMBER_OF_MODULE_PARTS_FUNCTIONS] = {
+  /* Functions for  MMEC numbers whose  internal representation is an  Emacs built-in
+     value of type `float'. */
+  {
+    .name		= "mmec-c-double-abs",
+    .implementation	= Fmmec_c_double_abs,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute abs(OP), where the operand is a number value of type `float'.",
+  },
+  {
+    .name		= "mmec-c-double-ceil",
+    .implementation	= Fmmec_c_double_ceil,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute ceil(OP), where the operand is a number value of type `float'.",
+  },
+  {
+    .name		= "mmec-c-double-floor",
+    .implementation	= Fmmec_c_double_floor,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute floor(OP), where the operand is a number value of type `float'.",
+  },
+  {
+    .name		= "mmec-c-double-rint",
+    .implementation	= Fmmec_c_double_rint,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute rint(OP), where the operand is a number value of type `float'.",
+  },
+  {
+    .name		= "mmec-c-double-trunc",
+    .implementation	= Fmmec_c_double_trunc,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute trunc(OP), where the operand is a number value of type `float'.",
+  },
+  {
+    .name		= "mmec-c-double-round",
+    .implementation	= Fmmec_c_double_round,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute round(OP), where the operand is a number value of type `float'.",
+  },
+
+  /* Functions  for MMEC  numbers  whose internal  representation  is a  user-pointer
+     object of type `float'. */
+  {
+    .name		= "mmec-c-float-abs",
+    .implementation	= Fmmec_c_float_abs,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute abs(OP), where the operand is a number value of type `float'.",
+  },
+  {
+    .name		= "mmec-c-float-ceil",
+    .implementation	= Fmmec_c_float_ceil,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute ceil(OP), where the operand is a number value of type `float'.",
+  },
+  {
+    .name		= "mmec-c-float-floor",
+    .implementation	= Fmmec_c_float_floor,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute floor(OP), where the operand is a number value of type `float'.",
+  },
+  {
+    .name		= "mmec-c-float-rint",
+    .implementation	= Fmmec_c_float_rint,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute rint(OP), where the operand is a number value of type `float'.",
+  },
+  {
+    .name		= "mmec-c-float-trunc",
+    .implementation	= Fmmec_c_float_trunc,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute trunc(OP), where the operand is a number value of type `float'.",
+  },
+  {
+    .name		= "mmec-c-float-round",
+    .implementation	= Fmmec_c_float_round,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute round(OP), where the operand is a number value of type `float'.",
+  },
+
+  /* Functions  for MMEC  numbers  whose internal  representation  is a  user-pointer
+     object of type `ldouble'. */
+  {
+    .name		= "mmec-c-ldouble-abs",
+    .implementation	= Fmmec_c_ldouble_abs,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute abs(OP), where the operand is a number value of type `ldouble'.",
+  },
+  {
+    .name		= "mmec-c-ldouble-ceil",
+    .implementation	= Fmmec_c_ldouble_ceil,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute ceil(OP), where the operand is a number value of type `ldouble'.",
+  },
+  {
+    .name		= "mmec-c-ldouble-floor",
+    .implementation	= Fmmec_c_ldouble_floor,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute floor(OP), where the operand is a number value of type `ldouble'.",
+  },
+  {
+    .name		= "mmec-c-ldouble-rint",
+    .implementation	= Fmmec_c_ldouble_rint,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute rint(OP), where the operand is a number value of type `ldouble'.",
+  },
+  {
+    .name		= "mmec-c-ldouble-trunc",
+    .implementation	= Fmmec_c_ldouble_trunc,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute trunc(OP), where the operand is a number value of type `ldouble'.",
+  },
+  {
+    .name		= "mmec-c-ldouble-round",
+    .implementation	= Fmmec_c_ldouble_round,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute round(OP), where the operand is a number value of type `ldouble'.",
+  },
+
+  /* Functions  for MMEC  numbers  whose internal  representation  is a  user-pointer
+     object of type `sint64'. */
+  {
+    .name		= "mmec-c-sint64-abs",
+    .implementation	= Fmmec_c_sint64_abs,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute abs(OP), where the operand is a number value of type `sint64'.",
+  },
+
+  /* Functions  for MMEC  numbers  whose internal  representation  is a  user-pointer
+     object of type `uint64'. */
+  {
+    .name		= "mmec-c-uint64-abs",
+    .implementation	= Fmmec_c_uint64_abs,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Compute abs(OP), where the operand is a number value of type `uint64'.",
   },
 };
 
@@ -1611,6 +2009,8 @@ mmec_mathematics_init (emacs_env * env)
 {
   mmec_define_elisp_functions_from_table(env, module_arithmetics_functions_table,
 					 NUMBER_OF_MODULE_ARITHMETICS_FUNCTIONS, 0);
+  mmec_define_elisp_functions_from_table(env, module_parts_functions_table,
+					 NUMBER_OF_MODULE_PARTS_FUNCTIONS, 0);
   mmec_define_elisp_functions_from_table(env, module_exponentiation_and_logarithms_functions_table,
 					 NUMBER_OF_MODULE_EXPONENTIATION_AND_LOGARITHMS_FUNCTIONS, 0);
   mmec_define_elisp_functions_from_table(env, module_trigonometric_functions_table,

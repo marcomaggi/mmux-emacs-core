@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Sun Mar  1, 2020
-;; Time-stamp: <2020-03-02 12:22:11 marco>
+;; Time-stamp: <2020-03-02 17:37:03 marco>
 ;; Keywords: extensions, lisp
 
 ;; This file is part of MMUX Emacs Core.
@@ -97,7 +97,10 @@
   "Return the result of 1/OP.")
 
 (cl-defgeneric mmec-mod (dividend divisor)
-  "Return the value of DIVIDEND modulo DIVISOR.")
+  "Return mod(DIVIDEND, DIVISOR).")
+
+(cl-defgeneric mmec-% (dividend divisor)
+  "Return DIVIDEND % DIVISOR.")
 
 
 ;;;; exponentiation and logarithms generic functions
@@ -196,7 +199,7 @@
   "Return the hyperbolic inverse tangent of X.")
 
 
-;;;; arithmetics methods: addition
+;;;; arithmetics methods
 
 (cl-macrolet
     ((mmec--def (FUNCSTEM ELISPFUNC)
@@ -318,17 +321,94 @@
   (mmec--def uint64)
   (mmec--def ldouble))
 
-
-;;;; arithmetics methods:
+;;; --------------------------------------------------------------------
 
-;; (cl-defgeneric mmec-neg (op)
-;;   "Return the result of negating OP.")
+(cl-defmethod mmec-neg ((op float))
+  (- op))
 
-;; (cl-defgeneric mmec-inverse (op)
-;;   "Return the result of 1/OP.")
+(cl-defmethod mmec-neg ((op integer))
+  (- op))
 
-;; (cl-defgeneric mmec-mod (dividend divisor)
-;;   "Return the value of DIVIDEND modulo DIVISOR.")
+(cl-macrolet
+    ((mmec--def (TYPESTEM NORMSTEM)
+		(let* ((NUMTYPE		(mmec-sformat "mmec-%s" TYPESTEM))
+		       (NORMTYPE	(mmec-sformat "mmec-%s" NORMSTEM)))
+		  `(cl-defmethod mmec-neg ((op ,NUMTYPE))
+		     (,NUMTYPE (mmec-neg (,NORMTYPE op))))))
+     (mmec--defsint64 (TYPESTEM)
+		      `(mmec--def ,TYPESTEM sint64))
+     (mmec--defuint64 (TYPESTEM)
+		      `(mmec--def ,TYPESTEM uint64)))
+  (mmec--defsint64	char)
+  (mmec--defsint64	schar)
+  (mmec--defuint64	uchar)
+  (mmec--defuint64	wchar)
+  (mmec--defsint64	sshrt)
+  (mmec--defuint64	ushrt)
+  (mmec--defsint64	sint)
+  (mmec--defuint64	uint)
+  (mmec--defsint64	slong)
+  (mmec--defuint64	ulong)
+  (mmec--defsint64	sllong)
+  (mmec--defuint64	ullong)
+  (mmec--defsint64	ssize)
+  (mmec--defuint64	usize)
+  (mmec--defsint64	sintmax)
+  (mmec--defuint64	uintmax)
+  (mmec--defsint64	ptrdiff)
+  (mmec--defsint64	sint8)
+  (mmec--defuint64	uint8)
+  (mmec--defsint64	sint16)
+  (mmec--defuint64	uint16)
+  (mmec--defsint64	sint32)
+  (mmec--defuint64	uint32))
+
+(cl-macrolet
+    ((mmec--def (TYPESTEM)
+		(let* ((NUMTYPE		(mmec-sformat "mmec-%s"       TYPESTEM))
+		       (CFUNC		(mmec-sformat "mmec-c-%s-neg" TYPESTEM)))
+		  `(cl-defmethod mmec-neg ((op ,NUMTYPE))
+		     (mmec--make ,TYPESTEM :obj (,CFUNC (mmec--extract-obj ,TYPESTEM op)))))))
+  (mmec--def sint64)
+  (mmec--def uint64)
+  (mmec--def float)
+  (mmec--def double)
+  (mmec--def ldouble))
+
+(cl-macrolet
+    ((mmec--def (TYPESTEM)
+		(let* ((NUMTYPE		(mmec-sformat "mmec-%s"       TYPESTEM))
+		       (CFUNC		(mmec-sformat "mmec-c-%s-inv" TYPESTEM)))
+		  `(cl-defmethod mmec-inverse ((op ,NUMTYPE))
+		     (mmec--make ,TYPESTEM :obj (,CFUNC (mmec--extract-obj ,TYPESTEM op)))))))
+  (mmec--def sint64)
+  (mmec--def uint64)
+  (mmec--def float)
+  (mmec--def double)
+  (mmec--def ldouble))
+
+(cl-macrolet
+    ((mmec--def (TYPESTEM)
+		(let* ((NUMTYPE		(mmec-sformat "mmec-%s"       TYPESTEM))
+		       (CFUNC		(mmec-sformat "mmec-c-%s-mod" TYPESTEM)))
+		  `(cl-defmethod mmec-mod ((dividend ,NUMTYPE) (divisor ,NUMTYPE))
+		     (mmec--make ,TYPESTEM :obj (,CFUNC (mmec--extract-obj ,TYPESTEM dividend)
+							(mmec--extract-obj ,TYPESTEM divisor)))))))
+  (mmec--def sint64)
+  (mmec--def uint64)
+  (mmec--def float)
+  (mmec--def double)
+  (mmec--def ldouble))
+
+(cl-macrolet
+    ((mmec--def (TYPESTEM)
+		(let* ((NUMTYPE		(mmec-sformat "mmec-%s"           TYPESTEM))
+		       (CFUNC		(mmec-sformat "mmec-c-%s-percent" TYPESTEM)))
+		  `(cl-defmethod mmec-% ((dividend ,NUMTYPE) (divisor ,NUMTYPE))
+		     (mmec--make ,TYPESTEM :obj (,CFUNC (mmec--extract-obj ,TYPESTEM dividend)
+							(mmec--extract-obj ,TYPESTEM divisor)))))))
+  (mmec--def sint64)
+  (mmec--def uint64))
 
 
 ;;;; other methods

@@ -447,6 +447,18 @@ Value of type @objtype{integer} representing the size of @code{long double} meas
 @section Ranges representable by C language types
 
 
+@defmac mmec-limit-min @var{TYPE-OR-STEM}
+@defmacx mmec-limit-max @var{TYPE-OR-STEM}
+Expand into the constant name representing the minimum or maximum value allowed in the range of the
+specified number type.
+
+@lisp
+(mmec-limit-min sint)           @expansion{} mmec-sint-min
+(mmec-limit-max mmec-llong)     @expansion{} mmec-slong-max
+@end lisp
+@end defmac
+
+
 @deftypevr {Constant} mmec-char mmec-CHAR_MIN
 @deftypevrx {Constant} mmec-char mmec-char-min
 Value of type @objtype{mmec-char} representing the minimum value in the range of by a @code{char}.
@@ -957,6 +969,7 @@ range of such type is available.
 
 @menu
 * ctypes typedefs::             Object type definitions.
+* ctypes predicates::           Predicates for number objects.
 * ctypes comparison::           Comparison operations.
 @end menu
 
@@ -1580,6 +1593,43 @@ This constructor signals that the given initialisation argument is invalid by ra
 @c ------------------------------------------------------------------------
 
 @ElispNumberValueFitsFunctions{ldouble, long double, floating-point, ldouble, Emacs user--pointer object representing its value}
+
+@c page
+@node ctypes predicates
+@section Predicates for number objects
+
+
+@defmac mmec-number-type-p @var{TYPE-OR-STEM} @var{EXPR}
+Expand into a form returning true if @var{EXPR} is of the specified number type.
+
+@lisp
+(mmec-number-type-p mmec-sint (mmec-int 123))
+@result{} t
+
+(mmec-number-type-p slong (mmec-slong -123))
+@result{} t
+
+(mmec-number-type-p slong (mmec-double 1.23))
+@result{} nil
+@end lisp
+@end defmac
+
+
+@defmac mmec-fits-number-type-p @var{TYPE-OR-STEM} @var{EXPR}
+Expand into a form returning true if @var{EXPR} is a number object that fits into the range of the
+specified number type.
+
+@lisp
+(mmec-fits-number-type-p mmec-sint (mmec-sshrt 123))
+@result{} t
+
+(mmec-fits-number-type-p sshrt mmec-sllong-max)
+@result{} nil
+
+(mmec-fits-number-type-p slong (mmec-limit-min sint8))
+@result{} t
+@end lisp
+@end defmac
 
 @c page
 @node ctypes comparison
@@ -2618,6 +2668,7 @@ The base type of all the error symbols.
 * errors range::                Range errors.
 * errors operations::           Operation errors.
 * errors mathematics::          Mathematics errors.
+* errors miscellaneous::        Miscellaneous errors.
 @end menu
 
 @c page
@@ -2625,14 +2676,14 @@ The base type of all the error symbols.
 @section Feature errors
 
 
-@deftypevr {Error Symbol} mmec-error-unsupported-feature
-@deftypevrx {Parent Error Symbol} mmec-error
+@deftypevr {Error Symbol} symbol mmec-error-unsupported-feature
+@deftypevrx {Parent Error Symbol} symbol mmec-error
 Signal that the requested feature is not implemented.
 @end deftypevr
 
 
-@deftypevr {Error Symbol} mmec-error-unimplemented-c-language-function
-@deftypevrx {Parent Error Symbol} mmec-error-unsupported-feature
+@deftypevr {Error Symbol} symbol mmec-error-unimplemented-c-language-function
+@deftypevrx {Parent Error Symbol} symbol mmec-error-unsupported-feature
 Signal that the requested C language function is not implemented by the underlying platform.
 @end deftypevr
 
@@ -2793,6 +2844,22 @@ Overflow while performing a mathematics operation.
 @deftypevr {Error Symbol} symbol mmec-error-mathematics-underflow
 @deftypevrx {Parent Error Symbol} symbol mmec-error-mathematics
 Underflow while performing a mathematics operation.
+@end deftypevr
+
+@c page
+@node errors miscellaneous
+@section Miscellaneous errors
+
+
+@deftypevr {Error Symbol} symbol mmec-error-invalid-argument
+@deftypevrx {Parent Error Symbol} symbol mmec-error
+An invalid argument was handed to a function or macro.
+@end deftypevr
+
+
+@deftypevr {Error Symbol} symbol mmec-error-unknown-number-object-type-or-stem
+@deftypevrx {Parent Error Symbol} symbol mmec-error-invalid-argument
+A symbol matching a number object type or type stem was expected.
 @end deftypevr
 
 @c page

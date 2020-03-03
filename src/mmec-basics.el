@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-03-03 05:10:21 marco>
+;; Time-stamp: <2020-03-03 05:59:23 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -141,6 +141,17 @@
 (define-error 'mmec-error-underflow
   "Underflow while performing a mathematic operation."
   'mmec-error)
+
+;;; --------------------------------------------------------------------
+;;; miscellaneous errors
+
+(define-error 'mmec-error-invalid-argument
+  "An invalid argument was handed to a function or macro."
+  'mmec-error)
+
+(define-error 'mmec-error-unknown-number-object-type-or-stem
+  "A symbol matching a number object type or type stem was expected."
+  'mmec-error-invalid-argument)
 
 
 ;;;; helpers

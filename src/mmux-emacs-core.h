@@ -193,6 +193,11 @@ MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, mathematics);
 MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, mathematics_overflow);
 MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, mathematics_underflow);
 
+/* ------------------------------------------------------------------ */
+
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, invalid_argument);
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, unknown_number_object_type_or_stem);
+
 
 /** --------------------------------------------------------------------
  ** Error detection functions.

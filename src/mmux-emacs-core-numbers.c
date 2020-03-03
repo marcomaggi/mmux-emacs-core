@@ -69,6 +69,12 @@
   bool									\
   mmec_clang_ ## NSTEM ## _fits_ ## BSTEM ## _range_p (mmec_clang_ ## NSTEM ## _t nval)	\
   {									\
+    if (0) {								\
+      fprintf(stderr, "%s: nval=%lld, min=%lld, max=%lld\n", __func__,	\
+	      (long long)nval,						\
+	      (long long)MMEC_ ## BCAPSTEM ## _MIN,			\
+	      (long long)MMEC_ ## BCAPSTEM ## _MAX);			\
+    }									\
     return (((MMEC_ ## BCAPSTEM ## _MIN <= nval) && (nval <= MMEC_ ## BCAPSTEM ## _MAX))? true : false); \
   }									\
   MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_ELISP_FUNC(NSTEM, BSTEM)

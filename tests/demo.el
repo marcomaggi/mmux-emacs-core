@@ -27,50 +27,42 @@
 ;;;; demo tests
 
 (cl-macrolet
-    ((mmec--def (TYPESTEM)
-		(let* ((TESTNAME	(mmec-sformat "mmec-%s-subbytevector" TYPESTEM))
-		       (BVTYPE		(mmec-sformat "mmec-%s-bytevector" TYPESTEM))
-		       (DOCSTRING	(format "Extract subsequences from a `%s' object." BVTYPE))
-		       (BVFROMVECTOR	(mmec-sformat "mmec-%s-bytevector-from-vector" TYPESTEM)))
-		  `(ert-deftest ,TESTNAME ()
-		     (should (mmec-bytevector-equal
-		     	      (let ((bv		(,BVFROMVECTOR [1 2 3 4 5 6]))
-		     		    (start	3)
-		     		    (past	3))
-		     		(let ((sbv (mmec-subbytevector bv :start start :past past)))
-		     		  ;;(cl-prin1 sbv)
-		     		  sbv))
-		     	      (,BVFROMVECTOR [])))))))
-  (mmec--def char)
-  ;; (mmec--def schar)
-  ;; (mmec--def uchar)
-  ;; (mmec--def wchar)
-  ;; (mmec--def sshrt)
-  ;;(mmec--def ushrt)
-  ;;(mmec--def sint)
-  ;; (mmec--def uint)
-  ;; (mmec--def slong)
-  ;; (mmec--def ulong)
-  ;; (mmec--def sllong)
-  ;; (mmec--def ullong)
-  ;; (mmec--def ssize)
-  ;; (mmec--def usize)
-  ;; (mmec--def sintmax)
-  ;; (mmec--def uintmax)
-  ;; (mmec--def ptrdiff)
-  ;; (mmec--def sint8)
-  ;; (mmec--def uint8)
-  ;; (mmec--def sint16)
-  ;; (mmec--def uint16)
-  ;; (mmec--def sint32)
-  ;; (mmec--def uint32)
-  ;; (mmec--def sint64)
-  ;; (mmec--def uint64)
-  ;; (mmec--def float)
-  ;;(mmec--def double)
-  ;; (mmec--def ldouble)
-  )
+    ((mmec--def (TYPESTEM ARGSTEM PROPERTY)
+		(let* ((TESTNAME	(mmec-sformat "mmec-test-%s-constructors" TYPESTEM))
+		       (NUMTYPE		(mmec-sformat "mmec-%s" TYPESTEM))
+		       (ARGTYPE		(mmec-sformat "mmec-%s" TYPESTEM))
+		       (CONSTRUCTOR	NUMTYPE))
+		  ;;(mmec-debug-print TYPESTEM ARGSTEM PROPERTY)
+		  (cl-case PROPERTY
+		    (fits		`(ert-deftest ,TESTNAME ()
+					   (should (mmec-number-type-p char (,CONSTRUCTOR (mmec-limit-min ,ARGSTEM))))
+					   (should (mmec-number-type-p char (,CONSTRUCTOR (mmec-limit-max ,ARGSTEM))))))
+		    (no-fits		`(ert-deftest ,TESTNAME ()
+					   (should (condition-case exc
+						       (progn
+							 (,CONSTRUCTOR (mmec-limit-min ,ARGSTEM))
+							 (signal 'mmec-test-error (list "Expected exception: no-fits.")))
+						     (mmec-error-value-out-of-range	t)))
+					   (should (condition-case exc
+						       (progn
+							 (,CONSTRUCTOR (mmec-limit-max ,ARGSTEM))
+							 (signal 'mmec-test-error (list "Expected exception: no-fits.")))
+						     (mmec-error-value-out-of-range	t)))))
+		    (unsupported	`(ert-deftest ,TESTNAME ()
+					   (should (condition-case exc
+						       (progn
+							 (,CONSTRUCTOR (mmec-limit-min ,ARGSTEM))
+							 (signal 'mmec-test-error (list "Expected exception: unsupported.")))
+						     (mmec-error-unsupported-init-type	t)))))
+		    (t
+		     (signal 'mmec-error-invalid-argument (list 'mmec--def PROPERTY)))
+		    ))))
 
+  (cl-macrolet
+      ((mmec--deftest (ARGSTEM PROPERTY) `(mmec--def char ,ARGSTEM ,PROPERTY)))
+    ;;(mmec--deftest char		fits)
+    (mmec--deftest schar	no-fits)
+    ))
 
 ;;;; done
 

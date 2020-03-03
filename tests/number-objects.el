@@ -40,13 +40,227 @@
 	      t)
 	     (t nil))))
 
+;;All the number type stems.
+;;
+;; (mmec--def	char)
+;; (mmec--def	schar)
+;; (mmec--def	uchar)
+;; (mmec--def	wchar)
+;; (mmec--def	sshrt)
+;; (mmec--def	ushrt)
+;; (mmec--def	sint)
+;; (mmec--def	uint)
+;; (mmec--def	slong)
+;; (mmec--def	ulong)
+;; (mmec--def	sllong)
+;; (mmec--def	ullong)
+;; (mmec--def	ssize)
+;; (mmec--def	usize)
+;; (mmec--def	sintmax)
+;; (mmec--def	uintmax)
+;; (mmec--def	ptrdiff)
+;; (mmec--def	sint8)
+;; (mmec--def	uint8)
+;; (mmec--def	sint16)
+;; (mmec--def	uint16)
+;; (mmec--def	sint32)
+;; (mmec--def	uint32)
+;; (mmec--def	sint64)
+;; (mmec--def	uint64)
+;; (mmec--def	float)
+;; (mmec--def	double)
+;; (mmec--def	ldouble))
+
+
+;;;; constants
+
+(cl-macrolet
+    ((mmec--def (TYPESTEM)
+		(let* ((TESTNAME	(mmec-sformat "mmec-test-%s-min-max-constants" TYPESTEM))
+		       (MINVAR		(mmec-sformat "mmec-%s-min" TYPESTEM))
+		       (MAXVAR		(mmec-sformat "mmec-%s-max" TYPESTEM)))
+		  `(ert-deftest ,TESTNAME ()
+		     (should (mmec= (mmec-limit-min ,TYPESTEM) ,MINVAR))
+		     (should (mmec= (mmec-limit-max ,TYPESTEM) ,MAXVAR))))))
+  (mmec--def char)
+  (mmec--def schar)
+  (mmec--def uchar)
+  (mmec--def wchar)
+  (mmec--def sshrt)
+  (mmec--def ushrt)
+  (mmec--def sint)
+  (mmec--def uint)
+  (mmec--def slong)
+  (mmec--def ulong)
+  (mmec--def sllong)
+  (mmec--def ullong)
+  (mmec--def ssize)
+  (mmec--def usize)
+  (mmec--def sintmax)
+  (mmec--def uintmax)
+  (mmec--def ptrdiff)
+  (mmec--def sint8)
+  (mmec--def uint8)
+  (mmec--def sint16)
+  (mmec--def uint16)
+  (mmec--def sint32)
+  (mmec--def uint32)
+  (mmec--def sint64)
+  (mmec--def uint64)
+  (mmec--def float)
+  (mmec--def double)
+  (mmec--def ldouble))
+
+
+;;;; predicates
+
+(ert-deftest mmec-test-fits-predicates ()
+  "Test the expansion of the macro `mmec-fits-number-type-p'."
+  (should	(mmec-fits-number-type-p mmec-sint	(mmec-sshrt 123)))
+  (should (not	(mmec-fits-number-type-p sshrt		mmec-sllong-max)))
+  (should	(mmec-fits-number-type-p slong		(mmec-limit-min sint8))))
+
+
+;;;; construction: mmec-char
+
+(cl-macrolet
+    ((mmec--def (TYPESTEM ARGSTEM PROPERTY)
+		(let* ((TESTNAME	(mmec-sformat "mmec-test-%s-constructors-%s" TYPESTEM ARGSTEM))
+		       (NUMTYPE		(mmec-sformat "mmec-%s" TYPESTEM))
+		       (ARGTYPE		(mmec-sformat "mmec-%s" TYPESTEM))
+		       (CONSTRUCTOR	NUMTYPE))
+		  ;;(mmec-debug-print TYPESTEM ARGSTEM PROPERTY)
+		  (cl-case PROPERTY
+		    (fits		`(ert-deftest ,TESTNAME ()
+					   (should (mmec-number-type-p ,TYPESTEM (,CONSTRUCTOR (mmec-limit-min ,ARGSTEM))))
+					   (should (mmec-number-type-p ,TYPESTEM (,CONSTRUCTOR (mmec-limit-max ,ARGSTEM))))))
+		    (no-fits		`(ert-deftest ,TESTNAME ()
+					   ;; (should (condition-case exc
+					   ;; 	       (progn
+					   ;; 		 (,CONSTRUCTOR (mmec-limit-min ,ARGSTEM))
+					   ;; 		 (signal 'mmec-test-error (list "Expected exception: no-fits.")))
+					   ;; 	     (mmec-error-value-out-of-range	t)))
+					   (should (condition-case exc
+						       (progn
+							 (,CONSTRUCTOR (mmec-limit-max ,ARGSTEM))
+							 (signal 'mmec-test-error (list "Expected exception: no-fits.")))
+						     (mmec-error-value-out-of-range	t)))))
+		    (unsupported	`(ert-deftest ,TESTNAME ()
+					   (should (condition-case exc
+						       (progn
+							 (,CONSTRUCTOR (mmec-limit-min ,ARGSTEM))
+							 (signal 'mmec-test-error (list "Expected exception: unsupported.")))
+						     (mmec-error-unsupported-init-type	t)))))
+		    (t
+		     (signal 'mmec-error-invalid-argument (list 'mmec--def PROPERTY)))
+		    ))))
+
+  (cl-macrolet
+      ((mmec--deftest (ARGSTEM PROPERTY) `(mmec--def char ,ARGSTEM ,PROPERTY)))
+    (mmec--deftest char		fits)
+    (mmec--deftest schar	fits)
+    (mmec--deftest uchar	unsupported)
+    (mmec--deftest wchar	unsupported)
+    (mmec--deftest sshrt	no-fits)
+    (mmec--deftest ushrt	unsupported)
+    (mmec--deftest sint		no-fits)
+    (mmec--deftest uint		unsupported)
+    (mmec--deftest slong	no-fits)
+    (mmec--deftest ulong	unsupported)
+    (mmec--deftest sllong	no-fits)
+    (mmec--deftest ullong	unsupported)
+    (mmec--deftest ssize	no-fits)
+    (mmec--deftest usize	unsupported)
+    (mmec--deftest sintmax	no-fits)
+    (mmec--deftest uintmax	unsupported)
+    (mmec--deftest ptrdiff	no-fits)
+    (mmec--deftest sint8	fits)
+    (mmec--deftest uint8	unsupported)
+    (mmec--deftest sint16	no-fits)
+    (mmec--deftest uint16	unsupported)
+    (mmec--deftest sint32	no-fits)
+    (mmec--deftest uint32	unsupported)
+    (mmec--deftest sint64	no-fits)
+    (mmec--deftest uint64	unsupported)
+    (mmec--deftest float	unsupported)
+    (mmec--deftest double	unsupported)
+    (mmec--deftest ldouble	unsupported))
+
+;;; --------------------------------------------------------------------
+
+  (cl-macrolet
+      ((mmec--deftest (ARGSTEM PROPERTY) `(mmec--def schar ,ARGSTEM ,PROPERTY)))
+    (mmec--deftest char		fits)
+    (mmec--deftest schar	fits)
+    (mmec--deftest uchar	unsupported)
+    (mmec--deftest wchar	unsupported)
+    (mmec--deftest sshrt	no-fits)
+    (mmec--deftest ushrt	unsupported)
+    (mmec--deftest sint		no-fits)
+    (mmec--deftest uint		unsupported)
+    (mmec--deftest slong	no-fits)
+    (mmec--deftest ulong	unsupported)
+    (mmec--deftest sllong	no-fits)
+    (mmec--deftest ullong	unsupported)
+    (mmec--deftest ssize	no-fits)
+    (mmec--deftest usize	unsupported)
+    (mmec--deftest sintmax	no-fits)
+    (mmec--deftest uintmax	unsupported)
+    (mmec--deftest ptrdiff	no-fits)
+    (mmec--deftest sint8	fits)
+    (mmec--deftest uint8	unsupported)
+    (mmec--deftest sint16	no-fits)
+    (mmec--deftest uint16	unsupported)
+    (mmec--deftest sint32	no-fits)
+    (mmec--deftest uint32	unsupported)
+    (mmec--deftest sint64	no-fits)
+    (mmec--deftest uint64	unsupported)
+    (mmec--deftest float	unsupported)
+    (mmec--deftest double	unsupported)
+    (mmec--deftest ldouble	unsupported))
+
+;;; --------------------------------------------------------------------
+
+  (cl-macrolet
+      ((mmec--deftest (ARGSTEM PROPERTY) `(mmec--def uchar ,ARGSTEM ,PROPERTY)))
+    (mmec--deftest char		unsupported)
+    (mmec--deftest schar	unsupported)
+    (mmec--deftest uchar	fits)
+    (mmec--deftest wchar	no-fits)
+    (mmec--deftest sshrt	unsupported)
+    (mmec--deftest ushrt	no-fits)
+    (mmec--deftest sint		unsupported)
+    (mmec--deftest uint		no-fits)
+    (mmec--deftest slong	unsupported)
+    (mmec--deftest ulong	no-fits)
+    (mmec--deftest sllong	unsupported)
+    (mmec--deftest ullong	no-fits)
+    (mmec--deftest ssize	unsupported)
+    (mmec--deftest usize	no-fits)
+    (mmec--deftest sintmax	unsupported)
+    (mmec--deftest uintmax	no-fits)
+    (mmec--deftest ptrdiff	unsupported)
+    (mmec--deftest sint8	unsupported)
+    (mmec--deftest uint8	fits)
+    (mmec--deftest sint16	unsupported)
+    (mmec--deftest uint16	no-fits)
+    (mmec--deftest sint32	unsupported)
+    (mmec--deftest uint32	no-fits)
+    (mmec--deftest sint64	unsupported)
+    (mmec--deftest uint64	no-fits)
+    (mmec--deftest float	unsupported)
+    (mmec--deftest double	unsupported)
+    (mmec--deftest ldouble	unsupported))
+
+  ;; End of outer CL-MACROLET.
+  )
+
 
 ;;;; equality tests
 
 (defmacro mmux-core-test--equality--integers-signed (TYPE)
-  (let* ((TYPE.str	(symbol-name TYPE))
-	 (TESTNAME	(intern (concat "equality-" TYPE.str)))
-	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality."))
+  (let* ((TESTNAME	(mmec-sformat "mmec-test-%s-equality" TYPE))
+	 (DOCSTRING	(format "Compare objects of type `%s' for equality." TYPE))
 	 (MAKER		(if (eq TYPE 'integer)
 			    'identity
 			  TYPE)))
@@ -65,7 +279,7 @@
 
 (defmacro mmux-core-test--equality--integers-unsigned (TYPE)
   (let* ((TYPE.str	(symbol-name TYPE))
-	 (TESTNAME	(intern (concat "equality-" TYPE.str)))
+	 (TESTNAME	(mmec-sformat "mmec-test-%s-equality" TYPE))
 	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
     `(progn
        (ert-deftest ,TESTNAME ()
@@ -82,7 +296,7 @@
 
 (defmacro mmux-core-test--floating-point--equal-tests (TYPE)
   (let* ((TYPE.str	(symbol-name TYPE))
-	 (TESTNAME	(intern (concat "equality-" TYPE.str)))
+	 (TESTNAME	(mmec-sformat "mmec-test-%s-equality" TYPE))
 	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality."))a)
     `(progn
        (ert-deftest ,TESTNAME ()
@@ -144,7 +358,7 @@
 
 (defmacro mmux-core-test--not-equal--integers-signed (TYPE)
   (let* ((TYPE.str	(symbol-name TYPE))
-	 (TESTNAME	(intern (concat "not-equality-" TYPE.str)))
+	 (TESTNAME	(mmec-sformat "mmec-test-%s-not-equality" TYPE))
 	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for not-equality.")))
     `(progn
        (ert-deftest ,TESTNAME ()
@@ -170,7 +384,7 @@
 
 (defmacro mmux-core-test--not-equal--integers-unsigned (TYPE)
   (let* ((TYPE.str	(symbol-name TYPE))
-	 (TESTNAME	(intern (concat "not-equality-" TYPE.str)))
+	 (TESTNAME	(mmec-sformat "mmec-test-%s-not-equality" TYPE))
 	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for not-equality.")))
     `(progn
        (ert-deftest ,TESTNAME ()
@@ -196,7 +410,7 @@
 
 (defmacro mmux-core-test--floating-point--not-equal-tests (TYPE)
   (let* ((TYPE.str	(symbol-name TYPE))
-	 (TESTNAME	(intern (concat "equality-" TYPE.str)))
+	 (TESTNAME	(mmec-sformat "mmec-test-%s-not-equality" TYPE))
 	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for not-equality.")))
     `(progn
        (ert-deftest ,TESTNAME ()
@@ -221,12 +435,12 @@
 	 (should 	(mmec/= (mmec-ldouble 5.0) (,TYPE 17.0)))
 	 ))))
 
-(ert-deftest not-equality-integer ()
+(ert-deftest mmec-test-integer-not-equality ()
   "Compare objects of type `integer' for not-equality."
   (should (not	(mmec/= 1 1)))
   (should 	(mmec/= 1 2)))
 
-(ert-deftest not-equality-float ()
+(ert-deftest mmec-test-float-not-equality ()
   "Compare objects of type `float' for not-equality."
   (should (not	(mmec/= 1.0 1.0)))
   (should 	(mmec/= 1.0 2.0)))
@@ -266,7 +480,7 @@
 
 (defmacro mmux-core-test--less-than--integers-signed (TYPE)
   (let* ((TYPE.str	(symbol-name TYPE))
-	 (TESTNAME	(intern (concat "less-than-" TYPE.str)))
+	 (TESTNAME	(mmec-sformat "mmec-test-%s-less-than" TYPE))
 	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
     `(progn
        (ert-deftest ,TESTNAME ()
@@ -297,7 +511,7 @@
 
 (defmacro mmux-core-test--less-than--integers-unsigned (TYPE)
   (let* ((TYPE.str	(symbol-name TYPE))
-	 (TESTNAME	(intern (concat "less-than-" TYPE.str)))
+	 (TESTNAME	(mmec-sformat "mmec-test-%s-less-than" TYPE))
 	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
     `(progn
        (ert-deftest ,TESTNAME ()
@@ -328,7 +542,7 @@
 
 (defmacro mmux-core-test--floating-point--less-than-tests (TYPE)
   (let* ((TYPE.str	(symbol-name TYPE))
-	 (TESTNAME	(intern (concat "less-than-" TYPE.str)))
+	 (TESTNAME	(mmec-sformat "mmec-test-%s-less-than" TYPE))
 	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
     `(progn
        (ert-deftest ,TESTNAME ()
@@ -360,13 +574,13 @@
 	 (should (not	(mmec< (mmec-ldouble 2.0) (,TYPE 1.0))))
 	 ))))
 
-(ert-deftest less-than-integer ()
+(ert-deftest mmec-test-integer-less-than ()
   "Compare objects of type `integer' for equality."
   (should 	(mmec< 1 2))
   (should (not	(mmec< 1 1)))
   (should (not	(mmec< 2 1))))
 
-(ert-deftest less-than-float ()
+(ert-deftest mmec-test-float-less-than ()
   "Compare objects of type `float' for equality."
   (should 	(mmec< 1.0 2.0))
   (should (not	(mmec< 1.0 1.0)))
@@ -407,7 +621,7 @@
 
 (defmacro mmux-core-test--greater-than--integers-signed (TYPE)
   (let* ((TYPE.str	(symbol-name TYPE))
-	 (TESTNAME	(intern (concat "greater-than-" TYPE.str)))
+	 (TESTNAME	(mmec-sformat "mmec-test-%s-greater-than" TYPE))
 	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
     `(progn
        (ert-deftest ,TESTNAME ()
@@ -438,7 +652,7 @@
 
 (defmacro mmux-core-test--greater-than--integers-unsigned (TYPE)
   (let* ((TYPE.str	(symbol-name TYPE))
-	 (TESTNAME	(intern (concat "greater-than-" TYPE.str)))
+	 (TESTNAME	(mmec-sformat "mmec-test-%s-greater-than" TYPE))
 	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
     `(progn
        (ert-deftest ,TESTNAME ()
@@ -467,7 +681,7 @@
 
 (defmacro mmux-core-test--floating-point--greater-than-tests (TYPE)
   (let* ((TYPE.str	(symbol-name TYPE))
-	 (TESTNAME	(intern (concat "greater-than-" TYPE.str)))
+	 (TESTNAME	(mmec-sformat "mmec-test-%s-greater-than" TYPE))
 	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
     `(progn
        (ert-deftest ,TESTNAME ()
@@ -499,13 +713,13 @@
 	 (should 	(mmec> (mmec-ldouble 2.0) (,TYPE 1.0)))
 	 ))))
 
-(ert-deftest greater-than-integer ()
+(ert-deftest mmec-test-integer-greater-than ()
   "Compare objects of type `integer' for equality."
   (should (not 	(mmec> 1 2)))
   (should (not	(mmec> 1 1)))
   (should 	(mmec> 2 1)))
 
-(ert-deftest greater-than-float ()
+(ert-deftest mmec-test-float-greater-than ()
   "Compare objects of type `float' for equality."
   (should (not 	(mmec> 1.0 2.0)))
   (should (not	(mmec> 1.0 1.0)))
@@ -546,7 +760,7 @@
 
 (defmacro mmux-core-test--less-than-or-equal-to--integers-signed (TYPE)
   (let* ((TYPE.str	(symbol-name TYPE))
-	 (TESTNAME	(intern (concat "less-than-or-equal-to-" TYPE.str)))
+	 (TESTNAME	(mmec-sformat "mmec-test-%s-less-than-or-equal-to" TYPE))
 	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
     `(progn
        (ert-deftest ,TESTNAME ()
@@ -577,7 +791,7 @@
 
 (defmacro mmux-core-test--less-than-or-equal-to--integers-unsigned (TYPE)
   (let* ((TYPE.str	(symbol-name TYPE))
-	 (TESTNAME	(intern (concat "less-than-or-equal-to-" TYPE.str)))
+	 (TESTNAME	(mmec-sformat "mmec-test-%s-less-than-or-equal-to" TYPE))
 	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
     `(progn
        (ert-deftest ,TESTNAME ()
@@ -608,7 +822,7 @@
 
 (defmacro mmux-core-test--floating-point--less-than-or-equal-to-tests (TYPE)
   (let* ((TYPE.str	(symbol-name TYPE))
-	 (TESTNAME	(intern (concat "less-than-or-equal-to-" TYPE.str)))
+	 (TESTNAME	(mmec-sformat "mmec-test-%s-less-than-or-equal-to" TYPE))
 	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
     `(progn
        (ert-deftest ,TESTNAME ()
@@ -640,13 +854,13 @@
 	 (should (not	(mmec<= (mmec-ldouble 2.0) (,TYPE 1.0))))
 	 ))))
 
-(ert-deftest less-than-or-equal-to-integer ()
+(ert-deftest mmec-test-integer-less-than-or-equal-to ()
   "Compare objects of type `integer' for equality."
   (should 	(mmec<= 1 2))
   (should 	(mmec<= 1 1))
   (should (not	(mmec<= 2 1))))
 
-(ert-deftest less-than-or-equal-to-float ()
+(ert-deftest mmec-test-float-less-than-or-equal-to ()
   "Compare objects of type `float' for equality."
   (should 	(mmec<= 1.0 2.0))
   (should 	(mmec<= 1.0 1.0))
@@ -687,7 +901,7 @@
 
 (defmacro mmux-core-test--greater-than-or-equal-to--integers-signed (TYPE)
   (let* ((TYPE.str	(symbol-name TYPE))
-	 (TESTNAME	(intern (concat "greater-than-or-equal-to-" TYPE.str)))
+	 (TESTNAME	(mmec-sformat "mmec-test-%s-greater-than-or-equal-to" TYPE))
 	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
     `(progn
        (ert-deftest ,TESTNAME ()
@@ -718,7 +932,7 @@
 
 (defmacro mmux-core-test--greater-than-or-equal-to--integers-unsigned (TYPE)
   (let* ((TYPE.str	(symbol-name TYPE))
-	 (TESTNAME	(intern (concat "greater-than-or-equal-to-" TYPE.str)))
+	 (TESTNAME	(mmec-sformat "mmec-test-%s-greater-than-or-equal-to" TYPE))
 	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
     `(progn
        (ert-deftest ,TESTNAME ()
@@ -750,7 +964,7 @@
 
 (defmacro mmux-core-test--floating-point--greater-than-or-equal-to-tests (TYPE)
   (let* ((TYPE.str	(symbol-name TYPE))
-	 (TESTNAME	(intern (concat "greater-than-or-equal-to-" TYPE.str)))
+	 (TESTNAME	(mmec-sformat "mmec-test-%s-greater-than-or-equal-to" TYPE))
 	 (DOCSTRING	(concat "Compare objects of type `" TYPE.str "' for equality.")))
     `(progn
        (ert-deftest ,TESTNAME ()
@@ -782,13 +996,13 @@
 	 (should 	(mmec>= (mmec-ldouble 2.0) (,TYPE 1.0)))
 	 ))))
 
-(ert-deftest greater-than-or-equal-to-integer ()
+(ert-deftest mmec-test-integer-greater-than-or-equal-to ()
   "Compare objects of type `integer' for equality."
   (should (not 	(mmec>= 1 2)))
   (should 	(mmec>= 1 1))
   (should 	(mmec>= 2 1)))
 
-(ert-deftest greater-than-or-equal-to-float ()
+(ert-deftest mmec-test-float-greater-than-or-equal-to ()
   "Compare objects of type `float' for equality."
   (should (not 	(mmec>= 1.0 2.0)))
   (should 	(mmec>= 1.0 1.0))
@@ -827,112 +1041,51 @@
 
 ;;;; mixed integer floating-point equality
 
-(defmacro mmux-core-test--mixed-integer--equal-tests (FTYPE)
-  (let* ((FTYPE.str	(symbol-name FTYPE))
-	 (TESTNAME	(intern (concat "mixed-equality-integer-" FTYPE.str))))
-    `(progn
-       (ert-deftest ,TESTNAME ()
-	 (should	(mmec= 1   (,FTYPE 1.0)))
-	 (should	(mmec= (,FTYPE 1.0) 1))
-	 (should (not	(mmec= 5   (,FTYPE 17.0))))
-	 (should (not	(mmec= (,FTYPE 5.0) 17)))
-	 ))))
-
-(mmux-core-test--mixed-integer--equal-tests		mmec-float)
-(mmux-core-test--mixed-integer--equal-tests		float)
-(mmux-core-test--mixed-integer--equal-tests		mmec-ldouble)
-
-;;; --------------------------------------------------------------------
-
-(defmacro mmux-core-test--mixed--equal-tests (ITYPE FTYPE)
-  (let* ((ITYPE.str	(symbol-name ITYPE))
-	 (FTYPE.str	(symbol-name FTYPE))
-	 (TESTNAME	(intern (concat "mixed-equality-" ITYPE.str "-" FTYPE.str))))
-    `(progn
-       (ert-deftest ,TESTNAME ()
-	 (should	(mmec= (,ITYPE 1)   (,FTYPE 1.0)))
-	 (should	(mmec= (,FTYPE 1.0) (,ITYPE 1)))
-	 (should (not	(mmec= (,ITYPE 5)   (,FTYPE 17.0))))
-	 (should (not	(mmec= (,FTYPE 5.0) (,ITYPE 17))))
-	 ))))
-
-(mmux-core-test--mixed--equal-tests mmec-sint	mmec-float)
-(mmux-core-test--mixed--equal-tests mmec-uint	mmec-float)
-
-(mmux-core-test--mixed--equal-tests mmec-sint	float)
-(mmux-core-test--mixed--equal-tests mmec-uint	float)
-
-(mmux-core-test--mixed--equal-tests mmec-sint	mmec-ldouble)
-(mmux-core-test--mixed--equal-tests mmec-uint	mmec-ldouble)
-
-
-;;;; number objects makers: mmec-char
-
-(ert-deftest mmec-number-char ()
-  "Build a `mmec-char' object."
-  (should	(mmec-fits-char-p	123))
-  (should (not	(mmec-fits-char-p	123000)))
-  ;;
-  (should	(mmec-char-p	(mmec-char 123)))
-  (should	(mmec-char-p	(mmec-char 123.0)))
-  (should	(mmec-char-p	(mmec-char (mmec-char		123))))
-  (should	(mmec-char-p	(mmec-char (mmec-schar		123))))
-  (should	(mmec-char-p	(mmec-char (mmec-sshrt		123))))
-  (should	(mmec-char-p	(mmec-char (mmec-sint		123))))
-  (should	(mmec-char-p	(mmec-char (mmec-slong		123))))
-  (should	(mmec-char-p	(mmec-char (mmec-sllong		123))))
-  (should	(mmec-char-p	(mmec-char (mmec-sintmax	123))))
-  (should	(mmec-char-p	(mmec-char (mmec-ssize		123))))
-  (should	(mmec-char-p	(mmec-char (mmec-ptrdiff	123))))
-  ;;
-  (my--unsupported-type-error mmec-char mmec-uchar	123)
-  (my--unsupported-type-error mmec-char mmec-wchar	123)
-  (my--unsupported-type-error mmec-char mmec-ushrt	123)
-  (my--unsupported-type-error mmec-char mmec-uint	123)
-  (my--unsupported-type-error mmec-char mmec-ulong	123)
-  (my--unsupported-type-error mmec-char mmec-ullong	123)
-  (my--unsupported-type-error mmec-char mmec-uintmax	123)
-  (my--unsupported-type-error mmec-char mmec-usize	123)
-  ;;
-  (my--init-argument-does-not-fit mmec-char 1230)
-  nil)
+(cl-macrolet
+    ((mmec--def (FTYPE)
+		(let* ((FTYPE.str	(symbol-name FTYPE))
+		       (TESTNAME	(mmec-sformat "mmec-test-%s-mixed-equality-integer" FTYPE)))
+		  `(progn
+		     (ert-deftest ,TESTNAME ()
+		       (should	(mmec= 1   (,FTYPE 1.0)))
+		       (should	(mmec= (,FTYPE 1.0) 1))
+		       (should (not	(mmec= 5   (,FTYPE 17.0))))
+		       (should (not	(mmec= (,FTYPE 5.0) 17)))
+		       )))))
+  (mmec--def		mmec-float)
+  (mmec--def		float)
+  (mmec--def		mmec-ldouble))
 
 ;;; --------------------------------------------------------------------
 
-(ert-deftest mmec-number-float ()
-  "Build a `mmec-float' object."
-  (should	(mmec-fits-float-p	123))
-  (should	(mmec-fits-float-p	12.3))
-  ;;
-  (should	(mmec-float-p	(mmec-float 123)))
-  (should	(mmec-float-p	(mmec-float 12.3)))
-  ;;
-  (should	(mmec-float-p	(mmec-float (mmec-char		123))))
-  (should	(mmec-float-p	(mmec-float (mmec-schar		123))))
-  (should	(mmec-float-p	(mmec-float (mmec-uchar		123))))
-  (should	(mmec-float-p	(mmec-float (mmec-sshrt		123))))
-  (should	(mmec-float-p	(mmec-float (mmec-ushrt		123))))
-  (should	(mmec-float-p	(mmec-float (mmec-sint		123))))
-  (should	(mmec-float-p	(mmec-float (mmec-uint		123))))
-  (should	(mmec-float-p	(mmec-float (mmec-slong		123))))
-  (should	(mmec-float-p	(mmec-float (mmec-ulong		123))))
-  (should	(mmec-float-p	(mmec-float (mmec-sllong	123))))
-  (should	(mmec-float-p	(mmec-float (mmec-ullong	123))))
-  (should	(mmec-float-p	(mmec-float (mmec-sintmax	123))))
-  (should	(mmec-float-p	(mmec-float (mmec-uintmax	123))))
-  (should	(mmec-float-p	(mmec-float (mmec-ssize		123))))
-  (should	(mmec-float-p	(mmec-float (mmec-usize		123))))
-  (should	(mmec-float-p	(mmec-float (mmec-ptrdiff	123))))
-  ;;
-  (my--init-argument-does-not-fit mmec-float 12.30)
-  t)
+(cl-macrolet
+    ((mmec--def (ITYPE FTYPE)
+		(let* ((ITYPE.str	(symbol-name ITYPE))
+		       (FTYPE.str	(symbol-name FTYPE))
+		       (TESTNAME	(mmec-sformat "mmec-test-%s-mixed-equality-integer-%s" FTYPE ITYPE)))
+		  `(progn
+		     (ert-deftest ,TESTNAME ()
+		       (should	(mmec= (,ITYPE 1)   (,FTYPE 1.0)))
+		       (should	(mmec= (,FTYPE 1.0) (,ITYPE 1)))
+		       (should (not	(mmec= (,ITYPE 5)   (,FTYPE 17.0))))
+		       (should (not	(mmec= (,FTYPE 5.0) (,ITYPE 17))))
+		       )))))
+
+  (mmec--def mmec-sint	mmec-float)
+  (mmec--def mmec-uint	mmec-float)
+
+  (mmec--def mmec-sint	float)
+  (mmec--def mmec-uint	float)
+
+  (mmec--def mmec-sint	mmec-ldouble)
+  (mmec--def mmec-uint	mmec-ldouble))
 
 
 ;;;; number objects: printing
 
 (cl-macrolet
     ((mmec--def (TYPESTEM)
-		(let* ((TESTNAME	(mmec-sformat "mmec-%s-print-test"	TYPESTEM))
+		(let* ((TESTNAME	(mmec-sformat "mmec-test-%s-print"	TYPESTEM))
 		       (NUMTYPE		(mmec-sformat "mmec-%s"			TYPESTEM))
 		       (DOCSTRING	(format "Test printing numbers of type `%s'." NUMTYPE))
 		       (RESULT		(format "#s(%s 123)" NUMTYPE)))
@@ -967,7 +1120,7 @@
 
 (cl-macrolet
     ((mmec--def (TYPESTEM)
-		(let* ((TESTNAME	(mmec-sformat "mmec-%s-print-test"	TYPESTEM))
+		(let* ((TESTNAME	(mmec-sformat "mmec-test-%s-print"	TYPESTEM))
 		       (NUMTYPE		(mmec-sformat "mmec-%s"			TYPESTEM))
 		       (DOCSTRING	(format "Test printing numbers of type `%s'." NUMTYPE))
 		       (RESULT		(format "#s(%s 123)" NUMTYPE)))

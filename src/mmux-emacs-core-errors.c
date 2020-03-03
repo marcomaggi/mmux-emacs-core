@@ -190,4 +190,17 @@ MMEC_DEFINE_ERROR_SIGNALLER(mmec, mathematics_underflow,
 			    "mmec-error-mathematics-underflow",
 			    "Underflow while performing a mathematics operation.")
 
+
+/** --------------------------------------------------------------------
+ ** Miscellaneous errors.
+ ** ----------------------------------------------------------------- */
+
+MMEC_DEFINE_ERROR_SIGNALLER(mmec, invalid_argument,
+			    "mmec-error-invalid-argument",
+			    "An invalid argument was handed to a function or macro.")
+
+MMEC_DEFINE_ERROR_SIGNALLER(mmec, unknown_number_object_type_or_stem,
+			    "mmec-error-unknown-number-object-type-or-stem",
+			    "A symbol matching a number object type or type stem was expected.")
+
 /* end of file */

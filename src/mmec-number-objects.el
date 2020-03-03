@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-02-25 06:51:13 marco>
+;; Time-stamp: <2020-03-03 07:01:12 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -32,6 +32,153 @@
 ;;; Code:
 
 (require 'mmec-basics)
+
+
+;;;; macros
+
+(defmacro mmec-limit-min (TYPE-OR-STEM)
+  "Expand into the constant name representing the minimum limit in the range of the specified number object"
+  (let ((STEM	(intern (mmec--strip-prefix-from-symbol-name TYPE-OR-STEM))))
+    (cl-case STEM
+      (char	'mmec-char-min)
+      (schar	'mmec-schar-min)
+      (uchar	'mmec-uchar-min)
+      (wchar	'mmec-wchar-min)
+      (sshrt	'mmec-sshrt-min)
+      (ushrt	'mmec-ushrt-min)
+      (sint	'mmec-sint-min)
+      (uint	'mmec-uint-min)
+      (slong	'mmec-slong-min)
+      (ulong	'mmec-ulong-min)
+      (sllong	'mmec-sllong-min)
+      (ullong	'mmec-ullong-min)
+      (ssize	'mmec-ssize-min)
+      (usize	'mmec-usize-min)
+      (sintmax	'mmec-sintmax-min)
+      (uintmax	'mmec-uintmax-min)
+      (ptrdiff	'mmec-ptrdiff-min)
+      (sint8	'mmec-sint8-min)
+      (uint8	'mmec-uint8-min)
+      (sint16	'mmec-sint16-min)
+      (uint16	'mmec-uint16-min)
+      (sint32	'mmec-sint32-min)
+      (uint32	'mmec-uint32-min)
+      (sint64	'mmec-sint64-min)
+      (uint64	'mmec-uint64-min)
+      (float	'mmec-float-min)
+      (double	'mmec-double-min)
+      (ldouble	'mmec-ldouble-min)
+      (t
+       (signal 'mmec-error-unknown-number-object-type-or-stem (list 'mmec-limits-min TYPE-OR-STEM))))))
+
+(defmacro mmec-limit-max (TYPE-OR-STEM)
+  "Expand into the constant name representing the maximum limit in the range of the specified number object"
+  (let ((STEM	(intern (mmec--strip-prefix-from-symbol-name TYPE-OR-STEM))))
+    (cl-case STEM
+      (char	'mmec-char-max)
+      (schar	'mmec-schar-max)
+      (uchar	'mmec-uchar-max)
+      (wchar	'mmec-wchar-max)
+      (sshrt	'mmec-sshrt-max)
+      (ushrt	'mmec-ushrt-max)
+      (sint	'mmec-sint-max)
+      (uint	'mmec-uint-max)
+      (slong	'mmec-slong-max)
+      (ulong	'mmec-ulong-max)
+      (sllong	'mmec-sllong-max)
+      (ullong	'mmec-ullong-max)
+      (ssize	'mmec-ssize-max)
+      (usize	'mmec-usize-max)
+      (sintmax	'mmec-sintmax-max)
+      (uintmax	'mmec-uintmax-max)
+      (ptrdiff	'mmec-ptrdiff-max)
+      (sint8	'mmec-sint8-max)
+      (uint8	'mmec-uint8-max)
+      (sint16	'mmec-sint16-max)
+      (uint16	'mmec-uint16-max)
+      (sint32	'mmec-sint32-max)
+      (uint32	'mmec-uint32-max)
+      (sint64	'mmec-sint64-max)
+      (uint64	'mmec-uint64-max)
+      (float	'mmec-float-max)
+      (double	'mmec-double-max)
+      (ldouble	'mmec-ldouble-max)
+      (t
+       (signal 'mmec-error-unknown-number-object-type-or-stem (list 'mmec-limits-max TYPE-OR-STEM))))))
+
+(defmacro mmec-number-type-p (TYPE-OR-STEM EXPR)
+  "Expand into a form returning true if EXPR is of the specified number type."
+  (let* ((STEM		(intern (mmec--strip-prefix-from-symbol-name TYPE-OR-STEM)))
+	 (PRED		(mmec-sformat "mmec-%s-p" STEM))
+	 (PREDFORM	`(,PRED ,EXPR)))
+    (cl-case STEM
+      (char	PREDFORM)
+      (schar	PREDFORM)
+      (uchar	PREDFORM)
+      (wchar	PREDFORM)
+      (sshrt	PREDFORM)
+      (ushrt	PREDFORM)
+      (sint	PREDFORM)
+      (uint	PREDFORM)
+      (slong	PREDFORM)
+      (ulong	PREDFORM)
+      (sllong	PREDFORM)
+      (ullong	PREDFORM)
+      (ssize	PREDFORM)
+      (usize	PREDFORM)
+      (sintmax	PREDFORM)
+      (uintmax	PREDFORM)
+      (ptrdiff	PREDFORM)
+      (sint8	PREDFORM)
+      (uint8	PREDFORM)
+      (sint16	PREDFORM)
+      (uint16	PREDFORM)
+      (sint32	PREDFORM)
+      (uint32	PREDFORM)
+      (sint64	PREDFORM)
+      (uint64	PREDFORM)
+      (float	PREDFORM)
+      (double	PREDFORM)
+      (ldouble	PREDFORM)
+      (t
+       (signal 'mmec-error-unknown-number-object-type-or-stem (list 'mmec-number-type-p TYPE-OR-STEM))))))
+
+(defmacro mmec-fits-number-type-p (TYPE-OR-STEM EXPR)
+  "Expand into a form returning true if EXPR is a number object that fits into the range of the specified number type."
+  (let* ((STEM		(intern (mmec--strip-prefix-from-symbol-name TYPE-OR-STEM)))
+	 (FITSFUNC	(mmec-sformat "mmec-fits-%s-p" STEM))
+	 (PREDFORM	`(,FITSFUNC ,EXPR)))
+    (cl-case STEM
+      (char	PREDFORM)
+      (schar	PREDFORM)
+      (uchar	PREDFORM)
+      (wchar	PREDFORM)
+      (sshrt	PREDFORM)
+      (ushrt	PREDFORM)
+      (sint	PREDFORM)
+      (uint	PREDFORM)
+      (slong	PREDFORM)
+      (ulong	PREDFORM)
+      (sllong	PREDFORM)
+      (ullong	PREDFORM)
+      (ssize	PREDFORM)
+      (usize	PREDFORM)
+      (sintmax	PREDFORM)
+      (uintmax	PREDFORM)
+      (ptrdiff	PREDFORM)
+      (sint8	PREDFORM)
+      (uint8	PREDFORM)
+      (sint16	PREDFORM)
+      (uint16	PREDFORM)
+      (sint32	PREDFORM)
+      (uint32	PREDFORM)
+      (sint64	PREDFORM)
+      (uint64	PREDFORM)
+      (float	PREDFORM)
+      (double	PREDFORM)
+      (ldouble	PREDFORM)
+      (t
+       (signal 'mmec-error-unknown-number-object-type-or-stem (list 'mmec-fits-number-type-p TYPE-OR-STEM))))))
 
 
 ;;;; basic numeric type definitions
@@ -94,7 +241,7 @@ a   duplicate  of   the  INIT   value,  but   it  reuses   the  internal
 representation (which is immutable)."
   (mmec-char--make :obj (mmec-char-obj init)))
 
-(cl-defmethod mmec-char ((init mmec-signed-integer))
+(mmec-defmethod mmec-char ((init mmec-signed-integer))
   "Constructor for number objects of type `mmec-char'.
 
 This constructor normalises the initialisation  argument to an object of
@@ -103,7 +250,7 @@ builds  an object  of type  `mmec-char', otherwise  is raised  the error
 condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
     (unless (mmec-fits-char-p obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-char init)))
+      (signal 'mmec-error-value-out-of-range (list --func-- init)))
     (mmec-char--make :obj (mmec-c-make-integer-char-from-usrptr-sint64 (mmec-sint64-obj obj)))))
 
 (cl-defmethod mmec-char ((init integer))
@@ -121,7 +268,7 @@ condition `mmec-error-value-out-of-range'."
       (signal 'mmec-error-value-out-of-range (list 'mmec-char init)))
     (mmec-char--make :obj (mmec-c-make-integer-char-from-usrptr-sint64 (mmec-sint64-obj obj)))))
 
-(cl-defmethod mmec-char ((init float))
+(mmec-defmethod mmec-char ((init float))
   "Constructor for number objects of type `mmec-char'.
 
 This  constructor accepts  as initialisation  argument a  value of  type
@@ -133,15 +280,15 @@ builds  an object  of type  `mmec-char', otherwise  it raises  the error
 condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
     (unless (mmec-fits-char-p obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-char init)))
+      (signal 'mmec-error-value-out-of-range (list --func-- init)))
     (mmec-char--make :obj (mmec-c-make-integer-char-from-usrptr-sint64 (mmec-sint64-obj obj)))))
 
-(cl-defmethod mmec-char ((init mmec-number))
+(mmec-defmethod mmec-char ((init mmec-number))
   "Constructor for number objects of type `mmec-char'.
 
 This constructor  method signals that the  given initialisation argument
 is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-char init)))
+  (signal 'mmec-error-unsupported-init-type (list --func-- init)))
 
 
 ;;;; C language type wrappers: signed char

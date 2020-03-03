@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-03-01 10:53:36 marco>
+;; Time-stamp: <2020-03-03 05:10:21 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -42,6 +42,17 @@
 (define-error 'mmec-error
   "Error while executing a MMUX Emacs Core operation."
   'error)
+
+;;; --------------------------------------------------------------------
+;;; features errors
+
+(define-error 'mmec-error-unsupported-feature
+  "The requested feature is not implemented."
+  'mmec-error)
+
+(define-error 'mmec-error-unimplemented-c-language-function
+  "The requested C language function is not implemented by the underlying platform."
+  'mmec-error)
 
 ;;; --------------------------------------------------------------------
 ;;; constructor errors

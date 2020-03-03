@@ -79,6 +79,19 @@ MMEC_DEFINE_ERROR_SIGNALLER(mmec, base, "mmec-error", "Error while executing a M
 
 
 /** --------------------------------------------------------------------
+ ** Features.
+ ** ----------------------------------------------------------------- */
+
+MMEC_DEFINE_ERROR_SIGNALLER(mmec, unsupported_feature,
+			    "mmec-error-unsupported-feature",
+			    "The requested feature is not implemented.")
+
+MMEC_DEFINE_ERROR_SIGNALLER(mmec, unimplemented_c_language_function,
+			    "mmec-error-unimplemented-c-language-function",
+			    "The requested C language function is not implemented by the underlying platform.")
+
+
+/** --------------------------------------------------------------------
  ** Constructor errors.
  ** ----------------------------------------------------------------- */
 

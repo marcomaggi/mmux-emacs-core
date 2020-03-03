@@ -2613,11 +2613,28 @@ The base type of all the error symbols.
 
 
 @menu
+* errors features::             Feature errors.
 * errors constructor::          Constructor errors.
 * errors range::                Range errors.
 * errors operations::           Operation errors.
 * errors mathematics::          Mathematics errors.
 @end menu
+
+@c page
+@node errors features
+@section Feature errors
+
+
+@deftypevr {Error Symbol} mmec-error-unsupported-feature
+@deftypevrx {Parent Error Symbol} mmec-error
+Signal that the requested feature is not implemented.
+@end deftypevr
+
+
+@deftypevr {Error Symbol} mmec-error-unimplemented-c-language-function
+@deftypevrx {Parent Error Symbol} mmec-error-unsupported-feature
+Signal that the requested C language function is not implemented by the underlying platform.
+@end deftypevr
 
 @c page
 @node errors constructor
@@ -3042,6 +3059,7 @@ An alias for the C language type @code{long double}.
 * capi errors detect::          Detecting errors.
 * capi errors typedefs::        Error--signalling type definitions.
 * capi errors base::            Signalling base errors.
+* capi errors features::        Signalling feature errors.
 * capi errors constructor::     Signalling constructor errors.
 * capi errors range::           Signalling range errors.
 * capi errors operations::      Signalling operation errors.
@@ -3141,6 +3159,21 @@ Prototype of functions signalling an error.
 
 @deftypefun mmec_error_signaller_fun_t mmec_error_base
 Signal an error with error symbol @code{mmec-error} then return @nil{}.
+@end deftypefun
+
+@c page
+@node capi errors features
+@subsection Signalling feature errors
+
+
+@deftypefun mmec_error_signaller_fun_t mmec_error_unsupported_feature
+Signal an error with error symbol @code{mmec-error-unsupported-feature} then return @nil{}.
+@end deftypefun
+
+
+@deftypefun mmec_error_signaller_fun_t mmec_error_unimplemented_c_language_function
+Signal an error with error symbol @code{mmec-error-unimplemented-c-language-function} then return
+@nil{}.
 @end deftypefun
 
 @c page

@@ -158,6 +158,11 @@ MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, base);
 
 /* ------------------------------------------------------------------ */
 
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, unsupported_feature);
+MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, unimplemented_c_language_function);
+
+/* ------------------------------------------------------------------ */
+
 MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, constructor);
 MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, memory_allocation);
 MMEC_ERROR_SIGNALLER_PROTOTYPE(mmec, instantiating_abstract_type);

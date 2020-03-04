@@ -1,5 +1,6 @@
 ﻿-*- coding: utf-8-with-signature-unix; fill-column: 200 -*-
 
+* Add the wint number object type.
 * Overflow test in subbytevector
   See the solution including gnulib modules as described in:
 

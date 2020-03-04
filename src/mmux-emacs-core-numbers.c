@@ -95,7 +95,7 @@
 MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(sint64,	char,		CHAR)
 MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(sint64,	schar,		SCHAR)
 MMEC_DEFINE_UNSIGNED_NORMALISED_TYPE_FITS_FUNC(uint64,	uchar,		UCHAR)
-MMEC_DEFINE_UNSIGNED_NORMALISED_TYPE_FITS_FUNC(uint64,	wchar,		WCHAR)
+MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(sint64,	wchar,		WCHAR)
 MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(sint64,	sshrt,		SSHRT)
 MMEC_DEFINE_UNSIGNED_NORMALISED_TYPE_FITS_FUNC(uint64,	ushrt,		USHRT)
 MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(sint64,	sint,		SINT)
@@ -314,7 +314,7 @@ MMEC_DEFINE_FLOAT_NUMBER_CONSTRUCTOR(double,	ldouble)
   MMEC_DEFINE_USRPTR_BASE_TYPE_FUNCTIONS(BSTEM)			\
   MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(BSTEM, NSTEM)
 
-MMEC_DEFINE_USRPTR_BASE_TYPE(wchar,	uint64)
+MMEC_DEFINE_USRPTR_BASE_TYPE(wchar,	sint64)
 MMEC_DEFINE_USRPTR_BASE_TYPE(sint,	sint64)
 MMEC_DEFINE_USRPTR_BASE_TYPE(uint,	uint64)
 MMEC_DEFINE_USRPTR_BASE_TYPE(slong,	sint64)
@@ -371,7 +371,7 @@ MMEC_DEFINE_USRPTR_BASE_TYPE_FUNCTIONS(ldouble)
 MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(sint64,		char,		integer)
 MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(sint64,		schar,		integer)
 MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(uint64,		uchar,		integer)
-MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(uint64,		wchar,		usrptr)
+MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(sint64,		wchar,		usrptr)
 MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(sint64,		sshrt,		integer)
 MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(uint64,		ushrt,		integer)
 MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(sint64,		sint,		usrptr)
@@ -563,7 +563,7 @@ MMEC_COMPARISON_OPERATIONS2(uint64, sint64)
     }									\
   }
 
-MMEC_DEFINE_PRINT_FUNCTION(wchar,	"%lu"		, (unsigned long int))
+MMEC_DEFINE_PRINT_FUNCTION(wchar,	"%lu"		, (signed long int))
 MMEC_DEFINE_PRINT_FUNCTION(sint,	"%d"		,)
 MMEC_DEFINE_PRINT_FUNCTION(uint,	"%u"		,)
 MMEC_DEFINE_PRINT_FUNCTION(slong,	"%ld"		,)
@@ -668,8 +668,8 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
   /* Constructors  for  custom number  objects  whose  internal representation  is  a
      user-pointer object. */
   {
-    .name		= "mmec-c-make-usrptr-wchar-from-usrptr-uint64",
-    .implementation	= Fmmec_make_usrptr_wchar_from_usrptr_uint64,
+    .name		= "mmec-c-make-usrptr-wchar-from-usrptr-sint64",
+    .implementation	= Fmmec_make_usrptr_wchar_from_usrptr_sint64,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Build and return a user-pointer object of type `wchar'.",
@@ -784,6 +784,13 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
   {
     .name		= "mmec-c-make-usrptr-sint64-from-integer-schar",
     .implementation	= Fmmec_make_usrptr_sint64_from_integer_schar,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `sint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-sint64-from-usrptr-wchar",
+    .implementation	= Fmmec_make_usrptr_sint64_from_usrptr_wchar,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Build and return a user-pointer object of type `sint64'.",
@@ -940,13 +947,6 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
   {
     .name		= "mmec-c-make-usrptr-uint64-from-usrptr-uintmax",
     .implementation	= Fmmec_make_usrptr_uint64_from_usrptr_uintmax,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Build and return a user-pointer object of type `uint64'.",
-  },
-  {
-    .name		= "mmec-c-make-usrptr-uint64-from-usrptr-wchar",
-    .implementation	= Fmmec_make_usrptr_uint64_from_usrptr_wchar,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Build and return a user-pointer object of type `uint64'.",
@@ -1242,8 +1242,8 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
     .documentation	= "Return true if the argument fits a user-pointer object of type `uchar'.",
   },
   {
-    .name		= "mmec-c-uint64-fits-wchar-p",
-    .implementation	= Fmmec_uint64_fits_wchar_range_p,
+    .name		= "mmec-c-sint64-fits-wchar-p",
+    .implementation	= Fmmec_sint64_fits_wchar_range_p,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `wchar'.",

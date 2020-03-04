@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  1, 2020
-;; Time-stamp: <2020-02-23 07:36:53 marco>
+;; Time-stamp: <2020-03-04 06:41:49 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -924,7 +924,7 @@
   (mmec--def char	t)
   (mmec--def schar	t)
   (mmec--def uchar	nil)
-  (mmec--def wchar	nil)
+  (mmec--def wchar	t)
   (mmec--def sshrt	t)
   (mmec--def ushrt	nil)
   (mmec--def sint	t)

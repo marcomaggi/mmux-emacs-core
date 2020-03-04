@@ -265,6 +265,7 @@ Return an integer representing the library interface current age.
 @menu
 * constants sizeof::            Size of common C language types.
 * constants limits::            Ranges representable by C language types.
+* constants signed::            Whether a C language type is signed or unsigned.
 * constants float::             Constants related to floating-point numbers.
 @end menu
 
@@ -620,7 +621,6 @@ Value of type @objtype{mmec-wchar} representing the minimum value in the range o
 @deftypevr {Constant} mmec-wchar mmec-WCHAR_MAX
 @deftypevrx {Constant} mmec-wchar mmec-wchar-max
 Value of type @objtype{mmec-wchar} representing the maximum value in the range of by a @code{wchar_t}.
-Valuex of type @objtype{mmec-wchar} representing the maximum value in the range of by a @code{wchar-t}.
 @end deftypevr
 
 
@@ -832,6 +832,60 @@ Value of type @objtype{mmec-ldouble} representing the system constant @code{LDBL
 @deftypevrx {Constant} mmec-ldouble mmec-ldouble-max
 Value of type @objtype{mmec-ldouble} representing the system constant @code{LDBL_MAX}.
 @end deftypevr
+
+@c page
+@node constants signed
+@section Whether a C language type is signed or unsigned
+
+
+@defmac mmec-number-type-is-signed @var{TYPE-OR-STEM}
+Expand into the constant name representing the signedness of the specified number type.
+
+@lisp
+(mmec-number-type-is-signed sint)
+@expansion{} mmec-sint-is-signed
+
+(mmec-number-type-is-signed mmec-slong)
+@expansion{} mmec-slong-is-signed
+@end lisp
+@end defmac
+
+
+@macro ElispDefineCtypeIsSigned{STEM}
+@defvr {Constant} mmec-\STEM\-is-signed
+Constant set to true if the number type @objtype{mmec-\STEM\} is signed; false if it is unsigned.
+@end defvr
+
+@end macro
+
+@ElispDefineCtypeIsSigned{char}
+@ElispDefineCtypeIsSigned{schar}
+@ElispDefineCtypeIsSigned{uchar}
+@ElispDefineCtypeIsSigned{wchar}
+@ElispDefineCtypeIsSigned{sshrt}
+@ElispDefineCtypeIsSigned{ushrt}
+@ElispDefineCtypeIsSigned{sint}
+@ElispDefineCtypeIsSigned{uint}
+@ElispDefineCtypeIsSigned{slong}
+@ElispDefineCtypeIsSigned{ulong}
+@ElispDefineCtypeIsSigned{sllong}
+@ElispDefineCtypeIsSigned{ullong}
+@ElispDefineCtypeIsSigned{sintmax}
+@ElispDefineCtypeIsSigned{uintmax}
+@ElispDefineCtypeIsSigned{ssize}
+@ElispDefineCtypeIsSigned{usize}
+@ElispDefineCtypeIsSigned{ptrdiff}
+@ElispDefineCtypeIsSigned{sint8}
+@ElispDefineCtypeIsSigned{uint8}
+@ElispDefineCtypeIsSigned{sint16}
+@ElispDefineCtypeIsSigned{uint16}
+@ElispDefineCtypeIsSigned{sint32}
+@ElispDefineCtypeIsSigned{uint32}
+@ElispDefineCtypeIsSigned{sint64}
+@ElispDefineCtypeIsSigned{uint64}
+@ElispDefineCtypeIsSigned{float}
+@ElispDefineCtypeIsSigned{double}
+@ElispDefineCtypeIsSigned{ldouble}
 
 @c page
 @node constants float
@@ -1209,7 +1263,7 @@ The following syntactic bindings are defined in the module @value{PackageEmacsMo
 The following syntactic bindings are defined in the module @value{PackageEmacsModule}.
 
 
-@ElispNumberValueDefinition{wchar, wchar_t, unsigned-integer, uint64, Emacs user--pointer object representing its code}
+@ElispNumberValueDefinition{wchar, wchar_t, signed-integer, sint64, Emacs user--pointer object representing its code}
 
 @c page
 @node ctypes typedefs sshrt
@@ -2056,7 +2110,7 @@ return false.
 @subsection Bytevector of @code{wchar} values
 
 
-@ElispBytevectorTypeDefinition{wchar, unsigned-integer, wchar_t}
+@ElispBytevectorTypeDefinition{wchar, signed-integer, wchar_t}
 
 @c page
 @node bytevec typedefs sshrt

@@ -121,7 +121,7 @@
   (should	(mmec-fits-number-type-p slong		(mmec-limit-min sint8))))
 
 
-;;;; construction: mmec-char
+;;;; construction
 
 (cl-macrolet
     ((mmec--def (TYPESTEM ARGSTEM PROPERTY)
@@ -155,12 +155,15 @@
 		     (signal 'mmec-error-invalid-argument (list 'mmec--def PROPERTY)))
 		    ))))
 
+;;; --------------------------------------------------------------------
+;;; mmec-char
+
   (cl-macrolet
       ((mmec--deftest (ARGSTEM PROPERTY) `(mmec--def char ,ARGSTEM ,PROPERTY)))
     (mmec--deftest char		fits)
     (mmec--deftest schar	fits)
     (mmec--deftest uchar	unsupported)
-    (mmec--deftest wchar	unsupported)
+    (mmec--deftest wchar	no-fits)
     (mmec--deftest sshrt	no-fits)
     (mmec--deftest ushrt	unsupported)
     (mmec--deftest sint		no-fits)
@@ -187,13 +190,14 @@
     (mmec--deftest ldouble	unsupported))
 
 ;;; --------------------------------------------------------------------
+;;; mmec-schar
 
   (cl-macrolet
       ((mmec--deftest (ARGSTEM PROPERTY) `(mmec--def schar ,ARGSTEM ,PROPERTY)))
     (mmec--deftest char		fits)
     (mmec--deftest schar	fits)
     (mmec--deftest uchar	unsupported)
-    (mmec--deftest wchar	unsupported)
+    (mmec--deftest wchar	no-fits)
     (mmec--deftest sshrt	no-fits)
     (mmec--deftest ushrt	unsupported)
     (mmec--deftest sint		no-fits)
@@ -220,13 +224,14 @@
     (mmec--deftest ldouble	unsupported))
 
 ;;; --------------------------------------------------------------------
+;;; mmec-uchar
 
   (cl-macrolet
       ((mmec--deftest (ARGSTEM PROPERTY) `(mmec--def uchar ,ARGSTEM ,PROPERTY)))
     (mmec--deftest char		unsupported)
     (mmec--deftest schar	unsupported)
     (mmec--deftest uchar	fits)
-    (mmec--deftest wchar	no-fits)
+    (mmec--deftest wchar	unsupported)
     (mmec--deftest sshrt	unsupported)
     (mmec--deftest ushrt	no-fits)
     (mmec--deftest sint		unsupported)
@@ -244,6 +249,108 @@
     (mmec--deftest uint8	fits)
     (mmec--deftest sint16	unsupported)
     (mmec--deftest uint16	no-fits)
+    (mmec--deftest sint32	unsupported)
+    (mmec--deftest uint32	no-fits)
+    (mmec--deftest sint64	unsupported)
+    (mmec--deftest uint64	no-fits)
+    (mmec--deftest float	unsupported)
+    (mmec--deftest double	unsupported)
+    (mmec--deftest ldouble	unsupported))
+
+;;; --------------------------------------------------------------------
+;;; mmec-wchar
+
+  (cl-macrolet
+      ((mmec--deftest (ARGSTEM PROPERTY) `(mmec--def wchar ,ARGSTEM ,PROPERTY)))
+    (mmec--deftest char		fits)
+    (mmec--deftest schar	fits)
+    (mmec--deftest uchar	unsupported)
+    (mmec--deftest wchar	fits)
+    (mmec--deftest sshrt	fits)
+    (mmec--deftest ushrt	unsupported)
+    (mmec--deftest sint		fits)
+    (mmec--deftest uint		unsupported)
+    (mmec--deftest slong	no-fits)
+    (mmec--deftest ulong	unsupported)
+    (mmec--deftest sllong	no-fits)
+    (mmec--deftest ullong	unsupported)
+    (mmec--deftest ssize	no-fits)
+    (mmec--deftest usize	unsupported)
+    (mmec--deftest sintmax	no-fits)
+    (mmec--deftest uintmax	unsupported)
+    (mmec--deftest ptrdiff	no-fits)
+    (mmec--deftest sint8	fits)
+    (mmec--deftest uint8	unsupported)
+    (mmec--deftest sint16	fits)
+    (mmec--deftest uint16	unsupported)
+    (mmec--deftest sint32	fits)
+    (mmec--deftest uint32	unsupported)
+    (mmec--deftest sint64	no-fits)
+    (mmec--deftest uint64	unsupported)
+    (mmec--deftest float	unsupported)
+    (mmec--deftest double	unsupported)
+    (mmec--deftest ldouble	unsupported))
+
+;;; --------------------------------------------------------------------
+;;; mmec-sshrt
+
+  (cl-macrolet
+      ((mmec--deftest (ARGSTEM PROPERTY) `(mmec--def sshrt ,ARGSTEM ,PROPERTY)))
+    (mmec--deftest char		fits)
+    (mmec--deftest schar	fits)
+    (mmec--deftest uchar	unsupported)
+    (mmec--deftest wchar	no-fits)
+    (mmec--deftest sshrt	fits)
+    (mmec--deftest ushrt	unsupported)
+    (mmec--deftest sint		no-fits)
+    (mmec--deftest uint		unsupported)
+    (mmec--deftest slong	no-fits)
+    (mmec--deftest ulong	unsupported)
+    (mmec--deftest sllong	no-fits)
+    (mmec--deftest ullong	unsupported)
+    (mmec--deftest ssize	no-fits)
+    (mmec--deftest usize	unsupported)
+    (mmec--deftest sintmax	no-fits)
+    (mmec--deftest uintmax	unsupported)
+    (mmec--deftest ptrdiff	no-fits)
+    (mmec--deftest sint8	fits)
+    (mmec--deftest uint8	unsupported)
+    (mmec--deftest sint16	fits)
+    (mmec--deftest uint16	unsupported)
+    (mmec--deftest sint32	no-fits)
+    (mmec--deftest uint32	unsupported)
+    (mmec--deftest sint64	no-fits)
+    (mmec--deftest uint64	unsupported)
+    (mmec--deftest float	unsupported)
+    (mmec--deftest double	unsupported)
+    (mmec--deftest ldouble	unsupported))
+
+;;; --------------------------------------------------------------------
+;;; mmec-ushrt
+
+  (cl-macrolet
+      ((mmec--deftest (ARGSTEM PROPERTY) `(mmec--def ushrt ,ARGSTEM ,PROPERTY)))
+    (mmec--deftest char		unsupported)
+    (mmec--deftest schar	unsupported)
+    (mmec--deftest uchar	fits)
+    (mmec--deftest wchar	unsupported)
+    (mmec--deftest sshrt	unsupported)
+    (mmec--deftest ushrt	fits)
+    (mmec--deftest sint		unsupported)
+    (mmec--deftest uint		no-fits)
+    (mmec--deftest slong	unsupported)
+    (mmec--deftest ulong	no-fits)
+    (mmec--deftest sllong	unsupported)
+    (mmec--deftest ullong	no-fits)
+    (mmec--deftest ssize	unsupported)
+    (mmec--deftest usize	no-fits)
+    (mmec--deftest sintmax	unsupported)
+    (mmec--deftest uintmax	no-fits)
+    (mmec--deftest ptrdiff	unsupported)
+    (mmec--deftest sint8	unsupported)
+    (mmec--deftest uint8	fits)
+    (mmec--deftest sint16	unsupported)
+    (mmec--deftest uint16	fits)
     (mmec--deftest sint32	unsupported)
     (mmec--deftest uint32	no-fits)
     (mmec--deftest sint64	unsupported)
@@ -325,7 +432,7 @@
 (mmux-core-test--equality--integers-signed	mmec-char)
 (mmux-core-test--equality--integers-unsigned	mmec-uchar)
 (mmux-core-test--equality--integers-signed	mmec-schar)
-(mmux-core-test--equality--integers-unsigned	mmec-wchar)
+(mmux-core-test--equality--integers-signed	mmec-wchar)
 (mmux-core-test--equality--integers-signed	mmec-sshrt)
 (mmux-core-test--equality--integers-unsigned	mmec-ushrt)
 (mmux-core-test--equality--integers-signed	mmec-sint)
@@ -448,7 +555,7 @@
 (mmux-core-test--not-equal--integers-signed	mmec-char)
 (mmux-core-test--not-equal--integers-unsigned	mmec-uchar)
 (mmux-core-test--not-equal--integers-signed	mmec-schar)
-(mmux-core-test--not-equal--integers-unsigned	mmec-wchar)
+(mmux-core-test--not-equal--integers-signed	mmec-wchar)
 (mmux-core-test--not-equal--integers-signed	mmec-sshrt)
 (mmux-core-test--not-equal--integers-unsigned	mmec-ushrt)
 (mmux-core-test--not-equal--integers-signed	mmec-sint)
@@ -589,7 +696,7 @@
 (mmux-core-test--less-than--integers-signed	mmec-char)
 (mmux-core-test--less-than--integers-unsigned	mmec-uchar)
 (mmux-core-test--less-than--integers-signed	mmec-schar)
-(mmux-core-test--less-than--integers-unsigned	mmec-wchar)
+(mmux-core-test--less-than--integers-signed	mmec-wchar)
 (mmux-core-test--less-than--integers-signed	mmec-sshrt)
 (mmux-core-test--less-than--integers-unsigned	mmec-ushrt)
 (mmux-core-test--less-than--integers-signed	mmec-sint)
@@ -728,7 +835,7 @@
 (mmux-core-test--greater-than--integers-signed		mmec-char)
 (mmux-core-test--greater-than--integers-unsigned	mmec-uchar)
 (mmux-core-test--greater-than--integers-signed		mmec-schar)
-(mmux-core-test--greater-than--integers-unsigned	mmec-wchar)
+(mmux-core-test--greater-than--integers-signed	mmec-wchar)
 (mmux-core-test--greater-than--integers-signed		mmec-sshrt)
 (mmux-core-test--greater-than--integers-unsigned	mmec-ushrt)
 (mmux-core-test--greater-than--integers-signed		mmec-sint)
@@ -869,7 +976,7 @@
 (mmux-core-test--less-than-or-equal-to--integers-signed		mmec-char)
 (mmux-core-test--less-than-or-equal-to--integers-unsigned	mmec-uchar)
 (mmux-core-test--less-than-or-equal-to--integers-signed		mmec-schar)
-(mmux-core-test--less-than-or-equal-to--integers-unsigned	mmec-wchar)
+(mmux-core-test--less-than-or-equal-to--integers-signed	mmec-wchar)
 (mmux-core-test--less-than-or-equal-to--integers-signed		mmec-sshrt)
 (mmux-core-test--less-than-or-equal-to--integers-unsigned	mmec-ushrt)
 (mmux-core-test--less-than-or-equal-to--integers-signed		mmec-sint)
@@ -1011,7 +1118,7 @@
 (mmux-core-test--greater-than-or-equal-to--integers-signed	mmec-char)
 (mmux-core-test--greater-than-or-equal-to--integers-unsigned	mmec-uchar)
 (mmux-core-test--greater-than-or-equal-to--integers-signed	mmec-schar)
-(mmux-core-test--greater-than-or-equal-to--integers-unsigned	mmec-wchar)
+(mmux-core-test--greater-than-or-equal-to--integers-signed	mmec-wchar)
 (mmux-core-test--greater-than-or-equal-to--integers-signed	mmec-sshrt)
 (mmux-core-test--greater-than-or-equal-to--integers-unsigned	mmec-ushrt)
 (mmux-core-test--greater-than-or-equal-to--integers-signed	mmec-sint)

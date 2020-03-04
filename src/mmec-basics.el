@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-03-03 05:59:23 marco>
+;; Time-stamp: <2020-03-04 06:27:40 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -163,48 +163,66 @@
   (intern (apply 'format STRING ARGS)))
 
 (eval-and-compile
+  (defconst mmec--the-prefix
+    "mmec-")
+  (defconst mmec--the-prefix-length
+    (length mmec--the-prefix))
+
   (defun mmec--prefixed-string-p (STRING)
-    ;;Return true if STRING begins with the prefix "mmec-".
-    ;;
+    "Return true if STRING begins with the prefix `mmec-'."
     (and (stringp STRING)
-	 (<= 5 (length STRING))
-	 (string= "mmec-" (substring STRING 0 5))))
+	 (< mmec--the-prefix-length (length STRING))
+	 (string= mmec--the-prefix (substring STRING 0 mmec--the-prefix-length))))
 
   (defun mmec--strip-prefix-from-symbol-name (SYMBOL)
-    ;;If SYMBOL's  name begins  with the  prefix "mmec-": strip  it and  return the  resulting string.
-    ;;Otherwise return SYMBOL's name itself.
-    ;;
-    (let ((STRING	(symbol-name SYMBOL)))
+    "If SYMBOL's name begins with the prefix `mmec-': strip it and return the resulting string; otherwise return SYMBOL's name itself."
+    (let ((STRING (symbol-name SYMBOL)))
       (if (mmec--prefixed-string-p STRING)
-	  ;;Strip the prefix.
-	  (substring STRING 5)
+	  (substring STRING (length mmec--the-prefix))
 	STRING)))
 
   (defun mmec--prepend-prefix-to-symbol-name (SYMBOL)
-    ;;If SYMBOL's name begins with the prefix "mmec-": return SYMBOL's name itself.  Otherwise prepend
-    ;;the prefix to te name and return the resulting string.
-    ;;
-    ;;
-    (let ((STRING	(symbol-name SYMBOL)))
+    "If SYMBOL's name begins with the prefix `mmec-': return SYMBOL's name itself; otherwise prepend the prefix to it and return the resulting string."
+    (let ((STRING (symbol-name SYMBOL)))
       (if (mmec--prefixed-string-p STRING)
 	  STRING
-	;;Prepend the prefix
-	(concat (concat "mmec-" STRING)))))
+	(concat mmec--the-prefix STRING))))
 
   (defun mmec--type-elisp-constructor-name (TYPE-OR-STEM)
-    (intern (concat (mmec--prepend-prefix-to-symbol-name TYPE-OR-STEM) "--make")))
+    "Return an interned symbol representing the standard MMUX Emacs name of a type constructor.
+
+(mmec--type-elisp-constructor-name 'sint64)
+=> mmec-sint64--make
+
+(mmec--type-elisp-constructor-name 'mmec-char)
+=> mmec-char--make
+
+(mmec--type-elisp-constructor-name \"ptrdiff\")
+=> mmec-ptrdiff--make"
+    (mmec-sformat "%s--make" (mmec--prepend-prefix-to-symbol-name TYPE-OR-STEM)))
   )
 
 (defmacro mmec--make (TYPE-OR-STEM &rest ARGS)
-  ;;Expand into the application of a struct constructor to the given arguments.  Example:
-  ;;
-  ;;  (cl-defstruct (mmec-sint64 (:constructor mmec-sint64--make))
-  ;;    obj)
-  ;;
-  ;;  (mmec--make sint64 :obj 123)
-  ;;  ==> (mmec-sint64--make :obj 123)
-  ;;
+  "Expand into the application of a struct constructor to the given arguments.
+
+Example:
+
+  (cl-defstruct (mmec-sint64 (:constructor mmec-sint64--make))
+    obj)
+  (mmec--make sint64 :obj 123) ==> (mmec-sint64--make :obj 123)"
   (cons (mmec--type-elisp-constructor-name TYPE-OR-STEM) ARGS))
+
+(defmacro mmec--make-obj (TYPE-OR-STEM OBJ-EXPR)
+  "Expand into the application of a struct constructor to the given object argument.
+
+Example:
+
+  (cl-defstruct (mmec-sint64 (:constructor mmec-sint64--make))
+    obj)
+
+  (mmec--make-obj sint64 123)
+  ==> (mmec-sint64--make :obj 123)"
+  `(,(mmec--type-elisp-constructor-name TYPE-OR-STEM) :obj ,OBJ-EXPR))
 
 (defmacro mmec--extract-obj (TYPE-OR-STEM VALUE)
   ;;Expand into the application of a struct slot getter to a struct instance.  Example:

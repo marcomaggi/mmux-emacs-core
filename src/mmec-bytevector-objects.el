@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-03-01 10:34:14 marco>
+;; Time-stamp: <2020-03-04 06:39:10 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -97,12 +97,12 @@
 	 (PARENT-BYTEVECTOR-TYPE	(mmec-sformat "mmec-%s-bytevector"		PARENT-STEM))
 	 (CONSTRUCTOR			BYTEVECTOR-TYPE)
 	 (SIZEOF-SLOT			(mmec-sformat "mmec-sizeof-%s"			TYPESTEM))
-	 (SIGNED-BOOL		(cl-case PARENT-STEM
-				  (signed-integer	't)
-				  (unsigned-integer	'nil)
-				  (floating-point	't)
-				  (t
-				   (signal 'mmec-error (list 'mmec--define-bytevector-type PARENT-STEM)))))
+	 (SIGNED-BOOL			(cl-case PARENT-STEM
+					  (signed-integer	't)
+					  (unsigned-integer	'nil)
+					  (floating-point	't)
+					  (t
+					   (signal 'mmec-error (list 'mmec--define-bytevector-type PARENT-STEM)))))
 	 (DOCSTRING			(format "Build and return a new instance of `mmec-%s-bytevector'." TYPESTEM)))
     `(progn
        (cl-defstruct (,BYTEVECTOR-TYPE
@@ -126,7 +126,7 @@
 (mmec--define-bytevector-type char	signed-integer)
 (mmec--define-bytevector-type schar	signed-integer)
 (mmec--define-bytevector-type uchar	unsigned-integer)
-(mmec--define-bytevector-type wchar	unsigned-integer)
+(mmec--define-bytevector-type wchar	signed-integer)
 (mmec--define-bytevector-type sshrt	signed-integer)
 (mmec--define-bytevector-type ushrt	unsigned-integer)
 (mmec--define-bytevector-type sint	signed-integer)

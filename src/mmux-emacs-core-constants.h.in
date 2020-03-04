@@ -101,8 +101,8 @@
 #define MMEC_SLLONG_MAX	LLONG_MAX //(@VALUEOF_LLONG_MAX@LL)
 #define MMEC_ULLONG_MIN	(0ULL)
 #define MMEC_ULLONG_MAX	(@VALUEOF_ULLONG_MAX@ULL)
-#define MMEC_WCHAR_MIN	(0UL)
-#define MMEC_WCHAR_MAX	(@VALUEOF_WCHAR_MAX@UL)
+#define MMEC_WCHAR_MIN	(@VALUEOF_WCHAR_MIN@LL)
+#define MMEC_WCHAR_MAX	(@VALUEOF_WCHAR_MAX@LL)
 
 /* ------------------------------------------------------------------ */
 

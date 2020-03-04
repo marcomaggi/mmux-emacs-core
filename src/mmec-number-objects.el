@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-03-04 06:50:16 marco>
+;; Time-stamp: <2020-03-04 09:10:20 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -275,7 +275,7 @@ argument INIT must be a number value.")
 This is the copy constructor implemented as method.  This method creates
 a   duplicate  of   the  INIT   value,  but   it  reuses   the  internal
 representation (which is immutable)."
-  (mmec--make-obj char (mmec-char-obj init)))
+  (mmec--make-obj char (mmec--extract-obj char init)))
 
 (mmec-defmethod mmec-char ((init mmec-signed-integer))
   "Constructor for number objects of type `mmec-char'.
@@ -285,7 +285,7 @@ type `mmec-sint64', then  it checks if the  range is valid: if  it is is
 builds  an object  of type  `mmec-char', otherwise  is raised  the error
 condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-char-p obj)
+    (unless (mmec--fits-obj char obj)
       (signal 'mmec-error-value-out-of-range (list --func-- init)))
     (mmec--make-obj char (mmec-c-make-integer-char-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -300,7 +300,7 @@ type `mmec-sint64', then  it checks if the  range is valid: if  it is is
 builds  an object  of type  `mmec-char', otherwise  it raises  the error
 condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-char-p obj)
+    (unless (mmec--fits-obj char obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-char init)))
     (mmec--make-obj char (mmec-c-make-integer-char-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -315,7 +315,7 @@ type `mmec-sint64', then  it checks if the  range is valid: if  it is is
 builds  an object  of type  `mmec-char', otherwise  it raises  the error
 condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-char-p obj)
+    (unless (mmec--fits-obj char obj)
       (signal 'mmec-error-value-out-of-range (list --func-- init)))
     (mmec--make-obj char (mmec-c-make-integer-char-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -346,7 +346,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj schar (mmec-schar-obj init)))
+  (mmec--make-obj schar (mmec--extract-obj schar init)))
 
 (cl-defmethod mmec-schar ((init mmec-signed-integer))
   "Constructor for number objects of type `mmec-schar'.
@@ -356,7 +356,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-schar',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-schar-p obj)
+    (unless (mmec--fits-obj schar obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-schar init)))
     (mmec--make-obj schar (mmec-c-make-integer-schar-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -371,7 +371,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-schar',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-schar-p obj)
+    (unless (mmec--fits-obj schar obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-schar init)))
     (mmec--make-obj schar (mmec-c-make-integer-schar-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -386,7 +386,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-schar',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-schar-p obj)
+    (unless (mmec--fits-obj schar obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-schar init)))
     (mmec--make-obj schar (mmec-c-make-integer-schar-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -417,7 +417,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj uchar (mmec-uchar-obj init)))
+  (mmec--make-obj uchar (mmec--extract-obj uchar init)))
 
 (cl-defmethod mmec-uchar ((init mmec-unsigned-integer))
   "Constructor for number objects of type `mmec-uchar'.
@@ -427,7 +427,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uchar',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-uchar-p obj)
+    (unless (mmec--fits-obj uchar obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uchar init)))
     (mmec--make-obj uchar (mmec-c-make-integer-uchar-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -442,7 +442,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uchar',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-uchar-p obj)
+    (unless (mmec--fits-obj uchar obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uchar init)))
     (mmec--make-obj uchar (mmec-c-make-integer-uchar-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -457,7 +457,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uchar',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-uchar-p obj)
+    (unless (mmec--fits-obj uchar obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uchar init)))
     (mmec--make-obj uchar (mmec-c-make-integer-uchar-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -488,7 +488,7 @@ argument INIT must be a number value.")
 This is the copy constructor implemented as method.  This method creates
 a   duplicate  of   the  INIT   value,  but   it  reuses   the  internal
 representation (which is immutable)."
-  (mmec--make-obj wchar (mmec-wchar-obj init)))
+  (mmec--make-obj wchar (mmec--extract-obj wchar init)))
 
 (cl-defmethod mmec-wchar ((init mmec-signed-integer))
   "Constructor for number objects of type `mmec-wchar'.
@@ -498,7 +498,7 @@ type `mmec-sint64', then it  checks if the range is valid;  if it is: it
 builds an  object of  type `mmec-wchar', otherwise  it raises  the error
 condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-wchar-p obj)
+    (unless (mmec--fits-obj wchar obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-wchar init)))
     (mmec--make-obj wchar (mmec-c-make-usrptr-wchar-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -513,7 +513,7 @@ type `mmec-sint64', then it  checks if the range is valid;  if it is: it
 builds an  object of  type `mmec-wchar', otherwise  it raises  the error
 condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-wchar-p obj)
+    (unless (mmec--fits-obj wchar obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-wchar init)))
     (mmec--make-obj wchar (mmec-c-make-usrptr-wchar-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -528,7 +528,7 @@ type `mmec-sint64', then it  checks if the range is valid;  if it is: it
 builds an  object of  type `mmec-wchar', otherwise  it raises  the error
 condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-wchar-p obj)
+    (unless (mmec--fits-obj wchar obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-wchar init)))
     (mmec--make-obj wchar (mmec-c-make-usrptr-wchar-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -559,7 +559,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj sshrt (mmec-sshrt-obj init)))
+  (mmec--make-obj sshrt (mmec--extract-obj sshrt init)))
 
 (cl-defmethod mmec-sshrt ((init mmec-signed-integer))
   "Constructor for number objects of type `mmec-sshrt'.
@@ -569,7 +569,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sshrt',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-sshrt-p obj)
+    (unless (mmec--fits-obj sshrt obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sshrt init)))
     (mmec--make-obj sshrt (mmec-c-make-integer-sshrt-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -584,7 +584,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sshrt',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-sshrt-p obj)
+    (unless (mmec--fits-obj sshrt obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sshrt init)))
     (mmec--make-obj sshrt (mmec-c-make-integer-sshrt-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -599,7 +599,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sshrt',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-sshrt-p obj)
+    (unless (mmec--fits-obj sshrt obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sshrt init)))
     (mmec--make-obj sshrt (mmec-c-make-integer-sshrt-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -630,7 +630,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj ushrt (mmec-ushrt-obj init)))
+  (mmec--make-obj ushrt (mmec--extract-obj ushrt init)))
 
 (cl-defmethod mmec-ushrt ((init mmec-unsigned-integer))
   "Constructor for number objects of type `mmec-ushrt'.
@@ -640,7 +640,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ushrt',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-ushrt-p obj)
+    (unless (mmec--fits-obj ushrt obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ushrt init)))
     (mmec--make-obj ushrt (mmec-c-make-integer-ushrt-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -655,7 +655,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ushrt',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-ushrt-p obj)
+    (unless (mmec--fits-obj ushrt obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ushrt init)))
     (mmec--make-obj ushrt (mmec-c-make-integer-ushrt-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -670,7 +670,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ushrt',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-ushrt-p obj)
+    (unless (mmec--fits-obj ushrt obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ushrt init)))
     (mmec--make-obj ushrt (mmec-c-make-integer-ushrt-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -701,7 +701,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj sint (mmec-sint-obj init)))
+  (mmec--make-obj sint (mmec--extract-obj sint init)))
 
 (cl-defmethod mmec-sint ((init mmec-signed-integer))
   "Constructor for number objects of type `mmec-sint'.
@@ -711,7 +711,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sint',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-sint-p obj)
+    (unless (mmec--fits-obj sint obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint init)))
     (mmec--make-obj sint (mmec-c-make-usrptr-sint-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -726,7 +726,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sint',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-sint-p obj)
+    (unless (mmec--fits-obj sint obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint init)))
     (mmec--make-obj sint (mmec-c-make-usrptr-sint-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -741,7 +741,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sint',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-sint-p obj)
+    (unless (mmec--fits-obj sint obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint init)))
     (mmec--make-obj sint (mmec-c-make-usrptr-sint-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -772,7 +772,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj uint (mmec-uint-obj init)))
+  (mmec--make-obj uint (mmec--extract-obj uint init)))
 
 (cl-defmethod mmec-uint ((init mmec-unsigned-integer))
   "Constructor for number objects of type `mmec-uint'.
@@ -782,7 +782,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uint',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-uint-p obj)
+    (unless (mmec--fits-obj uint obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint init)))
     (mmec--make-obj uint (mmec-c-make-usrptr-uint-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -797,7 +797,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uint',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-uint-p obj)
+    (unless (mmec--fits-obj uint obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint init)))
     (mmec--make-obj uint (mmec-c-make-usrptr-uint-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -812,7 +812,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uint',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-uint-p obj)
+    (unless (mmec--fits-obj uint obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint init)))
     (mmec--make-obj uint (mmec-c-make-usrptr-uint-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -843,7 +843,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj slong (mmec-slong-obj init)))
+  (mmec--make-obj slong (mmec--extract-obj slong init)))
 
 (cl-defmethod mmec-slong ((init mmec-signed-integer))
   "Constructor for number objects of type `mmec-slong'.
@@ -853,7 +853,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-slong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-slong-p obj)
+    (unless (mmec--fits-obj slong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-slong init)))
     (mmec--make-obj slong (mmec-c-make-usrptr-slong-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -868,7 +868,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-slong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-slong-p obj)
+    (unless (mmec--fits-obj slong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-slong init)))
     (mmec--make-obj slong (mmec-c-make-usrptr-slong-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -883,7 +883,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-slong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-slong-p obj)
+    (unless (mmec--fits-obj slong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-slong init)))
     (mmec--make-obj slong (mmec-c-make-usrptr-slong-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -914,7 +914,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj ulong (mmec-ulong-obj init)))
+  (mmec--make-obj ulong (mmec--extract-obj ulong init)))
 
 (cl-defmethod mmec-ulong ((init mmec-unsigned-integer))
   "Constructor for number objects of type `mmec-ulong'.
@@ -924,7 +924,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ulong',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-ulong-p obj)
+    (unless (mmec--fits-obj ulong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ulong init)))
     (mmec--make-obj ulong (mmec-c-make-usrptr-ulong-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -939,7 +939,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ulong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-ulong-p obj)
+    (unless (mmec--fits-obj ulong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ulong init)))
     (mmec--make-obj ulong (mmec-c-make-usrptr-ulong-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -954,7 +954,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ulong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-ulong-p obj)
+    (unless (mmec--fits-obj ulong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ulong init)))
     (mmec--make-obj ulong (mmec-c-make-usrptr-ulong-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -985,7 +985,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj sllong (mmec-sllong-obj init)))
+  (mmec--make-obj sllong (mmec--extract-obj sllong init)))
 
 (cl-defmethod mmec-sllong ((init mmec-signed-integer))
   "Constructor for number objects of type `mmec-sllong'.
@@ -995,7 +995,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sllong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-sllong-p obj)
+    (unless (mmec--fits-obj sllong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sllong init)))
     (mmec--make-obj sllong (mmec-c-make-usrptr-sllong-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1010,7 +1010,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sllong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-sllong-p obj)
+    (unless (mmec--fits-obj sllong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sllong init)))
     (mmec--make-obj sllong (mmec-c-make-usrptr-sllong-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1025,7 +1025,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sllong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-sllong-p obj)
+    (unless (mmec--fits-obj sllong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sllong init)))
     (mmec--make-obj sllong (mmec-c-make-usrptr-sllong-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1056,7 +1056,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj ullong (mmec-ullong-obj init)))
+  (mmec--make-obj ullong (mmec--extract-obj ullong init)))
 
 (cl-defmethod mmec-ullong ((init mmec-unsigned-integer))
   "Constructor for number objects of type `mmec-ullong'.
@@ -1066,7 +1066,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ullong',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-ullong-p obj)
+    (unless (mmec--fits-obj ullong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ullong init)))
     (mmec--make-obj ullong (mmec-c-make-usrptr-ullong-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1081,7 +1081,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ullong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-ullong-p obj)
+    (unless (mmec--fits-obj ullong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ullong init)))
     (mmec--make-obj ullong (mmec-c-make-usrptr-ullong-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1096,7 +1096,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ullong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-ullong-p obj)
+    (unless (mmec--fits-obj ullong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ullong init)))
     (mmec--make-obj ullong (mmec-c-make-usrptr-ullong-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1127,7 +1127,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj sintmax (mmec-sintmax-obj init)))
+  (mmec--make-obj sintmax (mmec--extract-obj sintmax init)))
 
 (cl-defmethod mmec-sintmax ((init mmec-signed-integer))
   "Constructor for number objects of type `mmec-sintmax'.
@@ -1137,7 +1137,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sintmax',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-sintmax-p obj)
+    (unless (mmec--fits-obj sintmax obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sintmax init)))
     (mmec--make-obj sintmax (mmec-c-make-usrptr-sintmax-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1152,7 +1152,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sintmax',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-sintmax-p obj)
+    (unless (mmec--fits-obj sintmax obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sintmax init)))
     (mmec--make-obj sintmax (mmec-c-make-usrptr-sintmax-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1167,7 +1167,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sintmax',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-sintmax-p obj)
+    (unless (mmec--fits-obj sintmax obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sintmax init)))
     (mmec--make-obj sintmax (mmec-c-make-usrptr-sintmax-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1198,7 +1198,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj uintmax (mmec-uintmax-obj init)))
+  (mmec--make-obj uintmax (mmec--extract-obj uintmax init)))
 
 (cl-defmethod mmec-uintmax ((init mmec-unsigned-integer))
   "Constructor for number objects of type `mmec-uintmax'.
@@ -1208,7 +1208,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uintmax',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-uintmax-p obj)
+    (unless (mmec--fits-obj uintmax obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uintmax init)))
     (mmec--make-obj uintmax (mmec-c-make-usrptr-uintmax-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1223,7 +1223,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uintmax',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-uintmax-p obj)
+    (unless (mmec--fits-obj uintmax obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uintmax init)))
     (mmec--make-obj uintmax (mmec-c-make-usrptr-uintmax-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1238,7 +1238,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uintmax',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-uintmax-p obj)
+    (unless (mmec--fits-obj uintmax obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uintmax init)))
     (mmec--make-obj uintmax (mmec-c-make-usrptr-uintmax-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1269,7 +1269,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj ssize (mmec-ssize-obj init)))
+  (mmec--make-obj ssize (mmec--extract-obj ssize init)))
 
 (cl-defmethod mmec-ssize ((init mmec-signed-integer))
   "Constructor for number objects of type `mmec-ssize'.
@@ -1279,7 +1279,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ssize',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-ssize-p obj)
+    (unless (mmec--fits-obj ssize obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ssize init)))
     (mmec--make-obj ssize (mmec-c-make-usrptr-ssize-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1294,7 +1294,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ssize',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-ssize-p obj)
+    (unless (mmec--fits-obj ssize obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ssize init)))
     (mmec--make-obj ssize (mmec-c-make-usrptr-ssize-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1309,7 +1309,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ssize',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-ssize-p obj)
+    (unless (mmec--fits-obj ssize obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ssize init)))
     (mmec--make-obj ssize (mmec-c-make-usrptr-ssize-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1340,7 +1340,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj usize (mmec-usize-obj init)))
+  (mmec--make-obj usize (mmec--extract-obj usize init)))
 
 (cl-defmethod mmec-usize ((init mmec-unsigned-integer))
   "Constructor for number objects of type `mmec-usize'.
@@ -1350,7 +1350,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-usize',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-usize-p obj)
+    (unless (mmec--fits-obj usize obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-usize init)))
     (mmec--make-obj usize (mmec-c-make-usrptr-usize-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1365,7 +1365,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-usize',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-usize-p obj)
+    (unless (mmec--fits-obj usize obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-usize init)))
     (mmec--make-obj usize (mmec-c-make-usrptr-usize-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1380,7 +1380,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-usize',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-usize-p obj)
+    (unless (mmec--fits-obj usize obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-usize init)))
     (mmec--make-obj usize (mmec-c-make-usrptr-usize-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1411,7 +1411,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj ptrdiff (mmec-ptrdiff-obj init)))
+  (mmec--make-obj ptrdiff (mmec--extract-obj ptrdiff init)))
 
 (cl-defmethod mmec-ptrdiff ((init mmec-signed-integer))
   "Constructor for number objects of type `mmec-ptrdiff'.
@@ -1421,7 +1421,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it is  is builds an object of type  `mmec-ptrdiff', otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-ptrdiff-p obj)
+    (unless (mmec--fits-obj ptrdiff obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ptrdiff init)))
     (mmec--make-obj ptrdiff (mmec-c-make-usrptr-ptrdiff-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1436,7 +1436,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it is  is builds an object of type  `mmec-ptrdiff', otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-ptrdiff-p obj)
+    (unless (mmec--fits-obj ptrdiff obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ptrdiff init)))
     (mmec--make-obj ptrdiff (mmec-c-make-usrptr-ptrdiff-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1451,7 +1451,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it is  is builds an object of type  `mmec-ptrdiff', otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-ptrdiff-p obj)
+    (unless (mmec--fits-obj ptrdiff obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ptrdiff init)))
     (mmec--make-obj ptrdiff (mmec-c-make-usrptr-ptrdiff-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1482,7 +1482,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj sint8 (mmec-sint8-obj init)))
+  (mmec--make-obj sint8 (mmec--extract-obj sint8 init)))
 
 (cl-defmethod mmec-sint8 ((init mmec-signed-integer))
   "Constructor for number objects of type `mmec-sint8'.
@@ -1492,7 +1492,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sint8',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-sint8-p obj)
+    (unless (mmec--fits-obj sint8 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint8 init)))
     (mmec--make-obj sint8 (mmec-c-make-integer-sint8-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1507,7 +1507,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sint8',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-sint8-p obj)
+    (unless (mmec--fits-obj sint8 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint8 init)))
     (mmec--make-obj sint8 (mmec-c-make-integer-sint8-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1522,7 +1522,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sint8',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-sint8-p obj)
+    (unless (mmec--fits-obj sint8 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint8 init)))
     (mmec--make-obj sint8 (mmec-c-make-integer-sint8-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1553,7 +1553,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj uint8 (mmec-uint8-obj init)))
+  (mmec--make-obj uint8 (mmec--extract-obj uint8 init)))
 
 (cl-defmethod mmec-uint8 ((init mmec-unsigned-integer))
   "Constructor for number objects of type `mmec-uint8'.
@@ -1563,7 +1563,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uint8',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-uint8-p obj)
+    (unless (mmec--fits-obj uint8 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint8 init)))
     (mmec--make-obj uint8 (mmec-c-make-integer-uint8-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1578,7 +1578,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uint8',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-uint8-p obj)
+    (unless (mmec--fits-obj uint8 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint8 init)))
     (mmec--make-obj uint8 (mmec-c-make-integer-uint8-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1593,7 +1593,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uint8',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-uint8-p obj)
+    (unless (mmec--fits-obj uint8 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint8 init)))
     (mmec--make-obj uint8 (mmec-c-make-integer-uint8-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1624,7 +1624,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj sint16 (mmec-sint16-obj init)))
+  (mmec--make-obj sint16 (mmec--extract-obj sint16 init)))
 
 (cl-defmethod mmec-sint16 ((init mmec-signed-integer))
   "Constructor for number objects of type `mmec-sint16'.
@@ -1634,7 +1634,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds an  object of type `mmec-sint16',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-sint16-p obj)
+    (unless (mmec--fits-obj sint16 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint16 init)))
     (mmec--make-obj sint16 (mmec-c-make-integer-sint16-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1649,7 +1649,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sint16',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-sint16-p obj)
+    (unless (mmec--fits-obj sint16 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint16 init)))
     (mmec--make-obj sint16 (mmec-c-make-integer-sint16-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1664,7 +1664,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sint16',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-sint16-p obj)
+    (unless (mmec--fits-obj sint16 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint16 init)))
     (mmec--make-obj sint16 (mmec-c-make-integer-sint16-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1695,7 +1695,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj uint16 (mmec-uint16-obj init)))
+  (mmec--make-obj uint16 (mmec--extract-obj uint16 init)))
 
 (cl-defmethod mmec-uint16 ((init mmec-unsigned-integer))
   "Constructor for number objects of type `mmec-uint16'.
@@ -1705,7 +1705,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds an  object of type `mmec-uint16',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-uint16-p obj)
+    (unless (mmec--fits-obj uint16 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint16 init)))
     (mmec--make-obj uint16 (mmec-c-make-integer-uint16-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1720,7 +1720,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uint16',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-uint16-p obj)
+    (unless (mmec--fits-obj uint16 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint16 init)))
     (mmec--make-obj uint16 (mmec-c-make-integer-uint16-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1735,7 +1735,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uint16',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-uint16-p obj)
+    (unless (mmec--fits-obj uint16 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint16 init)))
     (mmec--make-obj uint16 (mmec-c-make-integer-uint16-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1766,7 +1766,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj sint32 (mmec-sint32-obj init)))
+  (mmec--make-obj sint32 (mmec--extract-obj sint32 init)))
 
 (cl-defmethod mmec-sint32 ((init mmec-signed-integer))
   "Constructor for number objects of type `mmec-sint32'.
@@ -1776,7 +1776,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds an  object of type `mmec-sint32',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-sint32-p obj)
+    (unless (mmec--fits-obj sint32 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint32 init)))
     (mmec--make-obj sint32 (mmec-c-make-usrptr-sint32-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1791,7 +1791,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sint32',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-sint32-p obj)
+    (unless (mmec--fits-obj sint32 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint32 init)))
     (mmec--make-obj sint32 (mmec-c-make-usrptr-sint32-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1806,7 +1806,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sint32',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-sint32-p obj)
+    (unless (mmec--fits-obj sint32 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint32 init)))
     (mmec--make-obj sint32 (mmec-c-make-usrptr-sint32-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1837,7 +1837,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj uint32 (mmec-uint32-obj init)))
+  (mmec--make-obj uint32 (mmec--extract-obj uint32 init)))
 
 (cl-defmethod mmec-uint32 ((init mmec-unsigned-integer))
   "Constructor for number objects of type `mmec-uint32'.
@@ -1847,7 +1847,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds an  object of type `mmec-uint32',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-uint32-p obj)
+    (unless (mmec--fits-obj uint32 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint32 init)))
     (mmec--make-obj uint32 (mmec-c-make-usrptr-uint32-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1862,7 +1862,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uint32',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-uint32-p obj)
+    (unless (mmec--fits-obj uint32 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint32 init)))
     (mmec--make-obj uint32 (mmec-c-make-usrptr-uint32-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1877,7 +1877,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uint32',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-uint32-p obj)
+    (unless (mmec--fits-obj uint32 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint32 init)))
     (mmec--make-obj uint32 (mmec-c-make-usrptr-uint32-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -2087,7 +2087,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj float (mmec-float-obj init)))
+  (mmec--make-obj float (mmec--extract-obj float init)))
 
 (cl-defmethod mmec-float ((init mmec-integer))
   "Constructor for number objects of type `mmec-float'.
@@ -2099,9 +2099,9 @@ object of type `mmec-ldouble', then it checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-float',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-ldouble init)))
-    (unless (mmec-fits-float-p obj)
+    (unless (mmec--fits-obj float obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-float init)))
-    (mmec--make-obj float (mmec-c-make-usrptr-float-from-usrptr-ldouble (mmec-ldouble-obj obj)))))
+    (mmec--make-obj float (mmec-c-make-usrptr-float-from-usrptr-ldouble (mmec--extract-obj ldouble obj)))))
 
 (cl-defmethod mmec-float ((init integer))
   "Constructor for number objects of type `mmec-float'.
@@ -2114,9 +2114,9 @@ object of type `mmec-ldouble', then it checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-float',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-ldouble init)))
-    (unless (mmec-fits-float-p obj)
+    (unless (mmec--fits-obj float obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-float init)))
-    (mmec--make-obj float (mmec-c-make-usrptr-float-from-usrptr-ldouble (mmec-ldouble-obj obj)))))
+    (mmec--make-obj float (mmec-c-make-usrptr-float-from-usrptr-ldouble (mmec--extract-obj ldouble obj)))))
 
 (cl-defmethod mmec-float ((init float))
   "Constructor for number objects of type `mmec-float'.
@@ -2129,9 +2129,9 @@ object of type `mmec-ldouble', then it checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-float',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-ldouble init)))
-    (unless (mmec-fits-float-p obj)
+    (unless (mmec--fits-obj float obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-float init)))
-    (mmec--make-obj float (mmec-c-make-usrptr-float-from-usrptr-ldouble (mmec-ldouble-obj obj)))))
+    (mmec--make-obj float (mmec-c-make-usrptr-float-from-usrptr-ldouble (mmec--extract-obj ldouble obj)))))
 
 (cl-defmethod mmec-float ((init mmec-number))
   "Constructor for number objects of type `mmec-float'.
@@ -2160,7 +2160,7 @@ argument INIT must be a number value.")
 This is the copy constructor  implemented as method.  This method
 creates  a duplicate  of  the  INIT value,  but  it reuses  the
 internal representation (which is immutable)."
-  (mmec--make-obj double (mmec-double-obj init)))
+  (mmec--make-obj double (mmec--extract-obj double init)))
 
 (cl-defmethod mmec-double ((init mmec-signed-integer))
   "Constructor for number objects of type `mmec-double'.
@@ -2170,9 +2170,9 @@ object of type `mmec-ldouble', then it checks if the range is valid:
 if it  is: it builds an  object of type `mmec-double',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-ldouble init)))
-    (unless (mmec-fits-double-p obj)
+    (unless (mmec--fits-obj double obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-double init)))
-    (mmec--make-obj double (mmec-c-make-elisp-float-from-usrptr-ldouble (mmec-ldouble-obj obj)))))
+    (mmec--make-obj double (mmec-c-make-elisp-float-from-usrptr-ldouble (mmec--extract-obj ldouble obj)))))
 
 (cl-defmethod mmec-double ((init integer))
   "Constructor for number objects of type `mmec-double'.
@@ -2185,9 +2185,9 @@ type `mmec-ldouble', then it  checks if the range is valid:  if it is: it
 builds an  object of type  `mmec-double', otherwise it raises  the error
 condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-ldouble init)))
-    (unless (mmec-fits-double-p obj)
+    (unless (mmec--fits-obj double obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-double init)))
-    (mmec--make-obj double (mmec-c-make-elisp-float-from-usrptr-ldouble (mmec-ldouble-obj obj)))))
+    (mmec--make-obj double (mmec-c-make-elisp-float-from-usrptr-ldouble (mmec--extract-obj ldouble obj)))))
 
 (cl-defmethod mmec-double ((init float))
   "Constructor for number objects of type `mmec-double'.

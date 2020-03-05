@@ -1934,6 +1934,14 @@ slots; if its value is invalid the condition
 @end deffn
 
 
+@deffn {Generic Function} copy-mmec-\TYPESTEM\-bytevector @var{BV}
+@deffnx {Method} copy-mmec-\TYPESTEM\-bytevector ((@var{BV} mmec-\TYPESTEM\-bytevector))
+@deffnx {Method} copy-mmec-bytevector ((@var{BV} mmec-\TYPESTEM\-bytevector))
+Build and return a copy of @var{BV}.  Duplicate both the outer structure and its internal
+representation.
+@end deffn
+
+
 @ElispBytevectorCommonMethods{\TYPESTEM\, \PARENTSTEM\, \CTYPE\}
 @end macro
 
@@ -2051,6 +2059,12 @@ Return true if @var{OBJ} is an instance of @objtype{mmec-bytevector}; otherwise 
 @defunx mmec-bytevector-obj @var{BV}
 Field getters for bytevector objects.
 @end defun
+
+
+@deffn {Generic Function} copy-mmec-bytevector @var{BV}
+The copy constructor for bytevector objects.  It must duplicate both the outer structure and its
+internal representation.
+@end deffn
 
 @c page
 @node bytevec typedefs integer

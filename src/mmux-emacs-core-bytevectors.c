@@ -183,6 +183,43 @@ Fmmec_make_bytevector (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void
 
 
 /** --------------------------------------------------------------------
+ ** Copy constructors.
+ ** ----------------------------------------------------------------- */
+
+mmec_intrep_bytevector_t *
+mmec_copy_intrep_bytevector (emacs_env * env, mmec_intrep_bytevector_t const * const bv_original)
+{
+  mmec_intrep_bytevector_t *	bv_copy;
+
+  bv_copy = mmec_new_intrep_bytevector(env, bv_original->number_of_slots, bv_original->slot_size, bv_original->hold_signed_values);
+  if (mmec_funcall_returned_with_success(env)) {
+    uint8_t	*src = (uint8_t *)(bv_original->ptr);
+    uint8_t	*dst = (uint8_t *)(bv_copy->ptr);
+
+    memcpy(dst, src, bv_original->number_of_slots * bv_original->slot_size);
+    return bv_copy;
+  } else {
+    return NULL;
+  }
+}
+
+static emacs_value
+Fmmec_copy_bytevector (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
+{
+  assert(nargs == 1);
+  mmec_intrep_bytevector_t const * const bv_original = mmec_get_intrep_bytevector_from_emacs_value(env, args[0]);
+  mmec_intrep_bytevector_t * bv_copy;
+
+  bv_copy = mmec_copy_intrep_bytevector(env, bv_original);
+  if (mmec_funcall_returned_with_success(env)) {
+    return mmec_new_emacs_value_from_intrep_bytevector(env, bv_copy);
+  } else {
+    return mmec_new_emacs_value_nil(env);
+  }
+}
+
+
+/** --------------------------------------------------------------------
  ** Bytevector user-pointer objects: inspection.
  ** ----------------------------------------------------------------- */
 
@@ -641,7 +678,7 @@ Fmmec_c_subbytevector (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void
  ** Elisp functions table.
  ** ----------------------------------------------------------------- */
 
-#define NUMBER_OF_MODULE_FUNCTIONS	(1+28+28+1 + 168)
+#define NUMBER_OF_MODULE_FUNCTIONS	(1+28+28+1 + 168 + 1)
 static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNCTIONS] = {
   /* Constructors. */
   {
@@ -649,7 +686,14 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
     .implementation	= Fmmec_make_bytevector,
     .min_arity		= 3,
     .max_arity		= 3,
-    .documentation	= "Build and return a new bytevector user pointer object."
+    .documentation	= "Build and return a new bytevector user-pointer object."
+  },
+  {
+    .name		= "mmec-c-copy-bytevector",
+    .implementation	= Fmmec_copy_bytevector,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Copy a user-pointer object of type `bytevector'."
   },
 
   /* Bytevector objects: getters. */

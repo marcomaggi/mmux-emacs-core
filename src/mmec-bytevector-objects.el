@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-03-05 07:31:34 marco>
+;; Time-stamp: <2020-03-05 10:24:36 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -95,16 +95,18 @@
   (let* ((BVTYPE	(mmec-sformat "mmec-%s-bytevector"		TYPESTEM))
 	 (BVTYPE-MAKER	(mmec-sformat "mmec-%s-bytevector--make"	TYPESTEM))
 	 (PARENT-BVTYPE	(mmec-sformat "mmec-%s-bytevector"		PARENT-STEM))
-	 (CONSTRUCTOR	BVTYPE)
+	 (MAKER-NAME	BVTYPE)
+	 (COPIER-NAME	(mmec-sformat "mmec-%s-bytevector--copier"	TYPESTEM))
 	 (DOCSTRING	(format "Build and return a new instance of `%s'." BVTYPE)))
     `(progn
        (cl-defstruct (,BVTYPE
 		      (:constructor	,BVTYPE-MAKER)
-		      (:include		,PARENT-BVTYPE)))
+		      (:include		,PARENT-BVTYPE)
+		      (:copier		,COPIER-NAME)))
 
-       (cl-defgeneric ,CONSTRUCTOR (number-of-slots)
+       (cl-defgeneric ,MAKER-NAME (number-of-slots)
 	 ,DOCSTRING)
-       (mmec-defmethod ,CONSTRUCTOR ((number-of-slots integer))
+       (mmec-defmethod ,MAKER-NAME ((number-of-slots integer))
 	 ,DOCSTRING
 	 (when (> 0 number-of-slots)
 	   (signal 'mmec-error-bytevector-constructor-invalid-number-of-slots (list --func-- number-of-slots)))
@@ -147,14 +149,38 @@
 (mmec--defbv double	floating-point)
 (mmec--defbv ldouble	floating-point)
 
-;; Define the standard constructors with names like "make-mmec-sint-bytevector".
+(cl-defgeneric copy-mmec-bytevector (BV)
+  "Build and return a copy of the bytevector BV.")
+
+;; Define the standard constructors with  names like "make-mmec-sint-bytevector" and standard copier
+;; functions with names like "copy-mmec-sint-bytevector".
 (cl-macrolet
     ((mmec--def (TYPE-OR-STEM)
-		(let* ((STEM		(intern (mmec--strip-prefix-from-symbol-name TYPE-OR-STEM)))
-		       (ALIAS-NAME	(mmec-sformat "make-mmec-%s-bytevector"	STEM))
-		       (BVTYPE		(mmec-sformat "mmec-%s-bytevector"	STEM))
-		       (DOCSTRING	(format "Standard constructor for the object type `%s'." BVTYPE)))
-		  `(defalias (quote ,ALIAS-NAME) (quote ,BVTYPE) ,DOCSTRING))))
+		(let* ((STEM			(intern (mmec--strip-prefix-from-symbol-name TYPE-OR-STEM)))
+		       (MAKER-NAME		(mmec-sformat "make-mmec-%s-bytevector"	      STEM))
+		       (COPIER-NAME		(mmec-sformat "copy-mmec-%s-bytevector"	      STEM))
+		       (BVTYPE			(mmec-sformat "mmec-%s-bytevector"	      STEM))
+		       (BVTYPE-OBJ		(mmec-sformat "mmec-%s-bytevector-obj"	      STEM))
+		       (COPIER-NAME		(mmec-sformat "copy-mmec-%s-bytevector"       STEM))
+		       (STRUCT-COPIER-NAME	(mmec-sformat "mmec-%s-bytevector--copier"    STEM))
+		       (MAKER-DOCSTRING		(format "Standard constructor for the object type `%s'." BVTYPE))
+		       (COPIER-DOCSTRING	(format "Build and return a copy of the bytevector BV of type `%s'." BVTYPE)))
+		  `(progn
+		     (defalias (quote ,MAKER-NAME) (quote ,BVTYPE) ,MAKER-DOCSTRING)
+
+		     (cl-defgeneric ,COPIER-NAME (BV)
+		       "Build and return a copy of the bytevector BV.")
+
+		     (cl-defmethod  ,COPIER-NAME ((original ,BVTYPE))
+		       ,COPIER-DOCSTRING
+		       (let ((copy (,STRUCT-COPIER-NAME original)))
+			 (setf (,BVTYPE-OBJ copy) (mmec-c-copy-bytevector (mmec--extract-obj ,BVTYPE original)))
+			 copy))
+
+		     (cl-defmethod copy-mmec-bytevector ((BV ,BVTYPE))
+		       "Build and return a copy of the bytevector BV."
+		       (,COPIER-NAME BV))
+		     ))))
   (mmec--def char)
   (mmec--def schar)
   (mmec--def uchar)

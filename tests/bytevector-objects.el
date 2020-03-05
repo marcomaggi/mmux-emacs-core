@@ -241,6 +241,54 @@
   (should 	(mmec-ldouble-bytevector-p		(mmec-ldouble-bytevector 123))))
 
 
+;;;; bytevector copiers
+
+(cl-macrolet
+    ((mmec--def (TYPESTEM)
+		(let* ((TESTNAME		(mmec-sformat "mmec-%s-bytevector-copier" TYPESTEM))
+		       (NUMTYPE			(mmec-sformat "mmec-%s" TYPESTEM))
+		       (BVTYPE			(mmec-sformat "mmec-%s-bytevector" TYPESTEM))
+		       (BVTYPE-FROM-VECTOR	(mmec-sformat "%s-from-vector" BVTYPE))
+		       (COPY-BVTYPE		(mmec-sformat "copy-%s" BVTYPE))
+		       (TEST-DOCSTRING		(format "Test copiers for a `%s' object." BVTYPE)))
+		  `(ert-deftest ,TESTNAME ()
+		     ,TEST-DOCSTRING
+		     (let* ((org	(,BVTYPE-FROM-VECTOR [10 11 12 13 14 15]))
+			    (copy	(,COPY-BVTYPE org)))
+		       (should (mmec-bytevector-equal org copy)))
+		     (let* ((org	(,BVTYPE-FROM-VECTOR [10 11 12 13 14 15]))
+			    (copy	(copy-mmec-bytevector org)))
+		       (should (mmec-bytevector-equal org copy)))))))
+  (mmec--def char)
+  (mmec--def schar)
+  (mmec--def uchar)
+  (mmec--def wchar)
+  (mmec--def sshrt)
+  (mmec--def ushrt)
+  (mmec--def sint)
+  (mmec--def uint)
+  (mmec--def slong)
+  (mmec--def ulong)
+  (mmec--def sllong)
+  (mmec--def ullong)
+  (mmec--def sintmax)
+  (mmec--def uintmax)
+  (mmec--def ssize)
+  (mmec--def usize)
+  (mmec--def ptrdiff)
+  (mmec--def sint8)
+  (mmec--def uint8)
+  (mmec--def sint16)
+  (mmec--def uint16)
+  (mmec--def sint32)
+  (mmec--def uint32)
+  (mmec--def sint64)
+  (mmec--def uint64)
+  (mmec--def float)
+  (mmec--def double)
+  (mmec--def ldouble))
+
+
 ;;;; bytevector objects: getters and setters
 
 (cl-macrolet

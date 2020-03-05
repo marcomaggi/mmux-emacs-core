@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-03-05 07:22:38 marco>
+;; Time-stamp: <2020-03-05 07:31:34 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -91,16 +91,16 @@
 
 ;;;; bytevector type definitions
 
-(defmacro mmec--define-bytevector-type (TYPESTEM PARENT-STEM)
-  (let* ((BYTEVECTOR-TYPE		(mmec-sformat "mmec-%s-bytevector"		TYPESTEM))
-	 (BYTEVECTOR-TYPE-MAKER		(mmec-sformat "mmec-%s-bytevector--make"	TYPESTEM))
-	 (PARENT-BYTEVECTOR-TYPE	(mmec-sformat "mmec-%s-bytevector"		PARENT-STEM))
-	 (CONSTRUCTOR			BYTEVECTOR-TYPE)
-	 (DOCSTRING			(format "Build and return a new instance of `mmec-%s-bytevector'." TYPESTEM)))
+(defmacro mmec--defbv (TYPESTEM PARENT-STEM)
+  (let* ((BVTYPE	(mmec-sformat "mmec-%s-bytevector"		TYPESTEM))
+	 (BVTYPE-MAKER	(mmec-sformat "mmec-%s-bytevector--make"	TYPESTEM))
+	 (PARENT-BVTYPE	(mmec-sformat "mmec-%s-bytevector"		PARENT-STEM))
+	 (CONSTRUCTOR	BVTYPE)
+	 (DOCSTRING	(format "Build and return a new instance of `%s'." BVTYPE)))
     `(progn
-       (cl-defstruct (,BYTEVECTOR-TYPE
-		      (:constructor	,BYTEVECTOR-TYPE-MAKER)
-		      (:include		,PARENT-BYTEVECTOR-TYPE)))
+       (cl-defstruct (,BVTYPE
+		      (:constructor	,BVTYPE-MAKER)
+		      (:include		,PARENT-BVTYPE)))
 
        (cl-defgeneric ,CONSTRUCTOR (number-of-slots)
 	 ,DOCSTRING)
@@ -108,7 +108,7 @@
 	 ,DOCSTRING
 	 (when (> 0 number-of-slots)
 	   (signal 'mmec-error-bytevector-constructor-invalid-number-of-slots (list --func-- number-of-slots)))
-	 (mmec--make ,BYTEVECTOR-TYPE
+	 (mmec--make ,BVTYPE
 		     :number-of-slots		number-of-slots
 		     :slot-size			(mmec-sizeof-number-type ,TYPESTEM)
 		     :signed-p			(mmec-number-type-is-signed-p ,TYPESTEM)
@@ -118,34 +118,34 @@
 		     :number-of-allocated-bytes	(* number-of-slots (mmec-sizeof-number-type ,TYPESTEM))))
        )))
 
-(mmec--define-bytevector-type char	signed-integer)
-(mmec--define-bytevector-type schar	signed-integer)
-(mmec--define-bytevector-type uchar	unsigned-integer)
-(mmec--define-bytevector-type wchar	signed-integer)
-(mmec--define-bytevector-type sshrt	signed-integer)
-(mmec--define-bytevector-type ushrt	unsigned-integer)
-(mmec--define-bytevector-type sint	signed-integer)
-(mmec--define-bytevector-type uint	unsigned-integer)
-(mmec--define-bytevector-type slong	signed-integer)
-(mmec--define-bytevector-type ulong	unsigned-integer)
-(mmec--define-bytevector-type sllong	signed-integer)
-(mmec--define-bytevector-type ullong	unsigned-integer)
-(mmec--define-bytevector-type sintmax	signed-integer)
-(mmec--define-bytevector-type uintmax	unsigned-integer)
-(mmec--define-bytevector-type ssize	signed-integer)
-(mmec--define-bytevector-type usize	unsigned-integer)
-(mmec--define-bytevector-type ptrdiff	signed-integer)
-(mmec--define-bytevector-type sint8	signed-integer)
-(mmec--define-bytevector-type uint8	unsigned-integer)
-(mmec--define-bytevector-type sint16	signed-integer)
-(mmec--define-bytevector-type uint16	unsigned-integer)
-(mmec--define-bytevector-type sint32	signed-integer)
-(mmec--define-bytevector-type uint32	unsigned-integer)
-(mmec--define-bytevector-type sint64	signed-integer)
-(mmec--define-bytevector-type uint64	unsigned-integer)
-(mmec--define-bytevector-type float	floating-point)
-(mmec--define-bytevector-type double	floating-point)
-(mmec--define-bytevector-type ldouble	floating-point)
+(mmec--defbv char	signed-integer)
+(mmec--defbv schar	signed-integer)
+(mmec--defbv uchar	unsigned-integer)
+(mmec--defbv wchar	signed-integer)
+(mmec--defbv sshrt	signed-integer)
+(mmec--defbv ushrt	unsigned-integer)
+(mmec--defbv sint	signed-integer)
+(mmec--defbv uint	unsigned-integer)
+(mmec--defbv slong	signed-integer)
+(mmec--defbv ulong	unsigned-integer)
+(mmec--defbv sllong	signed-integer)
+(mmec--defbv ullong	unsigned-integer)
+(mmec--defbv sintmax	signed-integer)
+(mmec--defbv uintmax	unsigned-integer)
+(mmec--defbv ssize	signed-integer)
+(mmec--defbv usize	unsigned-integer)
+(mmec--defbv ptrdiff	signed-integer)
+(mmec--defbv sint8	signed-integer)
+(mmec--defbv uint8	unsigned-integer)
+(mmec--defbv sint16	signed-integer)
+(mmec--defbv uint16	unsigned-integer)
+(mmec--defbv sint32	signed-integer)
+(mmec--defbv uint32	unsigned-integer)
+(mmec--defbv sint64	signed-integer)
+(mmec--defbv uint64	unsigned-integer)
+(mmec--defbv float	floating-point)
+(mmec--defbv double	floating-point)
+(mmec--defbv ldouble	floating-point)
 
 ;; Define the standard constructors with names like "make-mmec-sint-bytevector".
 (cl-macrolet

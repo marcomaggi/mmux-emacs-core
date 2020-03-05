@@ -1924,7 +1924,8 @@ false.
 
 
 @deffn {Generic Function} mmec-\TYPESTEM\-bytevector @var{NUMBER-OF-SLOTS}
-@deffnx {Generic Function} mmec-\TYPESTEM\-bytevector ((@var{NUMBER-OF-SLOTS} integer))
+@deffnx {Method} mmec-\TYPESTEM\-bytevector ((@var{NUMBER-OF-SLOTS} integer))
+@deffnx {Alias} make-mmec-\TYPESTEM\-bytevector @var{NUMBER-OF-SLOTS}
 Build and return a new @objtype{mmec-\TYPESTEM\-bytevector}.
 
 The argument @var{NUMBER-OF-SLOTS} must be a non--negative exact integer representing the number of

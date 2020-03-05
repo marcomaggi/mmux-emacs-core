@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-03-05 06:51:05 marco>
+;; Time-stamp: <2020-03-05 07:22:38 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -146,6 +146,43 @@
 (mmec--define-bytevector-type float	floating-point)
 (mmec--define-bytevector-type double	floating-point)
 (mmec--define-bytevector-type ldouble	floating-point)
+
+;; Define the standard constructors with names like "make-mmec-sint-bytevector".
+(cl-macrolet
+    ((mmec--def (TYPE-OR-STEM)
+		(let* ((STEM		(intern (mmec--strip-prefix-from-symbol-name TYPE-OR-STEM)))
+		       (ALIAS-NAME	(mmec-sformat "make-mmec-%s-bytevector"	STEM))
+		       (BVTYPE		(mmec-sformat "mmec-%s-bytevector"	STEM))
+		       (DOCSTRING	(format "Standard constructor for the object type `%s'." BVTYPE)))
+		  `(defalias (quote ,ALIAS-NAME) (quote ,BVTYPE) ,DOCSTRING))))
+  (mmec--def char)
+  (mmec--def schar)
+  (mmec--def uchar)
+  (mmec--def wchar)
+  (mmec--def sshrt)
+  (mmec--def ushrt)
+  (mmec--def sint)
+  (mmec--def uint)
+  (mmec--def slong)
+  (mmec--def ulong)
+  (mmec--def sllong)
+  (mmec--def ullong)
+  (mmec--def ssize)
+  (mmec--def usize)
+  (mmec--def sintmax)
+  (mmec--def uintmax)
+  (mmec--def ptrdiff)
+  (mmec--def sint8)
+  (mmec--def uint8)
+  (mmec--def sint16)
+  (mmec--def uint16)
+  (mmec--def sint32)
+  (mmec--def uint32)
+  (mmec--def sint64)
+  (mmec--def uint64)
+  (mmec--def float)
+  (mmec--def double)
+  (mmec--def ldouble))
 
 
 ;;;; bytevector objects: inspection functions

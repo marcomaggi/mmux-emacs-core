@@ -45,6 +45,7 @@
 
 (ert-deftest mmec-uint8-bytevector ()
   "Build a `mmec-uint8-bytevector' object."
+  (should	(mmec-bytevector-p			(make-mmec-uint8-bytevector 123)))
   (should	(mmec-bytevector-p			(mmec-uint8-bytevector 123)))
   (should	(mmec-integer-bytevector-p		(mmec-uint8-bytevector 123)))
   (should (not	(mmec-floating-point-bytevector-p	(mmec-uint8-bytevector 123))))
@@ -62,6 +63,7 @@
 
 (ert-deftest mmec-sint8-bytevector ()
   "Build a `mmec-sint8-bytevector' object."
+  (should	(mmec-bytevector-p			(make-mmec-sint8-bytevector 123)))
   (should	(mmec-bytevector-p			(mmec-sint8-bytevector 123)))
   (should	(mmec-integer-bytevector-p		(mmec-sint8-bytevector 123)))
   (should (not	(mmec-floating-point-bytevector-p	(mmec-sint8-bytevector 123))))

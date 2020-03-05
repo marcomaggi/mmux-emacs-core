@@ -1126,16 +1126,18 @@ Given an instance of @objtype{mmec-\ETYPESTEM\}: return its internal representat
 @c ------------------------------------------------------------------------
 
 @macro ElispNumberValueDefaultMethods{ETYPESTEM, CTYPE, EANCESTORTYPESTEM, ENORMTYPESTEM, INTREPDESCR}
-@deffn {Generic Function} mmec-\ETYPESTEM\ @var{INIT}
+@deftypefn {Generic Function} mmec-\ETYPESTEM\ mmec-\ETYPESTEM\ @var{INIT}
+@deftypefnx {Alias} mmec-\ETYPESTEM\ make-mmec-\ETYPESTEM\ @var{INIT}
 Constructor for number of objects of type @objtype{mmec-\ETYPESTEM\}.  The argument @var{INIT} must be a
 number value.
-@end deffn
+@end deftypefn
 
 
-@deffn {Method} mmec-\ETYPESTEM\ (@var{INIT} mmec-\ETYPESTEM\)
+@deftypefn {Method} mmec-\ETYPESTEM\ mmec-\ETYPESTEM\ (@var{INIT} mmec-\ETYPESTEM\)
+@deftypefnx {Function} mmec-\ETYPESTEM\ copy-mmec-\ETYPESTEM\ @var{INIT}
 This is the copy constructor implemented as method.  This method creates a duplicate of the
 @var{INIT} value, but it reuses the internal representation (which is immutable).
-@end deffn
+@end deftypefn
 
 
 @deffn {Method} cl-print-object (@var{OBJ} mmec-\ETYPESTEM\) @var{STREAM}

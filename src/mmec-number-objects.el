@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-03-05 06:46:57 marco>
+;; Time-stamp: <2020-03-05 07:13:32 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -294,7 +294,7 @@ Example:
 (cl-macrolet ((mmec--define-abstract-type-constructor
 	       (TYPE)
 	       `(defun ,TYPE (&rest args)
-		  (signal 'mmux-core-instantiating-abstract-type (quote ,TYPE)))))
+		  (signal 'mmec-error-instantiating-abstract-type (quote ,TYPE)))))
   (mmec--define-abstract-type-constructor mmec-number)
   (mmec--define-abstract-type-constructor mmec-integer)
   (mmec--define-abstract-type-constructor mmec-signed-integer)
@@ -2349,6 +2349,45 @@ The argument INIT is an instance of `mmec-double'."
 This  constructor method  signals that  the given  initialisation
 argument is invalid."
   (signal 'mmec-error-unsupported-init-type (list 'mmec-ldouble init)))
+
+
+;;;; standard definitions
+
+(cl-macrolet
+    ((mmec--def (TYPE-OR-STEM)
+		(let* ((STEM		(intern (mmec--strip-prefix-from-symbol-name TYPE-OR-STEM)))
+		       (ALIAS-NAME	(mmec-sformat "make-mmec-%s"	STEM))
+		       (NUMTYPE		(mmec-sformat "mmec-%s"		STEM))
+		       (DOCSTRING	(format "Standard constructor for the object type `%s'." NUMTYPE)))
+		  `(defalias (quote ,ALIAS-NAME) (quote ,NUMTYPE) ,DOCSTRING))))
+  (mmec--def char)
+  (mmec--def schar)
+  (mmec--def uchar)
+  (mmec--def wchar)
+  (mmec--def sshrt)
+  (mmec--def ushrt)
+  (mmec--def sint)
+  (mmec--def uint)
+  (mmec--def slong)
+  (mmec--def ulong)
+  (mmec--def sllong)
+  (mmec--def ullong)
+  (mmec--def ssize)
+  (mmec--def usize)
+  (mmec--def sintmax)
+  (mmec--def uintmax)
+  (mmec--def ptrdiff)
+  (mmec--def sint8)
+  (mmec--def uint8)
+  (mmec--def sint16)
+  (mmec--def uint16)
+  (mmec--def sint32)
+  (mmec--def uint32)
+  (mmec--def sint64)
+  (mmec--def uint64)
+  (mmec--def float)
+  (mmec--def double)
+  (mmec--def ldouble))
 
 
 ;;;; range inclusion

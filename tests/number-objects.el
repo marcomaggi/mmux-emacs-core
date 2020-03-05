@@ -125,18 +125,22 @@
 
 (cl-macrolet
     ((mmec--def (TYPESTEM ARGSTEM PROPERTY)
-		(let* ((TESTNAME-MIN	(mmec-sformat "mmec-test-%s-constructors-%s-min" TYPESTEM ARGSTEM))
-		       (TESTNAME-MAX	(mmec-sformat "mmec-test-%s-constructors-%s-max" TYPESTEM ARGSTEM))
+		(let* ((TESTNAME-ALIAS	(mmec-sformat "mmec-test-%s-constructors-%s-alias" TYPESTEM ARGSTEM))
+		       (TESTNAME-MIN	(mmec-sformat "mmec-test-%s-constructors-%s-min"   TYPESTEM ARGSTEM))
+		       (TESTNAME-MAX	(mmec-sformat "mmec-test-%s-constructors-%s-max"   TYPESTEM ARGSTEM))
 		       (NUMTYPE		(mmec-sformat "mmec-%s" TYPESTEM))
 		       (ARGTYPE		(mmec-sformat "mmec-%s" TYPESTEM))
-		       (CONSTRUCTOR	NUMTYPE))
+		       (CONSTRUCTOR	NUMTYPE)
+		       (ALIAS-CTOR	(mmec-sformat "make-mmec-%s" TYPESTEM)))
 		  ;;(mmec-debug-print TYPESTEM ARGSTEM PROPERTY)
 		  (cl-case PROPERTY
 		    (fits		`(progn
 					   (ert-deftest ,TESTNAME-MIN ()
 					     (should (mmec-number-type-p ,TYPESTEM (,CONSTRUCTOR (mmec-limit-min ,ARGSTEM)))))
 					   (ert-deftest ,TESTNAME-MAX ()
-					     (should (mmec-number-type-p ,TYPESTEM (,CONSTRUCTOR (mmec-limit-max ,ARGSTEM)))))))
+					     (should (mmec-number-type-p ,TYPESTEM (,CONSTRUCTOR (mmec-limit-max ,ARGSTEM)))))
+					   (ert-deftest ,TESTNAME-ALIAS ()
+					     (should (mmec-number-type-p ,TYPESTEM (,ALIAS-CTOR  (mmec-limit-max ,ARGSTEM)))))))
 		    (no-fits		`(progn
 					   ;;We  include this  conditionally because  unsigned types
 					   ;;have zero as minimum, so they will always fit.
@@ -376,6 +380,48 @@
 
   ;; End of outer CL-MACROLET.
   )
+
+
+;;;; copy constructor
+
+(cl-macrolet
+    ((mmec--def (TYPESTEM)
+		(let* ((TESTNAME	(mmec-sformat "mmec-test-%s-copy-constructor" TYPESTEM))
+		       (NUMTYPE		(mmec-sformat "mmec-%s" TYPESTEM))
+		       (CONSTRUCTOR	NUMTYPE)
+		       (COPY-CTOR	(mmec-sformat "copy-%s" NUMTYPE)))
+		  `(ert-deftest ,TESTNAME ()
+		     (let* ((org	(,CONSTRUCTOR 123))
+			    (copy	(,COPY-CTOR org)))
+		       (should (mmec= org copy)))))))
+  (mmec--def char)
+  (mmec--def schar)
+  (mmec--def uchar)
+  (mmec--def wchar)
+  (mmec--def sshrt)
+  (mmec--def ushrt)
+  (mmec--def sint)
+  (mmec--def uint)
+  (mmec--def slong)
+  (mmec--def ulong)
+  (mmec--def sllong)
+  (mmec--def ullong)
+  (mmec--def ssize)
+  (mmec--def usize)
+  (mmec--def sintmax)
+  (mmec--def uintmax)
+  (mmec--def ptrdiff)
+  (mmec--def sint8)
+  (mmec--def uint8)
+  (mmec--def sint16)
+  (mmec--def uint16)
+  (mmec--def sint32)
+  (mmec--def uint32)
+  (mmec--def sint64)
+  (mmec--def uint64)
+  (mmec--def float)
+  (mmec--def double)
+  (mmec--def ldouble))
 
 
 ;;;; equality tests

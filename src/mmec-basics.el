@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-03-05 06:37:17 marco>
+;; Time-stamp: <2020-03-05 12:38:17 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -264,6 +264,22 @@ Optional argument STUFF must be the meat of the function definition."
   (declare (indent defun))
   `(cl-symbol-macrolet ((--func-- (quote ,FUNCNAME)))
      (cl-defun ,FUNCNAME ,@STUFF)))
+
+(defmacro mmec-defmacro (MACNAME &rest STUFF)
+  "Wrapper for `cl-defmacro' defined by MMUX Emacs Core.
+
+Define  a macro  like `cl-defmacro'  does with  the same  arguments.  In
+addition: the  whole definition  is wrapped into  a `cl-symbol-macrolet'
+form  defining the  special  constant `--func--'  which  expands to  the
+quoted function name.
+
+Argument  MACNAME  must  be  a  symbol representing  the  name  of  the
+function.
+
+Optional argument STUFF must be the meat of the function definition."
+  (declare (indent defun))
+  `(cl-symbol-macrolet ((--func-- (quote ,MACNAME)))
+     (cl-defmacro ,MACNAME ,@STUFF)))
 
 (defmacro mmec-defmethod (FUNCNAME &rest STUFF)
   "Wrapper for the macro `cl-defmethod' defined by MMUX Emacs Core.

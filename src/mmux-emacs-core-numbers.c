@@ -138,7 +138,8 @@ MMEC_DEFINE_SIGNED_NORMALISED_TYPE_FITS_FUNC(ldouble,	ldouble,	LDOUBLE)
 #undef  MMEC_DEFINE_INTEGER_NUMBER_CONSTRUCTOR
 #define MMEC_DEFINE_INTEGER_NUMBER_CONSTRUCTOR(BSTEM, NSTEM)		\
   emacs_value								\
-  Fmmec_make_integer_ ## BSTEM ## _from_usrptr_ ## NSTEM (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED) \
+  Fmmec_make_elisp_integer_ ## BSTEM ## _from_usrptr_ ## NSTEM		\
+  (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED) \
   {									\
     assert(nargs == 1);							\
     mmec_clang_ ## NSTEM ## _t nval =					\
@@ -179,7 +180,8 @@ MMEC_DEFINE_INTEGER_NUMBER_CONSTRUCTOR(uint16,	uint64)
 #undef  MMEC_DEFINE_FLOAT_NUMBER_CONSTRUCTOR
 #define MMEC_DEFINE_FLOAT_NUMBER_CONSTRUCTOR(BSTEM, NSTEM)		\
   emacs_value								\
-  Fmmec_make_elisp_float_from_usrptr_ ## NSTEM (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED) \
+  Fmmec_make_elisp_float_ ## BSTEM ## _from_usrptr_ ## NSTEM		\
+  (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED) \
   {									\
     assert(nargs == 1);							\
     mmec_clang_ ## NSTEM ## _t nval =					\
@@ -314,7 +316,6 @@ MMEC_DEFINE_FLOAT_NUMBER_CONSTRUCTOR(double,	ldouble)
   MMEC_DEFINE_USRPTR_BASE_TYPE_FUNCTIONS(BSTEM)			\
   MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(BSTEM, NSTEM)
 
-MMEC_DEFINE_USRPTR_BASE_TYPE(wchar,	sint64)
 MMEC_DEFINE_USRPTR_BASE_TYPE(sint,	sint64)
 MMEC_DEFINE_USRPTR_BASE_TYPE(uint,	uint64)
 MMEC_DEFINE_USRPTR_BASE_TYPE(slong,	sint64)
@@ -325,6 +326,7 @@ MMEC_DEFINE_USRPTR_BASE_TYPE(sintmax,	sint64)
 MMEC_DEFINE_USRPTR_BASE_TYPE(uintmax,	uint64)
 MMEC_DEFINE_USRPTR_BASE_TYPE(ssize,	sint64)
 MMEC_DEFINE_USRPTR_BASE_TYPE(usize,	uint64)
+MMEC_DEFINE_USRPTR_BASE_TYPE(wchar,	sint64)
 MMEC_DEFINE_USRPTR_BASE_TYPE(ptrdiff,	sint64)
 MMEC_DEFINE_USRPTR_BASE_TYPE(sint32,	sint64)
 MMEC_DEFINE_USRPTR_BASE_TYPE(uint32,	uint64)
@@ -357,7 +359,7 @@ MMEC_DEFINE_USRPTR_BASE_TYPE_FUNCTIONS(ldouble)
  */
 #undef  MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR
 #define MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(BSTEM, ARGSTEM, ARGINTREP) \
-  emacs_value								\
+  static emacs_value								\
   Fmmec_make_usrptr_ ## BSTEM ## _from_ ## ARGINTREP ## _ ## ARGSTEM	\
   (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED) \
   {									\
@@ -399,7 +401,7 @@ MMEC_DEFINE_USRPTR_BASE_TYPE_ELISP_CONSTRUCTOR(ldouble,		ldouble,	usrptr)
 
 /* ------------------------------------------------------------------ */
 
-emacs_value
+static emacs_value
 Fmmec_make_usrptr_sint64_from_elisp_integer (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
 {
   assert(nargs == 1);
@@ -408,7 +410,7 @@ Fmmec_make_usrptr_sint64_from_elisp_integer (emacs_env *env, ptrdiff_t nargs, em
   return mmec_new_emacs_value_from_clang_sint64(env, val);
 }
 
-emacs_value
+static emacs_value
 Fmmec_make_usrptr_sint64_from_elisp_float (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
 {
   assert(nargs == 1);
@@ -419,7 +421,7 @@ Fmmec_make_usrptr_sint64_from_elisp_float (emacs_env *env, ptrdiff_t nargs, emac
 
 /* ------------------------------------------------------------------ */
 
-emacs_value
+static emacs_value
 Fmmec_make_usrptr_uint64_from_elisp_integer (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
 {
   assert(nargs == 1);
@@ -428,7 +430,7 @@ Fmmec_make_usrptr_uint64_from_elisp_integer (emacs_env *env, ptrdiff_t nargs, em
   return mmec_new_emacs_value_from_clang_uint64(env, val);
 }
 
-emacs_value
+static emacs_value
 Fmmec_make_usrptr_uint64_from_elisp_float (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
 {
   assert(nargs == 1);
@@ -439,7 +441,7 @@ Fmmec_make_usrptr_uint64_from_elisp_float (emacs_env *env, ptrdiff_t nargs, emac
 
 /* ------------------------------------------------------------------ */
 
-emacs_value
+static emacs_value
 Fmmec_make_usrptr_ldouble_from_usrptr_sint64 (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
 {
   assert(nargs == 1);
@@ -448,7 +450,7 @@ Fmmec_make_usrptr_ldouble_from_usrptr_sint64 (emacs_env *env, ptrdiff_t nargs, e
   return mmec_new_emacs_value_from_clang_ldouble(env, val);
 }
 
-emacs_value
+static emacs_value
 Fmmec_make_usrptr_ldouble_from_usrptr_uint64 (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
 {
   assert(nargs == 1);
@@ -457,11 +459,20 @@ Fmmec_make_usrptr_ldouble_from_usrptr_uint64 (emacs_env *env, ptrdiff_t nargs, e
   return mmec_new_emacs_value_from_clang_ldouble(env, val);
 }
 
-emacs_value
+static emacs_value
 Fmmec_make_usrptr_ldouble_from_elisp_float (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
 {
   assert(nargs == 1);
   mmec_clang_double_t argval = mmec_extract_elisp_float_from_emacs_value(env, args[0]);
+  MMEC_CAST(mmec_clang_ldouble_t, val, argval);
+  return mmec_new_emacs_value_from_clang_ldouble(env, val);
+}
+
+static emacs_value
+Fmmec_make_usrptr_ldouble_from_elisp_integer (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED)
+{
+  assert(nargs == 1);
+  mmec_clang_double_t argval = mmec_extract_elisp_integer_from_emacs_value(env, args[0]);
   MMEC_CAST(mmec_clang_ldouble_t, val, argval);
   return mmec_new_emacs_value_from_clang_ldouble(env, val);
 }
@@ -534,7 +545,7 @@ MMEC_COMPARISON_OPERATIONS2(uint64, sint64)
 
 #undef  MMEC_DEFINE_PRINT_FUNCTION
 #define MMEC_DEFINE_PRINT_FUNCTION(STEM, TEMPLATE, CASTER)		\
-  emacs_value								\
+  static emacs_value								\
   Fmmec_c_ ## STEM ## _print_to_string (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED) \
   {									\
     assert(1 == nargs);							\
@@ -584,109 +595,216 @@ MMEC_DEFINE_PRINT_FUNCTION(ldouble,	"%Lg"		,)
 
 
 /** --------------------------------------------------------------------
- ** Elisp functions table.
+ ** Sign inspection functions.
  ** ----------------------------------------------------------------- */
 
-#define NUMBER_OF_MODULE_FUNCTIONS	133
-static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNCTIONS] = {
-  /* Constructors  for  custom number  objects  whose  internal representation  is  a
-     built-in "integer" object. */
-  {
-    .name		= "mmec-c-make-integer-char-from-usrptr-sint64",
-    .implementation	= Fmmec_make_integer_char_from_usrptr_sint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Build and return the internal representation of `mmec-char' value.",
-  },
-  {
-    .name		= "mmec-c-make-integer-schar-from-usrptr-sint64",
-    .implementation	= Fmmec_make_integer_schar_from_usrptr_sint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Build and return the internal representation of `mmec-schar' value.",
-  },
-  {
-    .name		= "mmec-c-make-integer-uchar-from-usrptr-uint64",
-    .implementation	= Fmmec_make_integer_uchar_from_usrptr_uint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Build and return the internal representation of `mmec-uchar' value.",
-  },
-  {
-    .name		= "mmec-c-make-integer-sshrt-from-usrptr-sint64",
-    .implementation	= Fmmec_make_integer_sshrt_from_usrptr_sint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Build and return the internal representation of `mmec-sshrt' value.",
-  },
-  {
-    .name		= "mmec-c-make-integer-ushrt-from-usrptr-uint64",
-    .implementation	= Fmmec_make_integer_ushrt_from_usrptr_uint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Build and return the internal representation of `mmec-ushrt' value.",
-  },
-  {
-    .name		= "mmec-c-make-integer-sint8-from-usrptr-sint64",
-    .implementation	= Fmmec_make_integer_sint8_from_usrptr_sint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Build and return the internal representation of `mmec-sint8' value..",
-  },
-  {
-    .name		= "mmec-c-make-integer-uint8-from-usrptr-uint64",
-    .implementation	= Fmmec_make_integer_uint8_from_usrptr_uint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Build and return the internal representation of `mmec-uint8' value.",
-  },
-  {
-    .name		= "mmec-c-make-integer-sint16-from-usrptr-sint64",
-    .implementation	= Fmmec_make_integer_sint16_from_usrptr_sint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Build and return the internal representation of `mmec-sint16' value.",
-  },
-  {
-    .name		= "mmec-c-make-integer-uint16-from-usrptr-uint64",
-    .implementation	= Fmmec_make_integer_uint16_from_usrptr_uint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Build and return the internal representation of `mmec-uint16' value.",
-  },
+#undef  MMEC_DEFINE_SIGN_FUNCTION_TEMPLATE
+#define MMEC_DEFINE_SIGN_FUNCTION_TEMPLATE(FUNCSTEM, TYPESTEM, ZERO, OP) \
+  static emacs_value							\
+  Fmmec_c_ ## TYPESTEM ## _ ## FUNCSTEM ##_p				\
+  (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void * elisp_func_data MMEC_UNUSED) \
+  {									\
+    assert(1 == nargs);							\
+    mmec_clang_ ## TYPESTEM ## _t val = mmec_extract_clang_ ## TYPESTEM ## _from_emacs_value(env, args[0]); \
+    return mmec_new_emacs_value_boolean(env, (ZERO OP val)? true : false); \
+  }
 
-  /* Constructors  for  custom number  objects  whose  internal representation  is  a
-     built-in "float" object. */
-  {
-    .name		= "mmec-c-make-elisp-float-from-usrptr-ldouble",
-    .implementation	= Fmmec_make_elisp_float_from_usrptr_ldouble,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Build and return the internal representation of `mmec-double' value.",
-  },
+#undef  MMEC_DEFINE_SIGN_FUNCTION_TRUE
+#define MMEC_DEFINE_SIGN_FUNCTION_TRUE(FUNCSTEM, TYPESTEM)		\
+  static emacs_value							\
+  Fmmec_c_ ## TYPESTEM ## _ ## FUNCSTEM ##_p				\
+  (emacs_env *env, ptrdiff_t nargs, emacs_value args[] MMEC_UNUSED, void * elisp_func_data MMEC_UNUSED) \
+  {									\
+    assert(1 == nargs);							\
+    return mmec_new_emacs_value_true(env);				\
+  }
 
-  /* Constructors  for  custom number  objects  whose  internal representation  is  a
-     user-pointer object. */
+#undef  MMEC_DEFINE_SIGN_FUNCTION_FALSE
+#define MMEC_DEFINE_SIGN_FUNCTION_FALSE(FUNCSTEM, TYPESTEM)		\
+  static emacs_value							\
+  Fmmec_c_ ## TYPESTEM ## _ ## FUNCSTEM ##_p				\
+  (emacs_env *env, ptrdiff_t nargs, emacs_value args[] MMEC_UNUSED, void * elisp_func_data MMEC_UNUSED) \
+  {									\
+    assert(1 == nargs);							\
+    return mmec_new_emacs_value_nil(env);				\
+  }
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_SIGN_FUNCTIONS
+#define MMEC_DEFINE_SIGN_FUNCTIONS(TYPESTEM, ZERO)			\
+  MMEC_DEFINE_SIGN_FUNCTION_TEMPLATE(zero,		TYPESTEM, ZERO, ==) \
+    MMEC_DEFINE_SIGN_FUNCTION_TEMPLATE(positive,	TYPESTEM, ZERO,  <) \
+    MMEC_DEFINE_SIGN_FUNCTION_TEMPLATE(negative,	TYPESTEM, ZERO,  >) \
+    MMEC_DEFINE_SIGN_FUNCTION_TEMPLATE(non_positive,	TYPESTEM, ZERO, >=) \
+    MMEC_DEFINE_SIGN_FUNCTION_TEMPLATE(non_negative,	TYPESTEM, ZERO, <=)
+
+MMEC_DEFINE_SIGN_FUNCTIONS(char,	0)
+MMEC_DEFINE_SIGN_FUNCTIONS(schar,	0)
+MMEC_DEFINE_SIGN_FUNCTIONS(sshrt,	0)
+MMEC_DEFINE_SIGN_FUNCTIONS(sint,	0)
+MMEC_DEFINE_SIGN_FUNCTIONS(slong,	0L)
+MMEC_DEFINE_SIGN_FUNCTIONS(sllong,	0LL)
+MMEC_DEFINE_SIGN_FUNCTIONS(sintmax,	0L)
+MMEC_DEFINE_SIGN_FUNCTIONS(ssize,	0L)
+MMEC_DEFINE_SIGN_FUNCTIONS(wchar,	0)
+MMEC_DEFINE_SIGN_FUNCTIONS(ptrdiff,	0)
+MMEC_DEFINE_SIGN_FUNCTIONS(sint8,	0)
+MMEC_DEFINE_SIGN_FUNCTIONS(sint16,	0)
+MMEC_DEFINE_SIGN_FUNCTIONS(sint32,	0)
+MMEC_DEFINE_SIGN_FUNCTIONS(sint64,	0LL)
+MMEC_DEFINE_SIGN_FUNCTIONS(float,	0.0F)
+MMEC_DEFINE_SIGN_FUNCTIONS(double,	0.0)
+MMEC_DEFINE_SIGN_FUNCTIONS(ldouble,	0.0L)
+
+/* ------------------------------------------------------------------ */
+
+#undef  MMEC_DEFINE_SIGN_FUNCTIONS
+#define MMEC_DEFINE_SIGN_FUNCTIONS(TYPESTEM, ZERO)			\
+  MMEC_DEFINE_SIGN_FUNCTION_TEMPLATE(zero,		TYPESTEM, ZERO, ==) \
+    MMEC_DEFINE_SIGN_FUNCTION_TRUE(positive,		TYPESTEM)	\
+    MMEC_DEFINE_SIGN_FUNCTION_FALSE(negative,		TYPESTEM)	\
+    MMEC_DEFINE_SIGN_FUNCTION_TEMPLATE(non_positive,	TYPESTEM, ZERO, ==) \
+    MMEC_DEFINE_SIGN_FUNCTION_TRUE(non_negative,	TYPESTEM)
+
+MMEC_DEFINE_SIGN_FUNCTIONS(uchar,	0)
+MMEC_DEFINE_SIGN_FUNCTIONS(ushrt,	0)
+MMEC_DEFINE_SIGN_FUNCTIONS(uint,	0)
+MMEC_DEFINE_SIGN_FUNCTIONS(ulong,	0UL)
+MMEC_DEFINE_SIGN_FUNCTIONS(ullong,	0ULL)
+MMEC_DEFINE_SIGN_FUNCTIONS(uintmax,	0L)
+MMEC_DEFINE_SIGN_FUNCTIONS(usize,	0UL)
+MMEC_DEFINE_SIGN_FUNCTIONS(uint8,	0)
+MMEC_DEFINE_SIGN_FUNCTIONS(uint16,	0)
+MMEC_DEFINE_SIGN_FUNCTIONS(uint32,	0)
+MMEC_DEFINE_SIGN_FUNCTIONS(uint64,	0ULL)
+
+
+/** --------------------------------------------------------------------
+ ** Elisp functions table: constructors, signed integers, integer intrep.
+ ** ----------------------------------------------------------------- */
+
+/* Constructors  for  custom  number  objects  representing  signed  integers,  whose
+ * internal representation is an Emacs built-in "integer" value.
+ */
+#define MODULE_FUNCTIONS__CONSTRUCTORS__SIGNED_INTEGERS__INTREP_INTEGER		5
+static mmec_module_function_t const
+  module_functions__constructors__signed_integers__intrep_integer[MODULE_FUNCTIONS__CONSTRUCTORS__SIGNED_INTEGERS__INTREP_INTEGER] = {
   {
-    .name		= "mmec-c-make-usrptr-wchar-from-usrptr-sint64",
-    .implementation	= Fmmec_make_usrptr_wchar_from_usrptr_sint64,
+    .name		= "mmec-c-make-elisp-integer-char-from-usrptr-sint64",
+    .implementation	= Fmmec_make_elisp_integer_char_from_usrptr_sint64,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Build and return a user-pointer object of type `wchar'.",
+    .documentation	= "Return an Emacs built-in `integer' value being the internal representation of a `mmec-char' value.",
   },
+  {
+    .name		= "mmec-c-make-elisp-integer-schar-from-usrptr-sint64",
+    .implementation	= Fmmec_make_elisp_integer_schar_from_usrptr_sint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return an Emacs built-in `integer' value being the internal representation of a `mmec-schar' value.",
+  },
+  {
+    .name		= "mmec-c-make-elisp-integer-sshrt-from-usrptr-sint64",
+    .implementation	= Fmmec_make_elisp_integer_sshrt_from_usrptr_sint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return an Emacs built-in `integer' value being the internal representation of a `mmec-sshrt' value.",
+  },
+  {
+    .name		= "mmec-c-make-elisp-integer-sint8-from-usrptr-sint64",
+    .implementation	= Fmmec_make_elisp_integer_sint8_from_usrptr_sint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return an Emacs built-in `integer' value being the internal representation of a `mmec-sint8' value.",
+  },
+  {
+    .name		= "mmec-c-make-elisp-integer-sint16-from-usrptr-sint64",
+    .implementation	= Fmmec_make_elisp_integer_sint16_from_usrptr_sint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return an Emacs built-in `integer' value being the internal representation of a `mmec-sint16' value.",
+  },
+};
+
+
+/** --------------------------------------------------------------------
+ ** Elisp functions table: constructors, unsigned integers, integer intrep.
+ ** ----------------------------------------------------------------- */
+
+/* Constructors  for  custom number  objects  representing  unsigned integers,  whose
+ * internal representation is an Emacs built-in "integer" value.
+ */
+#define MODULE_FUNCTIONS__CONSTRUCTORS__UNSIGNED_INTEGERS__INTREP_INTEGER	4
+static mmec_module_function_t const
+  module_functions__constructors__unsigned_integers__intrep_integer[MODULE_FUNCTIONS__CONSTRUCTORS__UNSIGNED_INTEGERS__INTREP_INTEGER] = {
+  {
+    .name		= "mmec-c-make-elisp-integer-uchar-from-usrptr-uint64",
+    .implementation	= Fmmec_make_elisp_integer_uchar_from_usrptr_uint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return an Emacs built-in `integer' value being the internal representation of a `mmec-uchar' value.",
+  },
+  {
+    .name		= "mmec-c-make-elisp-integer-ushrt-from-usrptr-uint64",
+    .implementation	= Fmmec_make_elisp_integer_ushrt_from_usrptr_uint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return an Emacs built-in `integer' value being the internal representation of a `mmec-ushrt' value.",
+  },
+  {
+    .name		= "mmec-c-make-elisp-integer-uint8-from-usrptr-uint64",
+    .implementation	= Fmmec_make_elisp_integer_uint8_from_usrptr_uint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return an Emacs built-in `integer' value being the internal representation of a `mmec-uint8' value.",
+  },
+  {
+    .name		= "mmec-c-make-elisp-integer-uint16-from-usrptr-uint64",
+    .implementation	= Fmmec_make_elisp_integer_uint16_from_usrptr_uint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return an Emacs built-in `integer' value being the internal representation of a `mmec-uint16' value.",
+  },
+};
+
+
+/** --------------------------------------------------------------------
+ ** Elisp functions table: constructors, floating-point numbers, float intrep.
+ ** ----------------------------------------------------------------- */
+
+/* Constructors for  custom number objects representing  floating-point values, whose
+ * internal representation is an Emacs built-in "float" value.
+ */
+#define MODULE_FUNCTIONS__CONSTRUCTORS__FLOATING_POINT_NUMBERS__INTREP_FLOAT	1
+static mmec_module_function_t const
+  module_functions__constructors__floating_point_numbers__intrep_float[MODULE_FUNCTIONS__CONSTRUCTORS__FLOATING_POINT_NUMBERS__INTREP_FLOAT] = {
+  {
+    .name		= "mmec-c-make-elisp-float-double-from-usrptr-ldouble",
+    .implementation	= Fmmec_make_elisp_float_double_from_usrptr_ldouble,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return an Emacs built-in `float' value being the internal representation of a `mmec-double' value.",
+  },
+};
+
+
+/** --------------------------------------------------------------------
+ ** Elisp functions table: constructors, signed integers, usrptr intrep.
+ ** ----------------------------------------------------------------- */
+
+/* Constructors  for  custom  number  objects  representing  signed  integers,  whose
+ * internal representation is a user-pointer object.
+ */
+#define MODULE_FUNCTIONS__CONSTRUCTORS__SIGNED_INTEGERS__INTREP_USRPTR		8
+static mmec_module_function_t const
+  module_functions__constructors__signed_integers__intrep_usrptr[MODULE_FUNCTIONS__CONSTRUCTORS__SIGNED_INTEGERS__INTREP_USRPTR] = {
   {
     .name		= "mmec-c-make-usrptr-sint-from-usrptr-sint64",
     .implementation	= Fmmec_make_usrptr_sint_from_usrptr_sint64,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Build and return a user-pointer object of type `sint'.",
-  },
-  {
-    .name		= "mmec-c-make-usrptr-uint-from-usrptr-uint64",
-    .implementation	= Fmmec_make_usrptr_uint_from_usrptr_uint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Build and return a user-pointer object of type `uint'.",
   },
   {
     .name		= "mmec-c-make-usrptr-slong-from-usrptr-sint64",
@@ -696,25 +814,11 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
     .documentation	= "Build and return a user-pointer object of type `slong'.",
   },
   {
-    .name		= "mmec-c-make-usrptr-ulong-from-usrptr-uint64",
-    .implementation	= Fmmec_make_usrptr_ulong_from_usrptr_uint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Build and return a user-pointer object of type `ulong'.",
-  },
-  {
     .name		= "mmec-c-make-usrptr-sllong-from-usrptr-sint64",
     .implementation	= Fmmec_make_usrptr_sllong_from_usrptr_sint64,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Build and return a user-pointer object of type `sllong'.",
-  },
-  {
-    .name		= "mmec-c-make-usrptr-ullong-from-usrptr-uint64",
-    .implementation	= Fmmec_make_usrptr_ullong_from_usrptr_uint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Build and return a user-pointer object of type `ullong'.",
   },
   {
     .name		= "mmec-c-make-usrptr-sint32-from-usrptr-sint64",
@@ -724,25 +828,11 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
     .documentation	= "Build and return a user-pointer object of type `sint32'.",
   },
   {
-    .name		= "mmec-c-make-usrptr-uint32-from-usrptr-uint64",
-    .implementation	= Fmmec_make_usrptr_uint32_from_usrptr_uint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Build and return a user-pointer object of type `uint32'.",
-  },
-  {
     .name		= "mmec-c-make-usrptr-sintmax-from-usrptr-sint64",
     .implementation	= Fmmec_make_usrptr_sintmax_from_usrptr_sint64,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Build and return a user-pointer object of type `sintmax'.",
-  },
-  {
-    .name		= "mmec-c-make-usrptr-uintmax-from-usrptr-uint64",
-    .implementation	= Fmmec_make_usrptr_uintmax_from_usrptr_uint64,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Build and return a user-pointer object of type `uintmax'.",
   },
   {
     .name		= "mmec-c-make-usrptr-ssize-from-usrptr-sint64",
@@ -752,11 +842,11 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
     .documentation	= "Build and return a user-pointer object of type `ssize'.",
   },
   {
-    .name		= "mmec-c-make-usrptr-usize-from-usrptr-uint64",
-    .implementation	= Fmmec_make_usrptr_usize_from_usrptr_uint64,
+    .name		= "mmec-c-make-usrptr-wchar-from-usrptr-sint64",
+    .implementation	= Fmmec_make_usrptr_wchar_from_usrptr_sint64,
     .min_arity		= 1,
     .max_arity		= 1,
-    .documentation	= "Build and return a user-pointer object of type `usize'.",
+    .documentation	= "Build and return a user-pointer object of type `wchar'.",
   },
   {
     .name		= "mmec-c-make-usrptr-ptrdiff-from-usrptr-sint64",
@@ -765,6 +855,74 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
     .max_arity		= 1,
     .documentation	= "Build and return a user-pointer object of type `ptrdiff'.",
   },
+};
+
+
+/** --------------------------------------------------------------------
+ ** Elisp functions table: constructors, unsigned integers, usrptr intrep.
+ ** ----------------------------------------------------------------- */
+
+/* Constructors  for  custom number  objects  representing  unsigned integers,  whose
+ * internal representation is a user-pointer object.
+ */
+#define MODULE_FUNCTIONS__CONSTRUCTORS__UNSIGNED_INTEGERS__INTREP_USRPTR	6
+static mmec_module_function_t const
+  module_functions__constructors__unsigned_integers__intrep_usrptr[MODULE_FUNCTIONS__CONSTRUCTORS__UNSIGNED_INTEGERS__INTREP_USRPTR] = {
+  {
+    .name		= "mmec-c-make-usrptr-uint-from-usrptr-uint64",
+    .implementation	= Fmmec_make_usrptr_uint_from_usrptr_uint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `uint'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-ulong-from-usrptr-uint64",
+    .implementation	= Fmmec_make_usrptr_ulong_from_usrptr_uint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `ulong'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-ullong-from-usrptr-uint64",
+    .implementation	= Fmmec_make_usrptr_ullong_from_usrptr_uint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `ullong'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-uint32-from-usrptr-uint64",
+    .implementation	= Fmmec_make_usrptr_uint32_from_usrptr_uint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `uint32'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-uintmax-from-usrptr-uint64",
+    .implementation	= Fmmec_make_usrptr_uintmax_from_usrptr_uint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `uintmax'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-usize-from-usrptr-uint64",
+    .implementation	= Fmmec_make_usrptr_usize_from_usrptr_uint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `usize'.",
+  },
+};
+
+
+/** --------------------------------------------------------------------
+ ** Elisp functions table: constructors, floating-point numbers, usrptr intrep.
+ ** ----------------------------------------------------------------- */
+
+/* Constructors for  custom number objects representing  floating-point values, whose
+ * internal representation is a user-pointer object.
+ */
+#define MODULE_FUNCTIONS__CONSTRUCTORS__FLOATING_POINT_NUMBERS__INTREP_USRPTR	1
+static mmec_module_function_t const
+  module_functions__constructors__floating_point_numbers__intrep_usrptr[MODULE_FUNCTIONS__CONSTRUCTORS__FLOATING_POINT_NUMBERS__INTREP_USRPTR] = {
   {
     .name		= "mmec-c-make-usrptr-float-from-usrptr-ldouble",
     .implementation	= Fmmec_make_usrptr_float_from_usrptr_ldouble,
@@ -772,8 +930,18 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
     .max_arity		= 1,
     .documentation	= "Build and return a user-pointer object of type `float'.",
   },
+};
 
-  /* Constructors for user-pointer objects of type "sint64". */
+
+/** --------------------------------------------------------------------
+ ** Elisp functions table: constructors, sint64.
+ ** ----------------------------------------------------------------- */
+
+/* Constructors for custom number objects of type "sint64".
+ */
+#define MODULE_FUNCTIONS__CONSTRUCTORS__SINT64		16
+static mmec_module_function_t const
+  module_functions__constructors__sint64[MODULE_FUNCTIONS__CONSTRUCTORS__SINT64] = {
   {
     .name		= "mmec-c-make-usrptr-sint64-from-integer-char",
     .implementation	= Fmmec_make_usrptr_sint64_from_integer_char,
@@ -784,13 +952,6 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
   {
     .name		= "mmec-c-make-usrptr-sint64-from-integer-schar",
     .implementation	= Fmmec_make_usrptr_sint64_from_integer_schar,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Build and return a user-pointer object of type `sint64'.",
-  },
-  {
-    .name		= "mmec-c-make-usrptr-sint64-from-usrptr-wchar",
-    .implementation	= Fmmec_make_usrptr_sint64_from_usrptr_wchar,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Build and return a user-pointer object of type `sint64'.",
@@ -845,6 +1006,13 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
     .documentation	= "Build and return a user-pointer object of type `sint64'.",
   },
   {
+    .name		= "mmec-c-make-usrptr-sint64-from-usrptr-sint64",
+    .implementation	= Fmmec_make_usrptr_sint64_from_usrptr_sint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `sint64'.",
+  },
+  {
     .name		= "mmec-c-make-usrptr-sint64-from-usrptr-ssize",
     .implementation	= Fmmec_make_usrptr_sint64_from_usrptr_ssize,
     .min_arity		= 1,
@@ -854,6 +1022,13 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
   {
     .name		= "mmec-c-make-usrptr-sint64-from-usrptr-sintmax",
     .implementation	= Fmmec_make_usrptr_sint64_from_usrptr_sintmax,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `sint64'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-sint64-from-usrptr-wchar",
+    .implementation	= Fmmec_make_usrptr_sint64_from_usrptr_wchar,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Build and return a user-pointer object of type `sint64'.",
@@ -879,8 +1054,18 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
     .max_arity		= 1,
     .documentation	= "Build and return a user-pointer object of type `sint64'.",
   },
+};
 
-  /* Constructors for user-pointer objects of type "uint64". */
+
+/** --------------------------------------------------------------------
+ ** Elisp functions table: constructors, uint64.
+ ** ----------------------------------------------------------------- */
+
+/* Constructors for custom number objects of type "uint64".
+ */
+#define MODULE_FUNCTIONS__CONSTRUCTORS__UINT64		13
+static mmec_module_function_t const
+  module_functions__constructors__uint64[MODULE_FUNCTIONS__CONSTRUCTORS__UINT64] = {
   {
     .name		= "mmec-c-make-usrptr-uint64-from-integer-uchar",
     .implementation	= Fmmec_make_usrptr_uint64_from_integer_uchar,
@@ -938,6 +1123,13 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
     .documentation	= "Build and return a user-pointer object of type `uint64'.",
   },
   {
+    .name		= "mmec-c-make-usrptr-uint64-from-usrptr-uint64",
+    .implementation	= Fmmec_make_usrptr_uint64_from_usrptr_uint64,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `uint64'.",
+  },
+  {
     .name		= "mmec-c-make-usrptr-uint64-from-usrptr-usize",
     .implementation	= Fmmec_make_usrptr_uint64_from_usrptr_usize,
     .min_arity		= 1,
@@ -965,8 +1157,18 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
     .max_arity		= 1,
     .documentation	= "Build and return a user-pointer object of type `uint64'.",
   },
+};
 
-  /* Constructors for user-pointer objects of type "ldouble". */
+
+/** --------------------------------------------------------------------
+ ** Elisp functions table: constructors, ldouble.
+ ** ----------------------------------------------------------------- */
+
+/* Constructors for custom number objects of type "ldouble".
+ */
+#define MODULE_FUNCTIONS__CONSTRUCTORS__LDOUBLE		7
+static mmec_module_function_t const
+  module_functions__constructors__ldouble[MODULE_FUNCTIONS__CONSTRUCTORS__LDOUBLE] = {
   {
     .name		= "mmec-c-make-usrptr-ldouble-from-usrptr-sint64",
     .implementation	= Fmmec_make_usrptr_ldouble_from_usrptr_sint64,
@@ -989,8 +1191,22 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
     .documentation	= "Build and return a user-pointer object of type `ldouble'.",
   },
   {
+    .name		= "mmec-c-make-usrptr-ldouble-from-float-double",
+    .implementation	= Fmmec_make_usrptr_ldouble_from_float_double,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `ldouble'.",
+  },
+  {
     .name		= "mmec-c-make-usrptr-ldouble-from-usrptr-ldouble",
     .implementation	= Fmmec_make_usrptr_ldouble_from_usrptr_ldouble,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Build and return a user-pointer object of type `ldouble'.",
+  },
+  {
+    .name		= "mmec-c-make-usrptr-ldouble-from-elisp-integer",
+    .implementation	= Fmmec_make_usrptr_ldouble_from_elisp_integer,
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Build and return a user-pointer object of type `ldouble'.",
@@ -1002,224 +1218,16 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
     .max_arity		= 1,
     .documentation	= "Build and return a user-pointer object of type `ldouble'.",
   },
+};
 
-  /* Comparison functions. */
-  {
-    .name		= "mmec-c-sint64=",
-    .implementation	= Fmmec_compare_sint64_equal,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is equal to OP2.",
-  },
-  {
-    .name		= "mmec-c-sint64/=",
-    .implementation	= Fmmec_compare_sint64_not_equal,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is not equal to OP2.",
-  },
-  {
-    .name		= "mmec-c-sint64<",
-    .implementation	= Fmmec_compare_sint64_less,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is less than OP2.",
-  },
-  {
-    .name		= "mmec-c-sint64>",
-    .implementation	= Fmmec_compare_sint64_greater,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is greater than OP2.",
-  },
-  {
-    .name		= "mmec-c-sint64<=",
-    .implementation	= Fmmec_compare_sint64_less_equal,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is less than or equal to OP2.",
-  },
-  {
-    .name		= "mmec-c-sint64>=",
-    .implementation	= Fmmec_compare_sint64_greater_equal,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is greater than or equal to OP2.",
-  },
-  {
-    .name		= "mmec-c-uint64=",
-    .implementation	= Fmmec_compare_uint64_equal,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is equal to OP2.",
-  },
-  {
-    .name		= "mmec-c-uint64/=",
-    .implementation	= Fmmec_compare_uint64_not_equal,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is not equal to OP2.",
-  },
-  {
-    .name		= "mmec-c-uint64<",
-    .implementation	= Fmmec_compare_uint64_less,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is less than OP2.",
-  },
-  {
-    .name		= "mmec-c-uint64>",
-    .implementation	= Fmmec_compare_uint64_greater,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is greater than OP2.",
-  },
-  {
-    .name		= "mmec-c-uint64<=",
-    .implementation	= Fmmec_compare_uint64_less_equal,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is less than or equal to OP2.",
-  },
-  {
-    .name		= "mmec-c-uint64>=",
-    .implementation	= Fmmec_compare_uint64_greater_equal,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is greater than or equal to OP2.",
-  },
-  {
-    .name		= "mmec-c-ldouble=",
-    .implementation	= Fmmec_compare_ldouble_equal,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is equal to OP2.",
-  },
-  {
-    .name		= "mmec-c-ldouble/=",
-    .implementation	= Fmmec_compare_ldouble_not_equal,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is not equal to OP2.",
-  },
-  {
-    .name		= "mmec-c-ldouble<",
-    .implementation	= Fmmec_compare_ldouble_less,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is less than OP2.",
-  },
-  {
-    .name		= "mmec-c-ldouble>",
-    .implementation	= Fmmec_compare_ldouble_greater,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is greater than OP2.",
-  },
-  {
-    .name		= "mmec-c-ldouble<=",
-    .implementation	= Fmmec_compare_ldouble_less_equal,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is less than or equal to OP2.",
-  },
-  {
-    .name		= "mmec-c-ldouble>=",
-    .implementation	= Fmmec_compare_ldouble_greater_equal,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is greater than or equal to OP2.",
-  },
+
+/** --------------------------------------------------------------------
+ ** Elisp functions table: number objects fit predicate functions.
+ ** ----------------------------------------------------------------- */
 
-  /* Comparison operations between sint64 and uint64. */
-  {
-    .name		= "mmec-c-sint64-uint64=",
-    .implementation	= Fmmec_compare_sint64_uint64_equal,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is equal to OP2.",
-  },
-  {
-    .name		= "mmec-c-sint64-uint64/=",
-    .implementation	= Fmmec_compare_sint64_uint64_not_equal,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is not equal to OP2.",
-  },
-  {
-    .name		= "mmec-c-sint64-uint64<",
-    .implementation	= Fmmec_compare_sint64_uint64_less,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is less than OP2.",
-  },
-  {
-    .name		= "mmec-c-sint64-uint64>",
-    .implementation	= Fmmec_compare_sint64_uint64_greater,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is greater than OP2.",
-  },
-  {
-    .name		= "mmec-c-sint64-uint64<=",
-    .implementation	= Fmmec_compare_sint64_uint64_less_equal,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is less than or equal to OP2.",
-  },
-  {
-    .name		= "mmec-c-sint64-uint64>=",
-    .implementation	= Fmmec_compare_sint64_uint64_greater_equal,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is greater than or equal to OP2.",
-  },
-
-  /* Comparison operations between uint64 and sint64. */
-  {
-    .name		= "mmec-c-uint64-sint64=",
-    .implementation	= Fmmec_compare_uint64_sint64_equal,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is equal to OP2.",
-  },
-  {
-    .name		= "mmec-c-uint64-sint64/=",
-    .implementation	= Fmmec_compare_uint64_sint64_not_equal,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is not equal to OP2.",
-  },
-  {
-    .name		= "mmec-c-uint64-sint64<",
-    .implementation	= Fmmec_compare_uint64_sint64_less,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is less than OP2.",
-  },
-  {
-    .name		= "mmec-c-uint64-sint64>",
-    .implementation	= Fmmec_compare_uint64_sint64_greater,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is greater than OP2.",
-  },
-  {
-    .name		= "mmec-c-uint64-sint64<=",
-    .implementation	= Fmmec_compare_uint64_sint64_less_equal,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is less than or equal to OP2.",
-  },
-  {
-    .name		= "mmec-c-uint64-sint64>=",
-    .implementation	= Fmmec_compare_uint64_sint64_greater_equal,
-    .min_arity		= 2,
-    .max_arity		= 2,
-    .documentation	= "Return true if the OP1 is greater than or equal to OP2.",
-  },
-
-  /* Number range fit predicates. */
+#define MODULE_FUNCTIONS__FIT_PREDICATES	28
+static mmec_module_function_t const
+  module_functions__fit_predicates[MODULE_FUNCTIONS__FIT_PREDICATES] = {
   {
     .name		= "mmec-c-sint64-fits-char-p",
     .implementation	= Fmmec_sint64_fits_char_range_p,
@@ -1240,13 +1248,6 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
     .min_arity		= 1,
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `uchar'.",
-  },
-  {
-    .name		= "mmec-c-sint64-fits-wchar-p",
-    .implementation	= Fmmec_sint64_fits_wchar_range_p,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Return true if the argument fits a user-pointer object of type `wchar'.",
   },
 
   {
@@ -1335,6 +1336,13 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
     .documentation	= "Return true if the argument fits a user-pointer object of type `uintmax'.",
   },
   {
+    .name		= "mmec-c-sint64-fits-wchar-p",
+    .implementation	= Fmmec_sint64_fits_wchar_range_p,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Return true if the argument fits a user-pointer object of type `wchar'.",
+  },
+  {
     .name		= "mmec-c-sint64-fits-ptrdiff-p",
     .implementation	= Fmmec_sint64_fits_ptrdiff_range_p,
     .min_arity		= 1,
@@ -1420,16 +1428,16 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
     .max_arity		= 1,
     .documentation	= "Return true if the argument fits a user-pointer object of type `ldouble'.",
   },
+};
 
-  /* Number  printers for  number  types  having a  user-pointer  object as  internal
-     representation. */
-  {
-    .name		= "mmec-c-wchar-print-to-string",
-    .implementation	= Fmmec_c_wchar_print_to_string,
-    .min_arity		= 1,
-    .max_arity		= 1,
-    .documentation	= "Print to string a user-pointer object of type `wchar'.",
-  },
+
+/** --------------------------------------------------------------------
+ ** Elisp functions table: number objects printer functions.
+ ** ----------------------------------------------------------------- */
+
+#define MODULE_FUNCTIONS__PRINTERS	18
+static mmec_module_function_t const
+  module_functions__printers[MODULE_FUNCTIONS__PRINTERS] = {
   {
     .name		= "mmec-c-sint-print-to-string",
     .implementation	= Fmmec_c_sint_print_to_string,
@@ -1501,6 +1509,13 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
     .documentation	= "Print to string a user-pointer object of type `usize'.",
   },
   {
+    .name		= "mmec-c-wchar-print-to-string",
+    .implementation	= Fmmec_c_wchar_print_to_string,
+    .min_arity		= 1,
+    .max_arity		= 1,
+    .documentation	= "Print to string a user-pointer object of type `wchar'.",
+  },
+  {
     .name		= "mmec-c-ptrdiff-print-to-string",
     .implementation	= Fmmec_c_ptrdiff_print_to_string,
     .min_arity		= 1,
@@ -1553,13 +1568,411 @@ static mmec_module_function_t const module_functions_table[NUMBER_OF_MODULE_FUNC
 
 
 /** --------------------------------------------------------------------
+ ** Elisp functions table: sint64 comparison functions.
+ ** ----------------------------------------------------------------- */
+
+#define MODULE_FUNCTIONS__SINT64_COMPARISON	6
+static mmec_module_function_t const
+  module_functions__sint64_comparison[MODULE_FUNCTIONS__SINT64_COMPARISON] = {
+  {
+    .name		= "mmec-c-sint64=",
+    .implementation	= Fmmec_compare_sint64_equal,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is equal to OP2.",
+  },
+  {
+    .name		= "mmec-c-sint64/=",
+    .implementation	= Fmmec_compare_sint64_not_equal,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is not equal to OP2.",
+  },
+  {
+    .name		= "mmec-c-sint64<",
+    .implementation	= Fmmec_compare_sint64_less,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is less than OP2.",
+  },
+  {
+    .name		= "mmec-c-sint64>",
+    .implementation	= Fmmec_compare_sint64_greater,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is greater than OP2.",
+  },
+  {
+    .name		= "mmec-c-sint64<=",
+    .implementation	= Fmmec_compare_sint64_less_equal,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is less than or equal to OP2.",
+  },
+  {
+    .name		= "mmec-c-sint64>=",
+    .implementation	= Fmmec_compare_sint64_greater_equal,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is greater than or equal to OP2.",
+  },
+};
+
+
+/** --------------------------------------------------------------------
+ ** Elisp functions table: uint64 comparison functions.
+ ** ----------------------------------------------------------------- */
+
+#define MODULE_FUNCTIONS__UINT64_COMPARISON	6
+static mmec_module_function_t const
+  module_functions__uint64_comparison[MODULE_FUNCTIONS__UINT64_COMPARISON] = {
+  {
+    .name		= "mmec-c-uint64=",
+    .implementation	= Fmmec_compare_uint64_equal,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is equal to OP2.",
+  },
+  {
+    .name		= "mmec-c-uint64/=",
+    .implementation	= Fmmec_compare_uint64_not_equal,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is not equal to OP2.",
+  },
+  {
+    .name		= "mmec-c-uint64<",
+    .implementation	= Fmmec_compare_uint64_less,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is less than OP2.",
+  },
+  {
+    .name		= "mmec-c-uint64>",
+    .implementation	= Fmmec_compare_uint64_greater,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is greater than OP2.",
+  },
+  {
+    .name		= "mmec-c-uint64<=",
+    .implementation	= Fmmec_compare_uint64_less_equal,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is less than or equal to OP2.",
+  },
+  {
+    .name		= "mmec-c-uint64>=",
+    .implementation	= Fmmec_compare_uint64_greater_equal,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is greater than or equal to OP2.",
+  },
+};
+
+
+/** --------------------------------------------------------------------
+ ** Elisp functions table: ldouble comparison functions.
+ ** ----------------------------------------------------------------- */
+
+#define MODULE_FUNCTIONS__LDOUBLE_COMPARISON	6
+static mmec_module_function_t const
+  module_functions__ldouble_comparison[MODULE_FUNCTIONS__LDOUBLE_COMPARISON] = {
+  {
+    .name		= "mmec-c-ldouble=",
+    .implementation	= Fmmec_compare_ldouble_equal,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is equal to OP2.",
+  },
+  {
+    .name		= "mmec-c-ldouble/=",
+    .implementation	= Fmmec_compare_ldouble_not_equal,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is not equal to OP2.",
+  },
+  {
+    .name		= "mmec-c-ldouble<",
+    .implementation	= Fmmec_compare_ldouble_less,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is less than OP2.",
+  },
+  {
+    .name		= "mmec-c-ldouble>",
+    .implementation	= Fmmec_compare_ldouble_greater,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is greater than OP2.",
+  },
+  {
+    .name		= "mmec-c-ldouble<=",
+    .implementation	= Fmmec_compare_ldouble_less_equal,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is less than or equal to OP2.",
+  },
+  {
+    .name		= "mmec-c-ldouble>=",
+    .implementation	= Fmmec_compare_ldouble_greater_equal,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is greater than or equal to OP2.",
+  },
+};
+
+
+/** --------------------------------------------------------------------
+ ** Elisp functions table: sint64-uint64 comparison functions.
+ ** ----------------------------------------------------------------- */
+
+#define MODULE_FUNCTIONS__SINT64_UINT64_COMPARISON	6
+static mmec_module_function_t const
+  module_functions__sint64_uint64_comparison[MODULE_FUNCTIONS__SINT64_UINT64_COMPARISON] = {
+  {
+    .name		= "mmec-c-sint64-uint64=",
+    .implementation	= Fmmec_compare_sint64_uint64_equal,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is equal to OP2.",
+  },
+  {
+    .name		= "mmec-c-sint64-uint64/=",
+    .implementation	= Fmmec_compare_sint64_uint64_not_equal,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is not equal to OP2.",
+  },
+  {
+    .name		= "mmec-c-sint64-uint64<",
+    .implementation	= Fmmec_compare_sint64_uint64_less,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is less than OP2.",
+  },
+  {
+    .name		= "mmec-c-sint64-uint64>",
+    .implementation	= Fmmec_compare_sint64_uint64_greater,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is greater than OP2.",
+  },
+  {
+    .name		= "mmec-c-sint64-uint64<=",
+    .implementation	= Fmmec_compare_sint64_uint64_less_equal,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is less than or equal to OP2.",
+  },
+  {
+    .name		= "mmec-c-sint64-uint64>=",
+    .implementation	= Fmmec_compare_sint64_uint64_greater_equal,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is greater than or equal to OP2.",
+  },
+};
+
+
+/** --------------------------------------------------------------------
+ ** Elisp functions table: uint64-sint64 comparison functions.
+ ** ----------------------------------------------------------------- */
+
+#define MODULE_FUNCTIONS__UINT64_SINT64_COMPARISON	6
+static mmec_module_function_t const
+  module_functions__uint64_sint64_comparison[MODULE_FUNCTIONS__UINT64_SINT64_COMPARISON] = {
+  {
+    .name		= "mmec-c-uint64-sint64=",
+    .implementation	= Fmmec_compare_uint64_sint64_equal,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is equal to OP2.",
+  },
+  {
+    .name		= "mmec-c-uint64-sint64/=",
+    .implementation	= Fmmec_compare_uint64_sint64_not_equal,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is not equal to OP2.",
+  },
+  {
+    .name		= "mmec-c-uint64-sint64<",
+    .implementation	= Fmmec_compare_uint64_sint64_less,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is less than OP2.",
+  },
+  {
+    .name		= "mmec-c-uint64-sint64>",
+    .implementation	= Fmmec_compare_uint64_sint64_greater,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is greater than OP2.",
+  },
+  {
+    .name		= "mmec-c-uint64-sint64<=",
+    .implementation	= Fmmec_compare_uint64_sint64_less_equal,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is less than or equal to OP2.",
+  },
+  {
+    .name		= "mmec-c-uint64-sint64>=",
+    .implementation	= Fmmec_compare_uint64_sint64_greater_equal,
+    .min_arity		= 2,
+    .max_arity		= 2,
+    .documentation	= "Return true if the OP1 is greater than or equal to OP2.",
+  },
+};
+
+
+/** --------------------------------------------------------------------
+ ** Elisp functions table: sign inspection functions.
+ ** ----------------------------------------------------------------- */
+
+#undef  SIGN_INSPECTION_BLOB
+#define SIGN_INSPECTION_BLOB(STEM)					\
+  {									\
+    .name		= "mmec-c-" #STEM "-zero-p",			\
+      .implementation	= Fmmec_c_ ## STEM ## _zero_p,			\
+      .min_arity		= 1,					\
+      .max_arity		= 1,					\
+      .documentation	= "Return true if the operand is zero, otherwise return false.", \
+      },								\
+  {									\
+    .name		= "mmec-c-" #STEM "-positive-p",		\
+      .implementation	= Fmmec_c_ ## STEM ## _positive_p,		\
+      .min_arity		= 1,					\
+      .max_arity		= 1,					\
+      .documentation	= "Return true if the operand is positive, otherwise return false.", \
+      },								\
+  {									\
+    .name		= "mmec-c-" #STEM "-negative-p",		\
+      .implementation	= Fmmec_c_ ## STEM ## _negative_p,		\
+      .min_arity		= 1,					\
+      .max_arity		= 1,					\
+      .documentation	= "Return true if the operand is negative, otherwise return false.", \
+      },								\
+  {									\
+    .name		= "mmec-c-" #STEM "-non-positive-p",		\
+      .implementation	= Fmmec_c_ ## STEM ## _non_positive_p,		\
+      .min_arity		= 1,					\
+      .max_arity		= 1,					\
+      .documentation	= "Return true if the operand is non-positive, otherwise return false.", \
+      },								\
+  {									\
+    .name		= "mmec-c-" #STEM "-non-negative-p",		\
+      .implementation	= Fmmec_c_ ## STEM ## _non_negative_p,		\
+      .min_arity		= 1,					\
+      .max_arity		= 1,					\
+      .documentation	= "Return true if the operand is non-negative, otherwise return false.", \
+      },
+
+#define MODULE_FUNCTIONS__SIGN_INSPECTION	(5 * 28)
+static mmec_module_function_t const
+  module_functions__sign_inspection[MODULE_FUNCTIONS__SIGN_INSPECTION] = {
+  SIGN_INSPECTION_BLOB(char)
+  SIGN_INSPECTION_BLOB(schar)
+  SIGN_INSPECTION_BLOB(sshrt)
+  SIGN_INSPECTION_BLOB(sint)
+  SIGN_INSPECTION_BLOB(slong)
+  SIGN_INSPECTION_BLOB(sllong)
+  SIGN_INSPECTION_BLOB(sintmax)
+  SIGN_INSPECTION_BLOB(ssize)
+  SIGN_INSPECTION_BLOB(wchar)
+  SIGN_INSPECTION_BLOB(ptrdiff)
+  SIGN_INSPECTION_BLOB(sint8)
+  SIGN_INSPECTION_BLOB(sint16)
+  SIGN_INSPECTION_BLOB(sint32)
+  SIGN_INSPECTION_BLOB(sint64)
+  SIGN_INSPECTION_BLOB(float)
+  SIGN_INSPECTION_BLOB(double)
+  SIGN_INSPECTION_BLOB(ldouble)
+
+  SIGN_INSPECTION_BLOB(uchar)
+  SIGN_INSPECTION_BLOB(ushrt)
+  SIGN_INSPECTION_BLOB(uint)
+  SIGN_INSPECTION_BLOB(ulong)
+  SIGN_INSPECTION_BLOB(ullong)
+  SIGN_INSPECTION_BLOB(uintmax)
+  SIGN_INSPECTION_BLOB(usize)
+  SIGN_INSPECTION_BLOB(uint8)
+  SIGN_INSPECTION_BLOB(uint16)
+  SIGN_INSPECTION_BLOB(uint32)
+  SIGN_INSPECTION_BLOB(uint64)
+};
+
+
+/** --------------------------------------------------------------------
  ** Module initialisation.
  ** ----------------------------------------------------------------- */
 
 void
 mmec_number_objects_init (emacs_env * env)
 {
-  mmec_define_elisp_functions_from_table(env, module_functions_table, NUMBER_OF_MODULE_FUNCTIONS, 0);
+  mmec_define_elisp_functions_from_table(env,
+					 module_functions__constructors__signed_integers__intrep_integer,
+					 MODULE_FUNCTIONS__CONSTRUCTORS__SIGNED_INTEGERS__INTREP_INTEGER,
+					 0);
+
+  mmec_define_elisp_functions_from_table(env,
+  					 module_functions__constructors__unsigned_integers__intrep_integer,
+  					 MODULE_FUNCTIONS__CONSTRUCTORS__UNSIGNED_INTEGERS__INTREP_INTEGER,
+  					 0);
+
+  mmec_define_elisp_functions_from_table(env,
+  					 module_functions__constructors__floating_point_numbers__intrep_float,
+  					 MODULE_FUNCTIONS__CONSTRUCTORS__FLOATING_POINT_NUMBERS__INTREP_FLOAT,
+  					 0);
+
+  mmec_define_elisp_functions_from_table(env,
+  					 module_functions__constructors__signed_integers__intrep_usrptr,
+  					 MODULE_FUNCTIONS__CONSTRUCTORS__SIGNED_INTEGERS__INTREP_USRPTR,
+  					 0);
+
+  mmec_define_elisp_functions_from_table(env,
+  					 module_functions__constructors__unsigned_integers__intrep_usrptr,
+  					 MODULE_FUNCTIONS__CONSTRUCTORS__UNSIGNED_INTEGERS__INTREP_USRPTR,
+  					 0);
+
+  mmec_define_elisp_functions_from_table(env,
+  					 module_functions__constructors__floating_point_numbers__intrep_usrptr,
+  					 MODULE_FUNCTIONS__CONSTRUCTORS__FLOATING_POINT_NUMBERS__INTREP_USRPTR,
+  					 0);
+
+  mmec_define_elisp_functions_from_table(env,
+  					 module_functions__constructors__sint64,
+  					 MODULE_FUNCTIONS__CONSTRUCTORS__SINT64,
+  					 0);
+
+  mmec_define_elisp_functions_from_table(env,
+  					 module_functions__constructors__uint64,
+  					 MODULE_FUNCTIONS__CONSTRUCTORS__UINT64,
+  					 0);
+
+  mmec_define_elisp_functions_from_table(env,
+  					 module_functions__constructors__ldouble,
+  					 MODULE_FUNCTIONS__CONSTRUCTORS__LDOUBLE,
+  					 0);
+
+  mmec_define_elisp_functions_from_table(env, module_functions__printers,           MODULE_FUNCTIONS__PRINTERS,           0);
+  mmec_define_elisp_functions_from_table(env, module_functions__fit_predicates,     MODULE_FUNCTIONS__FIT_PREDICATES,     0);
+  mmec_define_elisp_functions_from_table(env, module_functions__sint64_comparison,  MODULE_FUNCTIONS__SINT64_COMPARISON,  0);
+  mmec_define_elisp_functions_from_table(env, module_functions__uint64_comparison,  MODULE_FUNCTIONS__UINT64_COMPARISON,  0);
+  mmec_define_elisp_functions_from_table(env, module_functions__ldouble_comparison, MODULE_FUNCTIONS__LDOUBLE_COMPARISON, 0);
+
+  mmec_define_elisp_functions_from_table(env,
+  					 module_functions__sint64_uint64_comparison,
+  					 MODULE_FUNCTIONS__SINT64_UINT64_COMPARISON,
+  					 0);
+
+  mmec_define_elisp_functions_from_table(env,
+  					 module_functions__uint64_sint64_comparison,
+  					 MODULE_FUNCTIONS__UINT64_SINT64_COMPARISON,
+  					 0);
+
+  mmec_define_elisp_functions_from_table(env, module_functions__sign_inspection, MODULE_FUNCTIONS__SIGN_INSPECTION, 0);
 }
 
 /* end of file */

@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-03-05 07:13:32 marco>
+;; Time-stamp: <2020-03-05 18:42:18 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -34,7 +34,14 @@
 (require 'mmec-basics)
 
 
-;;;; macros
+;;;; helpers
+
+(defun mmec--assert-positive-number (num funcname)
+  (when (mmec-negative-p num)
+    (signal 'mmec-error-value-out-of-range (list funcname num))))
+
+
+;;;; API macros
 
 (defmacro mmec-limit-min (TYPE-OR-STEM)
   "Expand into the constant name representing the minimum limit in the range of the specified number object"
@@ -223,13 +230,51 @@ Example:
       (t
        (signal 'mmec-error-unknown-number-object-type-or-stem (list 'mmec-fits-number-type-p TYPE-OR-STEM))))))
 
-(eval-and-compile
-  (defmacro mmec-number-type-is-signed-p (TYPE-OR-STEM)
-    "Expand to true if TYPE-OR-STEM represents a signed type; expand to false otherwise.
+(defmacro mmec-number-type-is-signed-p (TYPE-OR-STEM)
+  "Expand to true if TYPE-OR-STEM represents a signed type; expand to false otherwise.
 
 (mmec-number-type-is-signed-p sint)            => t
 (mmec-number-type-is-signed-p mmec-ulong)      => nil"
-    (let ((STEM (intern (mmec--strip-prefix-from-symbol-name TYPE-OR-STEM))))
+  (let ((STEM (intern (mmec--strip-prefix-from-symbol-name TYPE-OR-STEM))))
+    (cl-case STEM
+      (char	t)
+      (schar	t)
+      (uchar	nil)
+      (wchar	t)
+      (sshrt	t)
+      (ushrt	nil)
+      (sint	t)
+      (uint	nil)
+      (slong	t)
+      (ulong	nil)
+      (sllong	t)
+      (ullong	nil)
+      (ssize	t)
+      (usize	nil)
+      (sintmax	t)
+      (uintmax	nil)
+      (ptrdiff	t)
+      (sint8	t)
+      (uint8	nil)
+      (sint16	t)
+      (uint16	nil)
+      (sint32	t)
+      (uint32	nil)
+      (sint64	t)
+      (uint64	nil)
+      (float	t)
+      (double	t)
+      (ldouble	t)
+      (t
+       (signal 'mmec-error-unknown-number-object-type-or-stem (list 'mmec-number-type-is-signed-p TYPE-OR-STEM))))))
+
+(eval-and-compile
+  (defun mmec-symbol-number-type-is-signed-p (SYMBOL)
+    "Return true if SYMBOL represents a signed type; return false otherwise.
+
+(mmec-symbol-number-type-is-signed-p 'sint)		=> t
+(mmec-symbol-number-type-is-signed-p 'mmec-ulong)	=> nil"
+    (let ((STEM (intern (mmec--strip-prefix-from-symbol-name SYMBOL))))
       (cl-case STEM
 	(char		t)
 	(schar		t)
@@ -260,7 +305,7 @@ Example:
 	(double		t)
 	(ldouble	t)
 	(t
-	 (signal 'mmec-error-unknown-number-object-type-or-stem (list 'mmec-number-type-is-signed-p TYPE-OR-STEM)))))))
+	 (signal 'mmec-error-unknown-number-object-type-or-stem (list 'mmec-symbol-number-type-is-signed-p SYMBOL)))))))
 
 
 ;;;; basic numeric type definitions
@@ -302,1637 +347,321 @@ Example:
   (mmec--define-abstract-type-constructor mmec-floating-point))
 
 
-;;;; C language type wrappers: char
+;;;; bootstrap macros
 
-(cl-defstruct (mmec-char
-	       (:include	mmec-signed-integer)
-	       (:constructor	mmec-char--make))
-  obj)
+(defmacro mmec--define-number-object-constructor-as-generic-function (STEM)
+  "Define the constructor generic function for a number object type."
+  (let* ((NUMTYPE	(mmec-sformat "mmec-%s" STEM))
+	 (MAKER		NUMTYPE)
+	 (DOCSTRING	(format "Constructor for number objects of type `%s'.
 
-(cl-defgeneric mmec-char (init)
-  "Constructor for number objects of type `mmec-char'.
+The argument INIT must be a number value." NUMTYPE)))
+    `(cl-defgeneric ,MAKER (init)
+       ,DOCSTRING)))
 
-This  type  constructor  is  implemented as  a  generic  function.   The
-argument INIT must be a number value.")
+;;; --------------------------------------------------------------------
 
-(cl-defmethod mmec-char ((init mmec-char))
-  "Constructor for number objects of type `mmec-char'.
+(defmacro mmec--define-number-object-copy-constructor-as-method (STEM)
+  "Define the copy constructor method for a number type.
+
+The copy constructor method specialises the generic function constructor
+to accept an argument whose type is the same as the number object type."
+  (let* ((NUMTYPE	(mmec-sformat "mmec-%s" STEM))
+	 (MAKER		NUMTYPE)
+	 (DOCSTRING	(format "Constructor for number objects of type `%s'.
 
 This is the copy constructor implemented as method.  This method creates
 a   duplicate  of   the  INIT   value,  but   it  reuses   the  internal
 representation (which is immutable)."
-  (mmec--make-obj char (mmec--extract-obj char init)))
+				NUMTYPE)))
+    `(cl-defmethod ,MAKER ((init ,NUMTYPE))
+       ,DOCSTRING
+       (mmec--make-obj ,STEM (mmec--extract-obj ,STEM init)))))
 
-(mmec-defmethod mmec-char ((init mmec-signed-integer))
-  "Constructor for number objects of type `mmec-char'.
+;;; --------------------------------------------------------------------
 
-This constructor normalises the initialisation  argument to an object of
-type `mmec-sint64', then  it checks if the  range is valid: if  it is is
-builds  an object  of type  `mmec-char', otherwise  is raised  the error
-condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p char obj)
-      (signal 'mmec-error-value-out-of-range (list --func-- init)))
-    (mmec--make-obj char (mmec-c-make-integer-char-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
+(mmec-defmacro mmec--define-number-object-constructor-as-method-parent-argument (STEM &key INTREP-TYPE PARENT-STEM NORM-STEM)
+  "Define a constructor method for a number type.
 
-(cl-defmethod mmec-char ((init integer))
-  "Constructor for number objects of type `mmec-char'.
+Thsi constructor method specialises  the generic function constructor to
+accept an argument  whose type is the  same as the parent  of the number
+object type."
+  (let* ((NUMTYPE	(mmec-sformat "mmec-%s" STEM))
+	 (PARENT-TYPE	(mmec-sformat "mmec-%s" PARENT-STEM))
+	 (NORM-TYPE	(mmec-sformat "mmec-%s" NORM-STEM))
+	 (MAKER		NUMTYPE)
+	 (NORM-MAKER	NORM-TYPE)
+	 (INTREP-SPEC	(cl-case INTREP-TYPE
+			  (integer	"elisp-integer")
+			  (float	"elisp-float")
+			  (usrptr	"usrptr")
+			  (t
+			   (signal 'mmec-error-invalid-argument (list --func--)))))
+	 (CFUNC-CTOR	(mmec-sformat "mmec-c-make-%s-%s-from-usrptr-%s" INTREP-SPEC STEM NORM-STEM))
+	 (DOCSTRING	(format "Constructor for number objects of type `%s'.
+
+This constructor normalises the argument INIT to an object of type `%s',
+then it checks if  the range is valid; if it is: it  builds an object of
+type    `%s',    otherwise    it     raises    the    error    condition
+`mmec-error-value-out-of-range'."  NUMTYPE NORM-TYPE NUMTYPE)))
+
+    `(mmec-defmethod ,NUMTYPE ((init ,PARENT-TYPE))
+       ,DOCSTRING
+       (let ((obj (,NORM-MAKER init)))
+	 (unless (mmec-fits-number-type-p ,STEM obj)
+	   (signal 'mmec-error-value-out-of-range (list --func-- init)))
+	 (mmec--make-obj ,STEM (,CFUNC-CTOR (mmec--extract-obj ,NORM-STEM obj)))))))
+
+;;; --------------------------------------------------------------------
+
+(mmec-defmacro mmec--define-number-object-constructor-as-method-integer-argument (STEM &key INTREP-TYPE NORM-STEM)
+  (let* ((NUMTYPE	(mmec-sformat "mmec-%s" STEM))
+	 (NORM-TYPE	(mmec-sformat "mmec-%s" NORM-STEM))
+	 (MAKER		NUMTYPE)
+	 (NORM-MAKER	NORM-TYPE)
+	 (INTREP-SPEC	(cl-case INTREP-TYPE
+			  (integer	"elisp-integer")
+			  (float	"elisp-float")
+			  (usrptr	"usrptr")
+			  (t
+			   (signal 'mmec-error-invalid-argument (list --func--)))))
+	 (CFUNC-CTOR	(mmec-sformat "mmec-c-make-%s-%s-from-usrptr-%s" INTREP-SPEC STEM NORM-STEM))
+	 (DOCSTRING	(format "Constructor for number objects of type `%s'.
 
 This  constructor accepts  as initialisation  argument a  value of  type
 `integer'.
 
 This constructor normalises the initialisation  argument to an object of
-type `mmec-sint64', then  it checks if the  range is valid: if  it is is
-builds  an object  of type  `mmec-char', otherwise  it raises  the error
-condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p char obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-char init)))
-    (mmec--make-obj char (mmec-c-make-integer-char-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
+type `%s', then it checks if the range  is valid; if it is: it builds an
+object  of   type  `%s',  otherwise   it  raises  the   error  condition
+`mmec-error-value-out-of-range'."  NUMTYPE NORM-TYPE NUMTYPE)))
+    `(cl-defmethod ,MAKER ((init integer))
+       ,DOCSTRING
+       (let ((obj (,NORM-MAKER init)))
+	 (unless (mmec-fits-number-type-p ,STEM obj)
+	   (signal 'mmec-error-value-out-of-range (list ',NUMTYPE init)))
+	 (mmec--make-obj ,STEM (,CFUNC-CTOR (mmec--extract-obj ,NORM-STEM obj)))))))
 
-(mmec-defmethod mmec-char ((init float))
-  "Constructor for number objects of type `mmec-char'.
+;;; --------------------------------------------------------------------
+
+(mmec-defmacro mmec--define-number-object-constructor-as-method-float-argument (STEM &key INTREP-TYPE NORM-STEM)
+  (let* ((NUMTYPE	(mmec-sformat "mmec-%s" STEM))
+	 (NORM-TYPE	(mmec-sformat "mmec-%s" NORM-STEM))
+	 (MAKER		NUMTYPE)
+	 (NORM-MAKER	NORM-TYPE)
+	 (INTREP-SPEC	(cl-case INTREP-TYPE
+			  (integer	"elisp-integer")
+			  (float	"elisp-float")
+			  (usrptr	"usrptr")
+			  (t
+			   (signal 'mmec-error-invalid-argument (list --func--)))))
+	 (CFUNC-CTOR	(mmec-sformat "mmec-c-make-%s-%s-from-usrptr-%s" INTREP-SPEC STEM NORM-STEM))
+	 (DOCSTRING	(format "Constructor for number objects of type `%s'.
 
 This  constructor accepts  as initialisation  argument a  value of  type
 `float'.
 
 This constructor normalises the initialisation  argument to an object of
-type `mmec-sint64', then  it checks if the  range is valid: if  it is is
-builds  an object  of type  `mmec-char', otherwise  it raises  the error
-condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p char obj)
-      (signal 'mmec-error-value-out-of-range (list --func-- init)))
-    (mmec--make-obj char (mmec-c-make-integer-char-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
+type `%s', then it checks if the range  is valid; if it is: it builds an
+object  of   type  `%s',  otherwise   it  raises  the   error  condition
+`mmec-error-value-out-of-range'."  NUMTYPE NORM-TYPE NUMTYPE)))
+    `(cl-defmethod ,MAKER ((init float))
+       ,DOCSTRING
+       (let ((obj (,NORM-MAKER init)))
+	 (unless (mmec-fits-number-type-p ,STEM obj)
+	   (signal 'mmec-error-value-out-of-range (list ',NUMTYPE init)))
+	 (mmec--make-obj ,STEM (,CFUNC-CTOR (mmec--extract-obj ,NORM-STEM obj)))))))
 
-(mmec-defmethod mmec-char ((init mmec-number))
-  "Constructor for number objects of type `mmec-char'.
+;;; --------------------------------------------------------------------
+
+(mmec-defmacro mmec--define-number-object-constructor-as-method-signed-integer-argument (STEM &key INTREP-TYPE NORM-STEM)
+  (let* ((NUMTYPE	(mmec-sformat "mmec-%s" STEM))
+	 (NORM-TYPE	(mmec-sformat "mmec-%s" NORM-STEM))
+	 (MAKER		NUMTYPE)
+	 (NORM-MAKER	NORM-TYPE)
+	 (INTREP-SPEC	(cl-case INTREP-TYPE
+			  (integer	"elisp-integer")
+			  (float	"elisp-float")
+			  (usrptr	"usrptr")
+			  (t
+			   (signal 'mmec-error-invalid-argument (list --func--)))))
+	 (CFUNC-CTOR	(mmec-sformat "mmec-c-make-%s-%s-from-usrptr-%s" INTREP-SPEC STEM NORM-STEM))
+	 (DOCSTRING	(format "Constructor for number objects of type `%s'.
+
+This  constructor accepts  as initialisation  argument a  value of  type
+`mmec-signed-integer'.
+
+This constructor normalises the initialisation  argument to an object of
+type `%s', then it checks if the range  is valid; if it is: it builds an
+object  of   type  `%s',  otherwise   it  raises  the   error  condition
+`mmec-error-value-out-of-range'."  NUMTYPE NORM-TYPE NUMTYPE)))
+    `(cl-defmethod ,MAKER ((init mmec-signed-integer))
+       ,DOCSTRING
+       (let ((obj (,NORM-MAKER init)))
+	 (unless (mmec-fits-number-type-p ,STEM obj)
+	   (signal 'mmec-error-value-out-of-range (list ',NUMTYPE init)))
+	 (mmec--make-obj ,STEM (,CFUNC-CTOR (mmec--extract-obj ,NORM-STEM obj)))))))
+
+;;; --------------------------------------------------------------------
+
+(mmec-defmacro mmec--define-number-object-constructor-as-method-unsigned-integer-argument (STEM &key INTREP-TYPE NORM-STEM)
+  (let* ((NUMTYPE	(mmec-sformat "mmec-%s" STEM))
+	 (NORM-TYPE	(mmec-sformat "mmec-%s" NORM-STEM))
+	 (MAKER		NUMTYPE)
+	 (NORM-MAKER	NORM-TYPE)
+	 (INTREP-SPEC	(cl-case INTREP-TYPE
+			  (integer	"elisp-integer")
+			  (float	"elisp-float")
+			  (usrptr	"usrptr")
+			  (t
+			   (signal 'mmec-error-invalid-argument (list --func--)))))
+	 (CFUNC-CTOR	(mmec-sformat "mmec-c-make-%s-%s-from-usrptr-%s" INTREP-SPEC STEM NORM-STEM))
+	 (DOCSTRING	(format "Constructor for number objects of type `%s'.
+
+This  constructor accepts  as initialisation  argument a  value of  type
+`mmec-unsigned-integer'.
+
+This constructor normalises the initialisation  argument to an object of
+type `%s', then it checks if the range  is valid; if it is: it builds an
+object  of   type  `%s',  otherwise   it  raises  the   error  condition
+`mmec-error-value-out-of-range'."  NUMTYPE NORM-TYPE NUMTYPE)))
+    `(cl-defmethod ,MAKER ((init mmec-unsigned-integer))
+       ,DOCSTRING
+       (let ((obj (,NORM-MAKER init)))
+	 (unless (mmec-fits-number-type-p ,STEM obj)
+	   (signal 'mmec-error-value-out-of-range (list ',NUMTYPE init)))
+	 (mmec--make-obj ,STEM (,CFUNC-CTOR (mmec--extract-obj ,NORM-STEM obj)))))))
+
+;;; --------------------------------------------------------------------
+
+(mmec-defmacro mmec--define-number-object-constructor-as-method-floating-point-argument (STEM &key INTREP-TYPE NORM-STEM)
+  (let* ((NUMTYPE	(mmec-sformat "mmec-%s" STEM))
+	 (NORM-TYPE	(mmec-sformat "mmec-%s" NORM-STEM))
+	 (MAKER		NUMTYPE)
+	 (NORM-MAKER	NORM-TYPE)
+	 (INTREP-SPEC	(cl-case INTREP-TYPE
+			  (integer	"elisp-integer")
+			  (float	"elisp-float")
+			  (usrptr	"usrptr")
+			  (t
+			   (signal 'mmec-error-invalid-argument (list --func--)))))
+	 (CFUNC-CTOR	(mmec-sformat "mmec-c-make-%s-%s-from-usrptr-%s" INTREP-SPEC STEM NORM-STEM))
+	 (DOCSTRING	(format "Constructor for number objects of type `%s'.
+
+This  constructor accepts  as initialisation  argument a  value of  type
+`mmec-floating-point'.
+
+This constructor normalises the initialisation  argument to an object of
+type `%s', then it checks if the range  is valid; if it is: it builds an
+object  of   type  `%s',  otherwise   it  raises  the   error  condition
+`mmec-error-value-out-of-range'."  NUMTYPE NORM-TYPE NUMTYPE)))
+    `(cl-defmethod ,MAKER ((init mmec-floating-point))
+       ,DOCSTRING
+       (let ((obj (,NORM-MAKER init)))
+	 (unless (mmec-fits-number-type-p ,STEM obj)
+	   (signal 'mmec-error-value-out-of-range (list ',NUMTYPE init)))
+	 (mmec--make-obj ,STEM (,CFUNC-CTOR (mmec--extract-obj ,NORM-STEM obj)))))))
+
+;;; --------------------------------------------------------------------
+
+(defmacro mmec--define-number-object-constructor-for-unsupported-number-types (STEM)
+  (let* ((NUMTYPE	(mmec-sformat "mmec-%s" STEM))
+	 (MAKER		NUMTYPE)
+	 (DOCSTRING	(format "Constructor for number objects of type `%s'.
 
 This constructor  method signals that the  given initialisation argument
-is invalid."
-  (signal 'mmec-error-unsupported-init-type (list --func-- init)))
+is invalid." NUMTYPE)))
+    `(mmec-defmethod ,MAKER ((init mmec-number))
+       ,DOCSTRING
+       (signal 'mmec-error-unsupported-init-type (list --func-- init)))))
+
+;;; --------------------------------------------------------------------
+
+(mmec-defmacro mmec--define-number-object (STEM &key INTREP-TYPE NORM-STEM PARENT-STEM)
+  (let* ((NUMTYPE		(mmec-sformat "mmec-%s" STEM))
+	 (PARENT-TYPE		(mmec-sformat "mmec-%s" PARENT-STEM))
+	 (STRUCT-CTOR-NAME	(mmec--type-elisp-constructor-name STEM)))
+    `(progn
+       (cl-defstruct (,NUMTYPE
+		      (:include		,PARENT-TYPE)
+		      (:constructor	,STRUCT-CTOR-NAME))
+	 obj)
+
+       (mmec--define-number-object-constructor-as-generic-function		,STEM)
+       (mmec--define-number-object-copy-constructor-as-method			,STEM)
+       (mmec--define-number-object-constructor-as-method-parent-argument	,STEM :INTREP-TYPE ,INTREP-TYPE :NORM-STEM ,NORM-STEM
+										:PARENT-STEM ,PARENT-STEM)
+       (mmec--define-number-object-constructor-as-method-integer-argument	,STEM :INTREP-TYPE ,INTREP-TYPE :NORM-STEM ,NORM-STEM)
+       (mmec--define-number-object-constructor-as-method-float-argument		,STEM :INTREP-TYPE ,INTREP-TYPE :NORM-STEM ,NORM-STEM)
+       ,(cl-case PARENT-STEM
+	  (signed-integer
+	   `(mmec--define-number-object-constructor-as-method-signed-integer-argument
+	     ,STEM :INTREP-TYPE ,INTREP-TYPE :NORM-STEM ,NORM-STEM))
+	  (unsigned-integer
+	   `(mmec--define-number-object-constructor-as-method-unsigned-integer-argument
+	     ,STEM :INTREP-TYPE ,INTREP-TYPE :NORM-STEM ,NORM-STEM))
+	  (floating-point
+	   `(progn
+	      (mmec--define-number-object-constructor-as-method-signed-integer-argument
+	       ,STEM :INTREP-TYPE ,INTREP-TYPE :NORM-STEM ,NORM-STEM)
+	      (mmec--define-number-object-constructor-as-method-unsigned-integer-argument
+	       ,STEM :INTREP-TYPE ,INTREP-TYPE :NORM-STEM ,NORM-STEM)
+	      (mmec--define-number-object-constructor-as-method-floating-point-argument
+	       ,STEM :INTREP-TYPE ,INTREP-TYPE :NORM-STEM ,NORM-STEM)))
+	  (t
+	   (signal 'mmec-error-invalid-argument (list --func-- PARENT-STEM))))
+       (mmec--define-number-object-constructor-for-unsupported-number-types	,STEM)
+       )))
+
+;;; --------------------------------------------------------------------
+
+(mmec-defmacro mmec--define-normalised-number-object (STEM &key INTREP-TYPE PARENT-STEM)
+  (let* ((NUMTYPE		(mmec-sformat "mmec-%s" STEM))
+	 (PARENT-TYPE		(mmec-sformat "mmec-%s" PARENT-STEM))
+	 (STRUCT-CTOR-NAME	(mmec--type-elisp-constructor-name STEM)))
+    `(progn
+       (cl-defstruct (,NUMTYPE
+		      (:include		,PARENT-TYPE)
+		      (:constructor	,STRUCT-CTOR-NAME))
+	 obj)
+
+       (mmec--define-number-object-constructor-as-generic-function		,STEM)
+       (mmec--define-number-object-copy-constructor-as-method			,STEM)
+       (mmec--define-number-object-constructor-for-unsupported-number-types	,STEM)
+       )))
 
 
-;;;; C language type wrappers: signed char
-
-(cl-defstruct (mmec-schar
-	       (:include	mmec-signed-integer)
-	       (:constructor	mmec-schar--make))
-  obj)
-
-(cl-defgeneric mmec-schar (init)
-  "Constructor for number objects of type `mmec-schar'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-schar ((init mmec-schar))
-  "Constructor for number objects of type `mmec-schar'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj schar (mmec--extract-obj schar init)))
-
-(cl-defmethod mmec-schar ((init mmec-signed-integer))
-  "Constructor for number objects of type `mmec-schar'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is is builds  an object  of type `mmec-schar',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p schar obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-schar init)))
-    (mmec--make-obj schar (mmec-c-make-integer-schar-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-schar ((init integer))
-  "Constructor for number objects of type `mmec-schar'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is is builds  an object  of type `mmec-schar',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p schar obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-schar init)))
-    (mmec--make-obj schar (mmec-c-make-integer-schar-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-schar ((init float))
-  "Constructor for number objects of type `mmec-schar'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is is builds  an object  of type `mmec-schar',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p schar obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-schar init)))
-    (mmec--make-obj schar (mmec-c-make-integer-schar-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-schar ((init mmec-number))
-  "Constructor for number objects of type `mmec-schar'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-schar init)))
-
-
-;;;; C language type wrappers: unsigned char
-
-(cl-defstruct (mmec-uchar
-	       (:include	mmec-unsigned-integer)
-	       (:constructor	mmec-uchar--make))
-  obj)
-
-(cl-defgeneric mmec-uchar (init)
-  "Constructor for number objects of type `mmec-uchar'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-uchar ((init mmec-uchar))
-  "Constructor for number objects of type `mmec-uchar'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj uchar (mmec--extract-obj uchar init)))
-
-(cl-defmethod mmec-uchar ((init mmec-unsigned-integer))
-  "Constructor for number objects of type `mmec-uchar'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is is builds  an object  of type `mmec-uchar',  otherwise is
-raised the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p uchar obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-uchar init)))
-    (mmec--make-obj uchar (mmec-c-make-integer-uchar-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-uchar ((init integer))
-  "Constructor for number objects of type `mmec-uchar'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is is builds  an object  of type `mmec-uchar',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p uchar obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-uchar init)))
-    (mmec--make-obj uchar (mmec-c-make-integer-uchar-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-uchar ((init float))
-  "Constructor for number objects of type `mmec-uchar'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is is builds  an object  of type `mmec-uchar',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p uchar obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-uchar init)))
-    (mmec--make-obj uchar (mmec-c-make-integer-uchar-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-uchar ((init mmec-number))
-  "Constructor for number objects of type `mmec-uchar'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-uchar init)))
-
-
-;;;; C language type wrappers: wchar_t
-
-(cl-defstruct (mmec-wchar
-	       (:include	mmec-signed-integer)
-	       (:constructor	mmec-wchar--make))
-  obj)
-
-(cl-defgeneric mmec-wchar (init)
-  "Constructor for number objects of type `mmec-wchar'.
-
-This  type  constructor  is  implemented as  a  generic  function.   The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-wchar ((init mmec-wchar))
-  "Constructor for number objects of type `mmec-wchar'.
-
-This is the copy constructor implemented as method.  This method creates
-a   duplicate  of   the  INIT   value,  but   it  reuses   the  internal
-representation (which is immutable)."
-  (mmec--make-obj wchar (mmec--extract-obj wchar init)))
-
-(cl-defmethod mmec-wchar ((init mmec-signed-integer))
-  "Constructor for number objects of type `mmec-wchar'.
-
-This constructor normalises the initialisation  argument to an object of
-type `mmec-sint64', then it  checks if the range is valid;  if it is: it
-builds an  object of  type `mmec-wchar', otherwise  it raises  the error
-condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p wchar obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-wchar init)))
-    (mmec--make-obj wchar (mmec-c-make-usrptr-wchar-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-wchar ((init integer))
-  "Constructor for number objects of type `mmec-wchar'.
-
-This  constructor accepts  as initialisation  argument a  value of  type
-`integer'.
-
-This constructor normalises the initialisation  argument to an object of
-type `mmec-sint64', then it  checks if the range is valid;  if it is: it
-builds an  object of  type `mmec-wchar', otherwise  it raises  the error
-condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p wchar obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-wchar init)))
-    (mmec--make-obj wchar (mmec-c-make-usrptr-wchar-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-wchar ((init float))
-  "Constructor for number objects of type `mmec-wchar'.
-
-This  constructor accepts  as initialisation  argument a  value of  type
-`float'.
-
-This constructor normalises the initialisation  argument to an object of
-type `mmec-sint64', then it  checks if the range is valid;  if it is: it
-builds an  object of  type `mmec-wchar', otherwise  it raises  the error
-condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p wchar obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-wchar init)))
-    (mmec--make-obj wchar (mmec-c-make-usrptr-wchar-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-wchar ((init mmec-number))
-  "Constructor for number objects of type `mmec-wchar'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-wchar init)))
-
-
-;;;; C language type wrappers: signed short int
-
-(cl-defstruct (mmec-sshrt
-	       (:include	mmec-signed-integer)
-	       (:constructor	mmec-sshrt--make))
-  obj)
-
-(cl-defgeneric mmec-sshrt (init)
-  "Constructor for number objects of type `mmec-sshrt'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-sshrt ((init mmec-sshrt))
-  "Constructor for number objects of type `mmec-sshrt'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj sshrt (mmec--extract-obj sshrt init)))
-
-(cl-defmethod mmec-sshrt ((init mmec-signed-integer))
-  "Constructor for number objects of type `mmec-sshrt'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-sshrt',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p sshrt obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-sshrt init)))
-    (mmec--make-obj sshrt (mmec-c-make-integer-sshrt-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-sshrt ((init integer))
-  "Constructor for number objects of type `mmec-sshrt'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-sshrt',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p sshrt obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-sshrt init)))
-    (mmec--make-obj sshrt (mmec-c-make-integer-sshrt-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-sshrt ((init float))
-  "Constructor for number objects of type `mmec-sshrt'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-sshrt',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p sshrt obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-sshrt init)))
-    (mmec--make-obj sshrt (mmec-c-make-integer-sshrt-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-sshrt ((init mmec-number))
-  "Constructor for number objects of type `mmec-sshrt'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-sshrt init)))
-
-
-;;;; C language type wrappers: unsigned short int
-
-(cl-defstruct (mmec-ushrt
-	       (:include	mmec-unsigned-integer)
-	       (:constructor	mmec-ushrt--make))
-  obj)
-
-(cl-defgeneric mmec-ushrt (init)
-  "Constructor for number objects of type `mmec-ushrt'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-ushrt ((init mmec-ushrt))
-  "Constructor for number objects of type `mmec-ushrt'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj ushrt (mmec--extract-obj ushrt init)))
-
-(cl-defmethod mmec-ushrt ((init mmec-unsigned-integer))
-  "Constructor for number objects of type `mmec-ushrt'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-ushrt',  otherwise is
-raised the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p ushrt obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-ushrt init)))
-    (mmec--make-obj ushrt (mmec-c-make-integer-ushrt-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-ushrt ((init integer))
-  "Constructor for number objects of type `mmec-ushrt'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-ushrt',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p ushrt obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-ushrt init)))
-    (mmec--make-obj ushrt (mmec-c-make-integer-ushrt-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-ushrt ((init float))
-  "Constructor for number objects of type `mmec-ushrt'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-ushrt',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p ushrt obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-ushrt init)))
-    (mmec--make-obj ushrt (mmec-c-make-integer-ushrt-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-ushrt ((init mmec-number))
-  "Constructor for number objects of type `mmec-ushrt'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-ushrt init)))
-
-
-;;;; C language type wrappers: signed int
-
-(cl-defstruct (mmec-sint
-	       (:include	mmec-signed-integer)
-	       (:constructor	mmec-sint--make))
-  obj)
-
-(cl-defgeneric mmec-sint (init)
-  "Constructor for number objects of type `mmec-sint'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-sint ((init mmec-sint))
-  "Constructor for number objects of type `mmec-sint'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj sint (mmec--extract-obj sint init)))
-
-(cl-defmethod mmec-sint ((init mmec-signed-integer))
-  "Constructor for number objects of type `mmec-sint'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-sint',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p sint obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-sint init)))
-    (mmec--make-obj sint (mmec-c-make-usrptr-sint-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-sint ((init integer))
-  "Constructor for number objects of type `mmec-sint'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-sint',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p sint obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-sint init)))
-    (mmec--make-obj sint (mmec-c-make-usrptr-sint-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-sint ((init float))
-  "Constructor for number objects of type `mmec-sint'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-sint',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p sint obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-sint init)))
-    (mmec--make-obj sint (mmec-c-make-usrptr-sint-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-sint ((init mmec-number))
-  "Constructor for number objects of type `mmec-sint'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-sint init)))
-
-
-;;;; C language type wrappers: unsigned int
-
-(cl-defstruct (mmec-uint
-	       (:include	mmec-unsigned-integer)
-	       (:constructor	mmec-uint--make))
-  obj)
-
-(cl-defgeneric mmec-uint (init)
-  "Constructor for number objects of type `mmec-uint'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-uint ((init mmec-uint))
-  "Constructor for number objects of type `mmec-uint'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj uint (mmec--extract-obj uint init)))
-
-(cl-defmethod mmec-uint ((init mmec-unsigned-integer))
-  "Constructor for number objects of type `mmec-uint'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-uint',  otherwise is
-raised the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p uint obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-uint init)))
-    (mmec--make-obj uint (mmec-c-make-usrptr-uint-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-uint ((init integer))
-  "Constructor for number objects of type `mmec-uint'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-uint',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p uint obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-uint init)))
-    (mmec--make-obj uint (mmec-c-make-usrptr-uint-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-uint ((init float))
-  "Constructor for number objects of type `mmec-uint'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-uint',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p uint obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-uint init)))
-    (mmec--make-obj uint (mmec-c-make-usrptr-uint-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-uint ((init mmec-number))
-  "Constructor for number objects of type `mmec-uint'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-uint init)))
-
-
-;;;; C language type wrappers: signed long int
-
-(cl-defstruct (mmec-slong
-	       (:include	mmec-signed-integer)
-	       (:constructor	mmec-slong--make))
-  obj)
-
-(cl-defgeneric mmec-slong (init)
-  "Constructor for number objects of type `mmec-slong'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-slong ((init mmec-slong))
-  "Constructor for number objects of type `mmec-slong'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj slong (mmec--extract-obj slong init)))
-
-(cl-defmethod mmec-slong ((init mmec-signed-integer))
-  "Constructor for number objects of type `mmec-slong'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-slong',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p slong obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-slong init)))
-    (mmec--make-obj slong (mmec-c-make-usrptr-slong-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-slong ((init integer))
-  "Constructor for number objects of type `mmec-slong'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-slong',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p slong obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-slong init)))
-    (mmec--make-obj slong (mmec-c-make-usrptr-slong-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-slong ((init float))
-  "Constructor for number objects of type `mmec-slong'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-slong',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p slong obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-slong init)))
-    (mmec--make-obj slong (mmec-c-make-usrptr-slong-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-slong ((init mmec-number))
-  "Constructor for number objects of type `mmec-slong'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-slong init)))
-
-
-;;;; C language type wrappers: unsigned long int
-
-(cl-defstruct (mmec-ulong
-	       (:include	mmec-unsigned-integer)
-	       (:constructor	mmec-ulong--make))
-  obj)
-
-(cl-defgeneric mmec-ulong (init)
-  "Constructor for number objects of type `mmec-ulong'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-ulong ((init mmec-ulong))
-  "Constructor for number objects of type `mmec-ulong'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj ulong (mmec--extract-obj ulong init)))
-
-(cl-defmethod mmec-ulong ((init mmec-unsigned-integer))
-  "Constructor for number objects of type `mmec-ulong'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-ulong',  otherwise is
-raised the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p ulong obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-ulong init)))
-    (mmec--make-obj ulong (mmec-c-make-usrptr-ulong-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-ulong ((init integer))
-  "Constructor for number objects of type `mmec-ulong'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-ulong',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p ulong obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-ulong init)))
-    (mmec--make-obj ulong (mmec-c-make-usrptr-ulong-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-ulong ((init float))
-  "Constructor for number objects of type `mmec-ulong'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-ulong',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p ulong obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-ulong init)))
-    (mmec--make-obj ulong (mmec-c-make-usrptr-ulong-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-ulong ((init mmec-number))
-  "Constructor for number objects of type `mmec-ulong'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-ulong init)))
-
-
-;;;; C language type wrappers: signed long long int
-
-(cl-defstruct (mmec-sllong
-	       (:include	mmec-signed-integer)
-	       (:constructor	mmec-sllong--make))
-  obj)
-
-(cl-defgeneric mmec-sllong (init)
-  "Constructor for number objects of type `mmec-sllong'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-sllong ((init mmec-sllong))
-  "Constructor for number objects of type `mmec-sllong'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj sllong (mmec--extract-obj sllong init)))
-
-(cl-defmethod mmec-sllong ((init mmec-signed-integer))
-  "Constructor for number objects of type `mmec-sllong'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-sllong',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p sllong obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-sllong init)))
-    (mmec--make-obj sllong (mmec-c-make-usrptr-sllong-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-sllong ((init integer))
-  "Constructor for number objects of type `mmec-sllong'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-sllong',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p sllong obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-sllong init)))
-    (mmec--make-obj sllong (mmec-c-make-usrptr-sllong-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-sllong ((init float))
-  "Constructor for number objects of type `mmec-sllong'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-sllong',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p sllong obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-sllong init)))
-    (mmec--make-obj sllong (mmec-c-make-usrptr-sllong-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-sllong ((init mmec-number))
-  "Constructor for number objects of type `mmec-sllong'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-sllong init)))
-
-
-;;;; C language type wrappers: unsigned long long int
-
-(cl-defstruct (mmec-ullong
-	       (:include	mmec-unsigned-integer)
-	       (:constructor	mmec-ullong--make))
-  obj)
-
-(cl-defgeneric mmec-ullong (init)
-  "Constructor for number objects of type `mmec-ullong'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-ullong ((init mmec-ullong))
-  "Constructor for number objects of type `mmec-ullong'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj ullong (mmec--extract-obj ullong init)))
-
-(cl-defmethod mmec-ullong ((init mmec-unsigned-integer))
-  "Constructor for number objects of type `mmec-ullong'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-ullong',  otherwise is
-raised the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p ullong obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-ullong init)))
-    (mmec--make-obj ullong (mmec-c-make-usrptr-ullong-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-ullong ((init integer))
-  "Constructor for number objects of type `mmec-ullong'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-ullong',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p ullong obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-ullong init)))
-    (mmec--make-obj ullong (mmec-c-make-usrptr-ullong-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-ullong ((init float))
-  "Constructor for number objects of type `mmec-ullong'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-ullong',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p ullong obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-ullong init)))
-    (mmec--make-obj ullong (mmec-c-make-usrptr-ullong-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-ullong ((init mmec-number))
-  "Constructor for number objects of type `mmec-ullong'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-ullong init)))
-
-
-;;;; C language type wrappers: intmax_t
-
-(cl-defstruct (mmec-sintmax
-	       (:include	mmec-signed-integer)
-	       (:constructor	mmec-sintmax--make))
-  obj)
-
-(cl-defgeneric mmec-sintmax (init)
-  "Constructor for number objects of type `mmec-sintmax'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-sintmax ((init mmec-sintmax))
-  "Constructor for number objects of type `mmec-sintmax'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj sintmax (mmec--extract-obj sintmax init)))
-
-(cl-defmethod mmec-sintmax ((init mmec-signed-integer))
-  "Constructor for number objects of type `mmec-sintmax'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-sintmax',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p sintmax obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-sintmax init)))
-    (mmec--make-obj sintmax (mmec-c-make-usrptr-sintmax-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-sintmax ((init integer))
-  "Constructor for number objects of type `mmec-sintmax'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-sintmax',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p sintmax obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-sintmax init)))
-    (mmec--make-obj sintmax (mmec-c-make-usrptr-sintmax-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-sintmax ((init float))
-  "Constructor for number objects of type `mmec-sintmax'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-sintmax',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p sintmax obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-sintmax init)))
-    (mmec--make-obj sintmax (mmec-c-make-usrptr-sintmax-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-sintmax ((init mmec-number))
-  "Constructor for number objects of type `mmec-sintmax'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-sintmax init)))
-
-
-;;;; C language type wrappers: uintmax_t
-
-(cl-defstruct (mmec-uintmax
-	       (:include	mmec-unsigned-integer)
-	       (:constructor	mmec-uintmax--make))
-  obj)
-
-(cl-defgeneric mmec-uintmax (init)
-  "Constructor for number objects of type `mmec-uintmax'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-uintmax ((init mmec-uintmax))
-  "Constructor for number objects of type `mmec-uintmax'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj uintmax (mmec--extract-obj uintmax init)))
-
-(cl-defmethod mmec-uintmax ((init mmec-unsigned-integer))
-  "Constructor for number objects of type `mmec-uintmax'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-uintmax',  otherwise is
-raised the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p uintmax obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-uintmax init)))
-    (mmec--make-obj uintmax (mmec-c-make-usrptr-uintmax-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-uintmax ((init integer))
-  "Constructor for number objects of type `mmec-uintmax'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-uintmax',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p uintmax obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-uintmax init)))
-    (mmec--make-obj uintmax (mmec-c-make-usrptr-uintmax-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-uintmax ((init float))
-  "Constructor for number objects of type `mmec-uintmax'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-uintmax',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p uintmax obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-uintmax init)))
-    (mmec--make-obj uintmax (mmec-c-make-usrptr-uintmax-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-uintmax ((init mmec-number))
-  "Constructor for number objects of type `mmec-uintmax'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-uintmax init)))
-
-
-;;;; C language type wrappers: ssize_t
-
-(cl-defstruct (mmec-ssize
-	       (:include	mmec-signed-integer)
-	       (:constructor	mmec-ssize--make))
-  obj)
-
-(cl-defgeneric mmec-ssize (init)
-  "Constructor for number objects of type `mmec-ssize'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-ssize ((init mmec-ssize))
-  "Constructor for number objects of type `mmec-ssize'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj ssize (mmec--extract-obj ssize init)))
-
-(cl-defmethod mmec-ssize ((init mmec-signed-integer))
-  "Constructor for number objects of type `mmec-ssize'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-ssize',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p ssize obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-ssize init)))
-    (mmec--make-obj ssize (mmec-c-make-usrptr-ssize-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-ssize ((init integer))
-  "Constructor for number objects of type `mmec-ssize'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-ssize',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p ssize obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-ssize init)))
-    (mmec--make-obj ssize (mmec-c-make-usrptr-ssize-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-ssize ((init float))
-  "Constructor for number objects of type `mmec-ssize'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-ssize',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p ssize obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-ssize init)))
-    (mmec--make-obj ssize (mmec-c-make-usrptr-ssize-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-ssize ((init mmec-number))
-  "Constructor for number objects of type `mmec-ssize'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-ssize init)))
-
-
-;;;; C language type wrappers: size_t
-
-(cl-defstruct (mmec-usize
-	       (:include	mmec-unsigned-integer)
-	       (:constructor	mmec-usize--make))
-  obj)
-
-(cl-defgeneric mmec-usize (init)
-  "Constructor for number objects of type `mmec-usize'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-usize ((init mmec-usize))
-  "Constructor for number objects of type `mmec-usize'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj usize (mmec--extract-obj usize init)))
-
-(cl-defmethod mmec-usize ((init mmec-unsigned-integer))
-  "Constructor for number objects of type `mmec-usize'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-usize',  otherwise is
-raised the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p usize obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-usize init)))
-    (mmec--make-obj usize (mmec-c-make-usrptr-usize-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-usize ((init integer))
-  "Constructor for number objects of type `mmec-usize'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-usize',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p usize obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-usize init)))
-    (mmec--make-obj usize (mmec-c-make-usrptr-usize-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-usize ((init float))
-  "Constructor for number objects of type `mmec-usize'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-usize',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p usize obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-usize init)))
-    (mmec--make-obj usize (mmec-c-make-usrptr-usize-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-usize ((init mmec-number))
-  "Constructor for number objects of type `mmec-usize'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-usize init)))
-
-
-;;;; C language type wrappers: ptrdiff_t
-
-(cl-defstruct (mmec-ptrdiff
-	       (:include	mmec-signed-integer)
-	       (:constructor	mmec-ptrdiff--make))
-  obj)
-
-(cl-defgeneric mmec-ptrdiff (init)
-  "Constructor for number objects of type `mmec-ptrdiff'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-ptrdiff ((init mmec-ptrdiff))
-  "Constructor for number objects of type `mmec-ptrdiff'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj ptrdiff (mmec--extract-obj ptrdiff init)))
-
-(cl-defmethod mmec-ptrdiff ((init mmec-signed-integer))
-  "Constructor for number objects of type `mmec-ptrdiff'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it is  is builds an object of type  `mmec-ptrdiff', otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p ptrdiff obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-ptrdiff init)))
-    (mmec--make-obj ptrdiff (mmec-c-make-usrptr-ptrdiff-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-ptrdiff ((init integer))
-  "Constructor for number objects of type `mmec-ptrdiff'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it is  is builds an object of type  `mmec-ptrdiff', otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p ptrdiff obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-ptrdiff init)))
-    (mmec--make-obj ptrdiff (mmec-c-make-usrptr-ptrdiff-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-ptrdiff ((init float))
-  "Constructor for number objects of type `mmec-ptrdiff'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it is  is builds an object of type  `mmec-ptrdiff', otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p ptrdiff obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-ptrdiff init)))
-    (mmec--make-obj ptrdiff (mmec-c-make-usrptr-ptrdiff-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-ptrdiff ((init mmec-number))
-  "Constructor for number objects of type `mmec-ptrdiff'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-ptrdiff init)))
-
-
-;;;; C language type wrappers: int8_t
-
-(cl-defstruct (mmec-sint8
-	       (:include	mmec-signed-integer)
-	       (:constructor	mmec-sint8--make))
-  obj)
-
-(cl-defgeneric mmec-sint8 (init)
-  "Constructor for number objects of type `mmec-sint8'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-sint8 ((init mmec-sint8))
-  "Constructor for number objects of type `mmec-sint8'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj sint8 (mmec--extract-obj sint8 init)))
-
-(cl-defmethod mmec-sint8 ((init mmec-signed-integer))
-  "Constructor for number objects of type `mmec-sint8'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-sint8',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p sint8 obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-sint8 init)))
-    (mmec--make-obj sint8 (mmec-c-make-integer-sint8-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-sint8 ((init integer))
-  "Constructor for number objects of type `mmec-sint8'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-sint8',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p sint8 obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-sint8 init)))
-    (mmec--make-obj sint8 (mmec-c-make-integer-sint8-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-sint8 ((init float))
-  "Constructor for number objects of type `mmec-sint8'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-sint8',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p sint8 obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-sint8 init)))
-    (mmec--make-obj sint8 (mmec-c-make-integer-sint8-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-sint8 ((init mmec-number))
-  "Constructor for number objects of type `mmec-sint8'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-sint8 init)))
-
-
-;;;; C language type wrappers: uint8_t
-
-(cl-defstruct (mmec-uint8
-	       (:include	mmec-unsigned-integer)
-	       (:constructor	mmec-uint8--make))
-  obj)
-
-(cl-defgeneric mmec-uint8 (init)
-  "Constructor for number objects of type `mmec-uint8'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-uint8 ((init mmec-uint8))
-  "Constructor for number objects of type `mmec-uint8'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj uint8 (mmec--extract-obj uint8 init)))
-
-(cl-defmethod mmec-uint8 ((init mmec-unsigned-integer))
-  "Constructor for number objects of type `mmec-uint8'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-uint8',  otherwise is
-raised the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p uint8 obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-uint8 init)))
-    (mmec--make-obj uint8 (mmec-c-make-integer-uint8-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-uint8 ((init integer))
-  "Constructor for number objects of type `mmec-uint8'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-uint8',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p uint8 obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-uint8 init)))
-    (mmec--make-obj uint8 (mmec-c-make-integer-uint8-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-uint8 ((init float))
-  "Constructor for number objects of type `mmec-uint8'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-uint8',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p uint8 obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-uint8 init)))
-    (mmec--make-obj uint8 (mmec-c-make-integer-uint8-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-uint8 ((init mmec-number))
-  "Constructor for number objects of type `mmec-uint8'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-uint8 init)))
-
-
-;;;; C language type wrappers: int16_t
-
-(cl-defstruct (mmec-sint16
-	       (:include	mmec-signed-integer)
-	       (:constructor	mmec-sint16--make))
-  obj)
-
-(cl-defgeneric mmec-sint16 (init)
-  "Constructor for number objects of type `mmec-sint16'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-sint16 ((init mmec-sint16))
-  "Constructor for number objects of type `mmec-sint16'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj sint16 (mmec--extract-obj sint16 init)))
-
-(cl-defmethod mmec-sint16 ((init mmec-signed-integer))
-  "Constructor for number objects of type `mmec-sint16'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds an  object of type `mmec-sint16',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p sint16 obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-sint16 init)))
-    (mmec--make-obj sint16 (mmec-c-make-integer-sint16-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-sint16 ((init integer))
-  "Constructor for number objects of type `mmec-sint16'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-sint16',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p sint16 obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-sint16 init)))
-    (mmec--make-obj sint16 (mmec-c-make-integer-sint16-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-sint16 ((init float))
-  "Constructor for number objects of type `mmec-sint16'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-sint16',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p sint16 obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-sint16 init)))
-    (mmec--make-obj sint16 (mmec-c-make-integer-sint16-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-sint16 ((init mmec-number))
-  "Constructor for number objects of type `mmec-sint16'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-sint16 init)))
-
-
-;;;; C language type wrappers: uint16_t
-
-(cl-defstruct (mmec-uint16
-	       (:include	mmec-unsigned-integer)
-	       (:constructor	mmec-uint16--make))
-  obj)
-
-(cl-defgeneric mmec-uint16 (init)
-  "Constructor for number objects of type `mmec-uint16'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-uint16 ((init mmec-uint16))
-  "Constructor for number objects of type `mmec-uint16'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj uint16 (mmec--extract-obj uint16 init)))
-
-(cl-defmethod mmec-uint16 ((init mmec-unsigned-integer))
-  "Constructor for number objects of type `mmec-uint16'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds an  object of type `mmec-uint16',  otherwise is
-raised the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p uint16 obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-uint16 init)))
-    (mmec--make-obj uint16 (mmec-c-make-integer-uint16-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-uint16 ((init integer))
-  "Constructor for number objects of type `mmec-uint16'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-uint16',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p uint16 obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-uint16 init)))
-    (mmec--make-obj uint16 (mmec-c-make-integer-uint16-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-uint16 ((init float))
-  "Constructor for number objects of type `mmec-uint16'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-uint16',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p uint16 obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-uint16 init)))
-    (mmec--make-obj uint16 (mmec-c-make-integer-uint16-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-uint16 ((init mmec-number))
-  "Constructor for number objects of type `mmec-uint16'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-uint16 init)))
-
-
-;;;; C language type wrappers: int32_t
-
-(cl-defstruct (mmec-sint32
-	       (:include	mmec-signed-integer)
-	       (:constructor	mmec-sint32--make))
-  obj)
-
-(cl-defgeneric mmec-sint32 (init)
-  "Constructor for number objects of type `mmec-sint32'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-sint32 ((init mmec-sint32))
-  "Constructor for number objects of type `mmec-sint32'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj sint32 (mmec--extract-obj sint32 init)))
-
-(cl-defmethod mmec-sint32 ((init mmec-signed-integer))
-  "Constructor for number objects of type `mmec-sint32'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds an  object of type `mmec-sint32',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p sint32 obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-sint32 init)))
-    (mmec--make-obj sint32 (mmec-c-make-usrptr-sint32-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-sint32 ((init integer))
-  "Constructor for number objects of type `mmec-sint32'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-sint32',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p sint32 obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-sint32 init)))
-    (mmec--make-obj sint32 (mmec-c-make-usrptr-sint32-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-sint32 ((init float))
-  "Constructor for number objects of type `mmec-sint32'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-sint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-sint32',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-sint64 init)))
-    (unless (mmec-fits-number-type-p sint32 obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-sint32 init)))
-    (mmec--make-obj sint32 (mmec-c-make-usrptr-sint32-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
-
-(cl-defmethod mmec-sint32 ((init mmec-number))
-  "Constructor for number objects of type `mmec-sint32'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-sint32 init)))
-
-
-;;;; C language type wrappers: uint32_t
-
-(cl-defstruct (mmec-uint32
-	       (:include	mmec-unsigned-integer)
-	       (:constructor	mmec-uint32--make))
-  obj)
-
-(cl-defgeneric mmec-uint32 (init)
-  "Constructor for number objects of type `mmec-uint32'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-uint32 ((init mmec-uint32))
-  "Constructor for number objects of type `mmec-uint32'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj uint32 (mmec--extract-obj uint32 init)))
-
-(cl-defmethod mmec-uint32 ((init mmec-unsigned-integer))
-  "Constructor for number objects of type `mmec-uint32'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds an  object of type `mmec-uint32',  otherwise is
-raised the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p uint32 obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-uint32 init)))
-    (mmec--make-obj uint32 (mmec-c-make-usrptr-uint32-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-uint32 ((init integer))
-  "Constructor for number objects of type `mmec-uint32'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-uint32',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p uint32 obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-uint32 init)))
-    (mmec--make-obj uint32 (mmec-c-make-usrptr-uint32-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-uint32 ((init float))
-  "Constructor for number objects of type `mmec-uint32'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-uint64', then it  checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-uint32',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-uint64 init)))
-    (unless (mmec-fits-number-type-p uint32 obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-uint32 init)))
-    (mmec--make-obj uint32 (mmec-c-make-usrptr-uint32-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
-
-(cl-defmethod mmec-uint32 ((init mmec-number))
-  "Constructor for number objects of type `mmec-uint32'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-uint32 init)))
+;;;; C language type wrappers
+
+(mmec--define-number-object char	:INTREP-TYPE integer	:NORM-STEM sint64	:PARENT-STEM signed-integer)
+(mmec--define-number-object schar	:INTREP-TYPE integer	:NORM-STEM sint64	:PARENT-STEM signed-integer)
+(mmec--define-number-object uchar	:INTREP-TYPE integer	:NORM-STEM uint64	:PARENT-STEM unsigned-integer)
+(mmec--define-number-object wchar	:INTREP-TYPE usrptr 	:NORM-STEM sint64	:PARENT-STEM signed-integer)
+(mmec--define-number-object sshrt	:INTREP-TYPE integer	:NORM-STEM sint64	:PARENT-STEM signed-integer)
+(mmec--define-number-object ushrt	:INTREP-TYPE integer	:NORM-STEM uint64	:PARENT-STEM unsigned-integer)
+(mmec--define-number-object sint	:INTREP-TYPE usrptr 	:NORM-STEM sint64	:PARENT-STEM signed-integer)
+(mmec--define-number-object uint	:INTREP-TYPE usrptr 	:NORM-STEM uint64	:PARENT-STEM unsigned-integer)
+(mmec--define-number-object slong	:INTREP-TYPE usrptr 	:NORM-STEM sint64	:PARENT-STEM signed-integer)
+(mmec--define-number-object ulong	:INTREP-TYPE usrptr 	:NORM-STEM uint64	:PARENT-STEM unsigned-integer)
+(mmec--define-number-object sllong	:INTREP-TYPE usrptr 	:NORM-STEM sint64	:PARENT-STEM signed-integer)
+(mmec--define-number-object ullong	:INTREP-TYPE usrptr 	:NORM-STEM uint64	:PARENT-STEM unsigned-integer)
+(mmec--define-number-object sintmax	:INTREP-TYPE usrptr 	:NORM-STEM sint64	:PARENT-STEM signed-integer)
+(mmec--define-number-object uintmax	:INTREP-TYPE usrptr 	:NORM-STEM uint64	:PARENT-STEM unsigned-integer)
+(mmec--define-number-object ssize	:INTREP-TYPE usrptr 	:NORM-STEM sint64	:PARENT-STEM signed-integer)
+(mmec--define-number-object usize	:INTREP-TYPE usrptr 	:NORM-STEM uint64	:PARENT-STEM unsigned-integer)
+(mmec--define-number-object ptrdiff	:INTREP-TYPE usrptr 	:NORM-STEM sint64	:PARENT-STEM signed-integer)
+(mmec--define-number-object sint8	:INTREP-TYPE integer 	:NORM-STEM sint64	:PARENT-STEM signed-integer)
+(mmec--define-number-object uint8	:INTREP-TYPE integer 	:NORM-STEM uint64	:PARENT-STEM unsigned-integer)
+(mmec--define-number-object sint16	:INTREP-TYPE integer 	:NORM-STEM sint64	:PARENT-STEM signed-integer)
+(mmec--define-number-object uint16	:INTREP-TYPE integer 	:NORM-STEM uint64	:PARENT-STEM unsigned-integer)
+(mmec--define-number-object sint32	:INTREP-TYPE usrptr 	:NORM-STEM sint64	:PARENT-STEM signed-integer)
+(mmec--define-number-object uint32	:INTREP-TYPE usrptr 	:NORM-STEM uint64	:PARENT-STEM unsigned-integer)
+(mmec--define-number-object float	:INTREP-TYPE usrptr 	:NORM-STEM ldouble	:PARENT-STEM floating-point)
+(mmec--define-number-object double	:INTREP-TYPE float 	:NORM-STEM ldouble	:PARENT-STEM floating-point)
+
+(mmec--define-normalised-number-object sint64	:INTREP-TYPE usrptr 	:PARENT-STEM signed-integer)
+(mmec--define-normalised-number-object uint64	:INTREP-TYPE usrptr 	:PARENT-STEM unsigned-integer)
+(mmec--define-normalised-number-object ldouble	:INTREP-TYPE usrptr 	:PARENT-STEM floating-point)
 
 
 ;;;; C language type wrappers: sint64_t
@@ -1940,26 +669,6 @@ argument is invalid."
 ;;The custom number type  `mmec-sint64' is special because it is  used for normalised representation
 ;;of all the signed integer numbers, both built-in and custom.
 ;;
-
-(cl-defstruct (mmec-sint64
-	       (:include	mmec-signed-integer)
-	       (:constructor	mmec-sint64--make))
-  obj)
-
-(cl-defgeneric mmec-sint64 (init)
-  "Constructor for number objects of type `mmec-sint64'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-sint64 ((init mmec-sint64))
-  "Constructor for number objects of type `mmec-sint64'.
-
-The argument INIT is an instance  of type `mmec-sit64': this is the copy
-constructor implemented as  method.  This method creates  a duplicate of
-the elisp  object, but it  reuses the internal representation  (which is
-immutable)."
-  (mmec--make mmec-sint64 :obj (mmec--extract-obj mmec-sint64 init)))
 
 (cl-defmethod mmec-sint64 ((init integer))
   "Constructor for number objects of type `mmec-sint64'.
@@ -1972,13 +681,6 @@ The argument INIT must be a value of type `integer'."
 
 The argument INIT must be a  value of type `float'."
   (mmec--make sint64 :obj (mmec-c-make-usrptr-sint64-from-elisp-float init)))
-
-(cl-defmethod mmec-sint64 ((init mmec-number))
-  "Constructor for number objects of type `mmec-sint64'.
-
-This constructor  method signals that the  given initialisation argument
-is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-sint64 init)))
 
 (cl-macrolet ((mmec--define-sint64-constructor-method-for-integer-intrep-init
 	       (INIT-TYPE-OR-STEM)
@@ -2032,222 +734,81 @@ The argument INIT must be an object of type `%s'." INIT-TYPE)))
 ;;of all the unsigned integer numbers, both built-in and custom.
 ;;
 
-(cl-defstruct (mmec-uint64
-	       (:include	mmec-unsigned-integer)
-	       (:constructor	mmec-uint64--make))
-  obj)
-
-(cl-defgeneric mmec-uint64 (init)
+(mmec-defmethod mmec-uint64 ((init integer))
   "Constructor for number objects of type `mmec-uint64'.
 
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-uint64 ((init mmec-uint64))
-  "Constructor for number objects of type `mmec-uint64'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make mmec-uint64 :obj (mmec--extract-obj mmec-uint64 init)))
-
-(cl-defmethod mmec-uint64 ((init integer))
-  "Constructor for number objects of type `mmec-uint64'.
-
-This  constructor method  accepts  as  initialisation argument  a
-value of the Emacs's built-in type `integer'."
-  (when (> 0 init)
-    (signal 'mmec-error-value-out-of-range (list 'mmec-uint64 init)))
+The argument INIT  must be a value  of type `integer'.  If  the value is
+negative: the condition `mmec-error-value-out-of-range' is raised."
+  (mmec--assert-positive-number init --func--)
   (mmec--make uint64 :obj (mmec-c-make-usrptr-uint64-from-elisp-integer init)))
 
-(cl-defmethod mmec-uint64 ((init float))
+(mmec-defmethod mmec-uint64 ((init float))
   "Constructor for number objects of type `mmec-uint64'.
 
-This  constructor method  accepts  as  initialisation argument  a
-value  of the  Emacs's built-in  type `float'.   If the  value is
-negative:   the   condition  `mmec-error-value-out-of-range'   is
-raised."
-  (when (> 0.0 init)
-    (signal 'mmec-error-value-out-of-range (list 'mmec-uint64 init)))
+The argument  INIT must  be a value  of type `float'.   If the  value is
+negative: the condition `mmec-error-value-out-of-range' is raised."
+  (mmec--assert-positive-number init --func--)
   (mmec--make uint64 :obj (mmec-c-make-usrptr-uint64-from-elisp-float init)))
 
-(cl-defmethod mmec-uint64 ((init mmec-number))
-  "Constructor for number objects of type `mmec-uint64'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-uint64 init)))
-
-(cl-macrolet ((mmec--define-uint64-constructor-method-for-integer-init
-	       (INIT-TYPE-OR-STEM)
-	       (let* ((INIT-TYPE	(intern (mmec--prepend-prefix-to-symbol-name INIT-TYPE-OR-STEM)))
-		      (DOCSTRING	(format "Constructor for number objects of type `mmec-uint64'.
-
-This  constructor method  accepts as  initialisation argument  an
-instance of type `%s'." INIT-TYPE)))
-		 `(cl-defmethod mmec-uint64 ((init ,INIT-TYPE))
-		    ,DOCSTRING
-		    (mmec--make uint64 :obj (mmec-c-make-usrptr-uint64-from-elisp-integer (mmec--extract-obj ,INIT-TYPE init)))))))
-  (mmec--define-uint64-constructor-method-for-integer-init uchar)
-  (mmec--define-uint64-constructor-method-for-integer-init ushrt)
-  (mmec--define-uint64-constructor-method-for-integer-init uint8)
-  (mmec--define-uint64-constructor-method-for-integer-init uint16))
-
+;;Define constructor  methods with initialisation  value: signed  integer having `integer'  value as
+;;internal representation.
+;;
 (cl-macrolet
-    ((mmec--define-uint64-constructor-method-for-usrptr-intrep-init
-      (INIT-TYPE-OR-STEM)
-      (let* ((INIT-TYPE		(intern (mmec--prepend-prefix-to-symbol-name INIT-TYPE-OR-STEM)))
-	     (CLANG-CONSTRUCTOR	(intern (format "mmec-c-make-usrptr-uint64-from-usrptr-%s" INIT-TYPE-OR-STEM)))
-	     (DOCSTRING		(format "Constructor for number objects of type `mmec-uint64'.
+    ((mmec--def (INIT-TYPE-OR-STEM)
+		(let* ((INIT-TYPE	(intern (mmec--prepend-prefix-to-symbol-name INIT-TYPE-OR-STEM)))
+		       (DOCSTRING	(format "Constructor for number objects of type `mmec-uint64'.
+
+This constructor  method accepts as initialisation  argument an instance
+of type `%s'." INIT-TYPE)))
+		  `(mmec-defmethod mmec-uint64 ((init ,INIT-TYPE))
+		     ,DOCSTRING
+		     (mmec--assert-positive-number init --func--)
+		     (mmec--make uint64 :obj (mmec-c-make-usrptr-uint64-from-elisp-integer (mmec--extract-obj ,INIT-TYPE init)))))))
+  (mmec--def char)
+  (mmec--def schar)
+  (mmec--def sshrt)
+  (mmec--def sint8)
+  (mmec--def sint16))
+
+;;Define constructor methods  with initialisation value: unsigned integer having  `integer' value as
+;;internal representation.
+;;
+(cl-macrolet
+    ((mmec--def (INIT-TYPE-OR-STEM)
+		(let* ((INIT-TYPE	(intern (mmec--prepend-prefix-to-symbol-name INIT-TYPE-OR-STEM)))
+		       (DOCSTRING	(format "Constructor for number objects of type `mmec-uint64'.
+
+This constructor  method accepts as initialisation  argument an instance
+of type `%s'." INIT-TYPE)))
+		  `(mmec-defmethod mmec-uint64 ((init ,INIT-TYPE))
+		     ,DOCSTRING
+		     (mmec--make uint64 :obj (mmec-c-make-usrptr-uint64-from-elisp-integer (mmec--extract-obj ,INIT-TYPE init)))))))
+  (mmec--def uchar)
+  (mmec--def ushrt)
+  (mmec--def uint8)
+  (mmec--def uint16))
+
+;;Define  constructor methods  with initialisation  value:  unsigned integer  having a  user-pointer
+;;object as internal representation.
+;;
+(cl-macrolet
+    ((mmec--def (INIT-TYPE-OR-STEM)
+		(let* ((INIT-TYPE		(intern (mmec--prepend-prefix-to-symbol-name INIT-TYPE-OR-STEM)))
+		       (CLANG-CONSTRUCTOR	(intern (format "mmec-c-make-usrptr-uint64-from-usrptr-%s" INIT-TYPE-OR-STEM)))
+		       (DOCSTRING		(format "Constructor for number objects of type `mmec-uint64'.
 
 This  constructor method  accepts as  initialisation argument  an
 instance of type `%s'." INIT-TYPE)))
-	`(cl-defmethod mmec-uint64 ((init ,INIT-TYPE))
-	   ,DOCSTRING
-	   (mmec--make uint64 :obj (,CLANG-CONSTRUCTOR  (mmec--extract-obj ,INIT-TYPE init)))))))
+		  `(mmec-defmethod mmec-uint64 ((init ,INIT-TYPE))
+		     ,DOCSTRING
+		     (mmec--make uint64 :obj (,CLANG-CONSTRUCTOR  (mmec--extract-obj ,INIT-TYPE init)))))))
 
-  (mmec--define-uint64-constructor-method-for-usrptr-intrep-init uint)
-  (mmec--define-uint64-constructor-method-for-usrptr-intrep-init ulong)
-  (mmec--define-uint64-constructor-method-for-usrptr-intrep-init ullong)
-  (mmec--define-uint64-constructor-method-for-usrptr-intrep-init uintmax)
-  (mmec--define-uint64-constructor-method-for-usrptr-intrep-init usize)
-  (mmec--define-uint64-constructor-method-for-usrptr-intrep-init uint32))
-
-
-;;;; C language type wrappers: float
-
-(cl-defstruct (mmec-float
-	       (:include	mmec-floating-point)
-	       (:constructor	mmec-float--make))
-  obj)
-
-(cl-defgeneric mmec-float (init)
-  "Constructor for number objects of type `mmec-float'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-float ((init mmec-float))
-  "Constructor for number objects of type `mmec-float'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj float (mmec--extract-obj float init)))
-
-(cl-defmethod mmec-float ((init mmec-integer))
-  "Constructor for number objects of type `mmec-float'.
-
-The argument INIT is a value of type `mmec-integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-ldouble', then it checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-float',  otherwise is
-raised the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-ldouble init)))
-    (unless (mmec-fits-number-type-p float obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-float init)))
-    (mmec--make-obj float (mmec-c-make-usrptr-float-from-usrptr-ldouble (mmec--extract-obj ldouble obj)))))
-
-(cl-defmethod mmec-float ((init integer))
-  "Constructor for number objects of type `mmec-float'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-ldouble', then it checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-float',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-ldouble init)))
-    (unless (mmec-fits-number-type-p float obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-float init)))
-    (mmec--make-obj float (mmec-c-make-usrptr-float-from-usrptr-ldouble (mmec--extract-obj ldouble obj)))))
-
-(cl-defmethod mmec-float ((init float))
-  "Constructor for number objects of type `mmec-float'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-ldouble', then it checks if the range is valid:
-if it  is: it builds  an object  of type `mmec-float',  otherwise it
-raises the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-ldouble init)))
-    (unless (mmec-fits-number-type-p float obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-float init)))
-    (mmec--make-obj float (mmec-c-make-usrptr-float-from-usrptr-ldouble (mmec--extract-obj ldouble obj)))))
-
-(cl-defmethod mmec-float ((init mmec-number))
-  "Constructor for number objects of type `mmec-float'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-float init)))
-
-
-;;;; C language type wrappers: double float
-
-(cl-defstruct (mmec-double
-	       (:include	mmec-floating-point)
-	       (:constructor	mmec-double--make))
-  obj)
-
-(cl-defgeneric mmec-double (init)
-  "Constructor for number objects of type `mmec-double'.
-
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-double ((init mmec-double))
-  "Constructor for number objects of type `mmec-double'.
-
-This is the copy constructor  implemented as method.  This method
-creates  a duplicate  of  the  INIT value,  but  it reuses  the
-internal representation (which is immutable)."
-  (mmec--make-obj double (mmec--extract-obj double init)))
-
-(cl-defmethod mmec-double ((init mmec-signed-integer))
-  "Constructor for number objects of type `mmec-double'.
-
-This  constructor normalises  the initialisation  argument to  an
-object of type `mmec-ldouble', then it checks if the range is valid:
-if it  is: it builds an  object of type `mmec-double',  otherwise is
-raised the error condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-ldouble init)))
-    (unless (mmec-fits-number-type-p double obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-double init)))
-    (mmec--make-obj double (mmec-c-make-elisp-float-from-usrptr-ldouble (mmec--extract-obj ldouble obj)))))
-
-(cl-defmethod mmec-double ((init integer))
-  "Constructor for number objects of type `mmec-double'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `integer'.
-
-This constructor normalises the initialisation  argument to an object of
-type `mmec-ldouble', then it  checks if the range is valid:  if it is: it
-builds an  object of type  `mmec-double', otherwise it raises  the error
-condition `mmec-error-value-out-of-range'."
-  (let ((obj (mmec-ldouble init)))
-    (unless (mmec-fits-number-type-p double obj)
-      (signal 'mmec-error-value-out-of-range (list 'mmec-double init)))
-    (mmec--make-obj double (mmec-c-make-elisp-float-from-usrptr-ldouble (mmec--extract-obj ldouble obj)))))
-
-(cl-defmethod mmec-double ((init float))
-  "Constructor for number objects of type `mmec-double'.
-
-This constructor  accepts as  initialisation argument a  value of
-type `float'."
-  (mmec--make-obj double init))
-
-(cl-defmethod mmec-double ((init mmec-number))
-  "Constructor for number objects of type `mmec-double'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-double init)))
+  (mmec--def uint)
+  (mmec--def ulong)
+  (mmec--def ullong)
+  (mmec--def uintmax)
+  (mmec--def usize)
+  (mmec--def uint32))
 
 
 ;;;; C language type wrappers: long double float
@@ -2256,99 +817,67 @@ argument is invalid."
 ;;of all the floating-point numbers, both built-in and custom.
 ;;
 
-(cl-defstruct (mmec-ldouble
-	       (:include	mmec-floating-point)
-	       (:constructor	mmec-ldouble--make))
-  obj)
-
-(cl-defgeneric mmec-ldouble (init)
+(mmec-defmethod mmec-ldouble ((init integer))
   "Constructor for number objects of type `mmec-ldouble'.
 
-This type constructor is implemented  as a generic function.  The
-argument INIT must be a number value.")
-
-(cl-defmethod mmec-ldouble ((init mmec-ldouble))
-  "Constructor for number objects of type `mmec-ldouble'.
-
-This is the copy constructor  implemented as method.  This method
-creates a duplicate of the INIT value, but it reuses the internal
-representation (which is immutable)."
-  (mmec--make mmec-ldouble :obj (mmec--extract-obj mmec-ldouble init)))
-
-;;; --------------------------------------------------------------------
-
-(cl-defmethod mmec-ldouble ((init integer))
-  "Constructor for number objects of type `mmec-ldouble'.
-
-This  constructor method  accepts  as  initialisation argument  a
-value of the Emacs's built-in type `integer'.  The initialisation
-value  is  normalised  to  an   instance  of  `float',  then  the
-constructor is recursively applied to the normalised value."
+The argument INIT must be a valur of type `integer'.  The initialisation
+value is normalised  to an instance of `float', then  the constructor is
+recursively applied to the normalised value."
   (mmec-ldouble (float init)))
 
-(cl-defmethod mmec-ldouble ((init float))
+(mmec-defmethod mmec-ldouble ((init float))
   "Constructor for number objects of type `mmec-ldouble'.
 
-This  constructor method  accepts  as  initialisation argument  a
-value of the Emacs's built-in type `float'."
+The argument INIT must be a valur of type `float'."
   (mmec--make ldouble :obj (mmec-c-make-usrptr-ldouble-from-elisp-float init)))
 
 ;;; --------------------------------------------------------------------
 
-(cl-defmethod mmec-ldouble ((init mmec-sint64))
+(mmec-defmethod mmec-ldouble ((init mmec-sint64))
   "Constructor for number objects of type `mmec-ldouble'.
 
-This constructor  method initalises the returned  object with the
-value from an instance of `mmec-sint64'"
+This constructor  method initalises the  returned object with  the value
+from an instance of `mmec-sint64'"
   (mmec--make ldouble :obj (mmec-c-make-usrptr-ldouble-from-usrptr-sint64 (mmec--extract-obj sint64 init))))
 
-(cl-defmethod mmec-ldouble ((init mmec-uint64))
+(mmec-defmethod mmec-ldouble ((init mmec-uint64))
   "Constructor for number objects of type `mmec-ldouble'.
 
-This constructor  method initalises the returned  object with the
-value from an instance of `mmec-uint64'"
+This constructor  method initalises the  returned object with  the value
+from an instance of `mmec-uint64'"
   (mmec--make ldouble :obj (mmec-c-make-usrptr-ldouble-from-usrptr-uint64 (mmec--extract-obj uint64 init))))
 
 ;;; --------------------------------------------------------------------
 
-(cl-defmethod mmec-ldouble ((init mmec-signed-integer))
+(mmec-defmethod mmec-ldouble ((init mmec-signed-integer))
   "Constructor for number objects of type `mmec-ldouble'.
 
-This   constructor  method   normalises   any   number  of   type
-`mmec-signed-integer'  to  an  instance  of  `mmec-sint64',  then  it
+This    constructor   method    normalises    any    number   of    type
+`mmec-signed-integer'  to   an  instance   of  `mmec-sint64',   then  it
 recursively calls the constructor on the result."
   (mmec-ldouble (mmec-sint64 init)))
 
-(cl-defmethod mmec-ldouble ((init mmec-unsigned-integer))
+(mmec-defmethod mmec-ldouble ((init mmec-unsigned-integer))
   "Constructor for number objects of type `mmec-ldouble'.
 
-This   constructor  method   normalises   any   number  of   type
-`mmec-unsigned-integer'  to an  instance  of  `mmec-uint64', then  it
+This    constructor   method    normalises    any    number   of    type
+`mmec-unsigned-integer'  to  an  instance   of  `mmec-uint64',  then  it
 recursively calls the constructor on the result."
   (mmec-ldouble (mmec-uint64 init)))
 
 ;;; --------------------------------------------------------------------
 
-(cl-defmethod mmec-ldouble ((init mmec-float))
+(mmec-defmethod mmec-ldouble ((init mmec-float))
   "Constructor for number objects of type `mmec-ldouble'.
 
 The argument INIT is an instance of `mmec-float'."
   (mmec--make ldouble :obj (mmec-c-make-usrptr-ldouble-from-usrptr-float (mmec--extract-obj float init))))
 
-(cl-defmethod mmec-ldouble ((init mmec-double))
+(mmec-defmethod mmec-ldouble ((init mmec-double))
   "Constructor for number objects of type `mmec-ldouble'.
 
 The argument INIT is an instance of `mmec-double'."
   (mmec--make ldouble :obj (mmec-c-make-usrptr-ldouble-from-elisp-float (mmec--extract-obj double init))))
-
-;;; --------------------------------------------------------------------
-
-(cl-defmethod mmec-ldouble ((init mmec-number))
-  "Constructor for number objects of type `mmec-ldouble'.
-
-This  constructor method  signals that  the given  initialisation
-argument is invalid."
-  (signal 'mmec-error-unsupported-init-type (list 'mmec-ldouble init)))
 
 
 ;;;; standard definitions
@@ -2663,6 +1192,107 @@ The argument OP2 must be of type `%s'.
 (mmec--define-numeric-comparison <=)
 (mmec--define-numeric-comparison >=)
 (mmec--define-numeric-comparison /=)
+
+
+;;;; sign inspection functions
+
+(cl-defgeneric mmec-zero-p (obj)
+  "Return true if the numeric argument is zero; otherwise return false.")
+
+(cl-defgeneric mmec-positive-p (obj)
+  "Return true if the numeric argument is positive; otherwise return false.")
+
+(cl-defgeneric mmec-negative-p (obj)
+  "Return true if the numeric argument is negative; otherwise return false.")
+
+(cl-defgeneric mmec-non-positive-p (obj)
+  "Return true if the numeric argument is non-positive; otherwise return false.")
+
+(cl-defgeneric mmec-non-negative-p (obj)
+  "Return true if the numeric argument is non-negative; otherwise return false.")
+
+;;; --------------------------------------------------------------------
+
+(cl-macrolet
+    ((mmec--def (TYPE)
+		`(progn
+		   (cl-defmethod mmec-zero-p ((obj ,TYPE))
+		     "Return true if the numeric argument is zero; otherwise return false."
+		     (zerop obj))
+		   (cl-defmethod mmec-positive-p ((obj ,TYPE))
+		     "Return true if the numeric argument is positive; otherwise return false."
+		     (< 0 obj))
+		   (cl-defmethod mmec-negative-p ((obj ,TYPE))
+		     "Return true if the numeric argument is negative; otherwise return false."
+		     (> 0 obj))
+		   (cl-defmethod mmec-non-positive-p ((obj ,TYPE))
+		     "Return true if the numeric argument is non-positive; otherwise return false."
+		     (>= 0 obj))
+		   (cl-defmethod mmec-non-negative-p ((obj ,TYPE))
+		     "Return true if the numeric argument is non-negative; otherwise return false."
+		     (<= 0 obj))
+		   )))
+  (mmec--def integer)
+  (mmec--def float))
+
+;;; --------------------------------------------------------------------
+
+(cl-macrolet
+    ((mmec--def (TYPESTEM)
+		(let* ((NUMTYPE			(mmec-sformat "mmec-%s" TYPESTEM))
+		       (CFUNC-ZERO-P		(mmec-sformat "mmec-c-%s-zero-p" TYPESTEM))
+		       (CFUNC-POSITIVE-P	(mmec-sformat "mmec-c-%s-positive-p" TYPESTEM))
+		       (CFUNC-NEGATIVE-P	(mmec-sformat "mmec-c-%s-negative-p" TYPESTEM))
+		       (CFUNC-NON-POSITIVE-P	(mmec-sformat "mmec-c-%s-positive-p" TYPESTEM))
+		       (CFUNC-NON-NEGATIVE-P	(mmec-sformat "mmec-c-%s-negative-p" TYPESTEM)))
+		  `(progn
+		     (cl-defmethod mmec-zero-p ((obj ,NUMTYPE))
+		       (,CFUNC-ZERO-P (mmec--extract-obj ,TYPESTEM obj)))
+		     (cl-defmethod mmec-positive-p ((obj ,NUMTYPE))
+		       ,(if (mmec-symbol-number-type-is-signed-p TYPESTEM)
+			    `(,CFUNC-POSITIVE-P (mmec--extract-obj ,TYPESTEM obj))
+			  t))
+		     (cl-defmethod mmec-negative-p ((obj ,NUMTYPE))
+		       ,(if (mmec-symbol-number-type-is-signed-p TYPESTEM)
+			    `(,CFUNC-NEGATIVE-P (mmec--extract-obj ,TYPESTEM obj))
+			  nil))
+		     (cl-defmethod mmec-non-positive-p ((obj ,NUMTYPE))
+		       ,(if (mmec-symbol-number-type-is-signed-p TYPESTEM)
+			    `(,CFUNC-NON-POSITIVE-P (mmec--extract-obj ,TYPESTEM obj))
+			  `(,CFUNC-ZERO-P (mmec--extract-obj ,TYPESTEM obj))))
+		     (cl-defmethod mmec-non-negative-p ((obj ,NUMTYPE))
+		       ,(if (mmec-symbol-number-type-is-signed-p TYPESTEM)
+			    `(,CFUNC-NON-NEGATIVE-P (mmec--extract-obj ,TYPESTEM obj))
+			  t))
+		     ))))
+  (mmec--def char)
+  (mmec--def schar)
+  (mmec--def uchar)
+  (mmec--def wchar)
+  (mmec--def sshrt)
+  (mmec--def ushrt)
+  (mmec--def sint)
+  (mmec--def uint)
+  (mmec--def slong)
+  (mmec--def ulong)
+  (mmec--def sllong)
+  (mmec--def ullong)
+  (mmec--def ssize)
+  (mmec--def usize)
+  (mmec--def sintmax)
+  (mmec--def uintmax)
+  (mmec--def ptrdiff)
+  (mmec--def sint8)
+  (mmec--def uint8)
+  (mmec--def sint16)
+  (mmec--def uint16)
+  (mmec--def sint32)
+  (mmec--def uint32)
+  (mmec--def sint64)
+  (mmec--def uint64)
+  (mmec--def float)
+  (mmec--def double)
+  (mmec--def ldouble))
 
 
 ;;;; done

@@ -879,6 +879,19 @@ Expand to true if @var{TYPE-OR-STEM} represents a signed type; expand to false o
 @end defmac
 
 
+@defun mmec-symbol-number-type-is-signed-p @var{SYMBOL}
+Return true if @var{SYMBOL} represents a signed type; return false otherwise.
+
+@lisp
+(mmec-symbol-number-type-is-signed-p 'sint)
+@result{} t
+
+(mmec-symbol-number-type-is-signed-p 'mmec-ulong)
+@result{} nil
+@end lisp
+@end defun
+
+
 @macro ElispDefineCtypeIsSigned{STEM}
 @defvr {Constant} mmec-\STEM\-is-signed
 Constant set to true if the number type @objtype{mmec-\STEM\} is signed; false if it is unsigned.
@@ -1053,6 +1066,7 @@ range of such type is available.
 * ctypes typedefs::             Object type definitions.
 * ctypes predicates::           Predicates for number objects.
 * ctypes comparison::           Comparison operations.
+* ctypes sign::                 Sign inspection functions.
 * ctypes miscellaneous::        Miscellaneous stuff.
 @end menu
 
@@ -1100,6 +1114,7 @@ range of such type is available.
 @ElispNumberValueDefaultMethods{\ETYPESTEM\, \CTYPE\, \EANCESTORTYPESTEM\, \ENORMTYPESTEM\, \INTREPDESCR\}
 @ElispNumberValueSpecialisedMethods{\ETYPESTEM\, \CTYPE\, \EANCESTORTYPESTEM\, \ENORMTYPESTEM\, \INTREPDESCR\}
 @ElispNumberValueFitsFunctions{\ETYPESTEM\, \CTYPE\, \EANCESTORTYPESTEM\, \ENORMTYPESTEM\, \INTREPDESCR\}
+@ElispNumberValueSignInspectionMethods{\ETYPESTEM\}
 @end macro
 
 @c ------------------------------------------------------------------------
@@ -1206,6 +1221,35 @@ value.
 Specialised method that converts @var{INIT} into a value of type @objtype{mmec-\ENORMTYPESTEM\},
 then returns true if the converted value would fit a representation as @objtype{mmec-\ETYPESTEM\};
 otherwise it returns false.
+@end deffn
+
+@end macro
+
+@c ------------------------------------------------------------------------
+
+@macro ElispNumberValueSignInspectionMethods{ETYPESTEM}
+@deffn {Method} mmec-zero-p (@var{OBJ} mmec-\ETYPESTEM\)
+Return true if the numeric argument is zero; otherwise return false.
+@end deffn
+
+
+@deffn {Method} mmec-positive-p (@var{OBJ} mmec-\ETYPESTEM\)
+Return true if the numeric argument is positive: @var{OBJ} > 0; otherwise return false.
+@end deffn
+
+
+@deffn {Method} mmec-negative-p (@var{OBJ} mmec-\ETYPESTEM\)
+Return true if the numeric argument is negative: @var{OBJ} < 0; otherwise return false.
+@end deffn
+
+
+@deffn {Method} mmec-non-positive-p (@var{OBJ} mmec-\ETYPESTEM\)
+Return true if the numeric argument is non--positive: @var{OBJ} <= 0; otherwise return false.
+@end deffn
+
+
+@deffn {Method} mmec-non-negative-p (@var{OBJ} mmec-\ETYPESTEM\)
+Return true if the numeric argument is non--negative: @var{OBJ} >= 0; otherwise return false.
 @end deffn
 
 @end macro
@@ -1872,6 +1916,45 @@ Return true if @vari{OP} \OPERATOR\ @varii{OP}; otherwise return false.
 
 
 @mmuxDefunNumericComparisonFunction{>=, one greater than or equal to the other}
+
+@c page
+@node ctypes sign
+@section Sign inspection functions
+
+
+@deffn {Generic Function} mmec-zero-p @var{OBJ}
+@deffnx {Method} mmec-zero-p (@var{OBJ} integer)
+@deffnx {Method} mmec-zero-p (@var{OBJ} float)
+Return true if the numeric argument is zero; otherwise return false.
+@end deffn
+
+
+@deffn {Generic Function} mmec-positive-p @var{OBJ}
+@deffnx {Method} mmec-positive-p (@var{OBJ} integer)
+@deffnx {Method} mmec-positive-p (@var{OBJ} float)
+Return true if the numeric argument is positive: @var{OBJ} > 0; otherwise return false.
+@end deffn
+
+
+@deffn {Generic Function} mmec-negative-p @var{OBJ}
+@deffnx {Method} mmec-negative-p (@var{OBJ} integer)
+@deffnx {Method} mmec-negative-p (@var{OBJ} float)
+Return true if the numeric argument is negative: @var{OBJ} < 0; otherwise return false.
+@end deffn
+
+
+@deffn {Generic Function} mmec-non-positive-p @var{OBJ}
+@deffnx {Method} mmec-non-positive-p (@var{OBJ} integer)
+@deffnx {Method} mmec-non-positive-p (@var{OBJ} float)
+Return true if the numeric argument is non--positive: @var{OBJ} <= 0; otherwise return false.
+@end deffn
+
+
+@deffn {Generic Function} mmec-non-negative-p @var{OBJ}
+@deffnx {Method} mmec-non-negative-p (@var{OBJ} integer)
+@deffnx {Method} mmec-non-negative-p (@var{OBJ} float)
+Return true if the numeric argument is non--negative: @var{OBJ} >= 0; otherwise return false.
+@end deffn
 
 @c page
 @node ctypes miscellaneous

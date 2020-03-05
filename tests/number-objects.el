@@ -125,32 +125,47 @@
 
 (cl-macrolet
     ((mmec--def (TYPESTEM ARGSTEM PROPERTY)
-		(let* ((TESTNAME	(mmec-sformat "mmec-test-%s-constructors-%s" TYPESTEM ARGSTEM))
+		(let* ((TESTNAME-MIN	(mmec-sformat "mmec-test-%s-constructors-%s-min" TYPESTEM ARGSTEM))
+		       (TESTNAME-MAX	(mmec-sformat "mmec-test-%s-constructors-%s-max" TYPESTEM ARGSTEM))
 		       (NUMTYPE		(mmec-sformat "mmec-%s" TYPESTEM))
 		       (ARGTYPE		(mmec-sformat "mmec-%s" TYPESTEM))
 		       (CONSTRUCTOR	NUMTYPE))
 		  ;;(mmec-debug-print TYPESTEM ARGSTEM PROPERTY)
 		  (cl-case PROPERTY
-		    (fits		`(ert-deftest ,TESTNAME ()
-					   (should (mmec-number-type-p ,TYPESTEM (,CONSTRUCTOR (mmec-limit-min ,ARGSTEM))))
-					   (should (mmec-number-type-p ,TYPESTEM (,CONSTRUCTOR (mmec-limit-max ,ARGSTEM))))))
-		    (no-fits		`(ert-deftest ,TESTNAME ()
-					   ;; (should (condition-case exc
-					   ;; 	       (progn
-					   ;; 		 (,CONSTRUCTOR (mmec-limit-min ,ARGSTEM))
-					   ;; 		 (signal 'mmec-test-error (list "Expected exception: no-fits.")))
-					   ;; 	     (mmec-error-value-out-of-range	t)))
-					   (should (condition-case exc
-						       (progn
-							 (,CONSTRUCTOR (mmec-limit-max ,ARGSTEM))
-							 (signal 'mmec-test-error (list "Expected exception: no-fits.")))
-						     (mmec-error-value-out-of-range	t)))))
-		    (unsupported	`(ert-deftest ,TESTNAME ()
-					   (should (condition-case exc
-						       (progn
-							 (,CONSTRUCTOR (mmec-limit-min ,ARGSTEM))
-							 (signal 'mmec-test-error (list "Expected exception: unsupported.")))
-						     (mmec-error-unsupported-init-type	t)))))
+		    (fits		`(progn
+					   (ert-deftest ,TESTNAME-MIN ()
+					     (should (mmec-number-type-p ,TYPESTEM (,CONSTRUCTOR (mmec-limit-min ,ARGSTEM)))))
+					   (ert-deftest ,TESTNAME-MAX ()
+					     (should (mmec-number-type-p ,TYPESTEM (,CONSTRUCTOR (mmec-limit-max ,ARGSTEM)))))))
+		    (no-fits		`(progn
+					   ;;We  include this  conditionally because  unsigned types
+					   ;;have zero as minimum, so they will always fit.
+					   (when (mmec-number-type-is-signed-p ,TYPESTEM)
+					     (ert-deftest ,TESTNAME-MIN ()
+					       (should (condition-case exc
+					   		   (progn
+					   		     (,CONSTRUCTOR (mmec-limit-min ,ARGSTEM))
+					   		     (signal 'mmec-test-error (list "Expected exception: no-fits.")))
+					   		 (mmec-error-value-out-of-range	t)))))
+					   (ert-deftest ,TESTNAME-MAX ()
+					     (should (condition-case exc
+							 (progn
+							   (,CONSTRUCTOR (mmec-limit-max ,ARGSTEM))
+							   (signal 'mmec-test-error (list "Expected exception: no-fits.")))
+						       (mmec-error-value-out-of-range	t))))))
+		    (unsupported	`(progn
+					   (ert-deftest ,TESTNAME-MIN ()
+					     (should (condition-case exc
+							 (progn
+							   (,CONSTRUCTOR (mmec-limit-min ,ARGSTEM))
+							   (signal 'mmec-test-error (list "Expected exception: unsupported.")))
+						       (mmec-error-unsupported-init-type	t))))
+					   (ert-deftest ,TESTNAME-MAX ()
+					     (should (condition-case exc
+							 (progn
+							   (,CONSTRUCTOR (mmec-limit-max ,ARGSTEM))
+							   (signal 'mmec-test-error (list "Expected exception: unsupported.")))
+						       (mmec-error-unsupported-init-type	t))))))
 		    (t
 		     (signal 'mmec-error-invalid-argument (list 'mmec--def PROPERTY)))
 		    ))))

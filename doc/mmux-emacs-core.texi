@@ -274,6 +274,20 @@ Return an integer representing the library interface current age.
 @section Size of common C language types
 
 
+@cindex Size of number types
+@cindex Number types, size of
+
+
+@defmac mmec-sizeof-number-type @var{TYPE-OR-STEM}
+Expand into the constant name representing the number of bytes used to represent a C language type.
+
+@lisp
+(mmec-sizeof-number-type char)          @expansion{} mmec-sizeof-char
+(mmec-sizeof-number-type mmec-ulong)    @expansion{} mmec-sizeof-ulong
+@end lisp
+@end defmac
+
+
 @deftypevr {Constant} integer mmec-SIZEOF_CHAR
 @deftypevrx {Constant} integer mmec-sizeof-char
 Value of type @objtype{integer} representing the size of @code{char} measured in bytes.
@@ -446,6 +460,18 @@ Value of type @objtype{integer} representing the size of @code{long double} meas
 @c page
 @node constants limits
 @section Ranges representable by C language types
+
+
+@cindex Representation range of number types
+@cindex Range of number types
+@cindex Limits of number types
+@cindex Minimum limit of number types
+@cindex Maximum limit of number types
+@cindex Number types, minimum limit
+@cindex Number types, maximum limit
+@cindex Number types, limits
+@cindex Number types, range limits
+@cindex Number types, representation range limits
 
 
 @defmac mmec-limit-min @var{TYPE-OR-STEM}
@@ -838,15 +864,17 @@ Value of type @objtype{mmec-ldouble} representing the system constant @code{LDBL
 @section Whether a C language type is signed or unsigned
 
 
-@defmac mmec-number-type-is-signed @var{TYPE-OR-STEM}
-Expand into the constant name representing the signedness of the specified number type.
+@cindex Number types, signed or unsigned
+@cindex Signed number types, constants
+@cindex Unsigned number types, constants
+
+
+@defmac mmec-number-type-is-signed-p @var{TYPE-OR-STEM}
+Expand to true if @var{TYPE-OR-STEM} represents a signed type; expand to false otherwise.
 
 @lisp
-(mmec-number-type-is-signed sint)
-@expansion{} mmec-sint-is-signed
-
-(mmec-number-type-is-signed mmec-slong)
-@expansion{} mmec-slong-is-signed
+(mmec-number-type-is-signed-p sint)             @expansion{} t
+(mmec-number-type-is-signed-p mmec-ulong)       @expansion{} nil
 @end lisp
 @end defmac
 
@@ -1025,6 +1053,7 @@ range of such type is available.
 * ctypes typedefs::             Object type definitions.
 * ctypes predicates::           Predicates for number objects.
 * ctypes comparison::           Comparison operations.
+* ctypes miscellaneous::        Miscellaneous stuff.
 @end menu
 
 @c page
@@ -1669,18 +1698,18 @@ Expand into a form returning true if @var{EXPR} is of the specified number type.
 @end defmac
 
 
-@defmac mmec-fits-number-type-p @var{TYPE-OR-STEM} @var{EXPR}
+@defmac mmec-fits-number-type-p-p @var{TYPE-OR-STEM} @var{EXPR}
 Expand into a form returning true if @var{EXPR} is a number object that fits into the range of the
 specified number type.
 
 @lisp
-(mmec-fits-number-type-p mmec-sint (mmec-sshrt 123))
+(mmec-fits-number-type-p-p mmec-sint (mmec-sshrt 123))
 @result{} t
 
-(mmec-fits-number-type-p sshrt mmec-sllong-max)
+(mmec-fits-number-type-p-p sshrt mmec-sllong-max)
 @result{} nil
 
-(mmec-fits-number-type-p slong (mmec-limit-min sint8))
+(mmec-fits-number-type-p-p slong (mmec-limit-min sint8))
 @result{} t
 @end lisp
 @end defmac
@@ -1841,6 +1870,25 @@ Return true if @vari{OP} \OPERATOR\ @varii{OP}; otherwise return false.
 
 
 @mmuxDefunNumericComparisonFunction{>=, one greater than or equal to the other}
+
+@c page
+@node ctypes miscellaneous
+@section Miscellaneous stuff
+
+
+@defmac mmec-fits-number-type-p @var{TYPE-OR-STEM} @var{EXPR}
+Expand into the application of a struct type predicate to the result of the given expression.
+
+Example:
+
+@lisp
+(mmec-fits-number-type-p sint obj)
+@expansion{} (mmec-fits-sint-p obj)
+
+(mmec-fits-number-type-p mmec-ptrdiff obj)
+@expansion{} (mmec-fits-ptrdiff-p obj)
+@end lisp
+@end defmac
 
 @c page
 @node bytevec
@@ -2914,6 +2962,12 @@ An invalid argument was handed to a function or macro.
 @deftypevr {Error Symbol} symbol mmec-error-unknown-number-object-type-or-stem
 @deftypevrx {Parent Error Symbol} symbol mmec-error-invalid-argument
 A symbol matching a number object type or type stem was expected.
+@end deftypevr
+
+
+@deftypevr {Error Symbol} symbol mmec-test-error
+@deftypevrx {Parent Error Symbol} symbol mmec-error
+Used to signal a generic error while executing a test.
 @end deftypevr
 
 @c page

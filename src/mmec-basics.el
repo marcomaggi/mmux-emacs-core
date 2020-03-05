@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-03-04 09:11:38 marco>
+;; Time-stamp: <2020-03-05 06:37:17 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -42,6 +42,10 @@
 (define-error 'mmec-error
   "Error while executing a MMUX Emacs Core operation."
   'error)
+
+(define-error 'mmec-test-error
+  "Generic error while executing a test."
+  'mmec-error)
 
 ;;; --------------------------------------------------------------------
 ;;; features errors
@@ -200,6 +204,8 @@
 (mmec--type-elisp-constructor-name \"ptrdiff\")
 => mmec-ptrdiff--make"
     (mmec-sformat "%s--make" (mmec--prepend-prefix-to-symbol-name TYPE-OR-STEM)))
+
+  ;;end of `eval-and-compile'
   )
 
 (defmacro mmec--make (TYPE-OR-STEM &rest ARGS)
@@ -239,17 +245,6 @@ Example:
   (let* ((TYPE.str	(mmec--prepend-prefix-to-symbol-name TYPE-OR-STEM))
 	 (EXTRACTOR	(intern (concat TYPE.str "-obj"))))
     `(,EXTRACTOR ,VALUE)))
-
-(defmacro mmec--fits-obj (TYPE-OR-STEM EXPR)
-  "Expand into the application of a struct type predicate to the result of the given expression.
-
-Example:
-
-  (mmec--fit-obj sint obj)
-  ==> (mmec-fits-sint-p obj)"
-  (let* ((TYPE.str	(mmec--strip-prefix-from-symbol-name TYPE-OR-STEM))
-	 (FITFUNC	(mmec-sformat "mmec-fits-%s-p" TYPE.str)))
-    `(,FITFUNC ,EXPR)))
 
 
 ;;;; common macros enhancement

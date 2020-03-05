@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-03-04 06:39:10 marco>
+;; Time-stamp: <2020-03-05 06:51:05 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -96,13 +96,6 @@
 	 (BYTEVECTOR-TYPE-MAKER		(mmec-sformat "mmec-%s-bytevector--make"	TYPESTEM))
 	 (PARENT-BYTEVECTOR-TYPE	(mmec-sformat "mmec-%s-bytevector"		PARENT-STEM))
 	 (CONSTRUCTOR			BYTEVECTOR-TYPE)
-	 (SIZEOF-SLOT			(mmec-sformat "mmec-sizeof-%s"			TYPESTEM))
-	 (SIGNED-BOOL			(cl-case PARENT-STEM
-					  (signed-integer	't)
-					  (unsigned-integer	'nil)
-					  (floating-point	't)
-					  (t
-					   (signal 'mmec-error (list 'mmec--define-bytevector-type PARENT-STEM)))))
 	 (DOCSTRING			(format "Build and return a new instance of `mmec-%s-bytevector'." TYPESTEM)))
     `(progn
        (cl-defstruct (,BYTEVECTOR-TYPE
@@ -117,10 +110,12 @@
 	   (signal 'mmec-error-bytevector-constructor-invalid-number-of-slots (list --func-- number-of-slots)))
 	 (mmec--make ,BYTEVECTOR-TYPE
 		     :number-of-slots		number-of-slots
-		     :slot-size			,SIZEOF-SLOT
-		     :signed-p			,SIGNED-BOOL
-		     :obj			(mmec-c-make-bytevector number-of-slots ,SIZEOF-SLOT ,SIGNED-BOOL)
-		     :number-of-allocated-bytes	(* number-of-slots ,SIZEOF-SLOT)))
+		     :slot-size			(mmec-sizeof-number-type ,TYPESTEM)
+		     :signed-p			(mmec-number-type-is-signed-p ,TYPESTEM)
+		     :obj			(mmec-c-make-bytevector number-of-slots
+									(mmec-sizeof-number-type ,TYPESTEM)
+									(mmec-number-type-is-signed-p ,TYPESTEM))
+		     :number-of-allocated-bytes	(* number-of-slots (mmec-sizeof-number-type ,TYPESTEM))))
        )))
 
 (mmec--define-bytevector-type char	signed-integer)

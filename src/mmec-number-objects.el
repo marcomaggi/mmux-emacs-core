@@ -4,7 +4,7 @@
 
 ;; Author: Marco Maggi <mrc.mgg@gmail.com>
 ;; Created: Feb  6, 2020
-;; Time-stamp: <2020-03-04 09:10:20 marco>
+;; Time-stamp: <2020-03-05 06:46:57 marco>
 ;; Keywords: extensions
 
 ;; This file is part of MMUX Emacs Core.
@@ -106,6 +106,44 @@
       (t
        (signal 'mmec-error-unknown-number-object-type-or-stem (list 'mmec-limits-max TYPE-OR-STEM))))))
 
+(defmacro mmec-sizeof-number-type (TYPE-OR-STEM)
+  "Expand into the constant name representing the number of bytes used to represent a C language type.
+
+(mmec-sizeof-number-type char)		==> mmec-sizeof-char
+(mmec-sizeof-number-type mmec-ulong)	==> mmec-sizeof-ulong"
+  (let ((STEM	(intern (mmec--strip-prefix-from-symbol-name TYPE-OR-STEM))))
+    (cl-case STEM
+      (char	'mmec-sizeof-char)
+      (schar	'mmec-sizeof-schar)
+      (uchar	'mmec-sizeof-uchar)
+      (wchar	'mmec-sizeof-wchar)
+      (sshrt	'mmec-sizeof-sshrt)
+      (ushrt	'mmec-sizeof-ushrt)
+      (sint	'mmec-sizeof-sint)
+      (uint	'mmec-sizeof-uint)
+      (slong	'mmec-sizeof-slong)
+      (ulong	'mmec-sizeof-ulong)
+      (sllong	'mmec-sizeof-sllong)
+      (ullong	'mmec-sizeof-ullong)
+      (ssize	'mmec-sizeof-ssize)
+      (usize	'mmec-sizeof-usize)
+      (sintmax	'mmec-sizeof-sintmax)
+      (uintmax	'mmec-sizeof-uintmax)
+      (ptrdiff	'mmec-sizeof-ptrdiff)
+      (sint8	'mmec-sizeof-sint8)
+      (uint8	'mmec-sizeof-uint8)
+      (sint16	'mmec-sizeof-sint16)
+      (uint16	'mmec-sizeof-uint16)
+      (sint32	'mmec-sizeof-sint32)
+      (uint32	'mmec-sizeof-uint32)
+      (sint64	'mmec-sizeof-sint64)
+      (uint64	'mmec-sizeof-uint64)
+      (float	'mmec-sizeof-float)
+      (double	'mmec-sizeof-double)
+      (ldouble	'mmec-sizeof-ldouble)
+      (t
+       (signal 'mmec-error-unknown-number-object-type-or-stem (list 'mmec-sizeof-number-type TYPE-OR-STEM))))))
+
 (defmacro mmec-number-type-p (TYPE-OR-STEM EXPR)
   "Expand into a form returning true if EXPR is of the specified number type."
   (let* ((STEM		(intern (mmec--strip-prefix-from-symbol-name TYPE-OR-STEM)))
@@ -144,46 +182,15 @@
        (signal 'mmec-error-unknown-number-object-type-or-stem (list 'mmec-number-type-p TYPE-OR-STEM))))))
 
 (defmacro mmec-fits-number-type-p (TYPE-OR-STEM EXPR)
-  "Expand into a form returning true if EXPR is a number object that fits into the range of the specified number type."
-  (let* ((STEM		(intern (mmec--strip-prefix-from-symbol-name TYPE-OR-STEM)))
-	 (FITSFUNC	(mmec-sformat "mmec-fits-%s-p" STEM))
-	 (PREDFORM	`(,FITSFUNC ,EXPR)))
-    (cl-case STEM
-      (char	PREDFORM)
-      (schar	PREDFORM)
-      (uchar	PREDFORM)
-      (wchar	PREDFORM)
-      (sshrt	PREDFORM)
-      (ushrt	PREDFORM)
-      (sint	PREDFORM)
-      (uint	PREDFORM)
-      (slong	PREDFORM)
-      (ulong	PREDFORM)
-      (sllong	PREDFORM)
-      (ullong	PREDFORM)
-      (ssize	PREDFORM)
-      (usize	PREDFORM)
-      (sintmax	PREDFORM)
-      (uintmax	PREDFORM)
-      (ptrdiff	PREDFORM)
-      (sint8	PREDFORM)
-      (uint8	PREDFORM)
-      (sint16	PREDFORM)
-      (uint16	PREDFORM)
-      (sint32	PREDFORM)
-      (uint32	PREDFORM)
-      (sint64	PREDFORM)
-      (uint64	PREDFORM)
-      (float	PREDFORM)
-      (double	PREDFORM)
-      (ldouble	PREDFORM)
-      (t
-       (signal 'mmec-error-unknown-number-object-type-or-stem (list 'mmec-fits-number-type-p TYPE-OR-STEM))))))
+  "Expand into the application of a struct type predicate to the result of the given expression.
 
-(defmacro mmec-number-type-is-signed (TYPE-OR-STEM)
-  "Expand into the constant name representing the signedness of the specified number type."
-  (let* ((STEM	(intern (mmec--strip-prefix-from-symbol-name TYPE-OR-STEM)))
-	 (FORM	(mmec-sformat "mmec-%s-is-signed" STEM)))
+Example:
+
+  (mmec-fits-number-type-p sint obj)
+  ==> (mmec-fits-sint-p obj)"
+  (let* ((STEM		(intern (mmec--strip-prefix-from-symbol-name TYPE-OR-STEM)))
+	 (FITFUNC	(mmec-sformat "mmec-fits-%s-p" STEM))
+	 (FORM		`(,FITFUNC ,EXPR)))
     (cl-case STEM
       (char	FORM)
       (schar	FORM)
@@ -214,7 +221,46 @@
       (double	FORM)
       (ldouble	FORM)
       (t
-       (signal 'mmec-error-unknown-number-object-type-or-stem (list 'mmec-number-type-is-signed TYPE-OR-STEM))))))
+       (signal 'mmec-error-unknown-number-object-type-or-stem (list 'mmec-fits-number-type-p TYPE-OR-STEM))))))
+
+(eval-and-compile
+  (defmacro mmec-number-type-is-signed-p (TYPE-OR-STEM)
+    "Expand to true if TYPE-OR-STEM represents a signed type; expand to false otherwise.
+
+(mmec-number-type-is-signed-p sint)            => t
+(mmec-number-type-is-signed-p mmec-ulong)      => nil"
+    (let ((STEM (intern (mmec--strip-prefix-from-symbol-name TYPE-OR-STEM))))
+      (cl-case STEM
+	(char		t)
+	(schar		t)
+	(uchar		nil)
+	(wchar		t)
+	(sshrt		t)
+	(ushrt		nil)
+	(sint		t)
+	(uint		nil)
+	(slong		t)
+	(ulong		nil)
+	(sllong		t)
+	(ullong		nil)
+	(ssize		t)
+	(usize		nil)
+	(sintmax	t)
+	(uintmax	nil)
+	(ptrdiff	t)
+	(sint8		t)
+	(uint8		nil)
+	(sint16		t)
+	(uint16		nil)
+	(sint32		t)
+	(uint32		nil)
+	(sint64		t)
+	(uint64		nil)
+	(float		t)
+	(double		t)
+	(ldouble	t)
+	(t
+	 (signal 'mmec-error-unknown-number-object-type-or-stem (list 'mmec-number-type-is-signed-p TYPE-OR-STEM)))))))
 
 
 ;;;; basic numeric type definitions
@@ -285,7 +331,7 @@ type `mmec-sint64', then  it checks if the  range is valid: if  it is is
 builds  an object  of type  `mmec-char', otherwise  is raised  the error
 condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj char obj)
+    (unless (mmec-fits-number-type-p char obj)
       (signal 'mmec-error-value-out-of-range (list --func-- init)))
     (mmec--make-obj char (mmec-c-make-integer-char-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -300,7 +346,7 @@ type `mmec-sint64', then  it checks if the  range is valid: if  it is is
 builds  an object  of type  `mmec-char', otherwise  it raises  the error
 condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj char obj)
+    (unless (mmec-fits-number-type-p char obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-char init)))
     (mmec--make-obj char (mmec-c-make-integer-char-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -315,7 +361,7 @@ type `mmec-sint64', then  it checks if the  range is valid: if  it is is
 builds  an object  of type  `mmec-char', otherwise  it raises  the error
 condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj char obj)
+    (unless (mmec-fits-number-type-p char obj)
       (signal 'mmec-error-value-out-of-range (list --func-- init)))
     (mmec--make-obj char (mmec-c-make-integer-char-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -356,7 +402,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-schar',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj schar obj)
+    (unless (mmec-fits-number-type-p schar obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-schar init)))
     (mmec--make-obj schar (mmec-c-make-integer-schar-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -371,7 +417,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-schar',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj schar obj)
+    (unless (mmec-fits-number-type-p schar obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-schar init)))
     (mmec--make-obj schar (mmec-c-make-integer-schar-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -386,7 +432,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-schar',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj schar obj)
+    (unless (mmec-fits-number-type-p schar obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-schar init)))
     (mmec--make-obj schar (mmec-c-make-integer-schar-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -427,7 +473,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uchar',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj uchar obj)
+    (unless (mmec-fits-number-type-p uchar obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uchar init)))
     (mmec--make-obj uchar (mmec-c-make-integer-uchar-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -442,7 +488,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uchar',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj uchar obj)
+    (unless (mmec-fits-number-type-p uchar obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uchar init)))
     (mmec--make-obj uchar (mmec-c-make-integer-uchar-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -457,7 +503,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is is builds  an object  of type `mmec-uchar',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj uchar obj)
+    (unless (mmec-fits-number-type-p uchar obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uchar init)))
     (mmec--make-obj uchar (mmec-c-make-integer-uchar-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -498,7 +544,7 @@ type `mmec-sint64', then it  checks if the range is valid;  if it is: it
 builds an  object of  type `mmec-wchar', otherwise  it raises  the error
 condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj wchar obj)
+    (unless (mmec-fits-number-type-p wchar obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-wchar init)))
     (mmec--make-obj wchar (mmec-c-make-usrptr-wchar-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -513,7 +559,7 @@ type `mmec-sint64', then it  checks if the range is valid;  if it is: it
 builds an  object of  type `mmec-wchar', otherwise  it raises  the error
 condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj wchar obj)
+    (unless (mmec-fits-number-type-p wchar obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-wchar init)))
     (mmec--make-obj wchar (mmec-c-make-usrptr-wchar-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -528,7 +574,7 @@ type `mmec-sint64', then it  checks if the range is valid;  if it is: it
 builds an  object of  type `mmec-wchar', otherwise  it raises  the error
 condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj wchar obj)
+    (unless (mmec-fits-number-type-p wchar obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-wchar init)))
     (mmec--make-obj wchar (mmec-c-make-usrptr-wchar-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -569,7 +615,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sshrt',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj sshrt obj)
+    (unless (mmec-fits-number-type-p sshrt obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sshrt init)))
     (mmec--make-obj sshrt (mmec-c-make-integer-sshrt-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -584,7 +630,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sshrt',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj sshrt obj)
+    (unless (mmec-fits-number-type-p sshrt obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sshrt init)))
     (mmec--make-obj sshrt (mmec-c-make-integer-sshrt-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -599,7 +645,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sshrt',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj sshrt obj)
+    (unless (mmec-fits-number-type-p sshrt obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sshrt init)))
     (mmec--make-obj sshrt (mmec-c-make-integer-sshrt-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -640,7 +686,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ushrt',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj ushrt obj)
+    (unless (mmec-fits-number-type-p ushrt obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ushrt init)))
     (mmec--make-obj ushrt (mmec-c-make-integer-ushrt-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -655,7 +701,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ushrt',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj ushrt obj)
+    (unless (mmec-fits-number-type-p ushrt obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ushrt init)))
     (mmec--make-obj ushrt (mmec-c-make-integer-ushrt-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -670,7 +716,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ushrt',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj ushrt obj)
+    (unless (mmec-fits-number-type-p ushrt obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ushrt init)))
     (mmec--make-obj ushrt (mmec-c-make-integer-ushrt-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -711,7 +757,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sint',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj sint obj)
+    (unless (mmec-fits-number-type-p sint obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint init)))
     (mmec--make-obj sint (mmec-c-make-usrptr-sint-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -726,7 +772,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sint',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj sint obj)
+    (unless (mmec-fits-number-type-p sint obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint init)))
     (mmec--make-obj sint (mmec-c-make-usrptr-sint-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -741,7 +787,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sint',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj sint obj)
+    (unless (mmec-fits-number-type-p sint obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint init)))
     (mmec--make-obj sint (mmec-c-make-usrptr-sint-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -782,7 +828,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uint',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj uint obj)
+    (unless (mmec-fits-number-type-p uint obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint init)))
     (mmec--make-obj uint (mmec-c-make-usrptr-uint-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -797,7 +843,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uint',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj uint obj)
+    (unless (mmec-fits-number-type-p uint obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint init)))
     (mmec--make-obj uint (mmec-c-make-usrptr-uint-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -812,7 +858,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uint',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj uint obj)
+    (unless (mmec-fits-number-type-p uint obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint init)))
     (mmec--make-obj uint (mmec-c-make-usrptr-uint-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -853,7 +899,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-slong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj slong obj)
+    (unless (mmec-fits-number-type-p slong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-slong init)))
     (mmec--make-obj slong (mmec-c-make-usrptr-slong-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -868,7 +914,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-slong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj slong obj)
+    (unless (mmec-fits-number-type-p slong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-slong init)))
     (mmec--make-obj slong (mmec-c-make-usrptr-slong-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -883,7 +929,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-slong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj slong obj)
+    (unless (mmec-fits-number-type-p slong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-slong init)))
     (mmec--make-obj slong (mmec-c-make-usrptr-slong-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -924,7 +970,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ulong',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj ulong obj)
+    (unless (mmec-fits-number-type-p ulong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ulong init)))
     (mmec--make-obj ulong (mmec-c-make-usrptr-ulong-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -939,7 +985,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ulong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj ulong obj)
+    (unless (mmec-fits-number-type-p ulong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ulong init)))
     (mmec--make-obj ulong (mmec-c-make-usrptr-ulong-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -954,7 +1000,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ulong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj ulong obj)
+    (unless (mmec-fits-number-type-p ulong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ulong init)))
     (mmec--make-obj ulong (mmec-c-make-usrptr-ulong-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -995,7 +1041,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sllong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj sllong obj)
+    (unless (mmec-fits-number-type-p sllong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sllong init)))
     (mmec--make-obj sllong (mmec-c-make-usrptr-sllong-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1010,7 +1056,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sllong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj sllong obj)
+    (unless (mmec-fits-number-type-p sllong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sllong init)))
     (mmec--make-obj sllong (mmec-c-make-usrptr-sllong-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1025,7 +1071,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sllong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj sllong obj)
+    (unless (mmec-fits-number-type-p sllong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sllong init)))
     (mmec--make-obj sllong (mmec-c-make-usrptr-sllong-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1066,7 +1112,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ullong',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj ullong obj)
+    (unless (mmec-fits-number-type-p ullong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ullong init)))
     (mmec--make-obj ullong (mmec-c-make-usrptr-ullong-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1081,7 +1127,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ullong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj ullong obj)
+    (unless (mmec-fits-number-type-p ullong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ullong init)))
     (mmec--make-obj ullong (mmec-c-make-usrptr-ullong-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1096,7 +1142,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ullong',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj ullong obj)
+    (unless (mmec-fits-number-type-p ullong obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ullong init)))
     (mmec--make-obj ullong (mmec-c-make-usrptr-ullong-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1137,7 +1183,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sintmax',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj sintmax obj)
+    (unless (mmec-fits-number-type-p sintmax obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sintmax init)))
     (mmec--make-obj sintmax (mmec-c-make-usrptr-sintmax-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1152,7 +1198,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sintmax',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj sintmax obj)
+    (unless (mmec-fits-number-type-p sintmax obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sintmax init)))
     (mmec--make-obj sintmax (mmec-c-make-usrptr-sintmax-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1167,7 +1213,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sintmax',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj sintmax obj)
+    (unless (mmec-fits-number-type-p sintmax obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sintmax init)))
     (mmec--make-obj sintmax (mmec-c-make-usrptr-sintmax-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1208,7 +1254,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uintmax',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj uintmax obj)
+    (unless (mmec-fits-number-type-p uintmax obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uintmax init)))
     (mmec--make-obj uintmax (mmec-c-make-usrptr-uintmax-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1223,7 +1269,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uintmax',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj uintmax obj)
+    (unless (mmec-fits-number-type-p uintmax obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uintmax init)))
     (mmec--make-obj uintmax (mmec-c-make-usrptr-uintmax-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1238,7 +1284,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uintmax',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj uintmax obj)
+    (unless (mmec-fits-number-type-p uintmax obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uintmax init)))
     (mmec--make-obj uintmax (mmec-c-make-usrptr-uintmax-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1279,7 +1325,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ssize',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj ssize obj)
+    (unless (mmec-fits-number-type-p ssize obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ssize init)))
     (mmec--make-obj ssize (mmec-c-make-usrptr-ssize-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1294,7 +1340,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ssize',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj ssize obj)
+    (unless (mmec-fits-number-type-p ssize obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ssize init)))
     (mmec--make-obj ssize (mmec-c-make-usrptr-ssize-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1309,7 +1355,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-ssize',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj ssize obj)
+    (unless (mmec-fits-number-type-p ssize obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ssize init)))
     (mmec--make-obj ssize (mmec-c-make-usrptr-ssize-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1350,7 +1396,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-usize',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj usize obj)
+    (unless (mmec-fits-number-type-p usize obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-usize init)))
     (mmec--make-obj usize (mmec-c-make-usrptr-usize-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1365,7 +1411,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-usize',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj usize obj)
+    (unless (mmec-fits-number-type-p usize obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-usize init)))
     (mmec--make-obj usize (mmec-c-make-usrptr-usize-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1380,7 +1426,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-usize',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj usize obj)
+    (unless (mmec-fits-number-type-p usize obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-usize init)))
     (mmec--make-obj usize (mmec-c-make-usrptr-usize-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1421,7 +1467,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it is  is builds an object of type  `mmec-ptrdiff', otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj ptrdiff obj)
+    (unless (mmec-fits-number-type-p ptrdiff obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ptrdiff init)))
     (mmec--make-obj ptrdiff (mmec-c-make-usrptr-ptrdiff-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1436,7 +1482,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it is  is builds an object of type  `mmec-ptrdiff', otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj ptrdiff obj)
+    (unless (mmec-fits-number-type-p ptrdiff obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ptrdiff init)))
     (mmec--make-obj ptrdiff (mmec-c-make-usrptr-ptrdiff-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1451,7 +1497,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it is  is builds an object of type  `mmec-ptrdiff', otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj ptrdiff obj)
+    (unless (mmec-fits-number-type-p ptrdiff obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-ptrdiff init)))
     (mmec--make-obj ptrdiff (mmec-c-make-usrptr-ptrdiff-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1492,7 +1538,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sint8',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj sint8 obj)
+    (unless (mmec-fits-number-type-p sint8 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint8 init)))
     (mmec--make-obj sint8 (mmec-c-make-integer-sint8-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1507,7 +1553,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sint8',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj sint8 obj)
+    (unless (mmec-fits-number-type-p sint8 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint8 init)))
     (mmec--make-obj sint8 (mmec-c-make-integer-sint8-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1522,7 +1568,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sint8',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj sint8 obj)
+    (unless (mmec-fits-number-type-p sint8 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint8 init)))
     (mmec--make-obj sint8 (mmec-c-make-integer-sint8-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1563,7 +1609,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uint8',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj uint8 obj)
+    (unless (mmec-fits-number-type-p uint8 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint8 init)))
     (mmec--make-obj uint8 (mmec-c-make-integer-uint8-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1578,7 +1624,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uint8',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj uint8 obj)
+    (unless (mmec-fits-number-type-p uint8 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint8 init)))
     (mmec--make-obj uint8 (mmec-c-make-integer-uint8-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1593,7 +1639,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uint8',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj uint8 obj)
+    (unless (mmec-fits-number-type-p uint8 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint8 init)))
     (mmec--make-obj uint8 (mmec-c-make-integer-uint8-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1634,7 +1680,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds an  object of type `mmec-sint16',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj sint16 obj)
+    (unless (mmec-fits-number-type-p sint16 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint16 init)))
     (mmec--make-obj sint16 (mmec-c-make-integer-sint16-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1649,7 +1695,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sint16',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj sint16 obj)
+    (unless (mmec-fits-number-type-p sint16 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint16 init)))
     (mmec--make-obj sint16 (mmec-c-make-integer-sint16-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1664,7 +1710,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sint16',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj sint16 obj)
+    (unless (mmec-fits-number-type-p sint16 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint16 init)))
     (mmec--make-obj sint16 (mmec-c-make-integer-sint16-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1705,7 +1751,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds an  object of type `mmec-uint16',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj uint16 obj)
+    (unless (mmec-fits-number-type-p uint16 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint16 init)))
     (mmec--make-obj uint16 (mmec-c-make-integer-uint16-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1720,7 +1766,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uint16',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj uint16 obj)
+    (unless (mmec-fits-number-type-p uint16 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint16 init)))
     (mmec--make-obj uint16 (mmec-c-make-integer-uint16-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1735,7 +1781,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uint16',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj uint16 obj)
+    (unless (mmec-fits-number-type-p uint16 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint16 init)))
     (mmec--make-obj uint16 (mmec-c-make-integer-uint16-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1776,7 +1822,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds an  object of type `mmec-sint32',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj sint32 obj)
+    (unless (mmec-fits-number-type-p sint32 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint32 init)))
     (mmec--make-obj sint32 (mmec-c-make-usrptr-sint32-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1791,7 +1837,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sint32',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj sint32 obj)
+    (unless (mmec-fits-number-type-p sint32 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint32 init)))
     (mmec--make-obj sint32 (mmec-c-make-usrptr-sint32-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1806,7 +1852,7 @@ object of type `mmec-sint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-sint32',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-sint64 init)))
-    (unless (mmec--fits-obj sint32 obj)
+    (unless (mmec-fits-number-type-p sint32 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-sint32 init)))
     (mmec--make-obj sint32 (mmec-c-make-usrptr-sint32-from-usrptr-sint64 (mmec--extract-obj sint64 obj)))))
 
@@ -1847,7 +1893,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds an  object of type `mmec-uint32',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj uint32 obj)
+    (unless (mmec-fits-number-type-p uint32 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint32 init)))
     (mmec--make-obj uint32 (mmec-c-make-usrptr-uint32-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1862,7 +1908,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uint32',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj uint32 obj)
+    (unless (mmec-fits-number-type-p uint32 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint32 init)))
     (mmec--make-obj uint32 (mmec-c-make-usrptr-uint32-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -1877,7 +1923,7 @@ object of type `mmec-uint64', then it  checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-uint32',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-uint64 init)))
-    (unless (mmec--fits-obj uint32 obj)
+    (unless (mmec-fits-number-type-p uint32 obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-uint32 init)))
     (mmec--make-obj uint32 (mmec-c-make-usrptr-uint32-from-usrptr-uint64 (mmec--extract-obj uint64 obj)))))
 
@@ -2099,7 +2145,7 @@ object of type `mmec-ldouble', then it checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-float',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-ldouble init)))
-    (unless (mmec--fits-obj float obj)
+    (unless (mmec-fits-number-type-p float obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-float init)))
     (mmec--make-obj float (mmec-c-make-usrptr-float-from-usrptr-ldouble (mmec--extract-obj ldouble obj)))))
 
@@ -2114,7 +2160,7 @@ object of type `mmec-ldouble', then it checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-float',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-ldouble init)))
-    (unless (mmec--fits-obj float obj)
+    (unless (mmec-fits-number-type-p float obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-float init)))
     (mmec--make-obj float (mmec-c-make-usrptr-float-from-usrptr-ldouble (mmec--extract-obj ldouble obj)))))
 
@@ -2129,7 +2175,7 @@ object of type `mmec-ldouble', then it checks if the range is valid:
 if it  is: it builds  an object  of type `mmec-float',  otherwise it
 raises the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-ldouble init)))
-    (unless (mmec--fits-obj float obj)
+    (unless (mmec-fits-number-type-p float obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-float init)))
     (mmec--make-obj float (mmec-c-make-usrptr-float-from-usrptr-ldouble (mmec--extract-obj ldouble obj)))))
 
@@ -2170,7 +2216,7 @@ object of type `mmec-ldouble', then it checks if the range is valid:
 if it  is: it builds an  object of type `mmec-double',  otherwise is
 raised the error condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-ldouble init)))
-    (unless (mmec--fits-obj double obj)
+    (unless (mmec-fits-number-type-p double obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-double init)))
     (mmec--make-obj double (mmec-c-make-elisp-float-from-usrptr-ldouble (mmec--extract-obj ldouble obj)))))
 
@@ -2185,7 +2231,7 @@ type `mmec-ldouble', then it  checks if the range is valid:  if it is: it
 builds an  object of type  `mmec-double', otherwise it raises  the error
 condition `mmec-error-value-out-of-range'."
   (let ((obj (mmec-ldouble init)))
-    (unless (mmec--fits-obj double obj)
+    (unless (mmec-fits-number-type-p double obj)
       (signal 'mmec-error-value-out-of-range (list 'mmec-double init)))
     (mmec--make-obj double (mmec-c-make-elisp-float-from-usrptr-ldouble (mmec--extract-obj ldouble obj)))))
 

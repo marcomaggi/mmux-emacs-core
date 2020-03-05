@@ -4099,6 +4099,30 @@ destructor only on user--pointer objects that are @strong{not} embedded into an 
 @end deftypefun
 
 
+@deftypefun {mmec_intrep_bytevector_t *} mmec_copy_intrep_bytevector (emacs_env * @var{env}, mmec_intrep_bytevector_t const * @var{bv_original})
+Allocate, initialise and return a new bytevector user--pointer object.  The returned bytevector is a
+copy of @var{bv_original}.
+
+Upon entering: this function clears any error condition in the environment @var{env}.  If an error
+occurs: this function signals an error and returns @cnull{}; we can test this condition with
+@cfunc{mmec_funcall_returned_with_success} and similar functions.
+
+We can use this function as follows:
+
+@example
+mmec_intrep_bytevector_t * bv_original = ...;
+mmec_intrep_bytevector_t * bv_copy;
+
+bv_copy = mmec_copy_intrep_bytevector(env, bv_original);
+if (mmec_funcall_returned_with_success(env)) @{
+  /* do something with BV_COPY */
+@} else @{
+  return mmec_new_emacs_value_nil(env);
+@}
+@end example
+@end deftypefun
+
+
 @macro ClangDefineBytevectorConstructor{TYPESTEM}
 @deftypefun mmec_intrep_bytevector_t * mmec_new_\TYPESTEM\_intrep_bytevector (emacs_env * @var{env}, intmax_t @var{number_of_slots})
 Allocate, initialise and return a new bytevector user--pointer object whose binary data area holds

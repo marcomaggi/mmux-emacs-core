@@ -191,6 +191,8 @@ mmec_copy_intrep_bytevector (emacs_env * env, mmec_intrep_bytevector_t const * c
 {
   mmec_intrep_bytevector_t *	bv_copy;
 
+  mmec_clear_environment_error(env);
+
   bv_copy = mmec_new_intrep_bytevector(env, bv_original->number_of_slots, bv_original->slot_size, bv_original->hold_signed_values);
   if (mmec_funcall_returned_with_success(env)) {
     uint8_t	*src = (uint8_t *)(bv_original->ptr);
